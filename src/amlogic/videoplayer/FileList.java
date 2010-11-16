@@ -1,0 +1,385 @@
+package amlogic.videoplayer;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
+import amlogic.videoplayer.R;
+import android.app.AlertDialog;
+import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
+import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+public class FileList extends ListActivity {
+	private List<File> listFiles =null;
+	private List<File> listVideos =null;
+	private List<String> items=null;
+	private List<String> paths=null;
+	private List<String> currentlist=null;
+	private String currenturl = null;
+	private String root_path = "/mnt";
+	private String extensions = "3gp,avi,mp4,mov,mpeg,mpg,rm,rmvb,vob,mkv";
+    
+	private View myView;
+	private TextView tileText;
+	private File file;
+	private String listtype = null;
+	
+	@Override
+	protected void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+	    setContentView(R.layout.main);
+	    
+        mDialog = new ProgressDialog(this);
+        mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mDialog.setMessage("Installing system files...");
+        mDialog.setCancelable(true);
+        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        mHandler = new Handler();
+        checkInstallFirmware.start();
+        
+         if(PlayList.getinstance().rootPath==null)
+	    	PlayList.getinstance().rootPath =root_path;
+	    	
+	    BrowserFile(PlayList.getinstance().rootPath);
+	    
+	    Button home = (Button) findViewById(R.id.Button_home);
+	    home.setOnClickListener(new View.OnClickListener() 
+	    {
+
+            public void onClick(View v) 
+            {
+            	FileList.this.finish();
+            	PlayList.getinstance().rootPath =null;
+            } 
+       
+	    });
+	    Button exit = (Button) findViewById(R.id.Button_exit);
+	    exit.setOnClickListener(new View.OnClickListener() 
+	    {
+
+            public void onClick(View v) 
+            {
+            	
+                if(paths == null) 
+                {
+                	FileList.this.finish();
+                	PlayList.getinstance().rootPath =null;
+                }
+                else
+                {
+                	if(paths.isEmpty())
+                	{
+                		FileList.this.finish();
+                		PlayList.getinstance().rootPath =null;
+                	}
+                	file = new File(paths.get(0).toString());
+                	currenturl =file.getParentFile().getParent();
+                	if(file.getParent().compareToIgnoreCase(root_path)!=0)
+                		BrowserFile(currenturl);
+                	else
+                	{
+                			FileList.this.finish();
+                			PlayList.getinstance().rootPath =null;
+                		
+                	}
+                }
+                
+            } 
+       
+	    });
+        
+	}
+	
+	private void BrowserFile(String filePath) {
+		int i = 0;
+		file = new File(filePath);
+		listFiles = new ArrayList<File>();
+	    items=new ArrayList<String>();
+	    paths=new ArrayList<String>();
+	    searchFile(file);
+	    if(listFiles.isEmpty()) {
+	    	Toast.makeText(FileList.this, "No files!", Toast.LENGTH_SHORT).show();
+	    	paths =currentlist;
+	    	return;
+	    }
+	    PlayList.getinstance().rootPath =filePath;
+	    
+	    File [] fs = new File[listFiles.size()];
+	    for(i=0;i<listFiles.size();i++) {
+	    	fs[i] = listFiles.get(i);
+	    }
+	    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));   
+	    
+	    for(i=0;i<fs.length;i++) {
+	    	File tempF = fs[i];
+	    	items.add(tempF.getName());
+	    	paths.add(tempF.getPath());
+	    }
+	    tileText =(TextView) findViewById(R.id.TextView_path);
+	    tileText.setText(filePath);
+	    setListAdapter(new MyAdapter(this,items,paths));
+	}
+
+	public void searchFile(File file)
+	{
+	    File[] the_Files;
+	    the_Files = file.listFiles(new MyFilter(extensions));
+	
+	    if(the_Files == null)
+	    {
+		  Toast.makeText(FileList.this, "No files!", Toast.LENGTH_SHORT).show();
+		  return;
+		 }
+
+	    for(int i=0;i<the_Files.length;i++) 
+	    {
+	    	File tempF = the_Files[i];
+	    	
+	    	
+	    	if (tempF.isDirectory())
+	    	{
+	    		if(!tempF.isHidden())
+	    		{
+	    		    listFiles.add(tempF);
+	    		    System.out.println("----------------this hidden a directory------------------");
+	    		}
+	    		System.out.println("----------------this is a directory------------------");
+	    			    	
+
+	    	} 
+	    	else
+	    	{
+	    		try 
+	    		{
+	    			listFiles.add(tempF);
+	    		} 
+	    		catch (Exception e) {
+	    			return;
+	    		}
+	    	}
+	    }
+	}
+
+	@Override
+	protected void onListItemClick(ListView l,View v,int position,long id) {
+		File file = new File(paths.get(position));
+	    currentlist =paths;
+	    if(file.isDirectory()) 
+	    {
+	    	BrowserFile(paths.get(position));
+	    	
+	    	//return;
+	    }
+	    else 
+	    {
+	    	file = new File(file.getParent());
+	    	filterDir(file);
+	    	PlayList.getinstance().rootPath= file.getPath();
+	    	int dircount =listFiles.size()-listVideos.size();
+	    	
+	    	if(dircount>=0&&(position-dircount)>=0)
+			 PlayList.getinstance().setlist(paths, position-dircount);
+			else
+			 PlayList.getinstance().setlist(paths, position);
+			 
+	    	showvideobar();
+	    	
+	    }
+	}
+
+	private void showvideobar() {
+		//* new an Intent object and ponit a class to start
+		Intent intent = new Intent();
+		intent.setClass(FileList.this, playermenu.class);
+		//* start an new Activity 
+		startActivity(intent);
+		//* close old Activity */
+		FileList.this.finish();
+		
+	}
+	
+	public void filterDir(File file)
+	{
+	    File[] the_Files;
+	    the_Files = file.listFiles(new MyFilter(extensions));
+	
+	    if(the_Files == null)
+	    	return;
+	    
+	    listVideos = new ArrayList<File>();
+	    for(int i=0;i<the_Files.length;i++) 
+	    {
+	    	File tempF = the_Files[i];
+	    	
+	    	if (tempF.isFile())
+	    	{
+	    		listVideos.add(tempF);
+	    	} 
+	    }
+	    
+	    paths=new ArrayList<String>();
+    	File [] fs = new File[listVideos.size()];
+	    for(int i=0;i<listVideos.size();i++) {
+	    	fs[i] = listVideos.get(i);
+	    }
+	    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));   
+	    
+	    for(int i=0;i<fs.length;i++) {
+	    	File tempF = fs[i];
+	    	paths.add(tempF.getPath());
+	    }
+	}
+	
+    private static final String TAG = "Amplayer";
+    private ProgressDialog mDialog;
+    private Handler mHandler;
+    /**
+     * Copy all files in assets/firmware to /system/etc/firmware.
+     *
+     * 1.  Place all firmware .bin in assets/firmware/
+     * 2.  Build APK.  Android.mk has a line to call "md5sum *.bin > checksum.txt"
+     *      This generated checksum.txt will be put into assets/firmware.
+     * 3.  On app startup, if /system/etc/firmware/checksum.txt does not match
+     *      the one generated in Step 2, then all files in assets/firmware/ will
+     *      be copied to /system/etc/firmware/.
+     */
+    Thread checkInstallFirmware = new Thread(new Runnable() {
+        static final String FIRMWARE_DEST = "/system/etc/firmware";
+        private boolean shouldInstall(AssetManager assetManager) {
+            // Install if checksum.txt files are different
+            try {
+                BufferedInputStream src = new BufferedInputStream(assetManager.open("firmware/checksum.txt"), (8*1024));
+                File destck = new File(FIRMWARE_DEST + "/checksum.txt");
+                if (!destck.exists())
+                    return true;
+                BufferedInputStream dest = new BufferedInputStream(new FileInputStream(destck), (8*1024));
+                int len;
+                byte[] bufd = new byte[1024];
+                byte[] bufs = new byte[1024];
+                while((len = dest.read(bufd, 0, 1024)) >= 0) {
+                    if (src.read(bufs, 0, len) != len ||
+                        !Arrays.equals(bufd, bufs)) {
+                        return true;
+                    }
+                }
+                if (src.read(bufs, 0, 1024) > 0) {
+                    return true;
+                }
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        private boolean copyOneFile(AssetManager assetManager, String src, final int progress, final int total) {
+            File targetFile = new File(FIRMWARE_DEST, src);
+            try {
+                if (targetFile.exists())
+                    targetFile.delete();
+                targetFile.createNewFile();
+            } catch (IOException e) {
+                Log.e(TAG, "Error! Could not delete/create file " + targetFile.toString());
+                Log.e(TAG, e.getMessage());
+            }
+            mHandler.post(new Runnable() {
+                public void run() {
+                    mDialog.show();
+                    mDialog.setMessage("Installing system files... " + (progress) + "/" + total);
+                }
+            });
+            try {
+                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile), (32 * 1024));
+                BufferedInputStream in = new BufferedInputStream(assetManager.open("firmware/" + src,
+                                                                                   AssetManager.ACCESS_STREAMING), (32 * 1024));
+                int len;
+                byte[] buf = new byte[1024];
+                while((len = in.read(buf)) != -1) {
+                    out.write(buf, 0, len);
+                }
+
+                Log.d(TAG, "Wrote file " + targetFile.toString());
+                in.close();
+                out.close();
+                return true;
+            } catch (Exception ex) {
+                Log.e(TAG, "Error! Install failed.");
+                Log.e(TAG, ex.getMessage());
+            }
+            return false;
+        }
+
+        public void run() {
+            AssetManager assetManager = getAssets();
+            String[] files = null;
+            try {
+                files = assetManager.list("firmware");
+
+                File destdir = new File(FIRMWARE_DEST);
+                if (!destdir.exists())
+                    if (!destdir.mkdir())
+                        Log.e(TAG, "Could not create directory " + FIRMWARE_DEST);
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+            if (shouldInstall(assetManager)) {
+                final long copystart = System.nanoTime();
+                final int filecount = files.length;
+                int progress = 1;
+                boolean copyfailed = false;
+                Log.d(TAG, "Asset file count=" + filecount);
+                for (int i=0; i<filecount; i++) {
+                    if (files[i].equals("checksum.txt"))
+                        continue;
+                    if (!copyOneFile(assetManager, files[i], progress, filecount))
+                        copyfailed = true;
+                    progress++;
+                }
+                if (!copyfailed)
+                    copyOneFile(assetManager, "checksum.txt", progress, filecount);
+                Log.d(TAG, "Firmware copied in " + ((System.nanoTime() - copystart)/1000/1000) + " ms");
+                mHandler.post(new Runnable() {
+                    public void run() {
+                        mDialog.dismiss();
+                    }
+                });
+            }
+            else
+                Log.d(TAG, "Firmware install not needed");
+        }
+    });
+	
+}

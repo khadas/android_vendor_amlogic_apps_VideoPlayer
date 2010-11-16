@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/app_gadmei_mbx/!svn/ver/1537/android_base/VideoPlayer_AmPlayer/jni
+END
+Android.mk
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/app_gadmei_mbx/!svn/ver/1536/android_base/VideoPlayer_AmPlayer/jni/Android.mk
+END
+Application.mk
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/app_gadmei_mbx/!svn/ver/1480/android_base/VideoPlayer_AmPlayer/jni/Application.mk
+END
+amplayerjni.c
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/app_gadmei_mbx/!svn/ver/1536/android_base/VideoPlayer_AmPlayer/jni/amplayerjni.c
+END

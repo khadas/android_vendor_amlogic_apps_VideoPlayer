@@ -1,0 +1,5 @@
+for videoplayer base on the libraries defined in AmPlayer,
+so don't use 'mm' command to build the apk.
+1, . build/envsetup.sh
+2, lunch 3
+3, make VideoPlayer

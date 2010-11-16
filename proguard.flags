@@ -1,0 +1,3 @@
+-keep class amlogic.playerservice.AmPlayer {
+  public void onUpdateState(int, int, int, int, int, int);
+}

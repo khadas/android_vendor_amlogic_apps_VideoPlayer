@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware
+END
+audiodsp_codec_aac.bin
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_aac.bin
+END
+audiodsp_codec_adpcm.bin
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_adpcm.bin
+END
+audiodsp_codec_wma.bin
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_wma.bin
+END
+checksum.txt
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/checksum.txt
+END
+audiodsp_codec_flac.bin
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_flac.bin
+END
+audiodsp_codec_ac3.bin
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_ac3.bin
+END
+audiodsp_codec_raac.bin
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_raac.bin
+END
+audiodsp_codec_dca.bin
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_dca.bin
+END
+audiodsp_codec_cook.bin
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_cook.bin
+END
+audiodsp_codec_amr.bin
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_amr.bin
+END
+audiodsp_codec_mp3.bin
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_mp3.bin
+END
+audiodsp_codec_mad.bin
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/app_gadmei_mbx/!svn/ver/1535/android_base/VideoPlayer_AmPlayer/assets/firmware/audiodsp_codec_mad.bin
+END
