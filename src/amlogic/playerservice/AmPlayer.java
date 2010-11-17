@@ -96,11 +96,13 @@ public class AmPlayer extends Service {
 			return 0;
 		}
 
-		public int FastForward() throws RemoteException {
+		public int FastForward(int speed) throws RemoteException {
+			native_sendcmd("forward:"+String.valueOf(speed));
 			return 0;
 		}
 
-		public int BackForward() throws RemoteException {
+		public int BackForward(int speed) throws RemoteException {
+			native_sendcmd("backward:"+String.valueOf(speed));
 			return 0;
 		}
 
@@ -114,7 +116,7 @@ public class AmPlayer extends Service {
 		}
 
 		public int Seek(int time) throws RemoteException {
-			
+			native_sendcmd("search:"+String.valueOf(time));
 			return 0;
 		}
 

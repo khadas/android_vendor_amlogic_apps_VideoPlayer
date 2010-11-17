@@ -21,12 +21,4 @@
   <string name="str_delete_title">你确定要删除文件吗？</string>
   <string name="str_rename_notice">文件名已经存在，是否要覆盖？</string>
   <string name="str_time_null">00:00:00</string>
-  <string name="mode_str_panel">PANEL</string>
-    <string name="mode_str_480i">HDMI 480i</string>
-    <string name="mode_str_480p">HDMI 480p</string>
-    <string name="mode_str_576i">HDMI 576i</string>
-    <string name="mode_str_576p">HDMI 576p</string>
-    <string name="mode_str_720p">HDMI 720p</string>
-    <string name="mode_str_1080i">HDMI 1080i</string>
-    <string name="mode_str_1080p">HDMI 1080p</string>
 </resources>

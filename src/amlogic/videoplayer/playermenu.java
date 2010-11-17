@@ -1,7 +1,12 @@
 package amlogic.videoplayer;
 
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.subtitleparser.Subtitle;
+import com.subtitleview.SubtitleView;
+
 import amlogic.playerservice.Player;
 import amlogic.playerservice.VideoInfo;
 import android.app.Activity;
@@ -26,6 +31,7 @@ public class playermenu extends Activity {
 	private String TAG = "playermenu";
     /** Called when the activity is first created. */
 	private int totaltime = 0;
+	private int curtime = 0;
 	private static final int TV_PANEL = 1;
     private static final int PLAY_MODE = 2;
     private static final int AUDIO_TRACE = 3;
@@ -44,8 +50,13 @@ public class playermenu extends Activity {
 	private LinearLayout infobar = null;
 	private LinearLayout morbar = null;
 	Timer timer = new Timer();
+	public Handler myHandler;
+	private final int msg_Key = 0x1234;
 	private static int PRE_NEXT_FLAG = 0;
+	private Thread threadPlay;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
+	
+	private SubtitleView subTitleView = null;
 	
     protected Dialog onCreateDialog(int id) {
     	 switch (id) {
@@ -244,11 +255,59 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.infobar);
+        
         initinfobar();
         
+        ThreadInit();
     }
+    
+    protected void ThreadInit()
+    {
+    	myHandler = new Handler(){
+    		@Override
+    		public void handleMessage(Message msg) {
+    			// TODO Auto-generated method stub
+    			super.handleMessage(msg);
+    			switch(msg.what){
+    			case msg_Key:
+    				if (PRE_NEXT_FLAG == 1)
+    				{
+    					Amplayer_play();
+    					PRE_NEXT_FLAG = 0;
+    				}
+    				break;
+    			default:
+    				break;
+    			}
+    		}
+        };
+    	threadPlay = new Thread(new Runnable(){
+        	public void run()
+            {
+            	try
+            	{
+            		do{
+            			Thread.sleep(800);
+            			Message msg = new Message();
+            			msg.what = msg_Key;
+            			myHandler.sendMessage(msg);
+            		}while(Thread.interrupted() == false);
+            	}
+            	catch (InterruptedException e)
+            	{
+            		e.printStackTrace();
+            	}
+            }
+        });
+    }
+    
     protected void initinfobar()
     {
+    	//set subtitle
+    	   subTitleView = (SubtitleView) findViewById(R.id.subTitle);
+           String filepath = "/mnt/sdcard/aaaa.ass";
+           openFile(filepath);
+           
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
         ImageButton more = (ImageButton)findViewById(R.id.moreBtn);
         ImageButton preItem = (ImageButton)findViewById(R.id.PreBtn);
@@ -291,6 +350,7 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
+				threadPlay.start();
 			}
         });
         
@@ -298,13 +358,14 @@ public class playermenu extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				String filename = PlayList.getinstance().movenext();
-				Toast toast = Toast.makeText(playermenu.this, filename, Toast.LENGTH_LONG);
-				toast.show();
+				Toast.makeText(playermenu.this, filename, Toast.LENGTH_LONG).show();
 				if(m_Amplayer == null)
 					return;
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
+				
+				threadPlay.start();
 			}
         });
         
@@ -321,6 +382,7 @@ public class playermenu extends Activity {
 					{
 						e.printStackTrace();
 					}
+					
 				}
 				else if (player_status == VideoInfo.PLAYER_PAUSE)
 				{
@@ -340,7 +402,7 @@ public class playermenu extends Activity {
 			public void onClick(View v) {
 				try
 				{
-					m_Amplayer.FastForward();
+					m_Amplayer.FastForward(2);
 				}
 				catch(RemoteException e)
 				{
@@ -353,7 +415,7 @@ public class playermenu extends Activity {
 			public void onClick(View v) {
 				try
 				{
-					m_Amplayer.BackForward();
+					m_Amplayer.BackForward(2);
 				}
 				catch(RemoteException e)
 				{
@@ -515,7 +577,13 @@ public class playermenu extends Activity {
     				Log.i(TAG,"get time "+secToTime(msg.arg1));
     		    	cur_time.setText(secToTime(msg.arg1));
     		    	total_time.setText(secToTime(msg.arg2));
+    		    	curtime = msg.arg1;
     		    	totaltime = msg.arg2;
+    		    	
+    		    	//for subtitle tick;
+    		    	if (player_status == VideoInfo.PLAYER_RUNNING)
+    		    		subTitleView.tick(curtime*1000);
+    		    	
     		    	if (totaltime == 0)
 						myProgressBar.setProgress(0);
 					else
@@ -526,6 +594,7 @@ public class playermenu extends Activity {
     				switch(player_status)
     				{
 					case VideoInfo.PLAYER_RUNNING:
+						
 						play.setBackgroundResource(R.drawable.pause_button);
 						break;
 					case VideoInfo.PLAYER_PAUSE:
@@ -655,5 +724,41 @@ public class playermenu extends Activity {
     	this.stopService(intent);
     	m_Amplayer = null;
     }
+    
+	private void openFile(String filepath)  {
+		
+		
+		Log.d(TAG, "open:" + filepath);
+		
+		try {
+			
+			if(subTitleView.setFile(filepath, "GBK")==Subtitle.SUBTYPE.SUB_INVALID)
+			{
+			
+				return;
+			}
+		} catch (Exception e) {
+			
+			Log.d(TAG, "open:errrrrrrrrrrrrrrr");
 
+			e.printStackTrace();
+		}
+	/*
+		SubtitleLine last = (SubtitleLine) subTitleView.getSubtitleFile().getLast();
+		
+		int allSecond = 0;
+		try {
+			
+			allSecond = last.getEnd().getMilValue() / 1000 + 1;
+		} catch (Exception e1) {
+			
+			
+			e1.printStackTrace();
+		}
+		Log.d(TAG, "---------");
+
+		String sTime = String.format("%02d:%02d:%02d", allSecond / 3600,
+				(allSecond % 3600) / 60, allSecond % 60);
+				*/
+	}
 }

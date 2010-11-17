@@ -5,7 +5,27 @@
     android:layout_height="fill_parent" 
     android:gravity="bottom" 
     android:background="@color/background">
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:id="@+id/subtitleLayout"
+	    	android:layout_height="wrap_content"
+	    	android:layout_width="fill_parent"
+	    	android:gravity="center"
+	    	android:orientation="horizontal" android:layout_gravity="bottom" android:clipChildren="false"
+	    	android:layout_alignParentBottom="true">
+	    <com.subtitleview.SubtitleView
+	    	android:id="@+id/subTitle"
+	    	android:minHeight = "60dip"
+	    	android:layout_height = "wrap_content"
+	    	android:layout_width ="fill_parent"
+	    	android:layout_gravity="center"
+	    	android:gravity="center"
+	    	android:textSize="16dip"
+	    	android:textStyle="bold"
+	    	android:paddingLeft = "7dip"
+	    	android:textColor = "#ffffff"
+	    	android:paddingBottom = "2dip">
+	    </com.subtitleview.SubtitleView>
+	</LinearLayout>
 	<LinearLayout android:layout_width="wrap_content"
 	 android:background="@drawable/movie_play_bk"
 	 android:orientation="vertical" 

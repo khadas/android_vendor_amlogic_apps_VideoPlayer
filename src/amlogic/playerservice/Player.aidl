@@ -15,8 +15,8 @@ interface Player
 	void DisableColorKey();
 
 	int Seek(int time);
-	int FastForward();
-	int BackForward();
+	int FastForward(int speed);
+	int BackForward(int speed);
 	
 	int	RegisterClientMessager(IBinder hbinder);
 }
