@@ -401,29 +401,23 @@ static int player_main(int argc, char *argv[])
 static void
 startcmd(JNIEnv *env, jobject obj, jstring filename) 
 {	
-	const char *fn = (*env)->GetStringUTFChars(env, filename, NULL);
-
-
+    const char *fn = (*env)->GetStringUTFChars(env, filename, NULL);
     char argv0[] = "amplayer";
     char noaudio[] = "-n";
     char background[] = "-b";
     char mode[] = "-m";
     char bc[] = "bc";
-    char argvfn[100];
-
-    strncpy(argvfn, fn, sizeof(argvfn));
-    argvfn[sizeof(argvfn) - 1] = '\0';
-    char *argv[] = {argv0, background, mode, bc, argvfn};
+    char *argv[] = {argv0, background, mode, bc, fn};
     //char *argv[] = {argv0, noaudio, background, mode, bc, argvfn};
 
-	LOGI("amplayer-JNI startcmd1(%s) enter", fn);
+    LOGI("amplayer-JNI startcmd1(%s) enter", fn);
 
     optind = 1;
-	player_main( sizeof(argv) / sizeof(argv[0]), argv);
+    player_main( sizeof(argv) / sizeof(argv[0]), argv);
 
-	LOGI("amplayer-JNI startcmd(%s) exit", fn);
+    LOGI("amplayer-JNI startcmd(%s) exit", fn);
 
-	(*env)->ReleaseStringUTFChars(env, filename, fn);
+    (*env)->ReleaseStringUTFChars(env, filename, fn);
 }
 
 static jint
