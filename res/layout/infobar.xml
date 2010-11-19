@@ -19,10 +19,8 @@
 	    	android:layout_width ="fill_parent"
 	    	android:layout_gravity="center"
 	    	android:gravity="center"
-	    	android:textSize="16dip"
 	    	android:textStyle="bold"
 	    	android:paddingLeft = "7dip"
-	    	android:textColor = "#ffffff"
 	    	android:paddingBottom = "2dip">
 	    </com.subtitleview.SubtitleView>
 	</LinearLayout>

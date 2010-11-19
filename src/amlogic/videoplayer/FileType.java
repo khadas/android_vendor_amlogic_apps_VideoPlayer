@@ -19,7 +19,7 @@ public class FileType {
 		else if(end.equals("3gp")||end.equals("mp4")||end.equals("avi")||
 				end.equals("mov")||end.equals("mpeg")||end.equals("mpg")||
 				end.equals("rm")||end.equals("rmvb")||end.equals("vob")
-				||end.equals("mkv")) {
+				||end.equals("mkv")||end.equals("ts")) {
 			type = "video";
 		}
 		else if(end.equals("jpg")||end.equals("gif")||end.equals("png")||end.equals("jpeg")

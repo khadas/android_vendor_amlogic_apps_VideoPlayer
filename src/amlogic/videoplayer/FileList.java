@@ -43,8 +43,24 @@ public class FileList extends ListActivity {
 	private List<String> currentlist=null;
 	private String currenturl = null;
 	private String root_path = "/mnt";
-	private String extensions = "3gp,avi,mp4,mov,mpeg,mpg,rm,rmvb,vob,mkv";
-    
+	private String extensions = "3gp," +
+								"asf," +
+								"avi," +
+								"dat," +
+								"f4v," +
+								"flv," +
+								"m2ts," +
+								"m4v," +
+								"mkv," +
+								"mp4," +
+								"mov," +
+								"mpe,mpeg,mpg" +
+								"mts," +
+								"rm,rmvb," +
+								"ts," +
+								"tp," +
+								"vob," +
+								"wm,wmv";
 	private View myView;
 	private TextView tileText;
 	private File file;

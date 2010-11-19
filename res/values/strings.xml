@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="sub_cancel">cancel</string>
+    <string name="sub_ok">ok</string>
+    <string name="sub_font">font:</string>
+    <string name="sub_color">color:</string>
+    <string name="sub_switch">switch:</string>
     <string name="str_exit">exit</string>
     <string name="str_vtvorpanel">output setting</string>
 	<string name="str_vplaymode">play mode</string>

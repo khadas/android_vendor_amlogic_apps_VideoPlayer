@@ -6,15 +6,83 @@
     android:gravity="bottom" 
     android:theme="@android:style/Theme.Translucent"  
     android:background="@color/background"> 
-    <LinearLayout
-    android:orientation="horizontal" android:id="@+id/morebarLayout" android:layout_width="800dp" android:layout_height="70dp" android:layout_gravity="bottom|center_horizontal" android:background="@color/background">
-
-<ImageButton android:id="@+id/ImageButton07" android:layout_height="70dp" android:layout_width="110dp" android:layout_marginLeft="15dp" android:src="@drawable/barback"></ImageButton><ImageButton android:id="@+id/ImageButton01" android:layout_height="70dp" android:layout_width="110dp" android:src="@drawable/tvorpanel"></ImageButton>
-<ImageButton android:id="@+id/ImageButton02" android:layout_height="70dp" android:layout_width="110dp" android:src="@drawable/playmode"></ImageButton>
-<ImageButton android:id="@+id/ImageButton03" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/audio_trace"></ImageButton>
-<ImageButton android:id="@+id/ImageButton04" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/subtitle"></ImageButton>
-<ImageButton android:id="@+id/ImageButton05" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/display"></ImageButton>
-<ImageButton android:id="@+id/ImageButton06" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/brightness"></ImageButton>
     
+    <LinearLayout android:layout_width="wrap_content" 
+ android:layout_height="wrap_content" android:id="@+id/LinearLayout_sub" android:orientation="vertical" android:layout_gravity="center">
+	<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/sub_switch" android:layout_gravity="center_horizontal" android:background="@drawable/fondsetup_unfocus_bar">
+		<TextView android:id="@+id/TextView01" android:gravity="left|center" 
+	 	android:layout_width="100dp" android:layout_height="40dp" 
+	 	android:textSize="24px" android:text="@string/sub_switch">
+	 	</TextView>
+		<ImageButton android:id="@+id/switch_l" 
+		android:layout_width="42dp" android:layout_height="40dp" android:src="@drawable/sub_larrow">
+	 	</ImageButton>
+     	<TextView android:layout_width="150dp" android:gravity="center" android:layout_height="40dp" 
+     	android:id="@+id/sub_swith111" android:textSize="24px">
+    	</TextView>
+     	<ImageButton android:id="@+id/switch_r" 
+     	 android:layout_width="42dp" android:layout_height="40dp" android:src="@drawable/sub_rarrow">
+     	 </ImageButton>
+	</LinearLayout>
+    
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/sub_font" android:layout_gravity="center_horizontal" android:background="@drawable/fondsetup_unfocus_bar">
+		<TextView android:id="@+id/TextView01"
+	 	android:layout_width="100dp" android:layout_height="40dp" android:gravity="left|center" 
+	 	android:textSize="24px" android:text="@string/sub_font">
+	 	</TextView>
+		<ImageButton android:id="@+id/font_l" 
+		android:layout_width="42dp" android:layout_height="40dp" android:src="@drawable/sub_larrow">
+	 	</ImageButton>
+     	<TextView android:layout_width="150dp" android:layout_height="40dp" android:gravity="center"
+     	android:textSize="24px" android:id="@+id/sub_font111">
+    	</TextView>
+     	<ImageButton android:id="@+id/font_r" 
+     	 android:layout_width="42dp" android:layout_height="40dp" android:src="@drawable/sub_rarrow">
+     	 </ImageButton>
+	</LinearLayout>
+	
+	<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/sub_color" android:layout_gravity="center_horizontal" android:background="@drawable/fondsetup_unfocus_bar">
+		<TextView android:id="@+id/TextView01"
+	 	android:layout_width="100dp" android:layout_height="40dp" android:gravity="left|center" 
+	 	android:textSize="24px" android:text="@string/sub_color">
+	 	</TextView>
+		<ImageButton android:id="@+id/color_l" 
+		android:layout_width="42dp" android:layout_height="40dp" android:src="@drawable/sub_larrow">
+	 	</ImageButton>
+     	<TextView android:layout_width="150dp" android:layout_height="40dp" android:gravity="center" 
+     	android:textSize="24px" android:id="@+id/sub_color111">
+    	</TextView>
+     	<ImageButton android:id="@+id/color_r" 
+     	 android:layout_width="42dp" android:layout_height="40dp" android:src="@drawable/sub_rarrow">
+     	 </ImageButton>
+	
+	</LinearLayout>
+	
+<LinearLayout android:layout_width="wrap_content" 
+     android:layout_height="wrap_content" 
+     android:id="@+id/sub_ok_on" android:background="@drawable/fondsetup_unfocus_bar">
+     <Button android:id="@+id/button_ok" 
+     android:text="@string/sub_ok" 
+     android:layout_height="50dp"
+     android:layout_width="167dp">
+      </Button>
+	<Button android:id="@+id/button_canncel" 
+	  android:text="@string/sub_cancel"
+	  android:layout_height="50dp"
+	  android:layout_width="167dp">
+	  </Button>
 </LinearLayout>
+</LinearLayout>
+    
+    <LinearLayout
+	    android:orientation="horizontal" android:id="@+id/morebarLayout" android:layout_width="800dp" android:layout_height="70dp" android:layout_gravity="bottom|center_horizontal" android:background="@color/background">
+	
+		<ImageButton android:id="@+id/ImageButton07" android:layout_height="70dp" android:layout_width="110dp" android:layout_marginLeft="15dp" android:src="@drawable/barback"></ImageButton><ImageButton android:id="@+id/ImageButton01" android:layout_height="70dp" android:layout_width="110dp" android:src="@drawable/tvorpanel"></ImageButton>
+		<ImageButton android:id="@+id/ImageButton02" android:layout_height="70dp" android:layout_width="110dp" android:src="@drawable/playmode"></ImageButton>
+		<ImageButton android:id="@+id/ImageButton03" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/audio_trace"></ImageButton>
+		<ImageButton android:id="@+id/ImageButton04" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/subtitle"></ImageButton>
+		<ImageButton android:id="@+id/ImageButton05" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/display"></ImageButton>
+		<ImageButton android:id="@+id/ImageButton06" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/brightness"></ImageButton>
+    
+	</LinearLayout>
 </LinearLayout>
