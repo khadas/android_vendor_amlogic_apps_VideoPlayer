@@ -438,8 +438,7 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.infobar);
-        if (setCodecMips() == 0)
-        	Log.d(TAG, "setCodecMips Failed");
+        
 		Log.d(TAG, "open:-------------428------------------");	
         subinit();
         initinfobar();
@@ -683,6 +682,8 @@ public class playermenu extends Activity {
 	
     public static int setCodecMips()
 	{
+    	int tmp;
+    	String buf = null;
 		File file = new File(InputFile);
 		if (!file.exists()) {        	
         	return 0;
@@ -699,8 +700,8 @@ public class playermenu extends Activity {
 			{
 				codec_mips = in.readLine();
 				Log.d(TAG, "file content:"+codec_mips);
-				int tmp = Integer.parseInt(codec_mips)*2;
-				codec_mips = Integer.toString(tmp);
+				tmp = Integer.parseInt(codec_mips)*2;
+				buf = Integer.toString(tmp);
 			} finally {
     			in.close();
     		} 
@@ -712,6 +713,31 @@ public class playermenu extends Activity {
 		
 		//write
 		try
+		{
+			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
+    		try
+    		{
+    			out.write(buf);    
+    			Log.d(TAG, "set codec mips ok:"+buf);
+    		} finally {
+				out.close();
+			}
+			 return 1;
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when write "+OutputFile);
+			return 0;
+		}
+	}
+    
+    public static int setDefCodecMips()
+    {
+    	File file = new File(OutputFile);
+		if (!file.exists()) {        	
+        	return 0;
+        }
+    	try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
     		try
@@ -728,7 +754,7 @@ public class playermenu extends Activity {
 			Log.e(TAG, "IOException when write "+OutputFile);
 			return 0;
 		}
-	}
+    }
     
     protected void closeScreenOffTimeout()
     {
@@ -840,6 +866,7 @@ public class playermenu extends Activity {
         
         Amplayer_stop();
         StopPlayerService();
+        setDefCodecMips();
         openScreenOffTimeout();
     }
 
@@ -908,6 +935,8 @@ public class playermenu extends Activity {
     public Player m_Amplayer = null;
     private void Amplayer_play()
     {
+    	if (setCodecMips() == 0)
+        	Log.d(TAG, "setCodecMips Failed");
     	try
 		{
 			m_Amplayer.Open(PlayList.getinstance().getcur());
