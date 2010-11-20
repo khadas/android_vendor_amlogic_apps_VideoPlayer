@@ -1,6 +1,11 @@
 package amlogic.videoplayer;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,7 +34,11 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.*;
 
 public class playermenu extends Activity {
-	private String TAG = "playermenu";
+	private static String TAG = "playermenu";
+	private static String codec_mips;
+	private static String InputFile = "/sys/class/audiodsp/codec_mips";
+	private static String OutputFile = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq";
+	
     /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
@@ -425,8 +434,9 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.infobar);
-        
-        Log.d(TAG, "open:-------------428------------------");
+        if (setCodecMips() == 0)
+        	Log.d(TAG, "setCodecMips Failed");
+		Log.d(TAG, "open:-------------428------------------");	
         subinit();
         initinfobar();
         
@@ -666,6 +676,53 @@ public class playermenu extends Activity {
 		StartPlayerService();
     }
 	
+    public static int setCodecMips()
+	{
+		File file = new File(InputFile);
+		if (!file.exists()) {        	
+        	return 0;
+        }
+		file = new File(OutputFile);
+		if (!file.exists()) {        	
+        	return 0;
+        }
+		//read
+		try
+		{
+			BufferedReader in = new BufferedReader(new FileReader(InputFile), 32);
+			try
+			{
+				codec_mips = in.readLine();
+				Log.d(TAG, "file content:"+codec_mips);
+			} finally {
+    			in.close();
+    		} 
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when read "+InputFile);
+		} 
+		
+		//write
+		try
+		{
+			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
+    		try
+    		{
+    			out.write(codec_mips);    
+    			Log.d(TAG, "set codec mips ok:"+codec_mips);
+    		} finally {
+				out.close();
+			}
+			 return 1;
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when write "+OutputFile);
+			return 0;
+		}
+	}
+    
     protected void waitForHide()	//infobar auto hide
     {
     	final Handler handler = new Handler(){   
