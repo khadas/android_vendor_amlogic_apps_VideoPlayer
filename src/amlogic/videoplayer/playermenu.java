@@ -694,6 +694,8 @@ public class playermenu extends Activity {
 			{
 				codec_mips = in.readLine();
 				Log.d(TAG, "file content:"+codec_mips);
+				int tmp = Integer.parseInt(codec_mips)*2;
+				codec_mips = Integer.toString(tmp);
 			} finally {
     			in.close();
     		} 
