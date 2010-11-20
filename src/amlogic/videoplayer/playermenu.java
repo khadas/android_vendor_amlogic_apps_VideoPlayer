@@ -1,16 +1,10 @@
 package amlogic.videoplayer;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.subtitleparser.Subtitle;
-import com.subtitleparser.SubtitleUtils;
 import com.subtitleview.SubtitleView;
 
 import amlogic.playerservice.Player;
@@ -28,24 +22,16 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
-import android.provider.Settings.System;
 import android.util.Log;
 import android.view.*;
 import android.view.WindowManager.LayoutParams;
 import android.widget.*;
 
 public class playermenu extends Activity {
-	private static String TAG = "playermenu";
-	private static String codec_mips;
-	private static String InputFile = "/sys/class/audiodsp/codec_mips";
-	private static String OutputFile = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq";
-	
+	private String TAG = "playermenu";
     /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
-	private int ScreenOffTimeoutValue = 0;
 	private static final int TV_PANEL = 1;
     private static final int PLAY_MODE = 2;
     private static final int AUDIO_TRACE = 3;
@@ -63,8 +49,6 @@ public class playermenu extends Activity {
 	private TextView total_time = null;
 	private LinearLayout infobar = null;
 	private LinearLayout morbar = null;
-	private LinearLayout subbar = null;
-	
 	Timer timer = new Timer();
 	public Handler myHandler;
 	private final int msg_Key = 0x1234;
@@ -72,17 +56,7 @@ public class playermenu extends Activity {
 	private Thread threadPlay;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 	
-	//for subtitle
-	private SubtitleUtils subMange = null;
-	private SubtitleView  subTitleView = null;
-	private subview_set   sub_para = null;
-	private int sub_switch_state = 0;
-	private int sub_font_state = 0;
-	private int sub_color_state = 0;
-	private TextView t_subswitch =null ;
-	private TextView t_subsfont=null ;
-	private TextView t_subscolor=null ;
-	private String color_text[]={ "white","yellow","blue"};
+	private SubtitleView subTitleView = null;
 	
     protected Dialog onCreateDialog(int id) {
     	 switch (id) {
@@ -191,9 +165,6 @@ public class playermenu extends Activity {
     private void videobar() {
     		
     		setContentView(R.layout.layout_imagebutton);
-    		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
-    		subbar.setVisibility(View.INVISIBLE);
-    		
     		morbar = (LinearLayout)findViewById(R.id.morebarLayout);
     		ImageButton panelortv = (ImageButton) findViewById(R.id.ImageButton01);
             panelortv.setOnClickListener(new View.OnClickListener() 
@@ -225,162 +196,8 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	if(sub_para.totalnum<=0)
-                	{
-                		Toast.makeText(playermenu.this, "No subtitle!", Toast.LENGTH_SHORT).show();
-                	    return;
-                	}
-                	subbar.setVisibility(View.VISIBLE);
-                	morbar.setVisibility(View.INVISIBLE);
-                	subtitle_control();
-                }
-
-				private void subtitle_control() {
-					t_subswitch =(TextView)findViewById(R.id.sub_swith111);
-  					t_subsfont =(TextView)findViewById(R.id.sub_font111);
-  					t_subscolor =(TextView)findViewById(R.id.sub_color111);
-  					
-  					sub_switch_state = sub_para.curid;
-	                sub_font_state = sub_para.font;
-	                
-	                if(sub_para.color==android.graphics.Color.WHITE)
-	                   sub_color_state =0;
-	                else if(sub_para.color==android.graphics.Color.YELLOW)
-	                   sub_color_state =1;
-	                else
-	                	sub_color_state =2;
-	                	
-	                
-	                if(sub_para.curid==sub_para.totalnum)
-							t_subswitch.setText("off");
-						 else
-							t_subswitch.setText(String.valueOf(sub_para.curid+1)+"/"+String.valueOf(sub_para.totalnum));
-  					
-  					t_subsfont.setText(String.valueOf(sub_font_state));
-  					t_subscolor.setText(color_text[sub_color_state]);
-  					
-  					Button ok = (Button) findViewById(R.id.button_ok);
-  					ok.setOnClickListener(new View.OnClickListener() 
-  		    	    {
-  		                public void onClick(View v) 
-  		                {
-  		                	sub_para.curid = sub_switch_state;
-  		                	sub_para.font = sub_font_state;
-  		                	
-  		             	  if(sub_para.curid==sub_para.totalnum )
-  		          		       sub_para.filepath =null;
-  		             	  else
-  		             		   sub_para.filepath =subMange.getSubPath(sub_para.curid);
-  		             	  
-  		             	  if(sub_color_state==0)
-  		             		    sub_para.color =android.graphics.Color.WHITE;
-  		             	  else if(sub_color_state==1) 
-  		             		  	sub_para.color =android.graphics.Color.YELLOW;
-  		             	  else
-  		             		  	sub_para.color =android.graphics.Color.BLUE;
-  		             	  
-  		                	subbar.setVisibility(View.INVISIBLE);
-  		                	morbar.setVisibility(View.VISIBLE);
-  		                } 
-  		    	    });
-  					Button cancel = (Button) findViewById(R.id.button_canncel);
-  					cancel.setOnClickListener(new View.OnClickListener() 
-  		    	    {
-  		                public void onClick(View v) 
-  		                {
-  		                	
-  		                	subbar.setVisibility(View.INVISIBLE);
-  		                	morbar.setVisibility(View.VISIBLE);
-  		                } 
-  		    	    });
-  					ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	
-  					ImageButton Bswitch_r = (ImageButton) findViewById(R.id.switch_r);
-  					ImageButton Bfont_l = (ImageButton) findViewById(R.id.font_l);	
-  					ImageButton Bfont_r = (ImageButton) findViewById(R.id.font_r);
-  					ImageButton Bcolor_l = (ImageButton) findViewById(R.id.color_l);	
-  					ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
-  					Bswitch_l.setOnClickListener(new View.OnClickListener() 
-  					{
-  						 public void onClick(View v) 
-   		                {
-  							 if(sub_switch_state <= 0)
-  								sub_switch_state =sub_para.totalnum;
-   							 else
-   								sub_switch_state --;
-   							
-  							 if(sub_switch_state==sub_para.totalnum)
-  								t_subswitch.setText("off");
-  							 else
-  								t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));
-   		                } 
-  					});
-  					Bswitch_r.setOnClickListener(new View.OnClickListener() 
-  					{
-  						 public void onClick(View v) 
-   		                {
-  							if(sub_switch_state >= sub_para.totalnum)
-  								sub_switch_state =0;
-   							 else
-   								sub_switch_state ++;
-   							
-  							 if(sub_switch_state==sub_para.totalnum)
-  								t_subswitch.setText("off");
-  							 else
-  								t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));;
-   		                } 
-  					});
-  					Bfont_l.setOnClickListener(new View.OnClickListener() 
-  					{
-  						 public void onClick(View v) 
-   		                {
-  							 if(sub_font_state > 12)
-  							    sub_font_state =sub_font_state-2;
-  							 else
-  								sub_font_state =30;
-  							 
-  							t_subsfont.setText(String.valueOf(sub_font_state));
-  							 
-   		                } 
-  					});
-  					Bfont_r.setOnClickListener(new View.OnClickListener() 
-  					{
-  						 public void onClick(View v) 
-   		                {
-  							if(sub_font_state < 30)
-  							    sub_font_state =sub_font_state +2;
-  							else
-  								sub_font_state =12;
-  							
-  							t_subsfont.setText(String.valueOf(sub_font_state));
-   		                } 
-  					});
-  					
-  					Bcolor_l.setOnClickListener(new View.OnClickListener() 
-  					{
-  						 public void onClick(View v) 
-   		                {
-  							 if(sub_color_state<= 0)
-  								sub_color_state=2;
-   							 else 
-   								sub_color_state-- ;
-   							 
-   							t_subscolor.setText(color_text[sub_color_state]);
-   		                } 
-  					});
-  					Bcolor_r.setOnClickListener(new View.OnClickListener() 
-  					{
-  						 public void onClick(View v) 
-   		                {
-  							 if(sub_color_state>=2)
-   								sub_color_state=0;
-    						  else 
-    							sub_color_state++ ;
-    							 
-  							t_subscolor.setText(color_text[sub_color_state]);
-   		                } 
-  					});
-				
-				} 
+                	showDialog(SUBTITLE_SET);
+                } 
     	    });
             ImageButton display = (ImageButton) findViewById(R.id.ImageButton05);
             display.setOnClickListener(new View.OnClickListener() 
@@ -439,10 +256,13 @@ public class playermenu extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.infobar);
         
+<<<<<<< HEAD:src/amlogic/videoplayer/playermenu.java
 		Log.d(TAG, "open:-------------428------------------");	
         subinit();
+=======
+>>>>>>> 3843c006ea09a12e7266ad8d47092c8662f56e4f:src/amlogic/videoplayer/playermenu.java
         initinfobar();
-        closeScreenOffTimeout();
+        
         ThreadInit();
     }
     
@@ -485,39 +305,14 @@ public class playermenu extends Activity {
             }
         });
     }
-    protected void subinit()
-    {
-    	Log.d(TAG, "open:-------------476------------------");
-    	subMange = new SubtitleUtils(PlayList.getinstance().getcur());
-    	sub_para= new subview_set();
-         
-    	//sub_para.totalnum =subMange.getSubTotal();
-    	sub_para.totalnum =0;
-    	sub_para.curid =0;
-    	sub_para.color =android.graphics.Color.WHITE;
-    	sub_para.font=20;
-    	if(sub_para.totalnum>0)
-    		sub_para.filepath =subMange.getSubPath(sub_para.curid);
-    	else
-    		sub_para.filepath =null;
-    	Log.d(TAG, "open:-------------488------------------");
-    }
     
     protected void initinfobar()
     {
     	//set subtitle
-    	Log.d(TAG, "open:-------------494------------------"+sub_para.filepath);
-    	subTitleView = (SubtitleView) findViewById(R.id.subTitle);
-    	
-    	subTitleView.setTextColor(sub_para.color);
-    	
-    	subTitleView.setTextSize(sub_para.font);
-    	Log.d(TAG, "open:-------------498------------------"+sub_para.filepath);
-    	
-    	//openFile(sub_para.filepath);
-    	
-		Log.d(TAG, "open:-------------502------------------"+sub_para.filepath);
-		
+    	   subTitleView = (SubtitleView) findViewById(R.id.subTitle);
+           String filepath = "/mnt/sdcard/aaaa.ass";
+           openFile(filepath);
+           
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
         ImageButton more = (ImageButton)findViewById(R.id.moreBtn);
         ImageButton preItem = (ImageButton)findViewById(R.id.PreBtn);
@@ -532,8 +327,6 @@ public class playermenu extends Activity {
     	cur_time.setText(secToTime(0));
     	total_time.setText(secToTime(0));
         
-    	Log.d(TAG, "open:-------------405------------------"+sub_para.filepath);
-    	
         browser.setOnClickListener(new ImageButton.OnClickListener()
     	{
 			public void onClick(View v) 
@@ -680,6 +473,7 @@ public class playermenu extends Activity {
 		StartPlayerService();
     }
 	
+<<<<<<< HEAD:src/amlogic/videoplayer/playermenu.java
     public static int setCodecMips()
 	{
     	int tmp;
@@ -772,6 +566,8 @@ public class playermenu extends Activity {
     	Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, ScreenOffTimeoutValue);
     }
     
+=======
+>>>>>>> 3843c006ea09a12e7266ad8d47092c8662f56e4f:src/amlogic/videoplayer/playermenu.java
     protected void waitForHide()	//infobar auto hide
     {
     	final Handler handler = new Handler(){   
@@ -844,6 +640,7 @@ public class playermenu extends Activity {
 				if (hour > 99)
 					return "99:59:59";
 				minute = minute%60;
+                second = i - hour * 3600 - minute * 60;
 				retStr = unitFormat(hour) + ":" + unitFormat(minute) + ":" + unitFormat(second);
 			}
 		}
@@ -866,8 +663,11 @@ public class playermenu extends Activity {
         
         Amplayer_stop();
         StopPlayerService();
+<<<<<<< HEAD:src/amlogic/videoplayer/playermenu.java
         setDefCodecMips();
         openScreenOffTimeout();
+=======
+>>>>>>> 3843c006ea09a12e7266ad8d47092c8662f56e4f:src/amlogic/videoplayer/playermenu.java
     }
 
     
@@ -988,7 +788,6 @@ public class playermenu extends Activity {
 			}
 			
 			//auto play
-			Log.d(TAG, "open:-------------sub name------------------"+sub_para.filepath);
 			Log.d(TAG,"to play files!");
 			try
 			{
@@ -1052,14 +851,22 @@ public class playermenu extends Activity {
 
 			e.printStackTrace();
 		}
-	
-	}
-}
+	/*
+		SubtitleLine last = (SubtitleLine) subTitleView.getSubtitleFile().getLast();
+		
+		int allSecond = 0;
+		try {
+			
+			allSecond = last.getEnd().getMilValue() / 1000 + 1;
+		} catch (Exception e1) {
+			
+			
+			e1.printStackTrace();
+		}
+		Log.d(TAG, "---------");
 
-class subview_set{
-	public int totalnum; 
-	public int curid;
-	public int color;
-	public int font; 
-	public String filepath;
+		String sTime = String.format("%02d:%02d:%02d", allSecond / 3600,
+				(allSecond % 3600) / 60, allSecond % 60);
+				*/
+	}
 }
