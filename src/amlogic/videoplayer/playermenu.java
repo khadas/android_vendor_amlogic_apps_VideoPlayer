@@ -28,6 +28,9 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
+import android.provider.Settings.System;
 import android.util.Log;
 import android.view.*;
 import android.view.WindowManager.LayoutParams;
@@ -42,6 +45,7 @@ public class playermenu extends Activity {
     /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
+	private int ScreenOffTimeoutValue = 0;
 	private static final int TV_PANEL = 1;
     private static final int PLAY_MODE = 2;
     private static final int AUDIO_TRACE = 3;
@@ -439,7 +443,7 @@ public class playermenu extends Activity {
 		Log.d(TAG, "open:-------------428------------------");	
         subinit();
         initinfobar();
-        
+        closeScreenOffTimeout();
         ThreadInit();
     }
     
@@ -725,6 +729,22 @@ public class playermenu extends Activity {
 		}
 	}
     
+    protected void closeScreenOffTimeout()
+    {
+    	try {
+			ScreenOffTimeoutValue = Settings.System.getInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT);
+		} catch (SettingNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, -1);
+    }
+    
+    protected void openScreenOffTimeout()
+    {
+    	Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, ScreenOffTimeoutValue);
+    }
+    
     protected void waitForHide()	//infobar auto hide
     {
     	final Handler handler = new Handler(){   
@@ -819,6 +839,7 @@ public class playermenu extends Activity {
         
         Amplayer_stop();
         StopPlayerService();
+        openScreenOffTimeout();
     }
 
     
