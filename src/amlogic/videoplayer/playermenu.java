@@ -46,6 +46,7 @@ public class playermenu extends Activity {
 	private int totaltime = 0;
 	private int curtime = 0;
 	private int ScreenOffTimeoutValue = 0;
+	private boolean backToFileList = false;
 	private static final int TV_PANEL = 1;
     private static final int PLAY_MODE = 2;
     private static final int AUDIO_TRACE = 3;
@@ -69,7 +70,6 @@ public class playermenu extends Activity {
 	public Handler myHandler;
 	private final int msg_Key = 0x1234;
 	private static int PRE_NEXT_FLAG = 0;
-	private Thread threadPlay;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 	
 	//for subtitle
@@ -466,24 +466,6 @@ public class playermenu extends Activity {
     			}
     		}
         };
-    	threadPlay = new Thread(new Runnable(){
-        	public void run()
-            {
-            	try
-            	{
-            		do{
-            			Thread.sleep(800);
-            			Message msg = new Message();
-            			msg.what = msg_Key;
-            			myHandler.sendMessage(msg);
-            		}while(Thread.interrupted() == false);
-            	}
-            	catch (InterruptedException e)
-            	{
-            		e.printStackTrace();
-            	}
-            }
-        });
     }
     protected void subinit()
     {
@@ -546,6 +528,7 @@ public class playermenu extends Activity {
 				if(m_Amplayer != null)
 					Amplayer_stop();
 				startActivity(selectFileIntent);
+				backToFileList = true;
 				playermenu.this.finish();
 			}
 		});
@@ -562,7 +545,7 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
-				threadPlay.start();
+				new PlayThread().start();
 			}
         });
         
@@ -577,7 +560,7 @@ public class playermenu extends Activity {
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
 				
-				threadPlay.start();
+				new PlayThread().start();
 			}
         });
         
@@ -873,7 +856,8 @@ public class playermenu extends Activity {
 	@Override
     public void onPause() {
         super.onPause();
-        
+        if (!backToFileList)
+        	PlayList.getinstance().rootPath =null;
         finish();
     }
     
@@ -1058,6 +1042,25 @@ public class playermenu extends Activity {
 			e.printStackTrace();
 		}
 	
+	}
+	
+	public class PlayThread extends Thread
+	{
+		public void run()
+		{
+			super.run();
+			try
+        	{
+        		Thread.sleep(600);
+        		Message msg = new Message();
+        		msg.what = msg_Key;
+        		myHandler.sendMessage(msg);
+        	}
+        	catch (InterruptedException e)
+        	{
+        		e.printStackTrace();
+        	}
+		}
 	}
 }
 
