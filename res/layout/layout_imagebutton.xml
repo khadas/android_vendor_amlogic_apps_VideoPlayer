@@ -21,13 +21,13 @@
 	<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/sub_switch" android:layout_gravity="center_horizontal">
 		<TextView android:id="@+id/TextView01" android:gravity="left|center" 
 	 	android:layout_width="86dp" android:layout_height="60dp" 
-	 	android:textSize="24px" android:text="@string/sub_switch" android:layout_marginLeft="6dp">
+	 	android:textSize="24px" android:text="@string/sub_switch" android:layout_marginLeft="6dp" android:textColor="@drawable/black">
 	 	</TextView>
 		<ImageButton android:id="@+id/switch_l" 
 		android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_larrow">
 	 	</ImageButton>
      	<TextView android:layout_width="104dp" android:gravity="center" android:layout_height="60dp" 
-     	android:id="@+id/sub_swith111" android:textSize="24px">
+     	android:id="@+id/sub_swith111" android:textSize="24px" android:textColor="@drawable/black">
     	</TextView>
      	<ImageButton android:id="@+id/switch_r" 
      	 android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_rarrow">
@@ -37,13 +37,13 @@
     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/sub_font" android:layout_gravity="center_horizontal" >
 		<TextView android:id="@+id/TextView01"
 	 	android:layout_width="86dp" android:layout_height="60dp" android:gravity="left|center" 
-	 	android:textSize="24px" android:text="@string/sub_font" android:layout_marginLeft="6dp">
+	 	android:textSize="24px" android:text="@string/sub_font" android:layout_marginLeft="6dp" android:textColor="@drawable/black">
 	 	</TextView>
 		<ImageButton android:id="@+id/font_l" 
 		android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_larrow">
 	 	</ImageButton>
      	<TextView android:layout_width="104dp" android:layout_height="60dp" android:gravity="center"
-     	android:textSize="24px" android:id="@+id/sub_font111">
+     	android:textSize="24px" android:id="@+id/sub_font111" android:textColor="@drawable/black">
     	</TextView>
      	<ImageButton android:id="@+id/font_r" 
      	 android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_rarrow">
@@ -53,13 +53,13 @@
 	<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/sub_color" android:layout_gravity="center_horizontal" >
 		<TextView android:id="@+id/TextView01"
 	 	android:layout_width="86dp" android:layout_height="60dp" android:gravity="left|center" 
-	 	android:textSize="24px" android:text="@string/sub_color" android:layout_marginLeft="6dp">
+	 	android:textSize="24px" android:text="@string/sub_color" android:layout_marginLeft="6dp" android:textColor="@drawable/black">
 	 	</TextView>
 		<ImageButton android:id="@+id/color_l" 
 		android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_larrow">
 	 	</ImageButton>
      	<TextView android:layout_width="104dp" android:layout_height="60dp" android:gravity="center" 
-     	android:textSize="24px" android:id="@+id/sub_color111">
+     	android:textSize="24px" android:id="@+id/sub_color111" android:textColor="@drawable/black">
     	</TextView>
      	<ImageButton android:id="@+id/color_r" 
      	 android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_rarrow">

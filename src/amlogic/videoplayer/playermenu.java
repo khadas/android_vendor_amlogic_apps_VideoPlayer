@@ -473,8 +473,8 @@ public class playermenu extends Activity {
     	subMange = new SubtitleUtils(PlayList.getinstance().getcur());
     	sub_para= new subview_set();
          
-    	//sub_para.totalnum =subMange.getSubTotal();
-    	sub_para.totalnum =0;
+    	sub_para.totalnum =subMange.getSubTotal();
+    	//sub_para.totalnum =0;
     	sub_para.curid =0;
     	sub_para.color =android.graphics.Color.WHITE;
     	sub_para.font=20;
@@ -496,7 +496,7 @@ public class playermenu extends Activity {
     	subTitleView.setTextSize(sub_para.font);
     	Log.d(TAG, "open:-------------498------------------"+sub_para.filepath);
     	
-    	//openFile(sub_para.filepath);
+    	openFile(sub_para.filepath);
     	
 		Log.d(TAG, "open:-------------502------------------"+sub_para.filepath);
 		
