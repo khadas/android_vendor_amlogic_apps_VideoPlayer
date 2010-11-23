@@ -261,8 +261,13 @@ public class SubtitleFile extends LinkedList {
         Log.d("subtitleFile", "appendSubtitleFile" + index);
     }
 
-    public void appendSubtitle(int index, int start, int end, byte[] bytearray,String encode) {
+    public void appendSubtitle(int index, int start, int end, byte[] bytearray,String encode1) {
         //public int appendSubtitle(int index) {
+        	String encode=encode1;
+        	if(encode.compareTo("UTF-16LE")==0||encode.compareTo("UTF-16BE")==0)
+        	{
+        		encode="UTF8";
+        	}
             SubtitleLine sl = null;
             SubtitleTime startTime = null;
             SubtitleTime endTime = null;

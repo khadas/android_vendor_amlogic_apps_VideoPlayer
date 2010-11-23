@@ -60,13 +60,89 @@ public class Subtitle {
 		 SUB_DIVX  ,
 		 SUB_IDXSUB 
 	}
+	private String filename=null;
+	private String charset=null;
+	private SUBTYPE subtype=SUBTYPE.SUB_INVALID;
+	private static SubtitleFile subFile=null;
+	private static String systemCharset="GBK";
     static {;
     	System.loadLibrary("subjni");
     }
 	
+	public Subtitle(){	}
+	public Subtitle(String name)
+	{
+		filename=name;
+	}
+	public void setSubname(String name)
+	{
+		filename=name;
+		charset=null;
+		subtype=SUBTYPE.SUB_INVALID;
+		subFile=null;
+	}
+	
+	public static void setSystemCharset(String st)
+	{
+		systemCharset=st;
+	}
+	
+	public String getCharset( )
+	{
+		if(filename!=null)
+		{
+			if(charset == null)
+			{
+				charset=checkEncoding(filename ,systemCharset);
+			}
+		}
+		else
+		{
+			return null;
+		}
+		return charset;
+	}
+	
+	public SubtitleFile parse() throws Exception
+	{
+		if(filename!=null)
+		{
+			if(charset==null)
+			{
+				getCharset();
+			}
+			if(subtype==null)
+			{
+				getSubType();
+			}
+			subFile=parseSubtitleFile(filename);
+		}
+		return subFile;
+	}
+	
+	public SubtitleFile getSubList()
+	{
+		if(subFile!=null)
+			return subFile;
+		else 
+			return null;
+	}
+	public SUBTYPE getSubType()
+	{
+		if(filename!=null)
+		{
+			if(charset==null)
+			{
+				getCharset();
+			}		
+			subtype=Subtitle.fileType(filename,charset);
+			return subtype;
+		}else
+			return null;
+	}
 
 
-    public static native SubtitleFile parseSubtitleFileByJni(String fileName, String enc);
+    public static native SubtitleFile parseSubtitleFileByJni(String fileName,String encode);
 
 
 
@@ -77,13 +153,14 @@ public class Subtitle {
 	 *            file name;
 	 * @return parsed SubtitleFile.
 	 */
-	public static SubtitleFile parseSubtitleFile(String fileName, String enc)
+	public SubtitleFile parseSubtitleFile(String fileName)
 			throws Exception {
 		SubtitleParser sp = null;
 		String input = null;
-	    Log.i("SubtitleFile", "------enter------parseSubtitleFile-----------" );
-	    SUBTYPE type = Subtitle.fileType(fileName);
-	    String encoding=checkEncoding( fileName,  enc);
+		
+		String encoding=getCharset();
+	    SUBTYPE type = getSubType();
+	    Log.i("SubtitleFile", "type="+type.toString()+"   encoding="+encoding );
 
 		switch (type) {
 //		case TYPE_SRT:
@@ -118,7 +195,6 @@ public class Subtitle {
 		case SUB_DIVX:
 			Log.i("SubtitleFile", "------------parseSubtitleFileByJni-----------"+fileName );
 			sp=new TextSubParser(); 
-		    Log.i("SubtitleFile", "------------parseSubtitleFileByJni-----------" );
 		    return sp.parse(fileName,encoding);
 		default:
 			sp = null;
@@ -126,53 +202,15 @@ public class Subtitle {
 		}
 	}
 
-	/**
-	 * Print a subtitle file into a string in a known format.
-	 * 
-	 * @param sf
-	 *            a SubtitleFile;
-	 * @param fileName
-	 *            name of the target File, only use to detect the format;
-	 * @return SubtitleFile printed into a string.
-	 */
-	public static String printSubtitleFile(SubtitleFile sf, String fileName)
-			throws Exception {
-		SubtitlePrinter sp = null;
 
-		switch (Subtitle.fileType(fileName)) {
-//		case TYPE_SRT:
-//			sp = new SrtPrinter();
-//			break;
-//		case TYPE_SUB:
-//			sp = new SubPrinter();
-//			break;
-		case SUB_SSA:			
-			sp=new SsaPrinter();
-			break;
-		case SUB_SAMI:			
-			sp=new SamiPrinter();
-			break;
-		default:
-			sp = null;
-			break;
-		}
-
-		// Unknown FILE
-		if (sp == null) {
-			throw new Exception("Unknown File Extension.");
-
-		} else {
-			return sp.print(sf);
-		}
-	}
 
 	/**
 	 * @return the file type analyzing only the extension. 
 	 */
-	public static SUBTYPE fileType(String file) {
+	public static SUBTYPE fileType(String file,String encoding) {
 		if (file.endsWith(".idx"))
 			return SUBTYPE.SUB_IDXSUB;	
-		return FileIO.dectFileType(file);
+		return FileIO.dectFileType(file,encoding);
 	}
 	
 	// 2-byte number
@@ -315,10 +353,11 @@ public class Subtitle {
 		return null;
 	}
 
-	public static String checkEncoding(String fileName, String enc)
+	private static String checkEncoding(String fileName, String enc)
 	{
 		BufferedInputStream bis = null;
 		byte[] first3Bytes=new byte[3];
+		String charset=enc;
 
 		try {
 			bis = new BufferedInputStream(new FileInputStream(new File(fileName)));
@@ -326,26 +365,33 @@ public class Subtitle {
 			int r =bis.read( first3Bytes, 0, 3) ;
 			if(r == -1)
 			{
-				return enc;
+				return charset;
 			}
 				
 			if (first3Bytes[0] == (byte) 0xFF && first3Bytes[1] == (byte) 0xFE)
 	        {
-				//charset = "UTF-16LE";
-				Log.v("-------","------UTF-16LE----");
+				charset = "UTF-16LE";
 	        }
             else if (first3Bytes[0] == (byte) 0xFE
                     && first3Bytes[1] == (byte) 0xFF)
             {
-            	//charset = "UTF-16BE";
-				Log.v("-------","------UTF-16BE----");
-
+            	charset = "UTF-16BE";
             }
             else if (first3Bytes[0] == (byte) 0xEF
                     && first3Bytes[1] == (byte) 0xBB
                     && first3Bytes[2] == (byte) 0xBF)
             {
-				return "UTF8";
+            	charset="UTF8";
+            }else
+            {
+            	if(1>0)//whether need to probe the file charset
+            	{
+            		String probe=probe_utf8_utf16(fileName,1024);
+            		if(probe!="")
+            		{
+            			charset=probe;
+            		}
+            	}
             }
 
 		} catch (FileNotFoundException e) {
@@ -355,9 +401,66 @@ public class Subtitle {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		return enc;
+	    Log.i("checkEncoding", "--filename:--"+fileName+"-charset:"+charset );
+		return charset;
+	}
+
+	
+	private static String probe_utf8_utf16(String fileName,int size)
+	{
+		char probe_find_time=10;
+		int utf8_count = 0;
+		int little_utf16 = 0;
+		int big_utf16 = 0;
+		int i=0;
+		byte[] probeBytes=new byte[size];
+		BufferedInputStream bis = null;
+		int r=0;
+		try {
+			bis = new BufferedInputStream(new FileInputStream(new File(fileName)));
+			bis.mark(0);
+			r = bis.read( probeBytes, 0, size);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(r == -1)
+		{
+			return "";
+		}
+		for(i=0; i<(size-5); i++){
+			if(probeBytes[i] == 0 && (probeBytes[i+1]>0x20 && probeBytes[i+1]<0x7d)){
+				i++;
+				big_utf16++;
+			}
+			else if(probeBytes[i+1] == 0 && (probeBytes[i]>0x20 && probeBytes[i]<0x7d)){
+				i++;
+				little_utf16++;
+			}
+			else if(((probeBytes[i]&0xE0)==0xE0)&&((probeBytes[i+1]&0xC0)==0x80)&&((probeBytes[i+2]&0xC0)==0x80)){
+				i+=2;
+				utf8_count++;
+				if(((probeBytes[i+1]>=0x80) && ((probeBytes[i+1]&0xE0) != 0xE0))|| 
+					((probeBytes[i+2]>=0x80) && ((probeBytes[i+2]&0xC0) != 0x80))|| 
+					((probeBytes[i+3]>=0x80) && ((probeBytes[i+3]&0xC0) != 0x80)))
+					return "";
+			}
+			if(big_utf16 >= probe_find_time)
+				return "UTF-16BE";
+			else if(little_utf16 >= probe_find_time)
+				return "UTF-16LE";
+			else if(utf8_count >=probe_find_time )
+				return "UTF-8";
+		}
+		if(i == (size - 2)){
+			if(big_utf16 > 0)
+				return "UTF-16BE";
+			else if(little_utf16 > 0)
+				return "UTF-16LE";
+			else if(utf8_count > 0)
+				return "UTF-8";
+		}
+		return "";
 	}
 
 	/**

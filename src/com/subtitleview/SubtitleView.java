@@ -19,6 +19,7 @@ public class SubtitleView extends TextView {
 	private Subtitle.SUBTYPE type=Subtitle.SUBTYPE.SUB_INVALID;
 	private boolean InsubStatus=false;
 	private Bitmap inter_bitmap = null;
+	private Subtitle subtitle=null;
 	
 	public void setInsubStatus(boolean flag)
 	{
@@ -39,10 +40,12 @@ public class SubtitleView extends TextView {
 
 	public SubtitleView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		subtitle = new Subtitle();
 	}
 
 	public SubtitleView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		subtitle = new Subtitle();
 	}
 	public void setViewStatus(boolean flag )
 	{
@@ -126,7 +129,8 @@ public class SubtitleView extends TextView {
 		// load Input File
 		try {
 		    Log.i("SubView", "------------parseSubtitleFile-----------" );
-		    type=Subtitle.fileType(file);
+			subtitle.setSubname(file);
+		    type=subtitle.getSubType();
 		    if(type==Subtitle.SUBTYPE.SUB_IDXSUB)
 		    {
 		    
@@ -137,7 +141,8 @@ public class SubtitleView extends TextView {
 		    }
 		    else
 		    {
-				subFile = Subtitle.parseSubtitleFile(file, enc);
+		    	
+		    	subFile =subtitle.parse();
 	    	}
 		} catch (Exception e) {
 		    Log.i("SubView", "------------err-----------" );

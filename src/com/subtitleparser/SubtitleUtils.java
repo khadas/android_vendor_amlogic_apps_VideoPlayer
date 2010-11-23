@@ -11,18 +11,16 @@ public class SubtitleUtils {
 	private List<String> strlist = new ArrayList<String>();
 	private int exSubtotle=0;
 	
-	private String TAG = "playermenu";
-	
     private static final String[] extensions = {
+    	"txt",
         "srt",
         "smi",
         "sami",
         "rt",
         "ssa",
+        "ass",
         "sub",
         "idx",
-        "txt",
-        "ass",
        /* "may be need add new types--------------" */};	
 	public  SubtitleUtils() {
 	}
@@ -34,33 +32,26 @@ public class SubtitleUtils {
 	public void setFileName(String name) {
 		if(filename !=name)
 		{
-			if(strlist.size()>0)
-				strlist.clear();
-			
+			strlist.clear();
 			filename = name;
 			subfile= new File(filename);
 			accountExSubtitleNumber();
-			
+
 		}
 	}
 	
     public int getSubTotal()
     {
-    	
     	return exSubtotle+accountInSubtitleNumber();
     }
    
     public String getSubPath(int index)
     {
-    
     	if(subfile==null)
-    	{
     		return null ;
-    	}
+    	
     	if(index<exSubtotle)
-    	{
     		return strlist.get(index);
-    	}
     	else if(index<getSubTotal())
     	{
     		setInSubtitleNumber(index-exSubtotle);
@@ -84,9 +75,7 @@ public class SubtitleUtils {
 	    	        for (String ext : extensions) {
 	    	            if (file.endsWith(ext))
 	    	            {
-	    	            	
 	    	            	strlist.add(DirFile.getAbsolutePath()+"/"+file);
-	    	            	Log.i(TAG, "----------------------90-----sub num-----------------------"+DirFile.getAbsolutePath()+"/"+file);
 	    	            	break;
 	    	            }
 	    	        }	    			
@@ -94,7 +83,6 @@ public class SubtitleUtils {
 	    	}    	
     	}
     	exSubtotle=strlist.size();
-    	Log.i(TAG, "----------------------84-----sub num-----------------------"+exSubtotle);
     }
     
     //wait to finish.

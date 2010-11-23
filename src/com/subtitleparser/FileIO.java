@@ -56,7 +56,7 @@ public class FileIO {
 		return contents.toString();
 	}
 	
-	public static Subtitle.SUBTYPE dectFileType(String filePath)
+	public static Subtitle.SUBTYPE dectFileType(String filePath,String encoding)
 	{
 		BufferedReader input = null;
 		int testMaxLines =60;
@@ -80,7 +80,8 @@ public class FileIO {
 		try {
 			//use buffering
 			//this implementation reads one line at a time
-			input = new BufferedReader( new FileReader(filePath));
+//			input = new BufferedReader( new FileReader(filePath));
+			input = new BufferedReader( new InputStreamReader(new FileInputStream(new File(filePath)),encoding),1024);
 			String line = null; //not declared within while loop
 			try {
 				while (( line = input.readLine()) != null&&testMaxLines>0)
@@ -183,6 +184,9 @@ public class FileIO {
 				e.printStackTrace();
 			}
 		}catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return Subtitle.SUBTYPE.SUB_INVALID;
