@@ -18,6 +18,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,7 +34,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class FileList extends ListActivity {
 	private List<File> listFiles =null;
@@ -397,5 +399,39 @@ public class FileList extends ListActivity {
                 Log.d(TAG, "Firmware install not needed");
         }
     });
-	
+    
+    //option menu
+   private final int MENU_ABOUT = 0;
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        menu.add(0, MENU_ABOUT, 0, "About");
+        return true;
+    }
+    
+    public boolean onOptionsItemSelected(MenuItem item) 
+    {
+        switch (item.getItemId()) 
+        {
+	        case MENU_ABOUT:
+	        /*	String aboutinfo = " Amlogic VideoPlayer";
+	        	aboutinfo += "\n Version: "+"V1.0.0"+" ";
+	        	aboutinfo += "\n Date: "+"2010.11.23"+" ";
+	        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	        	builder.setMessage(aboutinfo);
+	        	AlertDialog about = builder.create();
+	        	about.show();*/
+			try {
+				Toast.makeText(FileList.this, " Amlogic VideoPlayer \n Version: " +
+	        			FileList.this.getPackageManager().getPackageInfo("amlogic.videoplayer", 0).versionName,
+	        			Toast.LENGTH_SHORT)
+	        			.show();
+			} catch (NameNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        	return true;
+        }
+        return false;
+    }
+    
 }
