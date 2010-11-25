@@ -60,7 +60,7 @@ public class FileList extends ListActivity {
 								"mp2," +
 								"mp4," +
 								"mov," +
-								"mpe,mpeg,mpg" +
+								"mpe,mpeg,mpg," +
 								"mts," +
 								"rm,rmvb," +
 								"ts," +
