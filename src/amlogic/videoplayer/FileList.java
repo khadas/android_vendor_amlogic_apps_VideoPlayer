@@ -49,11 +49,15 @@ public class FileList extends ListActivity {
 								"asf," +
 								"avi," +
 								"dat," +
+								"divx," +
 								"f4v," +
 								"flv," +
+								"h264," +
+								"lst," +
 								"m2ts," +
 								"m4v," +
 								"mkv," +
+								"mp2," +
 								"mp4," +
 								"mov," +
 								"mpe,mpeg,mpg" +
@@ -61,6 +65,7 @@ public class FileList extends ListActivity {
 								"rm,rmvb," +
 								"ts," +
 								"tp," +
+								"vc1," +
 								"vob," +
 								"wm,wmv";
 	private View myView;
@@ -413,13 +418,6 @@ public class FileList extends ListActivity {
         switch (item.getItemId()) 
         {
 	        case MENU_ABOUT:
-	        /*	String aboutinfo = " Amlogic VideoPlayer";
-	        	aboutinfo += "\n Version: "+"V1.0.0"+" ";
-	        	aboutinfo += "\n Date: "+"2010.11.23"+" ";
-	        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	        	builder.setMessage(aboutinfo);
-	        	AlertDialog about = builder.create();
-	        	about.show();*/
 			try {
 				Toast.makeText(FileList.this, " Amlogic VideoPlayer \n Version: " +
 	        			FileList.this.getPackageManager().getPackageInfo("amlogic.videoplayer", 0).versionName,
