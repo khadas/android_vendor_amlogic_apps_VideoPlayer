@@ -163,6 +163,8 @@ public class AmPlayer extends Service {
 			Message s_message = new Message();
 			s_message.what = VideoInfo.STATUS_CHANGED_INFO_MSG;
 			s_message.arg1 = player_status;
+			if (player_status == VideoInfo.PLAYER_ERROR)
+				s_message.arg2 = error_no;
 			Log.d(TAG,"player status changed to: " + player_status);
 			try {
 				mClient.send(s_message);

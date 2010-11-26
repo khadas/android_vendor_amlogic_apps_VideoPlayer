@@ -54,7 +54,7 @@ public class FileList extends ListActivity {
 								"flv," +
 								"h264," +
 								"lst," +
-								"m2ts,mts," +
+								"m2ts," +
 								"m4v," +
 								"mkv," +
 								"mp2," +
@@ -68,10 +68,9 @@ public class FileList extends ListActivity {
 								"vc1," +
 								"vob," +
 								"wm,wmv";
-	private View myView;
+	
 	private TextView tileText;
 	private File file;
-	private String listtype = null;
 	
 	@Override
 	protected void onCreate(Bundle icicle) {

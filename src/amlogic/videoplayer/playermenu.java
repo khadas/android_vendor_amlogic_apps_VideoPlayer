@@ -13,6 +13,7 @@ import com.subtitleparser.Subtitle;
 import com.subtitleparser.SubtitleUtils;
 import com.subtitleview.SubtitleView;
 
+import amlogic.playerservice.Errorno;
 import amlogic.playerservice.Player;
 import amlogic.playerservice.VideoInfo;
 import android.app.Activity;
@@ -905,6 +906,35 @@ public class playermenu extends Activity {
 							PlayList.getinstance().movenext();
 						
 						Amplayer_play();
+						break;
+					case VideoInfo.PLAYER_ERROR:
+						String InfoStr = null;
+						switch (msg.arg2)
+			        	{
+							case Errorno.PLAYER_UNSUPPORT:
+								InfoStr = "Unsupport Video and Audio format";
+								break;
+							case Errorno.PLAYER_UNSUPPORT_VIDEO:
+								InfoStr = "Unsupport Video format";
+								break;
+							case Errorno.PLAYER_UNSUPPORT_AUDIO:
+								InfoStr = "Unsupport Audio format";
+								break;
+							case Errorno.FFMPEG_OPEN_FAILED:
+								InfoStr = "Open file("+PlayList.getinstance().getcur()+")failed";
+								break;	
+							case  Errorno.FFMPEG_PARSE_FAILED:
+								InfoStr = "Parser file("+PlayList.getinstance().getcur()+")failed";
+								break;
+							case  Errorno.DECODER_INIT_FAILED:
+								InfoStr = "Decode Init failed";
+								break;
+							default:
+								InfoStr = "Unknow Error";
+								break;
+			        	}	
+						Toast.makeText(playermenu.this, InfoStr, Toast.LENGTH_LONG)
+							.show();
 						break;
 					default:
 						break;
