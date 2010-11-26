@@ -26,7 +26,7 @@
 		<ImageButton android:id="@+id/switch_l" 
 		android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_larrow">
 	 	</ImageButton>
-     	<TextView android:layout_width="104dp" android:gravity="center" android:layout_height="60dp" 
+     	<TextView android:layout_width="94dp" android:gravity="center" android:layout_height="60dp" 
      	android:id="@+id/sub_swith111" android:textSize="24px" android:textColor="@drawable/black">
     	</TextView>
      	<ImageButton android:id="@+id/switch_r" 
@@ -42,7 +42,7 @@
 		<ImageButton android:id="@+id/font_l" 
 		android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_larrow">
 	 	</ImageButton>
-     	<TextView android:layout_width="104dp" android:layout_height="60dp" android:gravity="center"
+     	<TextView android:layout_width="94dp" android:layout_height="60dp" android:gravity="center"
      	android:textSize="24px" android:id="@+id/sub_font111" android:textColor="@drawable/black">
     	</TextView>
      	<ImageButton android:id="@+id/font_r" 
@@ -58,7 +58,7 @@
 		<ImageButton android:id="@+id/color_l" 
 		android:layout_width="72dp" android:layout_height="60dp" android:src="@drawable/sub_larrow">
 	 	</ImageButton>
-     	<TextView android:layout_width="104dp" android:layout_height="60dp" android:gravity="center" 
+     	<TextView android:layout_width="94dp" android:layout_height="60dp" android:gravity="center" 
      	android:textSize="24px" android:id="@+id/sub_color111" android:textColor="@drawable/black">
     	</TextView>
      	<ImageButton android:id="@+id/color_r" 

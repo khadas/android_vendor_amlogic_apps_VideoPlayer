@@ -488,18 +488,11 @@ public class playermenu extends Activity {
     protected void initinfobar()
     {
     	//set subtitle
-    	Log.d(TAG, "open:-------------494------------------"+sub_para.filepath);
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle);
-    	
     	subTitleView.setTextColor(sub_para.color);
-    	
     	subTitleView.setTextSize(sub_para.font);
-    	Log.d(TAG, "open:-------------498------------------"+sub_para.filepath);
-    	
     	openFile(sub_para.filepath);
-    	
-		Log.d(TAG, "open:-------------502------------------"+sub_para.filepath);
-		
+	
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
         ImageButton more = (ImageButton)findViewById(R.id.moreBtn);
         ImageButton preItem = (ImageButton)findViewById(R.id.PreBtn);
@@ -877,8 +870,12 @@ public class playermenu extends Activity {
     		    	
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
+    		    	{
+    		    		 Log.d(TAG, "open:-------------882------------------");
+    		    		if(subTitleView!=null)
     		    		subTitleView.tick(curtime*1000);
-    		    	
+    		    		Log.d(TAG, "open:-------------885------------------");
+    		    	}
     		    	if (totaltime == 0)
 						myProgressBar.setProgress(0);
 					else
@@ -929,6 +926,14 @@ public class playermenu extends Activity {
     	try
 		{
 			m_Amplayer.Open(PlayList.getinstance().getcur());
+			//reset sub;
+			Log.d(TAG, "open:-------------930------------------");
+			subTitleView.setText("");
+			subinit();
+			subTitleView.setTextColor(sub_para.color);
+	    	subTitleView.setTextSize(sub_para.font);
+	    	openFile(sub_para.filepath);
+	    	Log.d(TAG, "open:-------------935------------------");
 		}
 		catch(RemoteException e)
 		{
