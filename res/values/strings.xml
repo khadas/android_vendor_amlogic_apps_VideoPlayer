@@ -26,4 +26,5 @@
   <string name="str_delete_title">你确定要删除文件吗？</string>
   <string name="str_rename_notice">文件名已经存在，是否要覆盖？</string>
   <string name="str_time_null">00:00:00</string>
+  <string name="str_audio_stream">Audio Stream</string>
 </resources>

@@ -46,6 +46,8 @@ public class playermenu extends Activity {
     /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
+	private int cur_audio_stream = 0;
+	private int total_audio_num = 0;
 	private int ScreenOffTimeoutValue = 0;
 	private boolean backToFileList = false;
 	private static final int TV_PANEL = 1;
@@ -218,7 +220,32 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	showDialog(AUDIO_TRACE);
+                	//showDialog(AUDIO_TRACE);
+                	setContentView(R.layout.audiolist);
+                	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
+                    		R.layout.list_row,
+                    		AudioInfo.AudioStreamFormat));
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                    	public void onItemClick(AdapterView<?> arg0, View arg1,
+            					int arg2, long arg3) {
+            				// TODO Auto-generated method stub
+                    		try {
+                    			m_Amplayer.SwitchAID(AudioInfo.AudioStreamInfo.get(arg2).audio_id);
+                    			Log.d("audiostream","change audio stream to: " + arg2);
+                    			
+                			} catch (RemoteException e) {
+                				e.printStackTrace();
+                			}
+                    		videobar();
+                    		try {
+                    			m_Amplayer.GetMediaInfo();
+                    		} catch (RemoteException e) {
+                				e.printStackTrace();
+                			}
+            			}	
+                    });
                 } 
     	    });
             ImageButton sutitle = (ImageButton) findViewById(R.id.ImageButton04);
@@ -900,7 +927,11 @@ public class playermenu extends Activity {
     				switch(player_status)
     				{
 					case VideoInfo.PLAYER_RUNNING:
-						
+						try {
+							m_Amplayer.GetMediaInfo();
+						} catch(RemoteException e) {
+							e.printStackTrace();
+						}
 						play.setBackgroundResource(R.drawable.pause_button);
 						break;
 					case VideoInfo.PLAYER_PAUSE:
@@ -917,7 +948,8 @@ public class playermenu extends Activity {
 					case VideoInfo.PLAYER_PLAYEND:
 						if (playmode == REPEATLIST)
 							PlayList.getinstance().movenext();
-						
+						AudioInfo.AudioStreamFormat.clear();
+						AudioInfo.AudioStreamInfo.clear();
 						Amplayer_play();
 						break;
 					case VideoInfo.PLAYER_ERROR:
@@ -956,6 +988,10 @@ public class playermenu extends Activity {
 					default:
 						break;
     				}
+    				break;
+    			case VideoInfo.AUDIO_CHANGED_INFO_MSG:
+    				total_audio_num = msg.arg1;
+    				cur_audio_stream = msg.arg2;
     				break;
     			default:
     				super.handleMessage(msg);
@@ -1006,6 +1042,8 @@ public class playermenu extends Activity {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		AudioInfo.AudioStreamFormat.clear();
+		AudioInfo.AudioStreamInfo.clear();
     }
     
     ServiceConnection m_PlayerConn = new ServiceConnection()

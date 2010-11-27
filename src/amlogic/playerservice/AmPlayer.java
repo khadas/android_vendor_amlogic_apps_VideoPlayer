@@ -2,6 +2,7 @@ package amlogic.playerservice;
 
 
 import amlogic.playerservice.Player;
+import amlogic.videoplayer.AudioInfo;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -95,6 +96,17 @@ public class AmPlayer extends Service {
 		public int Close() throws RemoteException {
 			return 0;
 		}
+		
+		public int GetMediaInfo() throws RemoteException {
+			native_sendcmd("media");
+			return 0;
+		}
+		
+		public int SwitchAID(int id) throws RemoteException {
+			native_sendcmd("aid:" + id);
+			Log.d("audiostream","aid: " + id);
+			return 0;
+		}
 
 		public int FastForward(int speed) throws RemoteException {
 			native_sendcmd("forward:"+String.valueOf(speed));
@@ -173,5 +185,42 @@ public class AmPlayer extends Service {
 			}
 		}
 	}
-
+	
+	public static void onUpdateAid(int total_audio_num, int audio_id, int audio_format,
+			int ifChange)
+	{
+		
+		Log.d("audiostream", "total num:"+total_audio_num +
+				"------- current id:" + audio_id +
+				"------- format:" +audio_format);
+		
+		if (ifChange > 0)
+		{
+			Log.d("audiostream","audio stream changed to: " + audio_id);
+			Message s_message = new Message();
+			s_message.what = VideoInfo.AUDIO_CHANGED_INFO_MSG;
+			s_message.arg1 = total_audio_num;
+			s_message.arg2 = audio_id;
+			
+			try {
+				mClient.send(s_message);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			if (AudioInfo.AudioStreamInfo.size() < total_audio_num)
+			{
+				String type = null;
+				type = AudioInfo.getAudioFormat(audio_format);
+				AudioInfo.ASInfo asinfo = new AudioInfo.ASInfo();
+				asinfo.audio_id = audio_id;
+				asinfo.audio_format = type;
+				AudioInfo.AudioStreamInfo.add(asinfo);
+				AudioInfo.AudioStreamFormat.add(type);
+				Log.d("audiostream","AudioInfo.AudioStream.add: " + type);
+			}
+		}
+	}
 }

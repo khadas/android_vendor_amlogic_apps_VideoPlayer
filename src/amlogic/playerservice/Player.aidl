@@ -10,6 +10,8 @@ interface Player
 	int Resume();
 	int Stop();
 	int Close();
+	int GetMediaInfo();
+	int SwitchAID(int id);
 
 	int  SetColorKey(int color);
 	void DisableColorKey();

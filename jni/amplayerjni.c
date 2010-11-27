@@ -470,6 +470,7 @@ struct fields_t {
 };
 static JavaVM *gJavaVM ;
 static struct fields_t fields;
+static struct fields_t fields_a;
 
 int onUpdate_player_info_java( JNIEnv *env,player_info_t * info)
 {    
@@ -528,6 +529,32 @@ vm_update_state(player_info_t *info)
 #endif
 }
 
+int update_audio_info(int total_audio_num, int audio_id, int audio_format, int Flag)
+{
+	JNIEnv *env;
+	int ret = -1;
+	int isAttached = -1;
+	ret = (*gJavaVM)->GetEnv(gJavaVM, (void**) &env, JNI_VERSION_1_4);
+    if(ret <0){
+        LOGE("callback handler:failed to get java env by native thread");
+        ret = (*gJavaVM)->AttachCurrentThread(gJavaVM,&env,NULL);
+        if(ret <0){
+            LOGE("callback handler:failed to attach current thread");
+            return -1;
+        }
+        isAttached = 1;
+    }
+	LOGI("update audio info");  
+    (*env)->CallStaticVoidMethod(env, fields_a.gVp_cls, fields_a.post_event,
+    					   total_audio_num,
+    					   audio_id,
+    					   audio_format,
+    					   Flag);
+    if(isAttached >0){
+        LOGI("callback handler:detach current thread");
+        (*gJavaVM)->DetachCurrentThread(gJavaVM);
+    } 
+	return 0;
 }
 
 /** 
@@ -672,6 +699,7 @@ JNI_OnLoad(JavaVM* vm, void* reserved)
     if(fields.gVp_cls){
         LOGI("get videoplayer class global reference");   
     }
+    fields_a.gVp_cls = fields.gVp_cls;
     (*env)->DeleteLocalRef(env, clazz);    
     
     fields.post_event = (*env)->GetStaticMethodID(env, fields.gVp_cls, "onUpdateState", "(IIIIII)V");
@@ -682,7 +710,27 @@ JNI_OnLoad(JavaVM* vm, void* reserved)
         return -101;
     }
     
+    fields_a.post_event = (*env)->GetStaticMethodID(env, fields_a.gVp_cls, "onUpdateAid", "(IIII)V");
+    if(fields_a.post_event){
+        LOGI("get update audio info object id");
+    }else{
+        LOGE("failed to get audio info object id");
+        return -101;
+    }
     return JNI_VERSION_1_4;
 }
 
+JNIEXPORT void
+JNI_OnUnload(JavaVM* vm, void* reserved)
+{
+	JNIEnv* env = NULL;
 
+    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
+        LOGE("GetEnv failed!");
+        return;
+    }
+    (*env)->DeleteGlobalRef(env, fields.gVp_cls);
+	(*env)->DeleteGlobalRef(env, fields_a.gVp_cls);	
+	
+	return;
+}
