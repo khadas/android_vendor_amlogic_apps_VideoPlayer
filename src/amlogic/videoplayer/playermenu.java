@@ -539,7 +539,6 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
-				new PlayThread().start();
 			}
         });
         
@@ -553,8 +552,6 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
-				
-				new PlayThread().start();
 			}
         });
         
@@ -589,26 +586,42 @@ public class playermenu extends Activity {
                 
         fastforword.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
-				try
+				if (player_status == VideoInfo.PLAYER_SEARCHING)
 				{
-					m_Amplayer.FastForward(2);
+					try	{
+						m_Amplayer.FastForward(0);
+					} catch(RemoteException e) {
+						e.printStackTrace();
+					}
 				}
-				catch(RemoteException e)
+				else
 				{
-					e.printStackTrace();
+					try	{
+						m_Amplayer.FastForward(2);
+					} catch(RemoteException e) {
+						e.printStackTrace();
+					}
 				}
 			}
         });
         
         fastreverse.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
-				try
+				if (player_status == VideoInfo.PLAYER_SEARCHING)
 				{
-					m_Amplayer.BackForward(2);
+					try	{
+						m_Amplayer.BackForward(0);
+					} catch(RemoteException e) {
+						e.printStackTrace();
+					}
 				}
-				catch(RemoteException e)
+				else
 				{
-					e.printStackTrace();
+					try	{
+						m_Amplayer.BackForward(2);
+					} catch(RemoteException e) {
+						e.printStackTrace();
+					}
 				}
 			}
         });
@@ -936,6 +949,10 @@ public class playermenu extends Activity {
 						Toast.makeText(playermenu.this, InfoStr, Toast.LENGTH_LONG)
 							.show();
 						break;
+					case VideoInfo.PLAYER_INITOK:
+						if (setCodecMips() == 0)
+				        	Log.d(TAG, "setCodecMips Failed");
+						break;
 					default:
 						break;
     				}
@@ -951,8 +968,6 @@ public class playermenu extends Activity {
     public Player m_Amplayer = null;
     private void Amplayer_play()
     {
-    	if (setCodecMips() == 0)
-        	Log.d(TAG, "setCodecMips Failed");
     	try
 		{
 			m_Amplayer.Open(PlayList.getinstance().getcur());

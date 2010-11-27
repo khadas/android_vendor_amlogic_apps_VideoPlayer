@@ -18,8 +18,8 @@ public class AmPlayer extends Service {
     	System.loadLibrary("amplayerjni");
     };
     private static final String TAG = "amplayer";
-    private Messenger mClient = null;
-    private int player_status = 0;
+    private static Messenger mClient = null;
+    private static int player_status = 0;
     
     /**jni interface */
     public static native int native_startcmd(String filename);
@@ -72,7 +72,7 @@ public class AmPlayer extends Service {
 		}
 
 		public int Play() throws RemoteException {
-			startGetStates();
+			//startGetStates();
 			return 0;
 		}
 
@@ -87,7 +87,7 @@ public class AmPlayer extends Service {
 		}
 
 		public int Stop() throws RemoteException {
-			stopGetStates();
+			//stopGetStates();
 			native_sendcmd("stop");
 			return 0;
 		}
@@ -143,7 +143,7 @@ public class AmPlayer extends Service {
     	mhandler.removeCallbacks(mGetState);
     }
 
-	public void onUpdateState(int last_sta, int status, int full_time,
+	public static void onUpdateState(int last_sta, int status, int full_time,
 			int current_time, int last_time, int error_no)
 	{
 		Message message = new Message();

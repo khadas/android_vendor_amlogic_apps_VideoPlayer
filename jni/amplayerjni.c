@@ -21,6 +21,7 @@
 
 #include <controler.h>
 
+#include  <linux/fb.h>
 
 
 static global_ctrl_para_t player_para;
@@ -31,8 +32,10 @@ int osd_blank(char *path,int cmd)
 	int fd;
 	char  bcmd[16];
 	fd=open(path, O_CREAT|O_RDWR | O_TRUNC, 0644);
+	
 	if(fd>=0)
 		{
+		log_print("write  %s=%d\n",path,cmd);
 		sprintf(bcmd,"%d",cmd);
 		write(fd,bcmd,strlen(bcmd));
 		close(fd);
@@ -343,8 +346,7 @@ static int player_main(int argc, char *argv[])
 #ifdef _DBUS
 	register_dbus_controler();
 #endif
-	player_init();	
-	
+	player_init();		
 	if(start_controler(&player_para)!=0)
 	{
 		log_print("Can't get any controlers ,exit now\n");
@@ -371,6 +373,7 @@ static int player_main(int argc, char *argv[])
 #else
 	controler_run(&player_para);
 	release_extern_lib(&player_para);
+	
 	//player_progress_exit();
 	return 0;
 #endif
@@ -398,6 +401,10 @@ static int player_main(int argc, char *argv[])
 #define  FBIOPUT_OSD_SRCKEY_ENABLE  0x46fa
 #endif
 
+#ifndef FBIOPUT_OSD_SET_GBL_ALPHA
+#define  FBIOPUT_OSD_SET_GBL_ALPHA	0x4500
+#endif
+
 static void
 startcmd(JNIEnv *env, jobject obj, jstring filename) 
 {	
@@ -407,15 +414,16 @@ startcmd(JNIEnv *env, jobject obj, jstring filename)
     char background[] = "-b";
     char mode[] = "-m";
     char bc[] = "bc";
-    char *argv[] = {argv0, background, mode, bc, fn};
-    //char *argv[] = {argv0, noaudio, background, mode, bc, argvfn};
 
-    LOGI("amplayer-JNI startcmd1(%s) enter", fn);
+    char *argv[] = {argv0, background, mode, bc, fn};
+    //char *argv[] = {argv0, noaudio, background, mode, bc, fn};
+
+    LOGI("New amplayer-JNI startcmd1(%s) enter", fn);
 
     optind = 1;
     player_main( sizeof(argv) / sizeof(argv[0]), argv);
 
-    LOGI("amplayer-JNI startcmd(%s) exit", fn);
+    LOGI("New amplayer-JNI startcmd(%s) exit", fn);
 
     (*env)->ReleaseStringUTFChars(env, filename, fn);
 }
@@ -439,6 +447,7 @@ static player_info_t g_last_info;
 static jint
 reqstate(JNIEnv *env, jobject obj)
 {
+   #if 0
     jclass cls = (*env)->GetObjectClass(env, obj);
     jmethodID mid = (*env)->GetMethodID(env, cls, "onUpdateState", "(IIIIII)V");
     if (mid == NULL)
@@ -450,14 +459,75 @@ reqstate(JNIEnv *env, jobject obj)
                            g_last_info.current_time,
                            g_last_info.last_time,
                            g_last_info.error_no);
+    #endif
     return 0;
+}
+// just for update callback
+
+struct fields_t {
+	jclass gVp_cls;	
+    jmethodID post_event;
+};
+static JavaVM *gJavaVM ;
+static struct fields_t fields;
+
+int onUpdate_player_info_java( JNIEnv *env,player_info_t * info)
+{    
+    if(fields.gVp_cls!=NULL &&fields.post_event!=NULL){
+        LOGI("call java update method in JNI env ");  
+        (*env)->CallStaticVoidMethod(env,fields.gVp_cls,fields.post_event,
+                           info->last_sta,
+                           info->status,
+                           info->full_time,
+                           info->current_time,
+                           info->last_time,
+                           info->error_no);        
+        LOGI("call java update method in JNI env 2");    
+        return 0;
+    }
+    LOGE("never get java video player obj");
+    return -1;
+    
 }
 
 void
 vm_update_state(player_info_t *info)
 {
+#if 0
     MEMCPY(&g_last_info, info, sizeof(player_info_t));
     g_last_info.name = NULL;
+#else
+    JNIEnv *env;
+    int isAttached = -1;
+    int ret = -1;
+    //LOGI("callback handler:current time:%d",time(NULL));
+    if(NULL ==info){
+        LOGE("info is null,drop it");
+        return;
+    }
+    ret = (*gJavaVM)->GetEnv(gJavaVM, (void**) &env, JNI_VERSION_1_4);
+    if(ret <0){
+        LOGE("callback handler:failed to get java env by native thread");
+        ret = (*gJavaVM)->AttachCurrentThread(gJavaVM,&env,NULL);
+        if(ret <0){
+            LOGE("callback handler:failed to attach current thread");
+            return;
+        }
+        isAttached = 1;
+	}
+
+    ret = onUpdate_player_info_java(env,info);
+        
+    if(isAttached >0){
+        LOGI("callback handler:detach current thread");
+        (*gJavaVM)->DetachCurrentThread(gJavaVM);
+    }   
+    //LOGI("callback handler:end time:%d",time(NULL));    
+    LOGI("status:%d,current pos:%d,total:%d,errcode:%x\n",info->status,info->current_time,info->full_time,~(info->error_no));
+    return;
+#endif
+}
+
 }
 
 /** 
@@ -592,6 +662,26 @@ JNI_OnLoad(JavaVM* vm, void* reserved)
 //    if (registerNativeMethods(env, "amlogic/videoplayer/playermenu",
    //                           gPVMethods, NELEM(gPVMethods)) < 0)
       //  return -1;
+    gJavaVM = vm;
+    jclass clazz =(*env)->FindClass(env,"amlogic/playerservice/AmPlayer");
+    if(clazz == NULL){
+    	LOGE("can't get videoplayer class");
+        return -100;	
+    }	
+    fields.gVp_cls =(*env)->NewGlobalRef(env,clazz);
+    if(fields.gVp_cls){
+        LOGI("get videoplayer class global reference");   
+    }
+    (*env)->DeleteLocalRef(env, clazz);    
+    
+    fields.post_event = (*env)->GetStaticMethodID(env, fields.gVp_cls, "onUpdateState", "(IIIIII)V");
+    if(fields.post_event){
+        LOGI("get update state object id");
+    }else{
+        LOGE("failed to get update object id");
+        return -101;
+    }
+    
     return JNI_VERSION_1_4;
 }
 
