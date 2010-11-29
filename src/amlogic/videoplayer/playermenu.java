@@ -89,16 +89,6 @@ public class playermenu extends Activity {
 	
     protected Dialog onCreateDialog(int id) {
     	 switch (id) {
-         case TV_PANEL:
-             return new AlertDialog.Builder(playermenu.this)
-                 .setTitle(R.string.str_vtvorpanel)
-                 .setItems(R.array.tv_panel, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int which) {
-
-                       
-                     }
-                 })
-                 .create();
          case PLAY_MODE:
              return new AlertDialog.Builder(playermenu.this)
                  .setTitle(R.string.str_vplaymode)
@@ -108,26 +98,6 @@ public class playermenu extends Activity {
                     		 playmode = REPEATLIST;
                     	 else if (which == 1)
                     		 playmode = REPEATONE;
-                     }
-                 })
-                 .create(); 
-         case AUDIO_TRACE:
-             return new AlertDialog.Builder(playermenu.this)
-                 .setTitle(R.string.str_vaudio)
-                 .setItems(R.array.audio_trace, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int which) {
-
-                       
-                     }
-                 })
-                 .create();
-         case SUBTITLE_SET:
-             return new AlertDialog.Builder(playermenu.this)
-                 .setTitle(R.string.str_vsubtitle)
-                 .setItems(R.array.subtitle, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int which) {
-
-                       
                      }
                  })
                  .create();
@@ -194,6 +164,12 @@ public class playermenu extends Activity {
     private void videobar() {
     		
     		setContentView(R.layout.layout_imagebutton);
+    		
+    		subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
+        	subTitleView.setTextColor(sub_para.color);
+        	subTitleView.setTextSize(sub_para.font);
+        	openFile(sub_para.filepath);
+        	
     		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
     		subbar.setVisibility(View.INVISIBLE);
     		
@@ -308,7 +284,7 @@ public class playermenu extends Activity {
   		             		  	sub_para.color =android.graphics.Color.BLUE;
   		             	  
   		                	subbar.setVisibility(View.INVISIBLE);
-  		                	morbar.setVisibility(View.VISIBLE);
+  		                	videobar();
   		                } 
   		    	    });
   					Button cancel = (Button) findViewById(R.id.button_canncel);
@@ -318,7 +294,7 @@ public class playermenu extends Activity {
   		                {
   		                	
   		                	subbar.setVisibility(View.INVISIBLE);
-  		                	morbar.setVisibility(View.VISIBLE);
+  		                	videobar();
   		                } 
   		    	    });
   					ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	

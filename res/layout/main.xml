@@ -8,14 +8,11 @@
 	android:id="@+id/LinearLayout_tile" 
 	android:layout_width="fill_parent" 
 	android:background="@drawable/top_bar2"
-    android:layout_height="wrap_content"  
-    android:orientation="horizontal">
+    android:orientation="horizontal" android:layout_height="52dp">
 	<Button android:id="@+id/Button_home" 
 			android:background="@drawable/home_button" 
 			android:layout_marginLeft="12dp" 
-			android:layout_width="wrap_content" 
-			android:layout_weight="1"
-			android:layout_height="52dp">
+			android:layout_height="52dp" android:layout_width="50dp" android:layout_weight="0">
 	</Button>
 	<TextView 
 	android:layout_height="52dp" 
