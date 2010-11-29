@@ -57,7 +57,8 @@ public class playermenu extends Activity {
     private static final int DISPLAY_MODE = 5;
     private static final int BRIGHTNESS_SET = 6;
     
-    private static int playmode = 1;
+    //for repeat mode;
+    private static int m_playmode = 1;
     private static final int REPEATLIST = 1;
     private static final int REPEATONE = 2;
   
@@ -68,6 +69,7 @@ public class playermenu extends Activity {
 	private LinearLayout infobar = null;
 	private LinearLayout morbar = null;
 	private LinearLayout subbar = null;
+	private LinearLayout otherbar = null;
 	
 	Timer timer = new Timer();
 	public Handler myHandler;
@@ -85,82 +87,12 @@ public class playermenu extends Activity {
 	private TextView t_subswitch =null ;
 	private TextView t_subsfont=null ;
 	private TextView t_subscolor=null ;
+	private TextView morebar_tileText =null;
 	private String color_text[]={ "white","yellow","blue"};
+	private String[] m_display = {"4:3","16:9"};
+	private String[] m_brightness= {"1","2","3","4"};		
+	private String[] m_repeat= {"repeat list ","repeat one"};	
 	
-    protected Dialog onCreateDialog(int id) {
-    	 switch (id) {
-         case PLAY_MODE:
-             return new AlertDialog.Builder(playermenu.this)
-                 .setTitle(R.string.str_vplaymode)
-                 .setItems(R.array.play_mode, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int which) {
-                    	 if (which == 0)
-                    		 playmode = REPEATLIST;
-                    	 else if (which == 1)
-                    		 playmode = REPEATONE;
-                     }
-                 })
-                 .create();
-         case DISPLAY_MODE:
-             return new AlertDialog.Builder(playermenu.this)
-                 .setTitle(R.string.str_vdisplay)
-                 .setItems(R.array.display, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int which) {
-
-                       
-                     }
-                 })
-                 .create(); 
-         case BRIGHTNESS_SET:
-             return new AlertDialog.Builder(playermenu.this)
-                 .setTitle(R.string.str_brightness)
-                 .setItems(R.array.brightness, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int which) {
-                    	 WindowManager.LayoutParams lp = getWindow().getAttributes();	
-                    	 switch(which)
-                    	 {
-                    	 case 0:
-                    		 lp.screenBrightness = 0.2f;
-                    		 break;
-                    	 case 1:
-                    		 lp.screenBrightness = 0.5f;
-                    		 break;
-                    	 case 2:
-                    		 lp.screenBrightness = 0.7f;
-                    		 break;
-                    	 case 3:
-                    		 lp.screenBrightness = 1.0f;
-                    		 break;	 
-                    	 default:
-                    		  break;
-                    	 }
-                    	 getWindow().setAttributes(lp);
-                    	}
-                 })
-                 .create();
-         }
-         return null;
-    }
-@Override
-     protected void onPrepareDialog(int id, Dialog dialog) {
-         switch (id) {
-         case PLAY_MODE: 
-         case AUDIO_TRACE:	 
-         case BRIGHTNESS_SET: 
-         case DISPLAY_MODE:
-         case SUBTITLE_SET:	 
-            WindowManager wm = getWindowManager();
-           Display display = wm.getDefaultDisplay();
-             LayoutParams lp = dialog.getWindow().getAttributes();
-             if (display.getHeight() > display.getWidth()) {             
-                lp.width = (int) (display.getWidth() * 1.0);            
-                } else {                        
-                         lp.width = (int) (display.getWidth() * 0.5);                    
-                }
-             dialog.getWindow().setAttributes(lp);
-             break;
-         }
-    }  
     private void videobar() {
     		
     		setContentView(R.layout.layout_imagebutton);
@@ -172,6 +104,10 @@ public class playermenu extends Activity {
         	
     		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
     		subbar.setVisibility(View.INVISIBLE);
+    		
+    		otherbar = (LinearLayout)findViewById(R.id.LinearLayout_other);
+    		morebar_tileText = (TextView)findViewById(R.id.more_title);
+    		otherbar.setVisibility(View.INVISIBLE);
     		
     		morbar = (LinearLayout)findViewById(R.id.morebarLayout);
     		ImageButton panelortv = (ImageButton) findViewById(R.id.ImageButton01);
@@ -188,7 +124,23 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	showDialog(PLAY_MODE);
+                	otherbar.setVisibility(View.VISIBLE);
+                	morebar_tileText.setText("play mode");
+                	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
+                    		R.layout.list_row,m_repeat));
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    	{
+                    		 if (position == 0)
+                        		 m_playmode = REPEATLIST;
+                        	 else if (position == 1)
+                        		 m_playmode = REPEATONE;
+                    		 
+                    		 otherbar.setVisibility(View.INVISIBLE);
+                    	}
+                    });
                 } 
     	    });
             ImageButton audiotrace = (ImageButton) findViewById(R.id.ImageButton03);
@@ -196,9 +148,12 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	//showDialog(AUDIO_TRACE);
-                	setContentView(R.layout.audiolist);
+                	otherbar.setVisibility(View.VISIBLE);
+                	morbar.setVisibility(View.INVISIBLE);
+                	
+                	morebar_tileText.setText("audio trace");
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                	
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row,
                     		AudioInfo.AudioStreamFormat));
@@ -214,12 +169,14 @@ public class playermenu extends Activity {
                 			} catch (RemoteException e) {
                 				e.printStackTrace();
                 			}
-                    		videobar();
                     		try {
                     			m_Amplayer.GetMediaInfo();
                     		} catch (RemoteException e) {
                 				e.printStackTrace();
                 			}
+                    		
+                    		otherbar.setVisibility(View.INVISIBLE);
+                        	morbar.setVisibility(View.VISIBLE);
             			}	
                     });
                 } 
@@ -391,7 +348,24 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	showDialog(DISPLAY_MODE);
+                	otherbar.setVisibility(View.VISIBLE);
+                	morbar.setVisibility(View.INVISIBLE);
+                	
+                	morebar_tileText.setText("display mode");
+                	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
+                    		R.layout.list_row,m_display));
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    	{
+                    		 otherbar.setVisibility(View.INVISIBLE);
+                         	 morbar.setVisibility(View.VISIBLE);
+                    	}
+                    	 otherbar.setVisibility(View.INVISIBLE);
+                     	 morbar.setVisibility(View.VISIBLE);
+                    });
+                    
                 } 
     	    });
             ImageButton brigtness = (ImageButton) findViewById(R.id.ImageButton06);
@@ -399,7 +373,39 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	showDialog(BRIGHTNESS_SET);
+                	
+                	otherbar.setVisibility(View.VISIBLE);
+                	morbar.setVisibility(View.INVISIBLE);
+                	morebar_tileText.setText("brightness setting");
+                	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
+                    		R.layout.list_row,m_brightness));
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    		 WindowManager.LayoutParams lp = getWindow().getAttributes();	
+                        	 switch(position)
+                        	 {
+                        	 case 0:
+                        		 lp.screenBrightness = 0.2f;
+                        		 break;
+                        	 case 1:
+                        		 lp.screenBrightness = 0.5f;
+                        		 break;
+                        	 case 2:
+                        		 lp.screenBrightness = 0.7f;
+                        		 break;
+                        	 case 3:
+                        		 lp.screenBrightness = 1.0f;
+                        		 break;	 
+                        	 default:
+                        		  break;
+                        	 }
+                        	 getWindow().setAttributes(lp);
+                    		otherbar.setVisibility(View.INVISIBLE);
+                        	morbar.setVisibility(View.VISIBLE);
+                    	}
+                    });
                 } 
     	    }); 
             ImageButton backtovidebar = (ImageButton) findViewById(R.id.ImageButton07);
@@ -447,30 +453,8 @@ public class playermenu extends Activity {
         subinit();
         initinfobar();
         closeScreenOffTimeout();
-        ThreadInit();
     }
     
-    protected void ThreadInit()
-    {
-    	myHandler = new Handler(){
-    		@Override
-    		public void handleMessage(Message msg) {
-    			// TODO Auto-generated method stub
-    			super.handleMessage(msg);
-    			switch(msg.what){
-    			case msg_Key:
-    				if (PRE_NEXT_FLAG == 1)
-    				{
-    					Amplayer_play();
-    					PRE_NEXT_FLAG = 0;
-    				}
-    				break;
-    			default:
-    				break;
-    			}
-    		}
-        };
-    }
     protected void subinit()
     {
     	Log.d(TAG, "open:-------------476------------------");
@@ -922,7 +906,7 @@ public class playermenu extends Activity {
     					}
 						break;
 					case VideoInfo.PLAYER_PLAYEND:
-						if (playmode == REPEATLIST)
+						if (m_playmode == REPEATLIST)
 							PlayList.getinstance().movenext();
 						AudioInfo.AudioStreamFormat.clear();
 						AudioInfo.AudioStreamInfo.clear();
