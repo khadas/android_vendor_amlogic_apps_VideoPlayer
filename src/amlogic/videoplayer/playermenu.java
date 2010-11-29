@@ -17,10 +17,7 @@ import amlogic.playerservice.Errorno;
 import amlogic.playerservice.Player;
 import amlogic.playerservice.VideoInfo;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ComponentName;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -34,7 +31,6 @@ import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
 import android.util.Log;
 import android.view.*;
-import android.view.WindowManager.LayoutParams;
 import android.widget.*;
 
 public class playermenu extends Activity {
@@ -50,12 +46,7 @@ public class playermenu extends Activity {
 	private int total_audio_num = 0;
 	private int ScreenOffTimeoutValue = 0;
 	private boolean backToFileList = false;
-	private static final int TV_PANEL = 1;
-    private static final int PLAY_MODE = 2;
-    private static final int AUDIO_TRACE = 3;
-    private static final int SUBTITLE_SET = 4;
-    private static final int DISPLAY_MODE = 5;
-    private static final int BRIGHTNESS_SET = 6;
+	private boolean progressSliding = false;
     
     //for repeat mode;
     private static int m_playmode = 1;
@@ -357,15 +348,12 @@ public class playermenu extends Activity {
                     		R.layout.list_row,m_display));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
-                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     	{
                     		 otherbar.setVisibility(View.INVISIBLE);
                          	 morbar.setVisibility(View.VISIBLE);
                     	}
-                    	 otherbar.setVisibility(View.INVISIBLE);
-                     	 morbar.setVisibility(View.VISIBLE);
-                    });
-                    
+                    });    
                 } 
     	    });
             ImageButton brigtness = (ImageButton) findViewById(R.id.ImageButton06);
@@ -638,12 +626,15 @@ public class playermenu extends Activity {
 				{
 					e.printStackTrace();
 				}
+				waitForHide();
+				progressSliding = false;
 			}
 			
 			public void onStartTrackingTouch(SeekBar seekBar) 
 			{
 				// TODO Auto-generated method stub
-				
+				timer.cancel();
+				progressSliding = true;
 			}
 			
 			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) 
@@ -879,8 +870,10 @@ public class playermenu extends Activity {
     		    	}
     		    	if (totaltime == 0)
 						myProgressBar.setProgress(0);
-					else
-						myProgressBar.setProgress(msg.arg1*100/totaltime);
+					else {
+						if (!progressSliding)
+							myProgressBar.setProgress(msg.arg1*100/totaltime);
+					}
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
     				player_status = msg.arg1;
@@ -1029,7 +1022,11 @@ public class playermenu extends Activity {
 			Log.d(TAG,"to play files!");
 			try
 			{
-				m_Amplayer.SetColorKey(0x18c3);
+				final short color = ((0x8 >> 3) << 11) 
+									| ((0x30 >> 2) << 5) 
+									| ((0x8 >> 3) << 0);
+				m_Amplayer.SetColorKey(color);
+				Log.d(TAG, "set colorkey() color=" + color);
 			}
 			catch(RemoteException e)
 			{

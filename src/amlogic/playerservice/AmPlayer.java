@@ -21,6 +21,7 @@ public class AmPlayer extends Service {
     private static final String TAG = "amplayer";
     private static Messenger mClient = null;
     private static int player_status = 0;
+    private static int last_cur_time = -1;
     
     /**jni interface */
     public static native int native_startcmd(String filename);
@@ -158,14 +159,18 @@ public class AmPlayer extends Service {
 	public static void onUpdateState(int last_sta, int status, int full_time,
 			int current_time, int last_time, int error_no)
 	{
-		Message message = new Message();
-		message.what = VideoInfo.TIME_INFO_MSG;
-		message.arg1 = current_time;
-		message.arg2 = full_time;
-		try {
-			mClient.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
+		if (last_cur_time != current_time)
+		{
+			Message message = new Message();
+			message.what = VideoInfo.TIME_INFO_MSG;
+			message.arg1 = current_time;
+			message.arg2 = full_time;
+			try {
+				mClient.send(message);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			last_cur_time = current_time;
 		}
 		
 		//send message for status changed
