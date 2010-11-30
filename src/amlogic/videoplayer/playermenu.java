@@ -530,6 +530,8 @@ public class playermenu extends Activity {
 			}
         });
         
+        if (player_status == VideoInfo.PLAYER_RUNNING)
+			play.setBackgroundResource(R.drawable.pause_button);
         play.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
