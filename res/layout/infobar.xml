@@ -10,7 +10,9 @@
 	    	android:layout_height="wrap_content"
 	    	android:layout_width="fill_parent"
 	    	android:gravity="center"
-	    	android:orientation="horizontal" android:layout_gravity="bottom" android:clipChildren="false"
+	    	android:orientation="horizontal" 
+	    	android:layout_gravity="bottom" 
+	    	android:clipChildren="false"
 	    	android:layout_alignParentBottom="true">
 	    <com.subtitleview.SubtitleView
 	    	android:id="@+id/subTitle"
@@ -28,7 +30,9 @@
 	 android:background="@drawable/movie_play_bk"
 	 android:orientation="vertical" 
 	 android:id="@+id/infobarLayout" 
-	 android:gravity="bottom|center_horizontal" android:layout_height="wrap_content" android:layout_gravity="center_horizontal">
+	 android:gravity="bottom|center_horizontal" 
+	 android:layout_height="wrap_content" 
+	 android:layout_gravity="center_horizontal">
 			
 		<LinearLayout android:id="@+id/LinearLayout02"
 		 android:layout_height="wrap_content" 
@@ -60,7 +64,8 @@
 
 		<LinearLayout android:id="@+id/LinearLayout01"
 		 android:layout_width="wrap_content" 
-		 android:layout_height="wrap_content">
+		 android:layout_height="wrap_content" 
+		 android:layout_marginBottom="4dp">
 			<ImageButton android:layout_width="wrap_content"
 			  android:layout_height="wrap_content" 
 			  android:background="@drawable/browser_button" 
