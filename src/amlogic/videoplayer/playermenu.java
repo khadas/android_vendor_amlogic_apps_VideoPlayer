@@ -80,9 +80,9 @@ public class playermenu extends Activity {
 	private TextView t_subscolor=null ;
 	private TextView morebar_tileText =null;
 	private String color_text[]={ "white","yellow","blue"};
-	private String[] m_display = {"4:3","16:9"};
+	private String[] m_display = {"4:3","16:9","",""};
 	private String[] m_brightness= {"1","2","3","4"};		
-	private String[] m_repeat= {"repeat list ","repeat one"};	
+	private String[] m_repeat= {"repeat list ","repeat one","",""};	
 	
     private void videobar() {
     		
@@ -94,11 +94,11 @@ public class playermenu extends Activity {
         	openFile(sub_para.filepath);
         	
     		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
-    		subbar.setVisibility(View.INVISIBLE);
+    		subbar.setVisibility(View.GONE);
     		
     		otherbar = (LinearLayout)findViewById(R.id.LinearLayout_other);
     		morebar_tileText = (TextView)findViewById(R.id.more_title);
-    		otherbar.setVisibility(View.INVISIBLE);
+    		otherbar.setVisibility(View.GONE);
     		
     		morbar = (LinearLayout)findViewById(R.id.morebarLayout);
     		ImageButton panelortv = (ImageButton) findViewById(R.id.ImageButton01);
@@ -116,6 +116,7 @@ public class playermenu extends Activity {
                 public void onClick(View v) 
                 {
                 	otherbar.setVisibility(View.VISIBLE);
+                	morbar.setVisibility(View.GONE);
                 	morebar_tileText.setText("play mode");
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
@@ -129,7 +130,8 @@ public class playermenu extends Activity {
                         	 else if (position == 1)
                         		 m_playmode = REPEATONE;
                     		 
-                    		 otherbar.setVisibility(View.INVISIBLE);
+                    		 otherbar.setVisibility(View.GONE);
+                    		 morbar.setVisibility(View.VISIBLE);
                     	}
                     });
                 } 
@@ -140,7 +142,7 @@ public class playermenu extends Activity {
                 public void onClick(View v) 
                 {
                 	otherbar.setVisibility(View.VISIBLE);
-                	morbar.setVisibility(View.INVISIBLE);
+                	morbar.setVisibility(View.GONE);
                 	
                 	morebar_tileText.setText("audio trace");
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -166,7 +168,7 @@ public class playermenu extends Activity {
                 				e.printStackTrace();
                 			}
                     		
-                    		otherbar.setVisibility(View.INVISIBLE);
+                    		otherbar.setVisibility(View.GONE);
                         	morbar.setVisibility(View.VISIBLE);
             			}	
                     });
@@ -183,7 +185,7 @@ public class playermenu extends Activity {
                 	    return;
                 	}
                 	subbar.setVisibility(View.VISIBLE);
-                	morbar.setVisibility(View.INVISIBLE);
+                	morbar.setVisibility(View.GONE);
                 	subtitle_control();
                 }
 
@@ -231,7 +233,7 @@ public class playermenu extends Activity {
   		             	  else
   		             		  	sub_para.color =android.graphics.Color.BLUE;
   		             	  
-  		                	subbar.setVisibility(View.INVISIBLE);
+  		                	subbar.setVisibility(View.GONE);
   		                	videobar();
   		                } 
   		    	    });
@@ -241,7 +243,7 @@ public class playermenu extends Activity {
   		                public void onClick(View v) 
   		                {
   		                	
-  		                	subbar.setVisibility(View.INVISIBLE);
+  		                	subbar.setVisibility(View.GONE);
   		                	videobar();
   		                } 
   		    	    });
@@ -340,7 +342,7 @@ public class playermenu extends Activity {
                 public void onClick(View v) 
                 {
                 	otherbar.setVisibility(View.VISIBLE);
-                	morbar.setVisibility(View.INVISIBLE);
+                	morbar.setVisibility(View.GONE);
                 	
                 	morebar_tileText.setText("display mode");
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -350,7 +352,7 @@ public class playermenu extends Activity {
                     {
                     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     	{
-                    		 otherbar.setVisibility(View.INVISIBLE);
+                    		 otherbar.setVisibility(View.GONE);
                          	 morbar.setVisibility(View.VISIBLE);
                     	}
                     });    
@@ -363,7 +365,7 @@ public class playermenu extends Activity {
                 {
                 	
                 	otherbar.setVisibility(View.VISIBLE);
-                	morbar.setVisibility(View.INVISIBLE);
+                	morbar.setVisibility(View.GONE);
                 	morebar_tileText.setText("brightness setting");
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
@@ -390,7 +392,7 @@ public class playermenu extends Activity {
                         		  break;
                         	 }
                         	 getWindow().setAttributes(lp);
-                    		otherbar.setVisibility(View.INVISIBLE);
+                    		otherbar.setVisibility(View.GONE);
                         	morbar.setVisibility(View.VISIBLE);
                     	}
                     });
@@ -865,10 +867,10 @@ public class playermenu extends Activity {
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
     		    	{
-    		    		 Log.d(TAG, "open:-------------882------------------");
+    		    		
     		    		if(subTitleView!=null)
     		    		subTitleView.tick(curtime*1000);
-    		    		Log.d(TAG, "open:-------------885------------------");
+    		    		
     		    	}
     		    	if (totaltime == 0)
 						myProgressBar.setProgress(0);
@@ -961,15 +963,26 @@ public class playermenu extends Activity {
     {
     	try
 		{
+    		//if otherbar is visable;hide it 
+    		if(otherbar!=null&&morbar!=null)
+    		{	
+    			if(otherbar.getVisibility() == View.VISIBLE)
+    				otherbar.setVisibility(View.GONE);
+    			if(subbar.getVisibility() == View.VISIBLE)
+    				subbar.setVisibility(View.GONE);
+    			
+	            morbar.setVisibility(View.VISIBLE);
+    		}
+    		
 			m_Amplayer.Open(PlayList.getinstance().getcur());
 			//reset sub;
-			Log.d(TAG, "open:-------------930------------------");
 			subTitleView.setText("");
 			subinit();
 			subTitleView.setTextColor(sub_para.color);
 	    	subTitleView.setTextSize(sub_para.font);
 	    	openFile(sub_para.filepath);
-	    	Log.d(TAG, "open:-------------935------------------");
+	    	
+	    	
 		}
 		catch(RemoteException e)
 		{
