@@ -47,6 +47,7 @@ public class playermenu extends Activity {
 	private int ScreenOffTimeoutValue = 0;
 	private boolean backToFileList = false;
 	private boolean progressSliding = false;
+	private boolean INITOK = false;
     
     //for repeat mode;
     private static int m_playmode = 1;
@@ -507,6 +508,8 @@ public class playermenu extends Activity {
         preItem.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				if (!INITOK)
+					return;
 				String filename = PlayList.getinstance().moveprev();
 				Toast toast = Toast.makeText(playermenu.this, filename, Toast.LENGTH_LONG); 
 				toast.show();
@@ -522,6 +525,8 @@ public class playermenu extends Activity {
         nextItem.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				if (!INITOK)
+					return;
 				String filename = PlayList.getinstance().movenext();
 				Toast.makeText(playermenu.this, filename, Toast.LENGTH_LONG).show();
 				if(m_Amplayer == null)
@@ -565,6 +570,8 @@ public class playermenu extends Activity {
                 
         fastforword.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
+				if (!INITOK)
+					return;
 				if (player_status == VideoInfo.PLAYER_SEARCHING)
 				{
 					try	{
@@ -586,6 +593,8 @@ public class playermenu extends Activity {
         
         fastreverse.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
+				if (!INITOK)
+					return;
 				if (player_status == VideoInfo.PLAYER_SEARCHING)
 				{
 					try	{
@@ -816,6 +825,7 @@ public class playermenu extends Activity {
 				if (hour > 99)
 					return "99:59:59";
 				minute = minute%60;
+				second = i%60;
 				retStr = unitFormat(hour) + ":" + unitFormat(minute) + ":" + unitFormat(second);
 			}
 		}
@@ -907,6 +917,7 @@ public class playermenu extends Activity {
 							PlayList.getinstance().movenext();
 						AudioInfo.AudioStreamFormat.clear();
 						AudioInfo.AudioStreamInfo.clear();
+						INITOK = false;
 						Amplayer_play();
 						break;
 					case VideoInfo.PLAYER_ERROR:
@@ -939,6 +950,7 @@ public class playermenu extends Activity {
 							.show();
 						break;
 					case VideoInfo.PLAYER_INITOK:
+						INITOK = true;
 						if (setCodecMips() == 0)
 				        	Log.d(TAG, "setCodecMips Failed");
 						break;
@@ -1012,6 +1024,7 @@ public class playermenu extends Activity {
 		}
 		AudioInfo.AudioStreamFormat.clear();
 		AudioInfo.AudioStreamInfo.clear();
+		INITOK = false;
     }
     
     ServiceConnection m_PlayerConn = new ServiceConnection()
