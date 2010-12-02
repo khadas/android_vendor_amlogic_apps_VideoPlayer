@@ -891,6 +891,7 @@ public class playermenu extends Activity {
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
     				player_status = msg.arg1;
+    				
     				switch(player_status)
     				{
 					case VideoInfo.PLAYER_RUNNING:
@@ -922,31 +923,8 @@ public class playermenu extends Activity {
 						break;
 					case VideoInfo.PLAYER_ERROR:
 						String InfoStr = null;
-						switch (msg.arg2)
-			        	{
-							case Errorno.PLAYER_UNSUPPORT:
-								InfoStr = "Unsupport Video and Audio format";
-								break;
-							case Errorno.PLAYER_UNSUPPORT_VIDEO:
-								InfoStr = "Unsupport Video format";
-								break;
-							case Errorno.PLAYER_UNSUPPORT_AUDIO:
-								InfoStr = "Unsupport Audio format";
-								break;
-							case Errorno.FFMPEG_OPEN_FAILED:
-								InfoStr = "Open file("+PlayList.getinstance().getcur()+")failed";
-								break;	
-							case  Errorno.FFMPEG_PARSE_FAILED:
-								InfoStr = "Parser file("+PlayList.getinstance().getcur()+")failed";
-								break;
-							case  Errorno.DECODER_INIT_FAILED:
-								InfoStr = "Decode Init failed";
-								break;
-							default:
-								InfoStr = "Unknow Error";
-								break;
-			        	}	
-						Toast.makeText(playermenu.this, InfoStr, Toast.LENGTH_LONG)
+						InfoStr = getErrorInfo(msg.arg2);
+						Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_LONG)
 							.show();
 						break;
 					case VideoInfo.PLAYER_INITOK:
@@ -962,13 +940,59 @@ public class playermenu extends Activity {
     				total_audio_num = msg.arg1;
     				cur_audio_stream = msg.arg2;
     				break;
+    			case VideoInfo.HAS_ERROR_MSG:
+					String errStr = null;
+					errStr = getErrorInfo(msg.arg2);
+					Toast.makeText(playermenu.this, errStr, Toast.LENGTH_LONG)
+						.show();
+    				break;
     			default:
     				super.handleMessage(msg);
     				break;
     		}
     	}
     });
-    
+    private String getErrorInfo(int errID)
+    {
+    	String errStr = null;
+    	switch (errID)
+    	{
+			case Errorno.PLAYER_UNSUPPORT:
+				errStr = "Unsupport Video and Audio format";
+				break;
+			case Errorno.PLAYER_UNSUPPORT_VIDEO:
+				errStr = "Unsupport Video format";
+				break;
+			case Errorno.PLAYER_UNSUPPORT_AUDIO:
+				errStr = "Unsupport Audio format";
+				break;
+			case Errorno.FFMPEG_OPEN_FAILED:
+				errStr = "Open file("+PlayList.getinstance().getcur()+")failed";
+				break;	
+			case  Errorno.FFMPEG_PARSE_FAILED:
+				errStr = "Parser file("+PlayList.getinstance().getcur()+")failed";
+				break;
+			case  Errorno.DECODER_INIT_FAILED:
+				errStr = "Decode Init failed";
+				break;
+			case  Errorno.PLAYER_NO_VIDEO:
+				errStr = "file("+PlayList.getinstance().getcur()+")no video";
+				break;
+			case  Errorno.PLAYER_NO_AUDIO:
+				errStr = "file("+PlayList.getinstance().getcur()+")no audio";
+				break;
+			case  Errorno.PLAYER_SET_NOVIDEO:
+				errStr = "set playback without video";
+				break;
+			case  Errorno.PLAYER_SET_NOAUDIO:
+				errStr = "set playback without audio";
+				break;
+			default:
+				errStr = "Unknow Error";
+				break;
+    	}
+    	return errStr;
+    }
 	
     public Player m_Amplayer = null;
     private void Amplayer_play()

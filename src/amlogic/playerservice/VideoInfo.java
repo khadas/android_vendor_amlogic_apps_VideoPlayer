@@ -10,6 +10,7 @@ public class VideoInfo {
 	public final static int TIME_INFO_MSG = 1000;
 	public final static int STATUS_CHANGED_INFO_MSG = 1000+1;
 	public final static int AUDIO_CHANGED_INFO_MSG = 1000+2;
+	public final static int HAS_ERROR_MSG = 1000+3;
 
     //typedef enum { ... } player_status;
     public static final int PLAYER_UNKNOWN  = 0;

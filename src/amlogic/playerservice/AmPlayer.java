@@ -181,10 +181,26 @@ public class AmPlayer extends Service {
 			s_message.what = VideoInfo.STATUS_CHANGED_INFO_MSG;
 			s_message.arg1 = player_status;
 			if (player_status == VideoInfo.PLAYER_ERROR)
+			{
 				s_message.arg2 = error_no;
+				error_no = 0;
+			}
 			Log.d(TAG,"player status changed to: " + player_status);
 			try {
 				mClient.send(s_message);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (error_no != 0)
+		{
+			Message e_message = new Message();
+			e_message.what = VideoInfo.HAS_ERROR_MSG;
+			e_message.arg2 = error_no;
+			Log.d(TAG,"player has error: " + error_no);
+			try {
+				mClient.send(e_message);
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}

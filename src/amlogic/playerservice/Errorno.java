@@ -30,6 +30,14 @@ public class Errorno{
     public static final int PLAYER_SEEK_OVERSPILL  = -0x02000038;
     public static final int PLAYER_CHECK_CODEC_ERROR = -0x02000039;
     public static final int PLAYER_INVALID_CMD =     -0x02000040;
+    
+    public static final int PLAYER_REAL_AUDIO_FAILED = -0x02000041;
+	public static final int PLAYER_ADTS_NOIDX		 = -0x02000042;
+	public static final int PLAYER_SEEK_FAILED		 = -0x02000043;
+	public static final int PLAYER_NO_VIDEO  		 = -0x02000044;
+	public static final int PLAYER_NO_AUDIO  		 = -0x02000045;
+	public static final int PLAYER_SET_NOVIDEO  	 = -0x02000046;
+	public static final int PLAYER_SET_NOAUDIO  	 = -0x02000047;
 
     public static final int FFMPEG_SUCCESS =         0;
     public static final int FFMPEG_OPEN_FAILED =     -0x03000001;

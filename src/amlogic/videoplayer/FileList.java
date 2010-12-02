@@ -53,6 +53,7 @@ public class FileList extends ListActivity {
 								"f4v," +
 								"flv," +
 								"h264," +
+								"iso," +
 								"lst," +
 								"m2ts," +
 								"m4v," +
