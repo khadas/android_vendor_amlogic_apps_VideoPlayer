@@ -483,8 +483,8 @@ public class playermenu extends Activity {
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
     	total_time = (TextView)findViewById(R.id.TextView04);
-    	cur_time.setText(secToTime(0));
-    	total_time.setText(secToTime(0));
+    	cur_time.setText(secToTime(curtime));
+    	total_time.setText(secToTime(totaltime));
         
     	Log.d(TAG, "open:-------------405------------------"+sub_para.filepath);
     	
@@ -623,6 +623,8 @@ public class playermenu extends Activity {
 			}
 		});
         
+        if (curtime != 0)
+        	myProgressBar.setProgress(curtime*100/totaltime);
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() 
         {
     
