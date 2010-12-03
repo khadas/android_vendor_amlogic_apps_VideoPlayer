@@ -179,10 +179,20 @@ public class FileList extends ListActivity {
 	    			 tmppath = "nand";
 	    		else if((!tpath.equals("/mnt/sdcard"))&&tpath.startsWith("/mnt/sd"))
 	    			 tmppath = "usb";
-	    	}	
-	    	items.add(tmppath);
-	    	paths.add(tempF.getPath());
-	    }
+	    		//delete used folder
+	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/sata"))&&(!tpath.equals("/mnt/secure")))
+	    		{
+	    			items.add(tmppath);
+	    	    	paths.add(tempF.getPath());
+	    		}
+	    	}
+	    	else
+	    	{
+	    		items.add(tmppath);
+	    		paths.add(tempF.getPath());
+	    	}
+		 }
+		    
 	    tileText =(TextView) findViewById(R.id.TextView_path);
 	    tileText.setText(filePath);
 	    setListAdapter(new MyAdapter(this,items,paths));

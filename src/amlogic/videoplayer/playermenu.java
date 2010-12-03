@@ -880,7 +880,7 @@ public class playermenu extends Activity {
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
     		    	{
     		    		
-    		    		if(subTitleView!=null)
+    		    		if(subTitleView!=null&&sub_para.filepath!=null)
     		    		subTitleView.tick(curtime*1000);
     		    		
     		    	}
@@ -1125,7 +1125,11 @@ public class playermenu extends Activity {
 	private void openFile(String filepath)  {
 		
 		
-		Log.d(TAG, "open:" + filepath);
+		if(filepath==null)
+		{
+			Log.d(TAG, "----------------sub filepath is null----------------");
+			return;
+		}
 		
 		try {
 			
