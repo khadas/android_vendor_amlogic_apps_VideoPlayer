@@ -65,7 +65,6 @@ public class playermenu extends Activity {
 	
 	Timer timer = new Timer();
 	public Handler myHandler;
-	private final int msg_Key = 0x1234;
 	private static int PRE_NEXT_FLAG = 0;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 	
@@ -908,6 +907,7 @@ public class playermenu extends Activity {
 						play.setBackgroundResource(R.drawable.play_button);
 						break;
 					case VideoInfo.PLAYER_STOPED:
+						new PlayThread().start();
 						if (PRE_NEXT_FLAG == 1)
     					{
     						Log.d(TAG,"to play another file!");
@@ -1155,9 +1155,6 @@ public class playermenu extends Activity {
 			try
         	{
         		Thread.sleep(600);
-        		Message msg = new Message();
-        		msg.what = msg_Key;
-        		myHandler.sendMessage(msg);
         	}
         	catch (InterruptedException e)
         	{
