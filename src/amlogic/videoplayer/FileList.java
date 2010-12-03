@@ -165,9 +165,22 @@ public class FileList extends ListActivity {
 	    }
 	    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));   
 	    
-	    for(i=0;i<fs.length;i++) {
+	    for(i=0;i<fs.length;i++)
+	    {
 	    	File tempF = fs[i];
-	    	items.add(tempF.getName());
+	    	String tmppath = tempF.getName();
+	    	
+		    //change device name;	
+	    	if(filePath.equals("/mnt"))
+	    	{
+	    		String tpath = tempF.getAbsolutePath();  
+	    	
+	    		if (tpath.equals("/mnt/flash"))
+	    			 tmppath = "nand";
+	    		else if((!tpath.equals("/mnt/sdcard"))&&tpath.startsWith("/mnt/sd"))
+	    			 tmppath = "usb";
+	    	}	
+	    	items.add(tmppath);
 	    	paths.add(tempF.getPath());
 	    }
 	    tileText =(TextView) findViewById(R.id.TextView_path);
@@ -196,9 +209,7 @@ public class FileList extends ListActivity {
 	    		if(!tempF.isHidden())
 	    		{
 	    		    listFiles.add(tempF);
-	    		    System.out.println("----------------this hidden a directory------------------");
 	    		}
-	    		System.out.println("----------------this is a directory------------------");
 	    			    	
 
 	    	} 

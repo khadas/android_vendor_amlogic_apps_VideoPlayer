@@ -67,23 +67,15 @@ public class MyAdapter extends BaseAdapter {
 		}
 
 		File f=new File(paths.get(position).toString());
-		//FileType fileType = new FileType();
-		//String type = fileType.getFileType(f);
-    
-		holder.text.setText(f.getName());
+		
+        File txtf = new File(items.get(position).toString());
+        
+		holder.text.setText(txtf.getName());
 		if(f.isDirectory()) {
 			holder.icon.setImageBitmap(iconFolder);
 		}
 		else {
-		/*	if(type.equals("image/*"))
-				holder.icon.setImageBitmap(iconImage);
-			else if(type.equals("audio/*"))
-				holder.icon.setImageBitmap(iconAudio);
-			else if(type.equals("video/*"))
-			*/
 				holder.icon.setImageBitmap(iconVideo);
-			//else
-			//	holder.icon.setImageBitmap(iconFile);
 		}
 		return convertView;
 	}
