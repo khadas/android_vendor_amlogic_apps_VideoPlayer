@@ -33,6 +33,8 @@ $(shell mkdir -p $(LOCAL_PATH)/assets/firmware/)
 $(shell cp $(LOCAL_PATH)/../Amplayer/assets/firmware/* $(LOCAL_PATH)/assets/firmware/)
 $(shell cd $(LOCAL_PATH)/assets/firmware && md5sum *.bin > checksum.txt)
 
+LOCAL_MODULE_PATH := $(PRODUCT_OUT)/data/app
+
 include $(BUILD_PACKAGE)
 ##################################################
 
