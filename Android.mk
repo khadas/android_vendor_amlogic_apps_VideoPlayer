@@ -21,7 +21,8 @@ LOCAL_SDK_VERSION := current
 
 LOCAL_PACKAGE_NAME := VideoPlayer
 
-LOCAL_JNI_SHARED_LIBRARIES := libamplayerjni
+LOCAL_STATIC_JAVA_LIBRARIES := amlogic.subtitle
+LOCAL_JNI_SHARED_LIBRARIES := libamplayerjni libsubjni
 
 #LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
