@@ -23,14 +23,62 @@ public class AmPlayer extends Service {
     private static int player_status = 0;
     private static int last_cur_time = -1;
     
+    private int mPid = -1;
     /**jni interface */
-    public static native int native_startcmd(String filename);
+    /*public static native int native_startcmd(String filename);
     public static native int native_sendcmd(String cmd);
     public native int native_reqstate();//!!!should not be static
     public static native int native_setglobalalpha(int alpha);
     public static native int native_getosdbpp();
     public static native int native_enablecolorkey(short key_rgb565);
+    public static native int native_disablecolorkey();*/
+    
+  //TODO need api
+	private native int setMedia(String url,int loop,int playMode,int pos);//playMode:0,all,just default;
+	//play
+	private native int playMedia(String url,int loop,int playMode,int pos);// pos refer to "start position"
+
+	private native int start(int pid);
+	private native int pause(int pid);
+	private native int resume(int pid);
+	private native int seek(int pid,int pos);//in second
+	private native int stop(int pid);
+	private native int close(int pid);
+
+	private native int fastforward(int pid,int speed);
+	private native int fastrewind(int pid,int speed);
+	private native int setSubtitleOut(int pid, int sub_uid);
+	private native int setAudioTrack(int pid,int track_uid);
+	private native int setRepeat(int pid, int isRepeat);
+	private native Object getMetaInfo(int pid);
+
+	private static native int setTone(int pid, int tone);
+	private static native int setIVolume(int vol);
+	private static native int mute();
+	private static native int unmute();
+	private static native int setVideoBlackOut(int isBlackOut);
+
+	private static native int native_init();
+	private static native int native_uninit();
+
+    public static native int native_enablecolorkey(short key_rgb565);
     public static native int native_disablecolorkey();
+    public static native int native_setglobalalpha(int alpha);
+    public static native int native_getosdbpp();
+
+    public int start() { return start(mPid);}
+	public int pause() { return pause(mPid);}
+	public int resume() { return resume(mPid);}
+	public int seek(int pos) { return seek(mPid,pos);}
+	//public int stop() { return stop(mPid);}
+	//public int close() { return close(mPid);}
+	public int fastforward(int speed) { return fastforward(mPid,speed);}
+	public int fastrewind(int speed) { return fastrewind(mPid,speed);}
+	public int setSubtitleOut( int sub_uid) { return setSubtitleOut(mPid,sub_uid);}
+	public int setAudioTrack(int track_uid) { return setAudioTrack(mPid,track_uid);}
+	public int setRepeat(int isRepeat) { return setRepeat(mPid,isRepeat);}
+	public Object getMetaInfo() {return getMetaInfo(mPid);}//can't be use now
+	public int setTone(int tone) {return setTone(mPid, tone);}
 	
 	
 	public void onCreate()
@@ -65,11 +113,16 @@ public class AmPlayer extends Service {
 	public Player.Stub m_player = new Player.Stub()
 	{
 		public int Init() throws RemoteException {
+			native_init();
 			return 0;
 		}
 
 		public int Open(String filepath) throws RemoteException {
-			native_startcmd(filepath);
+			mPid = setMedia( filepath, 0, 0, 0);
+			if (mPid < 0)
+				Log.e(TAG, "get pid failed after setMedia");
+			else
+				start();
 			return 0;
 		}
 
@@ -79,18 +132,22 @@ public class AmPlayer extends Service {
 		}
 
 		public int Pause() throws RemoteException {
-			native_sendcmd("pause");
+			pause();
 			return 0;
 		}
 
 		public int Resume() throws RemoteException {
-			native_sendcmd("resume");
+			resume();
 			return 0;
 		}
 
 		public int Stop() throws RemoteException {
 			//stopGetStates();
-			native_sendcmd("stop");
+			if (mPid >= 0) {
+				stop(mPid);
+				close(mPid);
+				mPid = -1;
+			}
 			return 0;
 		}
 
@@ -99,23 +156,23 @@ public class AmPlayer extends Service {
 		}
 		
 		public int GetMediaInfo() throws RemoteException {
-			native_sendcmd("media");
+			getMetaInfo();
 			return 0;
 		}
 		
 		public int SwitchAID(int id) throws RemoteException {
-			native_sendcmd("aid:" + id);
+			setAudioTrack(id);
 			Log.d("audiostream","aid: " + id);
 			return 0;
 		}
 
 		public int FastForward(int speed) throws RemoteException {
-			native_sendcmd("forward:"+String.valueOf(speed));
+			fastforward(speed);
 			return 0;
 		}
 
 		public int BackForward(int speed) throws RemoteException {
-			native_sendcmd("backward:"+String.valueOf(speed));
+			fastrewind(speed);
 			return 0;
 		}
 
@@ -129,7 +186,7 @@ public class AmPlayer extends Service {
 		}
 
 		public int Seek(int time) throws RemoteException {
-			native_sendcmd("search:"+String.valueOf(time));
+			seek(time);
 			return 0;
 		}
 
@@ -144,7 +201,7 @@ public class AmPlayer extends Service {
 	Handler mhandler = new Handler();
     private Runnable mGetState = new Runnable() {
         public void run() {
-        	AmPlayer.this.native_reqstate();
+        	//AmPlayer.this.native_reqstate();
         	mhandler.postDelayed(mGetState, 500);
         }
     };
@@ -156,7 +213,7 @@ public class AmPlayer extends Service {
     	mhandler.removeCallbacks(mGetState);
     }
 
-	public static void onUpdateState(int last_sta, int status, int full_time,
+	public static void onUpdateState(int pid, int status, int full_time,
 			int current_time, int last_time, int error_no)
 	{
 		if (last_cur_time != current_time)
@@ -185,7 +242,7 @@ public class AmPlayer extends Service {
 				s_message.arg2 = error_no;
 				error_no = 0;
 			}
-			Log.d(TAG,"player status changed to: " + player_status);
+			Log.d(TAG,"player status changed to: " + Integer.toHexString(player_status));
 			try {
 				mClient.send(s_message);
 			} catch (RemoteException e) {

@@ -64,6 +64,7 @@ public class playermenu extends Activity {
 	private LinearLayout otherbar = null;
 	
 	Timer timer = new Timer();
+	Toast toast = null;
 	public Handler myHandler;
 	private static int PRE_NEXT_FLAG = 0;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
@@ -438,6 +439,7 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.infobar);
+        toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         
 		Log.d(TAG, "open:-------------428------------------");	
         subinit();
@@ -510,7 +512,8 @@ public class playermenu extends Activity {
 				if (!INITOK)
 					return;
 				String filename = PlayList.getinstance().moveprev();
-				Toast toast = Toast.makeText(playermenu.this, filename, Toast.LENGTH_LONG); 
+				toast.cancel();
+				toast.setText(filename);
 				toast.show();
 				if(m_Amplayer == null)
 					return;
@@ -527,7 +530,9 @@ public class playermenu extends Activity {
 				if (!INITOK)
 					return;
 				String filename = PlayList.getinstance().movenext();
-				Toast.makeText(playermenu.this, filename, Toast.LENGTH_LONG).show();
+				toast.cancel();
+				toast.setText(filename); 
+				toast.show();
 				if(m_Amplayer == null)
 					return;
 				else
