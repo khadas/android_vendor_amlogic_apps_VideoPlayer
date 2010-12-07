@@ -518,8 +518,8 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_close
   (JNIEnv *env, jobject obj, jint pid){  
     if(pid>=0)  
         player_exit(pid);
-    if(gMplayerClazz != NULL)
-        (*env)->DeleteGlobalRef(env,gMplayerClazz);
+    //if(gMplayerClazz != NULL)
+    //    (*env)->DeleteGlobalRef(env,gMplayerClazz);
     return 0;
 }
 
@@ -530,6 +530,7 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_close
  */
 JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_start
   (JNIEnv *env, jobject obj, jint pid){
+#if 0
     player_cmd_t cmd;
     int ret = -1;
     memset((void*)&cmd,0,sizeof(player_cmd_t));
@@ -539,6 +540,10 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_start
     ret = player_send_message(pid,&cmd);
     
     return ret;
+#endif
+	LOGI("player start play");
+    player_start_play(pid);
+	return 0;
 }
 
 /*
@@ -877,4 +882,18 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved){
     result = JNI_VERSION_1_4;   
     register_amlogic_media_mediaplayer(env); 
     return result;
+}
+
+void JNI_OnUnload(JavaVM* vm, void* reserved)
+{
+	JNIEnv* env = NULL;
+
+    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
+        LOGE("GetEnv failed!");
+        return;
+    }
+	if(gMplayerClazz != NULL)
+    	(*env)->DeleteGlobalRef(env, gMplayerClazz);
+	
+	return;
 }

@@ -70,7 +70,7 @@ public class AmPlayer extends Service {
 	public int pause() { return pause(mPid);}
 	public int resume() { return resume(mPid);}
 	public int seek(int pos) { return seek(mPid,pos);}
-	//public int stop() { return stop(mPid);}
+	public int stop() { return stop(mPid);}
 	public int close() { return close(mPid);}
 	public int fastforward(int speed) { return fastforward(mPid,speed);}
 	public int fastrewind(int speed) { return fastrewind(mPid,speed);}
@@ -145,15 +145,16 @@ public class AmPlayer extends Service {
 			//stopGetStates();
 			if (mPid >= 0) {
 				stop(mPid);
-				close(mPid);
-				mPid = -1;
 			}
 			return 0;
 		}
 
 		public int Close() throws RemoteException {
-			close();
-			mPid = -1;
+			if (mPid >= 0)
+			{
+				close();
+				mPid = -1;
+			}
 			return 0;
 		}
 		
