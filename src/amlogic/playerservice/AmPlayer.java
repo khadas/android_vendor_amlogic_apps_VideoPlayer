@@ -71,7 +71,7 @@ public class AmPlayer extends Service {
 	public int resume() { return resume(mPid);}
 	public int seek(int pos) { return seek(mPid,pos);}
 	//public int stop() { return stop(mPid);}
-	//public int close() { return close(mPid);}
+	public int close() { return close(mPid);}
 	public int fastforward(int speed) { return fastforward(mPid,speed);}
 	public int fastrewind(int speed) { return fastrewind(mPid,speed);}
 	public int setSubtitleOut( int sub_uid) { return setSubtitleOut(mPid,sub_uid);}
@@ -152,6 +152,8 @@ public class AmPlayer extends Service {
 		}
 
 		public int Close() throws RemoteException {
+			close();
+			mPid = -1;
 			return 0;
 		}
 		
@@ -216,6 +218,11 @@ public class AmPlayer extends Service {
 	public static void onUpdateState(int pid, int status, int full_time,
 			int current_time, int last_time, int error_no)
 	{
+		if (null == mClient)
+		{
+			Log.i(TAG, "RegisterClientMessager has not be called. ");
+			return;
+		}
 		if (last_cur_time != current_time)
 		{
 			Message message = new Message();

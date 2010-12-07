@@ -921,6 +921,11 @@ public class playermenu extends Activity {
     					}
 						break;
 					case VideoInfo.PLAYER_PLAYEND:
+						try	{
+							m_Amplayer.Close();
+						} catch(RemoteException e) {
+							e.printStackTrace();
+						}
 						if (m_playmode == REPEATLIST)
 							PlayList.getinstance().movenext();
 						AudioInfo.AudioStreamFormat.clear();
