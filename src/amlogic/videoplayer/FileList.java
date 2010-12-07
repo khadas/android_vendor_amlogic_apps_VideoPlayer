@@ -76,6 +76,7 @@ public class FileList extends ListActivity {
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+	    stopMediaPlayer();
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 	    
@@ -453,4 +454,11 @@ public class FileList extends ListActivity {
         return false;
     }
     
+    public void stopMediaPlayer()//stop the backgroun music player
+    {
+    	Intent intent = new Intent();
+    	intent.setAction("com.android.music.musicservicecommand.pause");
+    	intent.putExtra("command", "stop");
+    	this.sendBroadcast(intent);
+    }
 }
