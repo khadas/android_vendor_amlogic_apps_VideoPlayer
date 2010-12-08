@@ -540,10 +540,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_start
     ret = player_send_message(pid,&cmd);
     
     return ret;
-#endif
+#else
 	LOGI("player start play");
     player_start_play(pid);
 	return 0;
+#endif
 }
 
 /*

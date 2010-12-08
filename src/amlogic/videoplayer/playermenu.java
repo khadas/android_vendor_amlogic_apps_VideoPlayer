@@ -911,14 +911,23 @@ public class playermenu extends Activity {
 					case VideoInfo.PLAYER_PAUSE:
 						play.setBackgroundResource(R.drawable.play_button);
 						break;
-					case VideoInfo.PLAYER_STOPED:
-						new PlayThread().start();
+					case VideoInfo.PLAYER_EXIT:						
 						if (PRE_NEXT_FLAG == 1)
     					{
     						Log.d(TAG,"to play another file!");
+							new PlayThread().start();
     						Amplayer_play();
     						PRE_NEXT_FLAG = 0;
     					}
+						break;
+					case VideoInfo.PLAYER_STOPED:
+						/*new PlayThread().start();
+						if (PRE_NEXT_FLAG == 1)
+    					{
+    						Log.d(TAG,"to play another file!");
+    						//Amplayer_play();
+    						PRE_NEXT_FLAG = 0;
+    					}*/
 						break;
 					case VideoInfo.PLAYER_PLAYEND:
 						try	{
@@ -931,7 +940,8 @@ public class playermenu extends Activity {
 						AudioInfo.AudioStreamFormat.clear();
 						AudioInfo.AudioStreamInfo.clear();
 						INITOK = false;
-						Amplayer_play();
+						PRE_NEXT_FLAG = 1;
+						//Amplayer_play();
 						break;
 					case VideoInfo.PLAYER_ERROR:
 						String InfoStr = null;
