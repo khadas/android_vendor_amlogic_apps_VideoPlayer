@@ -1,15 +1,15 @@
 LOCAL_PATH := $(call my-dir)
-AMPLAYER_PATH := $(LOCAL_PATH)/../../LibPlayer
+LIBPLAYER_PATH := $(LOCAL_PATH)/../../LibPlayer
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := libamplayerjni
 LOCAL_SRC_FILES := amlogic_playerservice_AmPlayer.c sys_conf.c
 LOCAL_ARM_MODE := arm
-LOCAL_C_INCLUDES := $(AMPLAYER_PATH)/amplayer/player/include \
-    $(AMPLAYER_PATH)/amplayer/control/include \
-    $(AMPLAYER_PATH)/amcodec/include \
-    $(AMPLAYER_PATH)/amffmpeg \
+LOCAL_C_INCLUDES := $(LIBPLAYER_PATH)/amplayer/player/include \
+    $(LIBPLAYER_PATH)/amplayer/control/include \
+    $(LIBPLAYER_PATH)/amcodec/include \
+    $(LIBPLAYER_PATH)/amffmpeg \
     $(JNI_H_INCLUDE) 
 
 LOCAL_MODULE_PATH := ${LOCAL_PATH}/../lib
