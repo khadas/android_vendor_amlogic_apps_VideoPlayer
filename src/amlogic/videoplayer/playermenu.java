@@ -409,6 +409,7 @@ public class playermenu extends Activity {
                 {
                 	setContentView(R.layout.infobar);
                 	initinfobar();
+                	getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 } 
     	    }); 
     	}
@@ -465,7 +466,7 @@ public class playermenu extends Activity {
     		sub_para.filepath =subMange.getSubPath(sub_para.curid);
     	else
     		sub_para.filepath =null;
-    	Log.d(TAG, "open:-------------488------------------");
+    
     }
     
     protected void initinfobar()
@@ -490,7 +491,6 @@ public class playermenu extends Activity {
     	cur_time.setText(secToTime(curtime));
     	total_time.setText(secToTime(totaltime));
         
-    	Log.d(TAG, "open:-------------405------------------"+sub_para.filepath);
     	
         browser.setOnClickListener(new ImageButton.OnClickListener()
     	{
