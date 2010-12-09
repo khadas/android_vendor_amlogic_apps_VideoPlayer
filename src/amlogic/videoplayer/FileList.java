@@ -1,28 +1,17 @@
 package amlogic.videoplayer;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 import amlogic.videoplayer.R;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,19 +69,6 @@ public class FileList extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 	    
-        mDialog = new ProgressDialog(this);
-        mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mDialog.setMessage("Installing system files...");
-        mDialog.setCancelable(true);
-        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            public void onCancel(DialogInterface dialog) {
-                finish();
-            }
-        });
-
-        mHandler = new Handler();
-        checkInstallFirmware.start();
-        
          if(PlayList.getinstance().rootPath==null)
 	    	PlayList.getinstance().rootPath =root_path;
 	    	
@@ -314,127 +290,9 @@ public class FileList extends ListActivity {
 	}
 	
     private static final String TAG = "Amplayer";
-    private ProgressDialog mDialog;
-    private Handler mHandler;
-    /**
-     * Copy all files in assets/firmware to /system/etc/firmware.
-     *
-     * 1.  Place all firmware .bin in assets/firmware/
-     * 2.  Build APK.  Android.mk has a line to call "md5sum *.bin > checksum.txt"
-     *      This generated checksum.txt will be put into assets/firmware.
-     * 3.  On app startup, if /system/etc/firmware/checksum.txt does not match
-     *      the one generated in Step 2, then all files in assets/firmware/ will
-     *      be copied to /system/etc/firmware/.
-     */
-    Thread checkInstallFirmware = new Thread(new Runnable() {
-        static final String FIRMWARE_DEST = "/system/etc/firmware";
-        private boolean shouldInstall(AssetManager assetManager) {
-            // Install if checksum.txt files are different
-            try {
-                BufferedInputStream src = new BufferedInputStream(assetManager.open("firmware/checksum.txt"), (8*1024));
-                File destck = new File(FIRMWARE_DEST + "/checksum.txt");
-                if (!destck.exists())
-                    return true;
-                BufferedInputStream dest = new BufferedInputStream(new FileInputStream(destck), (8*1024));
-                int len;
-                byte[] bufd = new byte[1024];
-                byte[] bufs = new byte[1024];
-                while((len = dest.read(bufd, 0, 1024)) >= 0) {
-                    if (src.read(bufs, 0, len) != len ||
-                        !Arrays.equals(bufd, bufs)) {
-                        return true;
-                    }
-                }
-                if (src.read(bufs, 0, 1024) > 0) {
-                    return true;
-                }
-                return false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
-
-        private boolean copyOneFile(AssetManager assetManager, String src, final int progress, final int total) {
-            File targetFile = new File(FIRMWARE_DEST, src);
-            try {
-                if (targetFile.exists())
-                    targetFile.delete();
-                targetFile.createNewFile();
-            } catch (IOException e) {
-                Log.e(TAG, "Error! Could not delete/create file " + targetFile.toString());
-                Log.e(TAG, e.getMessage());
-            }
-            mHandler.post(new Runnable() {
-                public void run() {
-                    mDialog.show();
-                    mDialog.setMessage("Installing system files... " + (progress) + "/" + total);
-                }
-            });
-            try {
-                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile), (32 * 1024));
-                BufferedInputStream in = new BufferedInputStream(assetManager.open("firmware/" + src,
-                                                                                   AssetManager.ACCESS_STREAMING), (32 * 1024));
-                int len;
-                byte[] buf = new byte[1024];
-                while((len = in.read(buf)) != -1) {
-                    out.write(buf, 0, len);
-                }
-
-                Log.d(TAG, "Wrote file " + targetFile.toString());
-                in.close();
-                out.close();
-                return true;
-            } catch (Exception ex) {
-                Log.e(TAG, "Error! Install failed.");
-                Log.e(TAG, ex.getMessage());
-            }
-            return false;
-        }
-
-        public void run() {
-            AssetManager assetManager = getAssets();
-            String[] files = null;
-            try {
-                files = assetManager.list("firmware");
-
-                File destdir = new File(FIRMWARE_DEST);
-                if (!destdir.exists())
-                    if (!destdir.mkdir())
-                        Log.e(TAG, "Could not create directory " + FIRMWARE_DEST);
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-            }
-
-            if (shouldInstall(assetManager)) {
-                final long copystart = System.nanoTime();
-                final int filecount = files.length;
-                int progress = 1;
-                boolean copyfailed = false;
-                Log.d(TAG, "Asset file count=" + filecount);
-                for (int i=0; i<filecount; i++) {
-                    if (files[i].equals("checksum.txt"))
-                        continue;
-                    if (!copyOneFile(assetManager, files[i], progress, filecount))
-                        copyfailed = true;
-                    progress++;
-                }
-                if (!copyfailed)
-                    copyOneFile(assetManager, "checksum.txt", progress, filecount);
-                Log.d(TAG, "Firmware copied in " + ((System.nanoTime() - copystart)/1000/1000) + " ms");
-                mHandler.post(new Runnable() {
-                    public void run() {
-                        mDialog.dismiss();
-                    }
-                });
-            }
-            else
-                Log.d(TAG, "Firmware install not needed");
-        }
-    });
     
     //option menu
-   private final int MENU_ABOUT = 0;
+    private final int MENU_ABOUT = 0;
     public boolean onCreateOptionsMenu(Menu menu)
     {
         menu.add(0, MENU_ABOUT, 0, "About");

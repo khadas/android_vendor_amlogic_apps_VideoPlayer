@@ -27,12 +27,6 @@ LOCAL_JNI_SHARED_LIBRARIES := libamplayerjni libsubjni
 #LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
-# Generate a checksum that will be used in the app to determine whether the
-# firmware in /system/etc/firmware needs to be updated.
-$(shell mkdir -p $(LOCAL_PATH)/assets/firmware/)
-$(shell cp $(LOCAL_PATH)/../Amplayer/assets/firmware/* $(LOCAL_PATH)/assets/firmware/)
-$(shell cd $(LOCAL_PATH)/assets/firmware && md5sum *.bin > checksum.txt)
-
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/data/app
 
 include $(BUILD_PACKAGE)
