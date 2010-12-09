@@ -155,7 +155,7 @@ public class FileList extends ListActivity {
 	    		if (tpath.equals("/mnt/flash"))
 	    			 tmppath = "nand";
 	    		else if((!tpath.equals("/mnt/sdcard"))&&tpath.startsWith("/mnt/sd"))
-	    			 tmppath = "usb";
+	    			 tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
 	    		//delete used folder
 	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure")))
 	    		{
