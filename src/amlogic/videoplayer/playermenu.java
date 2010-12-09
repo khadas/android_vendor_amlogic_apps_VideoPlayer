@@ -182,7 +182,10 @@ public class playermenu extends Activity {
                 {
                 	if(sub_para.totalnum<=0)
                 	{
-                		Toast.makeText(playermenu.this, "No subtitle!", Toast.LENGTH_SHORT).show();
+                		Toast toast =Toast.makeText(playermenu.this, "No subtitle!",Toast.LENGTH_SHORT );
+                		toast.setGravity(Gravity.BOTTOM,0,0);
+                		toast.setDuration(0x00000001);
+                		toast.show();
                 	    return;
                 	}
                 	subbar.setVisibility(View.VISIBLE);
