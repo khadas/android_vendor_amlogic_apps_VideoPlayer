@@ -35,16 +35,16 @@ jclass PlaybackState_getClass(JNIEnv *env){
 
     return (*env)->FindClass(env,"com/amlogic/media/PlaybackState");
 
-}
+}*/
 
 jclass MediaInfo_getClass(JNIEnv *env){
-    return (*env)->FindClass(env,"com/amlogic/media/MediaInfo");
+    return (*env)->FindClass(env,"amlogic/playerservice/MediaInfo");
 }
 
 jclass AudioMediaInfo_getClass(JNIEnv *env){
-    return (*env)->FindClass(env,"com/amlogic/media/AudioMediaInfo");
+    return (*env)->FindClass(env,"amlogic/playerservice/AudioMediaInfo");
 }
-
+/*
 jclass VideoMediaInfo_getClass(JNIEnv *env){
     return (*env)->FindClass(env,"com/amlogic/media/VideoMediaInfo");
 }
@@ -102,7 +102,7 @@ int update_player_info(int pid,player_info_t * info)
         (*gJavaVm)->DetachCurrentThread(gJavaVm);
     }   
     //LOGI("callback handler:end time:%d",time(NULL));    
-    LOGI("pid:%d,status:%d,current pos:%d,total:%d,errcode:%x\n",pid,info->status,info->current_time,info->full_time,~(info->error_no));
+    LOGI("pid:%d,status:%d,current pos:%d,total:%d,errcode:-0x%x\n",pid,info->status,info->current_time,info->full_time,-(info->error_no));
     return 0;
 }
 
@@ -175,7 +175,7 @@ int _media_info_dump(media_info_t* minfo)
     return 0;
 }
 jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
-#if 0    
+    
     int index = 0;
     jclass meta_cls = MediaInfo_getClass(env);
     if(NULL == meta_cls){            
@@ -191,6 +191,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     jmethodID constructor = (*env)->GetMethodID(env, meta_cls, "<init>", "()V");
     
     jobject meta_obj = (*env)->NewObject(env,meta_cls,constructor);
+#if 0
     (*env)->SetIntField(env,meta_obj,
         (*env)->GetFieldID(env, meta_cls, "filetype", "I"), (int)(msgt->stream_info.type));
     (*env)->SetLongField(env,meta_obj,
@@ -238,7 +239,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
        
          (*env)->SetObjectField(env,meta_obj,vinfo_id,vinfoArray);
      }
-    
+#endif    
      if(msgt->stream_info.total_audio_num>0){
          jclass ainfo_cls = AudioMediaInfo_getClass(env);
          jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
@@ -261,21 +262,21 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
             }
             (*env)->SetIntField(env,aobj,\
                 (*env)->GetFieldID(env, ainfo_cls, "audio_format", "I"), (int)(msgt->audio_info[index]->aformat));
-            (*env)->SetIntField(env,aobj,\
+            /*(*env)->SetIntField(env,aobj,\
                 (*env)->GetFieldID(env, ainfo_cls, "audio_channel", "I"), (int)(msgt->audio_info[index]->channel));
             (*env)->SetIntField(env,aobj,\
                 (*env)->GetFieldID(env, ainfo_cls, "audio_samplerate", "I"), (int)(msgt->audio_info[index]->sample_rate));
             (*env)->SetIntField(env,aobj,\
-                (*env)->GetFieldID(env, ainfo_cls, "bit_rate", "I"), (int)(msgt->audio_info[index]->bit_rate));
+                (*env)->GetFieldID(env, ainfo_cls, "bit_rate", "I"), (int)(msgt->audio_info[index]->bit_rate));*/
             (*env)->SetIntField(env,aobj,\
                 (*env)->GetFieldID(env, ainfo_cls, "uid", "I"), (int)(msgt->audio_info[index]->id));
 
 
              (*env)->SetObjectArrayElement(env,ainfoArray,index, aobj);  
             }  
-            (*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lcom/amlogic/media/AudioMediaInfo;"),ainfoArray);
+            (*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lamlogic/playerservice/AudioMediaInfo;"),ainfoArray);
         }
-               
+#if 0               
         if(msgt->audio_info[0]->audio_tag!=NULL){
 
             jclass tag_cls = AudioTagInfo_getClass(env);
@@ -336,10 +337,9 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
         
         (*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "sinfo", "[Lcom/amlogic/media/InternalSubtitleInfo;"),subArray);  
     }
-
-    return meta_obj;  
 #endif
-		return 0;     
+    return meta_obj;  
+     
 }
 
 

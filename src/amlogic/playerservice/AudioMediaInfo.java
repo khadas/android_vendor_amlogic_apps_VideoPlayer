@@ -1,17 +1,11 @@
-package amlogic.videoplayer;
+package amlogic.playerservice;
 
-import java.util.ArrayList;
-import java.util.List;
 
-public class AudioInfo {
-	public static List<String> AudioStreamFormat = new ArrayList<String>();
-	public static List<ASInfo> AudioStreamInfo = new ArrayList<ASInfo>();
-	
-	public static class ASInfo {
-		public int audio_id;
-		public String audio_format;
-	}
-    //audio format
+
+public class AudioMediaInfo {
+	public static final int UID_AUDIOTRACK_OFF = 0xFFFF;    
+	    
+	//audio format
     public static final int AFORMAT_UNKNOWN = -1;
     public static final int AFORMAT_MPEG   = 0;
     public static final int AFORMAT_PCM_S16LE = 1;
@@ -30,67 +24,93 @@ public class AudioInfo {
     public static final int AFORMAT_WMA  = 14;
     public static final int AFORMAT_WMAPRO   = 15;
     public static final int AFORMAT_MAX    = 16;
+    
+    
+	public int getUid() {
+		return uid;
+	}
 	
-	public static String getAudioFormat(int aformat)
-	{
+	public String getAudioFormat() {
 		String type = null;
-		switch(aformat)
+		switch(audio_format)
 		{
-		case AudioInfo.AFORMAT_UNKNOWN:
+		case AFORMAT_UNKNOWN:
+			type = "UNKNOWN";
 			break;
-		case AudioInfo.AFORMAT_MPEG:
+		case AFORMAT_MPEG:
 			type = "MPEG";
 			break;
-		case AudioInfo.AFORMAT_PCM_S16LE:
+		case AFORMAT_PCM_S16LE:
 			type = "PCM_S16LE";
 			break;
-		case AudioInfo.AFORMAT_AAC:
+		case AFORMAT_AAC:
 			type = "AAC";
 			break;
-		case AudioInfo.AFORMAT_AC3:
+		case AFORMAT_AC3:
 			type = "AC3";
 			break;
-		case AudioInfo.AFORMAT_ALAW:
+		case AFORMAT_ALAW:
 			type = "ALAW";
 			break;
-		case AudioInfo.AFORMAT_MULAW:
+		case AFORMAT_MULAW:
 			type = "MULAW";
 			break;
-		case AudioInfo.AFORMAT_DTS:
+		case AFORMAT_DTS:
 			type = "DTS";
 			break;
-		case AudioInfo.AFORMAT_PCM_S16BE:
+		case AFORMAT_PCM_S16BE:
 			type = "PCM_S16BE";
 			break;
-		case AudioInfo.AFORMAT_FLAC:
+		case AFORMAT_FLAC:
 			type = "FLAC";
 			break;
-		case AudioInfo.AFORMAT_COOK:
+		case AFORMAT_COOK:
 			type = "COOK";
 			break;
-		case AudioInfo.AFORMAT_PCM_U8:
+		case AFORMAT_PCM_U8:
 			type = "PCM_U8";
 			break;
-		case AudioInfo.AFORMAT_ADPCM:
+		case AFORMAT_ADPCM:
 			type = "ADPCM";
 			break;
-		case AudioInfo.AFORMAT_AMR:
+		case AFORMAT_AMR:
 			type = "AMR";
 			break;
-		case AudioInfo.AFORMAT_RAAC:
+		case AFORMAT_RAAC:
 			type = "RAAC";
 			break;
-		case AudioInfo.AFORMAT_WMA:
+		case AFORMAT_WMA:
 			type = "WMA";
 			break;
-		case AudioInfo.AFORMAT_WMAPRO:
+		case AFORMAT_WMAPRO:
 			type = "WMAPRO";
 			break;
-		case AudioInfo.AFORMAT_MAX:
+		case AFORMAT_MAX:
+			type = "MAX";
 			break;
 		default:
+			type = "UNKNOWN";
 			break;
 		}
 		return type;
 	}
+	
+	/*public int getAudioChannel() {
+		return audio_channel;
+	}
+	
+	public int getBitrate() {
+		return bit_rate;
+	}
+	
+	public int getAudioSamplerate() {
+		return audio_samplerate;
+	} */
+	
+	int uid;
+	private int audio_format;
+	//private int audio_channel;   
+    //private int bit_rate;
+    //private int audio_samplerate;
+    
 }

@@ -14,6 +14,7 @@ import com.subtitleparser.SubtitleUtils;
 import com.subtitleview.SubtitleView;
 
 import amlogic.playerservice.Errorno;
+import amlogic.playerservice.MediaInfo;
 import amlogic.playerservice.Player;
 import amlogic.playerservice.VideoInfo;
 import android.app.Activity;
@@ -66,6 +67,7 @@ public class playermenu extends Activity {
 	Timer timer = new Timer();
 	Toast toast = null;
 	public Handler myHandler;
+	public MediaInfo bMediaInfo = null;
 	private static int PRE_NEXT_FLAG = 0;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 	
@@ -147,17 +149,18 @@ public class playermenu extends Activity {
                 	
                 	morebar_tileText.setText("audio trace");
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
-                	
+                	if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
+                		AudioTrackOperation.setAudioStream(bMediaInfo);
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row,
-                    		AudioInfo.AudioStreamFormat));
+                    		AudioTrackOperation.AudioStreamFormat));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	public void onItemClick(AdapterView<?> arg0, View arg1,
             					int arg2, long arg3) {
             				// TODO Auto-generated method stub
                     		try {
-                    			m_Amplayer.SwitchAID(AudioInfo.AudioStreamInfo.get(arg2).audio_id);
+                    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
                     			Log.d("audiostream","change audio stream to: " + arg2);
                     			
                 			} catch (RemoteException e) {
@@ -905,7 +908,7 @@ public class playermenu extends Activity {
     				{
 					case VideoInfo.PLAYER_RUNNING:
 						try {
-							m_Amplayer.GetMediaInfo();
+							bMediaInfo = m_Amplayer.GetMediaInfo();
 						} catch(RemoteException e) {
 							e.printStackTrace();
 						}
@@ -940,8 +943,8 @@ public class playermenu extends Activity {
 						}
 						if (m_playmode == REPEATLIST)
 							PlayList.getinstance().movenext();
-						AudioInfo.AudioStreamFormat.clear();
-						AudioInfo.AudioStreamInfo.clear();
+						AudioTrackOperation.AudioStreamFormat.clear();
+						AudioTrackOperation.AudioStreamInfo.clear();
 						INITOK = false;
 						PRE_NEXT_FLAG = 1;
 						//Amplayer_play();
@@ -1071,8 +1074,8 @@ public class playermenu extends Activity {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		AudioInfo.AudioStreamFormat.clear();
-		AudioInfo.AudioStreamInfo.clear();
+		AudioTrackOperation.AudioStreamFormat.clear();
+		AudioTrackOperation.AudioStreamInfo.clear();
 		INITOK = false;
     }
     

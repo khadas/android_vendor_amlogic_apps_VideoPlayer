@@ -2,7 +2,7 @@ package amlogic.playerservice;
 
 
 import amlogic.playerservice.Player;
-import amlogic.videoplayer.AudioInfo;
+import amlogic.videoplayer.AudioTrackOperation;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -158,9 +158,8 @@ public class AmPlayer extends Service {
 			return 0;
 		}
 		
-		public int GetMediaInfo() throws RemoteException {
-			getMetaInfo();
-			return 0;
+		public MediaInfo GetMediaInfo() throws RemoteException {
+			return (MediaInfo)getMetaInfo();
 		}
 		
 		public int SwitchAID(int id) throws RemoteException {
@@ -272,7 +271,7 @@ public class AmPlayer extends Service {
 		}
 	}
 	
-	public static void onUpdateAid(int total_audio_num, int audio_id, int audio_format,
+	/*public static void onUpdateAid(int total_audio_num, int audio_id, int audio_format,
 			int ifChange)
 	{
 		
@@ -296,17 +295,17 @@ public class AmPlayer extends Service {
 		}
 		else
 		{
-			if (AudioInfo.AudioStreamInfo.size() < total_audio_num)
+			if (AudioTrackOperation.AudioStreamInfo.size() < total_audio_num)
 			{
 				String type = null;
-				type = AudioInfo.getAudioFormat(audio_format);
-				AudioInfo.ASInfo asinfo = new AudioInfo.ASInfo();
+				type = AudioTrackOperation.getAudioFormat(audio_format);
+				AudioTrackOperation.ASInfo asinfo = new AudioTrackOperation.ASInfo();
 				asinfo.audio_id = audio_id;
 				asinfo.audio_format = type;
-				AudioInfo.AudioStreamInfo.add(asinfo);
-				AudioInfo.AudioStreamFormat.add(type);
+				AudioTrackOperation.AudioStreamInfo.add(asinfo);
+				AudioTrackOperation.AudioStreamFormat.add(type);
 				Log.d("audiostream","AudioInfo.AudioStream.add: " + type);
 			}
 		}
-	}
+	}*/
 }

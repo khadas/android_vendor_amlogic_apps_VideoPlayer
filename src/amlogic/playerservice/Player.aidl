@@ -1,5 +1,7 @@
 package amlogic.playerservice;
 
+import amlogic.playerservice.MediaInfo;
+
 interface Player
 {
 	int Init();
@@ -10,7 +12,7 @@ interface Player
 	int Resume();
 	int Stop();
 	int Close();
-	int GetMediaInfo();
+	MediaInfo GetMediaInfo();
 	int SwitchAID(int id);
 
 	int  SetColorKey(int color);

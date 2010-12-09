@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: Player.aidl
+ * Original file: ./src/amlogic/playerservice/Player.aidl
  */
 package amlogic.playerservice;
 public interface Player extends android.os.IInterface
@@ -103,9 +103,15 @@ return true;
 case TRANSACTION_GetMediaInfo:
 {
 data.enforceInterface(DESCRIPTOR);
-int _result = this.GetMediaInfo();
+amlogic.playerservice.MediaInfo _result = this.GetMediaInfo();
 reply.writeNoException();
-reply.writeInt(_result);
+if ((_result!=null)) {
+reply.writeInt(1);
+_result.writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE);
+}
+else {
+reply.writeInt(0);
+}
 return true;
 }
 case TRANSACTION_SwitchAID:
@@ -313,16 +319,21 @@ _data.recycle();
 }
 return _result;
 }
-public int GetMediaInfo() throws android.os.RemoteException
+public amlogic.playerservice.MediaInfo GetMediaInfo() throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
-int _result;
+amlogic.playerservice.MediaInfo _result;
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
 mRemote.transact(Stub.TRANSACTION_GetMediaInfo, _data, _reply, 0);
 _reply.readException();
-_result = _reply.readInt();
+if ((0!=_reply.readInt())) {
+_result = amlogic.playerservice.MediaInfo.CREATOR.createFromParcel(_reply);
+}
+else {
+_result = null;
+}
 }
 finally {
 _reply.recycle();
@@ -476,7 +487,7 @@ public int Pause() throws android.os.RemoteException;
 public int Resume() throws android.os.RemoteException;
 public int Stop() throws android.os.RemoteException;
 public int Close() throws android.os.RemoteException;
-public int GetMediaInfo() throws android.os.RemoteException;
+public amlogic.playerservice.MediaInfo GetMediaInfo() throws android.os.RemoteException;
 public int SwitchAID(int id) throws android.os.RemoteException;
 public int SetColorKey(int color) throws android.os.RemoteException;
 public void DisableColorKey() throws android.os.RemoteException;
