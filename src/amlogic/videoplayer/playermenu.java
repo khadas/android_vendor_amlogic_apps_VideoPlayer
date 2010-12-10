@@ -49,6 +49,7 @@ public class playermenu extends Activity {
 	private boolean backToFileList = false;
 	private boolean progressSliding = false;
 	private boolean INITOK = false;
+	private boolean FF_FLAG = false;
     
     //for repeat mode;
     private static int m_playmode = 1;
@@ -554,24 +555,28 @@ public class playermenu extends Activity {
 				// TODO Auto-generated method stub
 				if (player_status == VideoInfo.PLAYER_RUNNING)
 				{
-					try
-					{
+					try	{
 						m_Amplayer.Pause();
-					}
-					catch(RemoteException e)
-					{
+					} catch(RemoteException e) {
 						e.printStackTrace();
 					}
-					
 				}
 				else if (player_status == VideoInfo.PLAYER_PAUSE)
 				{
-					try
-					{
+					try	{
 						m_Amplayer.Resume();
+					} catch(RemoteException e)	{
+						e.printStackTrace();
 					}
-					catch(RemoteException e)
-					{
+				}
+				else if (player_status == VideoInfo.PLAYER_SEARCHING)
+				{
+					try	{
+						if (FF_FLAG)
+							m_Amplayer.FastForward(0);
+						else
+							m_Amplayer.BackForward(0);
+					} catch(RemoteException e) {
 						e.printStackTrace();
 					}
 				}
@@ -597,6 +602,7 @@ public class playermenu extends Activity {
 					} catch(RemoteException e) {
 						e.printStackTrace();
 					}
+					FF_FLAG = true;
 				}
 			}
         });
@@ -620,6 +626,7 @@ public class playermenu extends Activity {
 					} catch(RemoteException e) {
 						e.printStackTrace();
 					}
+					FF_FLAG = false;
 				}
 			}
         });
