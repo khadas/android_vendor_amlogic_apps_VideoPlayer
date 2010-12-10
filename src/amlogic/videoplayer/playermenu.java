@@ -810,8 +810,15 @@ public class playermenu extends Activity {
     public boolean onTouchEvent (MotionEvent event)
     {
     	super.onTouchEvent(event);
-    	show_menu();
-    	waitForHide();
+    	if (event.getAction() == MotionEvent.ACTION_DOWN)
+    	{
+	    	if (infobar.getVisibility() == View.VISIBLE)
+	    		hide_infobar();
+	    	else {
+		    	show_menu();
+		    	waitForHide();
+	    	}
+    	}
     	return true;
     }
     
