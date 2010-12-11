@@ -391,6 +391,7 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setMedia
     _plCtrl.file_name = strndup(pname,FILENAME_LENGTH_MAX);
     _plCtrl.video_index = -1;//MUST
     _plCtrl.audio_index = -1;//MUST
+    _plCtrl.hassub = 1;  //enable subtitle
     if(pMode == 1){
         _plCtrl.nosound = 1;
         SYS_set_tsync_enable(0);//if no sound,can set to be 0
@@ -476,6 +477,7 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_playMedia
     _plCtrl.file_name = strndup(pname,FILENAME_LENGTH_MAX);
     _plCtrl.video_index = -1;//MUST
     _plCtrl.audio_index = -1;//MUST
+	_plCtrl.hassub = 1;
     if(pMode == 1){
         _plCtrl.nosound = 1;
         SYS_set_tsync_enable(0);//if no sound,can set to be 0
