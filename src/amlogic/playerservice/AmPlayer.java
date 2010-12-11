@@ -1,8 +1,6 @@
 package amlogic.playerservice;
 
-
 import amlogic.playerservice.Player;
-import amlogic.videoplayer.AudioTrackOperation;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -11,7 +9,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-
 
 public class AmPlayer extends Service {
     static 
@@ -117,8 +114,8 @@ public class AmPlayer extends Service {
 			return 0;
 		}
 
-		public int Open(String filepath) throws RemoteException {
-			mPid = setMedia( filepath, 0, 0, 0);
+		public int Open(String filepath, int position) throws RemoteException {
+			mPid = setMedia( filepath, 0, 0, position);
 			if (mPid < 0)
 				Log.e(TAG, "get pid failed after setMedia");
 			else

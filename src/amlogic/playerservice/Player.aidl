@@ -6,7 +6,7 @@ interface Player
 {
 	int Init();
 
-	int Open(String filepath);
+	int Open(String filepath, int position);
 	int Play();
 	int Pause();
 	int Resume();

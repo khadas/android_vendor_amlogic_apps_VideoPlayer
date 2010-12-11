@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: ./src/amlogic/playerservice/Player.aidl
+ * Original file: Player.aidl
  */
 package amlogic.playerservice;
 public interface Player extends android.os.IInterface
@@ -55,7 +55,9 @@ case TRANSACTION_Open:
 data.enforceInterface(DESCRIPTOR);
 java.lang.String _arg0;
 _arg0 = data.readString();
-int _result = this.Open(_arg0);
+int _arg1;
+_arg1 = data.readInt();
+int _result = this.Open(_arg0, _arg1);
 reply.writeNoException();
 reply.writeInt(_result);
 return true;
@@ -216,7 +218,7 @@ _data.recycle();
 }
 return _result;
 }
-public int Open(java.lang.String filepath) throws android.os.RemoteException
+public int Open(java.lang.String filepath, int position) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
@@ -224,6 +226,7 @@ int _result;
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
 _data.writeString(filepath);
+_data.writeInt(position);
 mRemote.transact(Stub.TRANSACTION_Open, _data, _reply, 0);
 _reply.readException();
 _result = _reply.readInt();
@@ -481,7 +484,7 @@ static final int TRANSACTION_BackForward = (android.os.IBinder.FIRST_CALL_TRANSA
 static final int TRANSACTION_RegisterClientMessager = (android.os.IBinder.FIRST_CALL_TRANSACTION + 14);
 }
 public int Init() throws android.os.RemoteException;
-public int Open(java.lang.String filepath) throws android.os.RemoteException;
+public int Open(java.lang.String filepath, int position) throws android.os.RemoteException;
 public int Play() throws android.os.RemoteException;
 public int Pause() throws android.os.RemoteException;
 public int Resume() throws android.os.RemoteException;

@@ -8,11 +8,20 @@
 
 
 -keep class com.subtitleparser.subtypes.RawData {
-  public  RawData(int[] ,int,int,int ,int ,String );
+  public  RawData(int[] ,int ,int ,int ,int ,java.lang.String );
 }
 
 -keep class com.subtitleparser.SubtitleUtils {
 	public native int getInSubtitleTotalByJni();
 	public native int setInSubtitleNumberByJni(int  );
 	public native int getCurrentInSubtitleIndexByJni();
+	public native void FileChangedByJni(java.lang.String);
+}
+-keep class com.subtitleparser.subtypes.IdxSubApi {
+  native static com.subtitleparser.subtypes.RawData getIdxsubRawdata(int ); 
+	native void setIdxFile(java.lang.String);
+}
+-keep class com.subtitleparser.subtypes.InSubApi {
+	native static com.subtitleparser.subtypes.RawData getrawdata(int ); 
+	native static SubData getdataByJni(int ); 
 }
