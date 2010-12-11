@@ -16,9 +16,13 @@ import com.subtitleview.SubtitleView;
 import amlogic.playerservice.Errorno;
 import amlogic.playerservice.MediaInfo;
 import amlogic.playerservice.Player;
+import amlogic.playerservice.ResumePlay;
+import amlogic.playerservice.SettingsVP;
 import amlogic.playerservice.VideoInfo;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -43,6 +47,7 @@ public class playermenu extends Activity {
     /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
+	private int position = 0;
 	private int cur_audio_stream = 0;
 	private int total_audio_num = 0;
 	private int ScreenOffTimeoutValue = 0;
@@ -50,6 +55,7 @@ public class playermenu extends Activity {
 	private boolean progressSliding = false;
 	private boolean INITOK = false;
 	private boolean FF_FLAG = false;
+	private boolean NOT_FIRSTTIME = false;
     
     //for repeat mode;
     private static int m_playmode = 1;
@@ -448,11 +454,13 @@ public class playermenu extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.infobar);
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
-        
-		Log.d(TAG, "open:-------------428------------------");	
-        subinit();
-        initinfobar();
         closeScreenOffTimeout();
+        SettingsVP.init(this);
+		Log.d(TAG, "open:-------------428------------------");	
+		subinit();
+		initinfobar();
+		
+        resumePlay();
     }
     
     protected void subinit()
@@ -518,6 +526,7 @@ public class playermenu extends Activity {
 				// TODO Auto-generated method stub
 				if (!INITOK)
 					return;
+				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().moveprev();
 				toast.cancel();
 				toast.setText(filename);
@@ -536,6 +545,7 @@ public class playermenu extends Activity {
 				// TODO Auto-generated method stub
 				if (!INITOK)
 					return;
+				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().movenext();
 				toast.cancel();
 				toast.setText(filename); 
@@ -677,7 +687,6 @@ public class playermenu extends Activity {
 		});
         
         waitForHide();
-		StartPlayerService();
     }
 	
     public static int setCodecMips()
@@ -870,12 +879,13 @@ public class playermenu extends Activity {
 	
 	@Override
     public void onDestroy() {
-        super.onDestroy();
-        
+        ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
         Amplayer_stop();
         StopPlayerService();
         setDefCodecMips();
         openScreenOffTimeout();
+        
+        super.onDestroy();
     }
 
 	@Override
@@ -921,6 +931,7 @@ public class playermenu extends Activity {
     				switch(player_status)
     				{
 					case VideoInfo.PLAYER_RUNNING:
+						NOT_FIRSTTIME = true;
 						try {
 							bMediaInfo = m_Amplayer.GetMediaInfo();
 						} catch(RemoteException e) {
@@ -936,7 +947,8 @@ public class playermenu extends Activity {
     					{
     						Log.d(TAG,"to play another file!");
 							new PlayThread().start();
-    						Amplayer_play();
+							if (resumePlay() == 0)
+								Amplayer_play();
     						PRE_NEXT_FLAG = 0;
     					}
 						break;
@@ -994,6 +1006,7 @@ public class playermenu extends Activity {
     		}
     	}
     });
+    
     private String getErrorInfo(int errID)
     {
     	String errStr = null;
@@ -1009,19 +1022,19 @@ public class playermenu extends Activity {
 				errStr = "Unsupport Audio format";
 				break;
 			case Errorno.FFMPEG_OPEN_FAILED:
-				errStr = "Open file("+PlayList.getinstance().getcur()+")failed";
+				errStr = "Open file ( "+PlayList.getinstance().getcur()+" ) failed";
 				break;	
 			case  Errorno.FFMPEG_PARSE_FAILED:
-				errStr = "Parser file("+PlayList.getinstance().getcur()+")failed";
+				errStr = "Parser file ( "+PlayList.getinstance().getcur()+" ) failed";
 				break;
 			case  Errorno.DECODER_INIT_FAILED:
 				errStr = "Decode Init failed";
 				break;
 			case  Errorno.PLAYER_NO_VIDEO:
-				errStr = "file("+PlayList.getinstance().getcur()+")no video";
+				errStr = "file have no video";
 				break;
 			case  Errorno.PLAYER_NO_AUDIO:
-				errStr = "file("+PlayList.getinstance().getcur()+")no audio";
+				errStr = "file have no audio";
 				break;
 			case  Errorno.PLAYER_SET_NOVIDEO:
 				errStr = "set playback without video";
@@ -1051,8 +1064,8 @@ public class playermenu extends Activity {
     			
 	            morbar.setVisibility(View.VISIBLE);
     		}
-    		
-			m_Amplayer.Open(PlayList.getinstance().getcur());
+    	
+			m_Amplayer.Open(PlayList.getinstance().getcur(), position);
 			//reset sub;
 			subTitleView.setText("");
 			subinit();
@@ -1108,10 +1121,9 @@ public class playermenu extends Activity {
 				m_Amplayer.RegisterClientMessager(m_PlayerMsg.getBinder());
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				Log.d(TAG,"set client fail!");
+				Log.e(TAG, "set client fail!");
 			}
 			
-			//auto play
 			Log.d(TAG, "open:-------------sub name------------------"+sub_para.filepath);
 			Log.d(TAG,"to play files!");
 			try
@@ -1185,6 +1197,43 @@ public class playermenu extends Activity {
 			e.printStackTrace();
 		}
 	
+	}
+	
+	private int resumePlay()
+	{
+		final int pos = ResumePlay.check(PlayList.getinstance().getcur());
+		Log.d(TAG, "resumePlay() pos is :"+pos);
+		if (pos > 0)
+		{
+			AlertDialog.Builder resumeBuilder = new AlertDialog.Builder(this);
+			resumeBuilder.setTitle("VideoPlayer")  
+				.setMessage("Whether to resume this video from last position?") 
+				.setPositiveButton("OK",  
+					new DialogInterface.OnClickListener() {  
+			            public void onClick(DialogInterface dialog, int whichButton) {  
+			                position = pos;
+			                if (!NOT_FIRSTTIME)
+			        			StartPlayerService();
+			                else
+			                	Amplayer_play();
+			            }  
+			        })  
+			    .setNegativeButton("Cancel",  
+				    new DialogInterface.OnClickListener() {  
+				        public void onClick(DialogInterface dialog, int whichButton) {  
+				        	position = 0;
+				        	if (!NOT_FIRSTTIME)
+				    			StartPlayerService();
+				        	else
+				        		Amplayer_play();
+				        }  
+				    })  
+			    .show(); 
+			return pos;
+		}
+		if (!NOT_FIRSTTIME)
+			StartPlayerService();
+		return pos;
 	}
 	
 	public class PlayThread extends Thread
