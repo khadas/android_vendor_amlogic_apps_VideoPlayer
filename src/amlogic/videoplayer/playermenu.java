@@ -1,5 +1,5 @@
 package amlogic.videoplayer;
-
+import android.os.storage.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.util.TimerTask;
 import com.subtitleparser.Subtitle;
 import com.subtitleparser.SubtitleUtils;
 import com.subtitleview.SubtitleView;
-
+import android.content.Context;
 import amlogic.playerservice.Errorno;
 import amlogic.playerservice.MediaInfo;
 import amlogic.playerservice.Player;
@@ -456,7 +456,6 @@ public class playermenu extends Activity {
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         closeScreenOffTimeout();
         SettingsVP.init(this);
-		Log.d(TAG, "open:-------------428------------------");	
 		subinit();
 		initinfobar();
 		
@@ -465,7 +464,7 @@ public class playermenu extends Activity {
     
     protected void subinit()
     {
-    	Log.d(TAG, "open:-------------476------------------");
+    
     	subMange = new SubtitleUtils(PlayList.getinstance().getcur());
     	sub_para= new subview_set();
          
@@ -891,6 +890,9 @@ public class playermenu extends Activity {
 	@Override
     public void onPause() {
         super.onPause();
+        Log.d(TAG, "...........................onstop.........1237................");
+        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+        m_storagemgr.unregisterListener(mListener);
         if (!backToFileList)
         	PlayList.getinstance().rootPath =null;
         finish();
@@ -1124,7 +1126,7 @@ public class playermenu extends Activity {
 				Log.e(TAG, "set client fail!");
 			}
 			
-			Log.d(TAG, "open:-------------sub name------------------"+sub_para.filepath);
+			//auto play
 			Log.d(TAG,"to play files!");
 			try
 			{
@@ -1251,6 +1253,48 @@ public class playermenu extends Activity {
         	}
 		}
 	}
+
+	 private final StorageEventListener mListener = new StorageEventListener() {
+	        public void onUsbMassStorageConnectionChanged(boolean connected)
+	        {
+	        	//this is the action when connect to pc
+	        	return ;
+	        }
+	        public void onStorageStateChanged(String path, String oldState, String newState)
+	        {
+	        	Log.d(TAG, "..............onStorageStateChanged...................."+path+newState);
+	        	if (newState == null || path == null) 
+	        		return;
+	        	
+	        	if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0)
+	        	{
+	        		Log.d(TAG, "...........................unmounted........................."+path);
+	        		if(PlayList.getinstance().rootPath.startsWith(path)|PlayList.getinstance().rootPath.equals(path))
+	        		{
+	        			Intent selectFileIntent = new Intent();
+	    				selectFileIntent.setClass(playermenu.this, FileList.class);
+	    					
+	    				//stop play
+	    				if(m_Amplayer != null)
+	    					Amplayer_stop();
+	    				PlayList.getinstance().rootPath=null;
+	    				startActivity(selectFileIntent);
+	    				backToFileList = true;
+	    				playermenu.this.finish();
+	        		}
+	        	}
+	        }
+	        
+	    };
+	    
+	    @Override
+	    public void onResume() {
+	    	Log.d(TAG, "...........................onResume.........1237................");
+	        super.onResume();
+	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+			m_storagemgr.registerListener(mListener);
+	    }
+	    
 }
 
 class subview_set{

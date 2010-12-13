@@ -1,5 +1,6 @@
 package amlogic.videoplayer;
 
+import android.os.storage.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.List;
 import amlogic.videoplayer.R;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
@@ -62,6 +64,53 @@ public class FileList extends ListActivity {
 	private TextView tileText;
 	private File file;
 	
+	 private final StorageEventListener mListener = new StorageEventListener() {
+	        public void onUsbMassStorageConnectionChanged(boolean connected)
+	        {
+	        	//this is the action when connect to pc
+	        	return ;
+	        }
+	        public void onStorageStateChanged(String path, String oldState, String newState)
+	        {
+	        	if (newState == null || path == null) 
+	        		return;
+	        	
+	        	if(newState.compareTo("mounted") == 0)
+	        	{
+	        		//Log.d(TAGl, "....................................mounted.................................");
+	        		if(PlayList.getinstance().rootPath==null||PlayList.getinstance().rootPath.equals(root_path))
+	        			BrowserFile(root_path); 
+	        		
+	        	}
+	        	else if(newState.compareTo("unmounted") == 0)
+	        	{
+	        		//Log.d(TAGl, "....................................unmounted................................."+path);
+	        		if(PlayList.getinstance().rootPath.startsWith(path)|PlayList.getinstance().rootPath.equals(path))
+	        			BrowserFile(root_path); 
+	        	}
+	        	else if(newState.compareTo("removed") == 0)
+	        	{
+	        		//Log.d(TAGl, "....................................removed................................."+path);
+	        		if(PlayList.getinstance().rootPath.startsWith(path)|PlayList.getinstance().rootPath.equals(path))
+	        			BrowserFile(root_path); 
+	        	}
+	        }
+	        
+	    };
+	    
+	    @Override
+	    public void onResume() {
+	        super.onResume();
+	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+			m_storagemgr.registerListener(mListener);
+	    }
+	    
+	    @Override
+	    public void onPause() {
+	        super.onPause();
+	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+	        m_storagemgr.unregisterListener(mListener);
+	    }
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -174,9 +223,9 @@ public class FileList extends ListActivity {
 	    if(filePath.startsWith("/mnt/flash"))
 	    	filePath=filePath.replaceFirst("/mnt/flash","/mnt/nand");
 	    else if(filePath.startsWith("/mnt/sda"))
-	    	filePath=filePath.replaceFirst("/mnt/sda","/mnt/usb");
+	    	filePath=filePath.replaceFirst("/mnt/sda","/mnt/usb sda");
 	    else if(filePath.startsWith("/mnt/sdb"))
-	    	filePath=filePath.replaceFirst("/mnt/sdb","/mnt/usb");
+	    	filePath=filePath.replaceFirst("/mnt/sdb","/mnt/usb sdb");
 	    tileText.setText(filePath);
 	    setListAdapter(new MyAdapter(this,items,paths));
 	}
