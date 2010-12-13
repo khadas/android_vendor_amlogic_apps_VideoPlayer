@@ -64,7 +64,7 @@ int onUpdate_player_info_java( JNIEnv *env,int pid,player_info_t * info)
     if(gMplayerClazz!=NULL &&gPostMid!=NULL){
         LOGI("call java update method in JNI env 1");  
         (*env)->CallStaticVoidMethod(env, gMplayerClazz, gPostMid, pid,
-            info->status, info->full_time, info->current_time,info->last_time,
+            info->status, info->full_time, info->current_pts,info->last_time,
             info->error_no);
         LOGI("call java update method in JNI env 2");    
         return 0;

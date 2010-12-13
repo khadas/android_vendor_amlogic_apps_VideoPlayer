@@ -906,8 +906,8 @@ public class playermenu extends Activity {
     		switch(msg.what)
     		{
     			case VideoInfo.TIME_INFO_MSG:
-    				Log.i(TAG,"get time "+secToTime(msg.arg1));
-    		    	cur_time.setText(secToTime(msg.arg1));
+    				Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
+    		    	cur_time.setText(secToTime((msg.arg1)/90000));
     		    	total_time.setText(secToTime(msg.arg2));
     		    	curtime = msg.arg1;
     		    	totaltime = msg.arg2;
@@ -917,14 +917,14 @@ public class playermenu extends Activity {
     		    	{
     		    		
     		    		if(subTitleView!=null&&sub_para.filepath!=null)
-    		    		subTitleView.tick(curtime*1000);
+    		    		subTitleView.tick(curtime/90);
     		    		
     		    	}
     		    	if (totaltime == 0)
 						myProgressBar.setProgress(0);
 					else {
 						if (!progressSliding)
-							myProgressBar.setProgress(msg.arg1*100/totaltime);
+							myProgressBar.setProgress(msg.arg1/90000*100/totaltime);
 					}
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
