@@ -17,10 +17,10 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_SDK_VERSION := current
+#LOCAL_SDK_VERSION := current
 
 LOCAL_PACKAGE_NAME := VideoPlayer
-
+LOCAL_CERTIFICATE := platform
 LOCAL_STATIC_JAVA_LIBRARIES := amlogic.subtitle
 
 LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
