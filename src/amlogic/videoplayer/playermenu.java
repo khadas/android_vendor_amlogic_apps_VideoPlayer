@@ -1266,8 +1266,8 @@ public class playermenu extends Activity {
 	        	if (newState == null || path == null) 
 	        		return;
 	        	
-	        	//if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0)
-	        	//{
+	        	if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0)
+	        	{
 	        		Log.d(TAG, "...........................unmounted........................."+path);
 	        		if(PlayList.getinstance().rootPath.startsWith(path)|PlayList.getinstance().rootPath.equals(path))
 	        		{
@@ -1282,7 +1282,7 @@ public class playermenu extends Activity {
 	    				backToFileList = true;
 	    				playermenu.this.finish();
 	        		}
-	        	//}
+	        	}
 	        }
 	        
 	    };
