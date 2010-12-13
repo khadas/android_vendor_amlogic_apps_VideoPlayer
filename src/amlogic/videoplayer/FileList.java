@@ -174,9 +174,9 @@ public class FileList extends ListActivity {
 	    if(filePath.startsWith("/mnt/flash"))
 	    	filePath=filePath.replaceFirst("/mnt/flash","/mnt/nand");
 	    else if(filePath.startsWith("/mnt/sda"))
-	    	filePath=filePath.replaceFirst("/mnt/sda","/mnt/usb");
+	    	filePath=filePath.replaceFirst("/mnt/sda","/mnt/usb sda");
 	    else if(filePath.startsWith("/mnt/sdb"))
-	    	filePath=filePath.replaceFirst("/mnt/sdb","/mnt/usb");
+	    	filePath=filePath.replaceFirst("/mnt/sdb","/mnt/usb sdb");
 	    tileText.setText(filePath);
 	    setListAdapter(new MyAdapter(this,items,paths));
 	}
