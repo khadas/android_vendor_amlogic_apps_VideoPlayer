@@ -63,6 +63,7 @@ public class FileList extends ListActivity {
 	
 	private TextView tileText;
 	private File file;
+	private static String TAGl = "playermenu";
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)

@@ -906,7 +906,7 @@ public class playermenu extends Activity {
     		switch(msg.what)
     		{
     			case VideoInfo.TIME_INFO_MSG:
-    				Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
+    				//Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
     		    	cur_time.setText(secToTime((msg.arg1)/90000));
     		    	total_time.setText(secToTime(msg.arg2));
     		    	curtime = msg.arg1;
@@ -917,7 +917,10 @@ public class playermenu extends Activity {
     		    	{
     		    		
     		    		if(subTitleView!=null&&sub_para.filepath!=null)
-    		    		subTitleView.tick(curtime/90);
+    		    		{
+    		    			subTitleView.tick(curtime/90);
+    		    			//Log.i(TAG,".............sub time.................. "+curtime/90);
+    		    		}
     		    		
     		    	}
     		    	if (totaltime == 0)

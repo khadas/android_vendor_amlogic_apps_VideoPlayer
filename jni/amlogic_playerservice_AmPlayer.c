@@ -24,7 +24,7 @@ static jmethodID gPostMid = NULL;
 static jclass gMplayerClazz = NULL;
 
 //about player info updating interval
-#define PLAYER_INFO_POP_INTERVAL 1000 // 1s
+#define PLAYER_INFO_POP_INTERVAL 500 // 0.5s
 
 
 jclass MediaPlayer_getClass(JNIEnv *env) {
