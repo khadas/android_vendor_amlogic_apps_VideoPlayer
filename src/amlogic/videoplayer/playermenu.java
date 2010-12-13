@@ -12,7 +12,7 @@ import java.util.TimerTask;
 import com.subtitleparser.Subtitle;
 import com.subtitleparser.SubtitleUtils;
 import com.subtitleview.SubtitleView;
-
+import android.content.Context;
 import amlogic.playerservice.Errorno;
 import amlogic.playerservice.MediaInfo;
 import amlogic.playerservice.Player;

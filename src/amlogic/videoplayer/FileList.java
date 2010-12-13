@@ -9,6 +9,7 @@ import java.util.List;
 import amlogic.videoplayer.R;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
