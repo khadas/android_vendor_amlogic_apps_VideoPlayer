@@ -31,6 +31,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.SystemProperties; 
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
@@ -90,7 +91,7 @@ public class playermenu extends Activity {
 	private TextView t_subscolor=null ;
 	private TextView morebar_tileText =null;
 	private String color_text[]={ "white","yellow","blue"};
-	private String[] m_display = {"4:3","16:9","",""};
+	private String[] m_display = {"normal","full screen","4:3","16:9"};
 	private String[] m_brightness= {"1","2","3","4"};		
 	private String[] m_repeat= {"repeat list ","repeat one","",""};	
 	
@@ -366,6 +367,24 @@ public class playermenu extends Activity {
                     {
                     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     	{
+                    		switch (position)
+                    		{
+                    		case 0:	//normal
+                    			SystemProperties.set("media.LibPlayer.screen_mode", "0");
+                    			break;
+                    		case 1:	//full screen
+                    			SystemProperties.set("media.LibPlayer.screen_mode", "1");
+                    			break;
+                    		case 2:	//4:3
+                    			SystemProperties.set("media.LibPlayer.screen_mode", "2");
+                    			break;
+                    		case 3:	//16:9
+                    			SystemProperties.set("media.LibPlayer.screen_mode", "3");
+                    			break;
+                    		default:
+                    			break;
+                    		}
+                    		Log.d(TAG, "switch screen_mode to :"+position);
                     		 otherbar.setVisibility(View.GONE);
                          	 morbar.setVisibility(View.VISIBLE);
                     	}
