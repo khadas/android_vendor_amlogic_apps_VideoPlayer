@@ -16,7 +16,7 @@
 	    	android:layout_alignParentBottom="true">
 	    <com.subtitleview.SubtitleView
 	    	android:id="@+id/subTitle"
-	    	android:minHeight = "60dip"
+	    	android:minHeight = "80dip"
 	    	android:layout_height = "wrap_content"
 	    	android:layout_width ="fill_parent"
 	    	android:layout_gravity="center"
