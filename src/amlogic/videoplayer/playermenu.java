@@ -17,6 +17,7 @@ import amlogic.playerservice.Errorno;
 import amlogic.playerservice.MediaInfo;
 import amlogic.playerservice.Player;
 import amlogic.playerservice.ResumePlay;
+import amlogic.playerservice.ScreenMode;
 import amlogic.playerservice.SettingsVP;
 import amlogic.playerservice.VideoInfo;
 import android.app.Activity;
@@ -363,30 +364,30 @@ public class playermenu extends Activity {
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row,m_display));
+                    listView.setSelection(ScreenMode.getScreenMode());
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     	{
                     		switch (position)
                     		{
-                    		case 0:	//normal
-                    			SystemProperties.set("media.LibPlayer.screen_mode", "0");
+                    		case ScreenMode.NORMAL:
+                    			ScreenMode.setScreenMode("0");
                     			break;
-                    		case 1:	//full screen
-                    			SystemProperties.set("media.LibPlayer.screen_mode", "1");
+                    		case ScreenMode.FULLSTRETCH:
+                    			ScreenMode.setScreenMode("1");
                     			break;
-                    		case 2:	//4:3
-                    			SystemProperties.set("media.LibPlayer.screen_mode", "2");
+                    		case ScreenMode.RATIO4_3:
+                    			ScreenMode.setScreenMode("2");
                     			break;
-                    		case 3:	//16:9
-                    			SystemProperties.set("media.LibPlayer.screen_mode", "3");
+                    		case ScreenMode.RATIO16_9:
+                    			ScreenMode.setScreenMode("3");
                     			break;
                     		default:
                     			break;
                     		}
-                    		Log.d(TAG, "switch screen_mode to :"+position);
-                    		 otherbar.setVisibility(View.GONE);
-                         	 morbar.setVisibility(View.VISIBLE);
+                    		otherbar.setVisibility(View.GONE);
+                         	morbar.setVisibility(View.VISIBLE);
                     	}
                     });    
                 } 
@@ -928,7 +929,7 @@ public class playermenu extends Activity {
     				//Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
     		    	cur_time.setText(secToTime((msg.arg1)/90000));
     		    	total_time.setText(secToTime(msg.arg2));
-    		    	curtime = msg.arg1;
+    		    	curtime = msg.arg1/90000;
     		    	totaltime = msg.arg2;
     		    	
     		    	//for subtitle tick;
@@ -937,7 +938,7 @@ public class playermenu extends Activity {
     		    		
     		    		if(subTitleView!=null&&sub_para.filepath!=null)
     		    		{
-    		    			subTitleView.tick(curtime/90);
+    		    			subTitleView.tick(msg.arg1/90);
     		    			//Log.i(TAG,".............sub time.................. "+curtime/90);
     		    		}
     		    		
