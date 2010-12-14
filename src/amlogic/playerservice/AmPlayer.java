@@ -183,6 +183,11 @@ public class AmPlayer extends Service {
 		public void DisableColorKey() throws RemoteException {
 			native_disablecolorkey();
 		}
+		
+		public int GetOsdBpp() throws RemoteException {
+			int ret = native_getosdbpp();
+			return ret;
+		}
 
 		public int Seek(int time) throws RemoteException {
 			seek(time);

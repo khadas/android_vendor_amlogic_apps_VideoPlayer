@@ -17,6 +17,7 @@ interface Player
 
 	int  SetColorKey(int color);
 	void DisableColorKey();
+	int GetOsdBpp();
 
 	int Seek(int time);
 	int FastForward(int speed);

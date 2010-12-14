@@ -59,7 +59,7 @@ public class SettingsVP {
 	public static String getParaStr(String name)
 	{
 		String para = setting.getString(name, "");
-		Log.d("SettingsVP", "getParaStr() name:"+name+" content:"+para);
+		//Log.d("SettingsVP", "getParaStr() name:"+name+" content:"+para);
 		return para;
 	}
 	
@@ -74,6 +74,13 @@ public class SettingsVP {
 	{
 		return setting.edit()
 		  		 .putInt(name, para)
+		  		 .commit();
+	}
+	
+	public static boolean putParaBoolean(String name, Boolean para)
+	{
+		return setting.edit()
+		  		 .putBoolean(name, para)
 		  		 .commit();
 	}
 }

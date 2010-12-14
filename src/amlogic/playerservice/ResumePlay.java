@@ -8,10 +8,8 @@ public class ResumePlay {
 	
 	public static int check(String filename)
 	{
-		Log.d(TAG, "resumeCheck() filename is :"+ filename);
 		for (int i=0; i<RESUME_NUM_MAX; i++)
 		{
-			Log.d(TAG, "resumeCheck() filename"+i+" is :"+ SettingsVP.getParaStr("filename"+i));
 			if (filename.equals(SettingsVP.getParaStr("filename"+i)))
 			{
 				int position = SettingsVP.getParaInt("filetime"+i);

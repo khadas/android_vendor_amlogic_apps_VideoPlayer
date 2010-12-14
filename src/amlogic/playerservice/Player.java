@@ -143,6 +143,14 @@ this.DisableColorKey();
 reply.writeNoException();
 return true;
 }
+case TRANSACTION_GetOsdBpp:
+{
+data.enforceInterface(DESCRIPTOR);
+int _result = this.GetOsdBpp();
+reply.writeNoException();
+reply.writeInt(_result);
+return true;
+}
 case TRANSACTION_Seek:
 {
 data.enforceInterface(DESCRIPTOR);
@@ -394,6 +402,23 @@ _reply.recycle();
 _data.recycle();
 }
 }
+public int GetOsdBpp() throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_GetOsdBpp, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+}
 public int Seek(int time) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
@@ -478,10 +503,11 @@ static final int TRANSACTION_GetMediaInfo = (android.os.IBinder.FIRST_CALL_TRANS
 static final int TRANSACTION_SwitchAID = (android.os.IBinder.FIRST_CALL_TRANSACTION + 8);
 static final int TRANSACTION_SetColorKey = (android.os.IBinder.FIRST_CALL_TRANSACTION + 9);
 static final int TRANSACTION_DisableColorKey = (android.os.IBinder.FIRST_CALL_TRANSACTION + 10);
-static final int TRANSACTION_Seek = (android.os.IBinder.FIRST_CALL_TRANSACTION + 11);
-static final int TRANSACTION_FastForward = (android.os.IBinder.FIRST_CALL_TRANSACTION + 12);
-static final int TRANSACTION_BackForward = (android.os.IBinder.FIRST_CALL_TRANSACTION + 13);
-static final int TRANSACTION_RegisterClientMessager = (android.os.IBinder.FIRST_CALL_TRANSACTION + 14);
+static final int TRANSACTION_GetOsdBpp = (android.os.IBinder.FIRST_CALL_TRANSACTION + 11);
+static final int TRANSACTION_Seek = (android.os.IBinder.FIRST_CALL_TRANSACTION + 12);
+static final int TRANSACTION_FastForward = (android.os.IBinder.FIRST_CALL_TRANSACTION + 13);
+static final int TRANSACTION_BackForward = (android.os.IBinder.FIRST_CALL_TRANSACTION + 14);
+static final int TRANSACTION_RegisterClientMessager = (android.os.IBinder.FIRST_CALL_TRANSACTION + 15);
 }
 public int Init() throws android.os.RemoteException;
 public int Open(java.lang.String filepath, int position) throws android.os.RemoteException;
@@ -494,6 +520,7 @@ public amlogic.playerservice.MediaInfo GetMediaInfo() throws android.os.RemoteEx
 public int SwitchAID(int id) throws android.os.RemoteException;
 public int SetColorKey(int color) throws android.os.RemoteException;
 public void DisableColorKey() throws android.os.RemoteException;
+public int GetOsdBpp() throws android.os.RemoteException;
 public int Seek(int time) throws android.os.RemoteException;
 public int FastForward(int speed) throws android.os.RemoteException;
 public int BackForward(int speed) throws android.os.RemoteException;
