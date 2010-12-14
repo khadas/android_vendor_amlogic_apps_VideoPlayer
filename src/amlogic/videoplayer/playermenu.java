@@ -1291,8 +1291,9 @@ public class playermenu extends Activity {
 	        	if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0)
 	        	{
 	        		Log.d(TAG, "...........................unmounted........................."+path);
-	        		if(PlayList.getinstance().rootPath.startsWith(path)||PlayList.getinstance().rootPath.equals(path))
+	        		if(PlayList.getinstance().rootPath.startsWith(path))
 	        		{
+	        			Log.d(TAG, "...........................unmounted...2......................"+path);
 	        			Intent selectFileIntent = new Intent();
 	    				selectFileIntent.setClass(playermenu.this, FileList.class);
 	    					
