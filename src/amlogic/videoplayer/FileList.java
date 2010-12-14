@@ -86,13 +86,13 @@ public class FileList extends ListActivity {
 	        	else if(newState.compareTo("unmounted") == 0)
 	        	{
 	        		//Log.d(TAGl, "....................................unmounted................................."+path);
-	        		if(PlayList.getinstance().rootPath.startsWith(path)|PlayList.getinstance().rootPath.equals(path))
+	        		if(PlayList.getinstance().rootPath.startsWith(path)||PlayList.getinstance().rootPath.equals(path))
 	        			BrowserFile(root_path); 
 	        	}
 	        	else if(newState.compareTo("removed") == 0)
 	        	{
 	        		//Log.d(TAGl, "....................................removed................................."+path);
-	        		if(PlayList.getinstance().rootPath.startsWith(path)|PlayList.getinstance().rootPath.equals(path))
+	        		if(PlayList.getinstance().rootPath.startsWith(path)||PlayList.getinstance().rootPath.equals(path))
 	        			BrowserFile(root_path); 
 	        	}
 	        }
