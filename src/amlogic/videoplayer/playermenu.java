@@ -991,6 +991,12 @@ public class playermenu extends Activity {
 								Amplayer_play();
     						PRE_NEXT_FLAG = 0;
     					}
+						else
+						{
+							Log.d(TAG,"unexpected PLAYER_EXIT!");
+							if (resumePlay() == 0)
+								Amplayer_play();
+						}
 						break;
 					case VideoInfo.PLAYER_STOPED:
 						/*new PlayThread().start();
