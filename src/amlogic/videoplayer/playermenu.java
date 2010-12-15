@@ -118,7 +118,7 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FAST_SWITCH"));
+                //	sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FAST_SWITCH"));
                 } 
     	    });
             
@@ -460,6 +460,9 @@ public class playermenu extends Activity {
     		{
     			if(m_Amplayer == null)
 					return (true);
+    			//close sub
+    			if(subTitleView!=null)
+    				subTitleView.closeSubtitle();	
     			//stop play
     			Amplayer_stop();
 				return super.onKeyDown(keyCode, msg);
@@ -530,7 +533,9 @@ public class playermenu extends Activity {
 			// TODO Auto-generated method stub
 				Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
-					
+				//close sub;
+				if(subTitleView!=null)
+					subTitleView.closeSubtitle();	
 				//stop play
 				if(m_Amplayer != null)
 					Amplayer_stop();
@@ -899,6 +904,9 @@ public class playermenu extends Activity {
 	@Override
     public void onDestroy() {
         ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+        //close sub;
+        if(subTitleView!=null)
+        	subTitleView.closeSubtitle();	
         Amplayer_stop();
         StopPlayerService();
         setDefCodecMips();
@@ -935,7 +943,14 @@ public class playermenu extends Activity {
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
     		    	{
-    		    		
+    		    		if((msg.arg1/90000)<=5)
+    		    		{
+    		    			sub_para.totalnum =subMange.getSubTotal();
+    		    	    	if(sub_para.totalnum>0)
+    		    	    		sub_para.filepath =subMange.getSubPath(sub_para.curid);
+    		    	    	else
+    		    	    		sub_para.filepath =null;
+    		    		}
     		    		if(subTitleView!=null&&sub_para.filepath!=null)
     		    		{
     		    			subTitleView.tick(msg.arg1/90);
@@ -1297,7 +1312,9 @@ public class playermenu extends Activity {
 	        			Log.d(TAG, "...........................unmounted...2......................"+path);
 	        			Intent selectFileIntent = new Intent();
 	    				selectFileIntent.setClass(playermenu.this, FileList.class);
-	    					
+	    				//close sub;
+	    				if(subTitleView!=null)
+	    					subTitleView.closeSubtitle();		
 	    				//stop play
 	    				if(m_Amplayer != null)
 	    					Amplayer_stop();

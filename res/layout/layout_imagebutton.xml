@@ -76,7 +76,7 @@
 		
 		<com.subtitleview.SubtitleView
 	    	android:id="@+id/subTitle_more"
-	    	android:minHeight = "80dip"
+	    	android:minHeight = "100dip"
 	    	android:layout_height = "wrap_content"
 	    	android:layout_width ="fill_parent"
 	    	android:gravity="center"

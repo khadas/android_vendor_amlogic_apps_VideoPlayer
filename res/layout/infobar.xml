@@ -16,14 +16,13 @@
 	    	android:layout_alignParentBottom="true">
 	    <com.subtitleview.SubtitleView
 	    	android:id="@+id/subTitle"
-	    	android:minHeight = "80dip"
+	    	android:minHeight = "120dip"
 	    	android:layout_height = "wrap_content"
 	    	android:layout_width ="fill_parent"
-	    	android:layout_gravity="center"
 	    	android:gravity="center"
 	    	android:textStyle="bold"
 	    	android:paddingLeft = "7dip"
-	    	android:paddingBottom = "2dip">
+	    	android:paddingBottom = "2dip" android:layout_gravity="bottom|center">
 	    </com.subtitleview.SubtitleView>
 	</LinearLayout>
 	<LinearLayout android:layout_width="wrap_content"
