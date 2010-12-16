@@ -950,13 +950,19 @@ public class playermenu extends Activity {
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
     		    	{
-    		    		if((msg.arg1/90000)<=5)
+    		    		if((msg.arg1/90)>4500&&(msg.arg1/90)<=5200)
     		    		{
     		    			sub_para.totalnum =subMange.getSubTotal();
     		    	    	if(sub_para.totalnum>0)
     		    	    		sub_para.filepath =subMange.getSubPath(sub_para.curid);
     		    	    	else
     		    	    		sub_para.filepath =null;
+    		    	    	if(sub_para.filepath.equals("INSUB"))
+    		    	    	{
+    		    	    		Log.i(TAG,"...................open....insub.......................... ");
+    		    	    		openFile(sub_para.filepath);
+    		    	    	}
+    		    	    	
     		    		}
     		    		if(subTitleView!=null&&sub_para.filepath!=null)
     		    		{
