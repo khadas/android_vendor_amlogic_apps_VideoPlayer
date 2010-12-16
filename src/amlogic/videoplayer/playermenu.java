@@ -522,8 +522,8 @@ public class playermenu extends Activity {
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
     	total_time = (TextView)findViewById(R.id.TextView04);
-    	cur_time.setText(secToTime(curtime));
-    	total_time.setText(secToTime(totaltime));
+    	cur_time.setText(secToTime(curtime, false));
+    	total_time.setText(secToTime(totaltime, true));
         
     	
         browser.setOnClickListener(new ImageButton.OnClickListener()
@@ -862,14 +862,19 @@ public class playermenu extends Activity {
     	return true;
     }
     
-    private String secToTime(int i)
+    private String secToTime(int i, Boolean isTotalTime)
 	{
 		String retStr = null;
 		int hour = 0;
 		int minute = 0;
 		int second = 0;
 		if (i <= 0)
-			return "00:00:00";
+		{
+			if (isTotalTime && i<0)
+				return "99:59:59";
+			else
+				return "00:00:00";
+		}
 		else
 		{
 			minute = i/60;
@@ -935,8 +940,8 @@ public class playermenu extends Activity {
     		{
     			case VideoInfo.TIME_INFO_MSG:
     				//Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
-    		    	cur_time.setText(secToTime((msg.arg1)/90000));
-    		    	total_time.setText(secToTime(msg.arg2));
+    		    	cur_time.setText(secToTime((msg.arg1)/90000, false));
+    		    	total_time.setText(secToTime(msg.arg2, true));
     		    	curtime = msg.arg1/90000;
     		    	totaltime = msg.arg2;
     		    	
