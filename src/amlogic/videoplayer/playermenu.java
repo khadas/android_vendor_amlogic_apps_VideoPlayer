@@ -957,10 +957,14 @@ public class playermenu extends Activity {
     		    	    		sub_para.filepath =subMange.getSubPath(sub_para.curid);
     		    	    	else
     		    	    		sub_para.filepath =null;
-    		    	    	if(sub_para.filepath!=null&&sub_para.filepath.equals("INSUB"))
+    		    	    	
+    		    	    	//Log.d(TAG,".......................sub......path.................... "+sub_para.filepath);
+    		    	    	
+    		    	    	if(sub_para.filepath!=null)
     		    	    	{
     		    	    		//Log.i(TAG,"...................open....insub.......................... ");
-    		    	    		openFile(sub_para.filepath);
+    		    	    		if(sub_para.filepath.equals("INSUB"))
+    		    	    			openFile(sub_para.filepath);
     		    	    	}
     		    	    	
     		    		}
@@ -1232,7 +1236,7 @@ public class playermenu extends Activity {
 		
 		if(filepath==null)
 		{
-			Log.d(TAG, "----------------sub filepath is null----------------");
+			Log.d(TAG, "----------------sub filepath is null---L-------------");
 			return;
 		}
 		
