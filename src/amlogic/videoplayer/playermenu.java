@@ -464,6 +464,7 @@ public class playermenu extends Activity {
     			if(subTitleView!=null)
     				subTitleView.closeSubtitle();	
     			//stop play
+    			backToFileList = true;
     			Amplayer_stop();
 				return super.onKeyDown(keyCode, msg);
     		}
@@ -537,10 +538,10 @@ public class playermenu extends Activity {
 				if(subTitleView!=null)
 					subTitleView.closeSubtitle();	
 				//stop play
+				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
 				startActivity(selectFileIntent);
-				backToFileList = true;
 				playermenu.this.finish();
 			}
 		});
@@ -911,7 +912,8 @@ public class playermenu extends Activity {
         ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
         //close sub;
         if(subTitleView!=null)
-        	subTitleView.closeSubtitle();	
+        	subTitleView.closeSubtitle();
+        backToFileList = true;
         Amplayer_stop();
         StopPlayerService();
         setDefCodecMips();
@@ -988,7 +990,7 @@ public class playermenu extends Activity {
 						play.setBackgroundResource(R.drawable.play_button);
 						break;
 					case VideoInfo.PLAYER_EXIT:						
-						if (PRE_NEXT_FLAG == 1)
+						if (PRE_NEXT_FLAG == 1 || (!backToFileList) )
     					{
     						Log.d(TAG,"to play another file!");
 							new PlayThread().start();
@@ -996,12 +998,6 @@ public class playermenu extends Activity {
 								Amplayer_play();
     						PRE_NEXT_FLAG = 0;
     					}
-						else
-						{
-							Log.d(TAG,"unexpected PLAYER_EXIT!");
-							if (resumePlay() == 0)
-								Amplayer_play();
-						}
 						break;
 					case VideoInfo.PLAYER_STOPED:
 						/*new PlayThread().start();
@@ -1327,11 +1323,11 @@ public class playermenu extends Activity {
 	    				if(subTitleView!=null)
 	    					subTitleView.closeSubtitle();		
 	    				//stop play
+	    				backToFileList = true;
 	    				if(m_Amplayer != null)
 	    					Amplayer_stop();
 	    				PlayList.getinstance().rootPath=null;
 	    				startActivity(selectFileIntent);
-	    				backToFileList = true;
 	    				playermenu.this.finish();
 	        		}
 	        	}
