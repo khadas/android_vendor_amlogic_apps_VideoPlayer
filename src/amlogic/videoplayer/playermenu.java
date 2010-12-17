@@ -446,7 +446,20 @@ public class playermenu extends Activity {
     
     public boolean onKeyDown(int keyCode, KeyEvent msg) 
     {
-    	if (keyCode == KeyEvent.KEYCODE_BACK) 
+        Log.i(TAG, "onKeyDown" + keyCode);
+    	if (keyCode == KeyEvent.KEYCODE_POWER)
+    	{
+		    if (player_status == VideoInfo.PLAYER_RUNNING)
+			{
+				try	{
+					m_Amplayer.Pause();
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+			}		    
+		    return true;
+    	}
+    	else if (keyCode == KeyEvent.KEYCODE_BACK) 
     	{
     		if (morbar!=null) 
 	        {
@@ -928,9 +941,19 @@ public class playermenu extends Activity {
         Log.d(TAG, "...........................onstop.........1237................");
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         m_storagemgr.unregisterListener(mListener);
-        if (!backToFileList)
+        if (!backToFileList){
         	PlayList.getinstance().rootPath =null;
-        finish();
+		    if (player_status == VideoInfo.PLAYER_RUNNING)
+			{
+				try	{
+					m_Amplayer.Pause();
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+        }
+        else
+            finish();
     }
     
 	//=========================================================
