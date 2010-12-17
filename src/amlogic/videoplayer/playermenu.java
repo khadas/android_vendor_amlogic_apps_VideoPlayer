@@ -1255,7 +1255,9 @@ public class playermenu extends Activity {
     }
     
 	private void openFile(String filepath)  {
-		
+		//closed last time used sub;
+		if(subTitleView!=null)
+			subTitleView.closeSubtitle();	
 		
 		if(filepath==null)
 		{
