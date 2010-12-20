@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.subtitleparser.Subtitle;
+import com.subtitleparser.*;
 import com.subtitleparser.SubtitleUtils;
 import com.subtitleview.SubtitleView;
 import android.content.Context;
@@ -103,7 +103,7 @@ public class playermenu extends Activity {
     		subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
         	subTitleView.setTextColor(sub_para.color);
         	subTitleView.setTextSize(sub_para.font);
-        	openFile(sub_para.filepath);
+        	openFile(sub_para.sub_id);
         	
     		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
     		subbar.setVisibility(View.GONE);
@@ -238,9 +238,9 @@ public class playermenu extends Activity {
   		                	sub_para.font = sub_font_state;
   		                	
   		             	  if(sub_para.curid==sub_para.totalnum )
-  		          		       sub_para.filepath =null;
+  		             		   sub_para.sub_id =null;
   		             	  else
-  		             		   sub_para.filepath =subMange.getSubPath(sub_para.curid);
+  		             		   sub_para.sub_id =subMange.getSubID(sub_para.curid);
   		             	  
   		             	  if(sub_color_state==0)
   		             		    sub_para.color =android.graphics.Color.WHITE;
@@ -511,9 +511,9 @@ public class playermenu extends Activity {
     	sub_para.color =android.graphics.Color.WHITE;
     	sub_para.font=20;
     	if(sub_para.totalnum>0)
-    		sub_para.filepath =subMange.getSubPath(sub_para.curid);
+    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
     	else
-    		sub_para.filepath =null;
+    		sub_para.sub_id =null;
     
     }
     
@@ -523,7 +523,7 @@ public class playermenu extends Activity {
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle);
     	subTitleView.setTextColor(sub_para.color);
     	subTitleView.setTextSize(sub_para.font);
-    	openFile(sub_para.filepath);
+    	openFile(sub_para.sub_id);
 	
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
         ImageButton more = (ImageButton)findViewById(R.id.moreBtn);
@@ -977,21 +977,21 @@ public class playermenu extends Activity {
     		    		{
     		    			sub_para.totalnum =subMange.getSubTotal();
     		    	    	if(sub_para.totalnum>0)
-    		    	    		sub_para.filepath =subMange.getSubPath(sub_para.curid);
+    		    	    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
     		    	    	else
-    		    	    		sub_para.filepath =null;
+    		    	    		sub_para.sub_id =null;
     		    	    	
     		    	    	//Log.d(TAG,".......................sub......path.................... "+sub_para.filepath);
     		    	    	
-    		    	    	if(sub_para.filepath!=null)
+    		    	    	if(sub_para.sub_id!=null)
     		    	    	{
     		    	    		//Log.i(TAG,"...................open....insub.......................... ");
-    		    	    		if(sub_para.filepath.equals("INSUB"))
-    		    	    			openFile(sub_para.filepath);
+    		    	    		if(sub_para.sub_id.equals("INSUB"))
+    		    	    			openFile(sub_para.sub_id);
     		    	    	}
     		    	    	
     		    		}
-    		    		if(subTitleView!=null&&sub_para.filepath!=null)
+    		    		if(subTitleView!=null&&sub_para.sub_id!=null)
     		    		{
     		    			subTitleView.tick(msg.arg1/90);
     		    			//Log.i(TAG,".............sub time.................. "+curtime/90);
@@ -1151,7 +1151,7 @@ public class playermenu extends Activity {
 			subinit();
 			subTitleView.setTextColor(sub_para.color);
 	    	subTitleView.setTextSize(sub_para.font);
-	    	openFile(sub_para.filepath);
+	    	openFile(sub_para.sub_id);
 	    	
 	    	
 		}
@@ -1254,7 +1254,7 @@ public class playermenu extends Activity {
     	m_Amplayer = null;
     }
     
-	private void openFile(String filepath)  {
+	private void openFile(SubID filepath)  {
 		//closed last time used sub;
 		if(subTitleView!=null)
 			subTitleView.closeSubtitle();	
@@ -1385,5 +1385,6 @@ class subview_set{
 	public int curid;
 	public int color;
 	public int font; 
-	public String filepath;
+	//public String filepath;
+	public SubID sub_id;
 }
