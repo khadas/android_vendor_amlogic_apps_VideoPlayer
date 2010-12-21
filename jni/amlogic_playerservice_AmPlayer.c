@@ -240,7 +240,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
          (*env)->SetObjectField(env,meta_obj,vinfo_id,vinfoArray);
      }
 #endif    
-     if(msgt->stream_info.total_audio_num>0){
+     if(msgt->stream_info.has_audio>0 && msgt->stream_info.total_audio_num>0){
          jclass ainfo_cls = AudioMediaInfo_getClass(env);
          jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
          if(!amid){                
