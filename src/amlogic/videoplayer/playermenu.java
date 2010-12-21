@@ -96,6 +96,8 @@ public class playermenu extends Activity {
 	private String[] m_brightness= {"1","2","3","4"};		
 	private String[] m_repeat= {"repeat list ","repeat one","",""};	
 	
+        private boolean mSuspendFlag = false;
+
     private void videobar() {
     		
     		setContentView(R.layout.layout_imagebutton);
@@ -449,15 +451,16 @@ public class playermenu extends Activity {
         Log.i(TAG, "onKeyDown" + keyCode);
     	if (keyCode == KeyEvent.KEYCODE_POWER)
     	{
-		    if (player_status == VideoInfo.PLAYER_RUNNING)
-			{
-				try	{
-					m_Amplayer.Pause();
-				} catch(RemoteException e) {
-					e.printStackTrace();
-				}
-			}		    
-		    return true;
+                if (player_status == VideoInfo.PLAYER_RUNNING)
+                {
+                        try {
+                                m_Amplayer.Pause();
+                        } catch(RemoteException e) {
+                                e.printStackTrace();
+                        }
+                }
+                mSuspendFlag = true;
+                return true;
     	}
     	else if (keyCode == KeyEvent.KEYCODE_BACK) 
     	{
@@ -937,23 +940,27 @@ public class playermenu extends Activity {
 
 	@Override
     public void onPause() {
-        super.onPause();
         Log.d(TAG, "...........................onstop.........1237................");
+        super.onPause();
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         m_storagemgr.unregisterListener(mListener);
-        if (!backToFileList){
-        	PlayList.getinstance().rootPath =null;
-		    if (player_status == VideoInfo.PLAYER_RUNNING)
-			{
-				try	{
-					m_Amplayer.Pause();
-				} catch(RemoteException e) {
-					e.printStackTrace();
-				}
-			}
+        if (mSuspendFlag){
+            if (player_status == VideoInfo.PLAYER_RUNNING)
+            {
+                try{
+                    m_Amplayer.Pause();
+                } catch(RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+            mSuspendFlag = false;
         }
-        else
+        else{
+            if (!backToFileList){
+        	PlayList.getinstance().rootPath =null;
+            }
             finish();
+        }
     }
     
 	//=========================================================
