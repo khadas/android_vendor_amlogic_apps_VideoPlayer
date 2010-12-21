@@ -301,6 +301,36 @@ public class playermenu extends Activity {
   								t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));;
    		                } 
   					});
+  					
+  				
+  					//Log.d(TAG, "******************************302*************************"+sub_para.sub_id.filename);
+  					if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
+  					{
+  					//Log.d(TAG, "**************************305*********************"+sub_para.sub_id.filename);
+  							TextView font =(TextView)findViewById(R.id.font_title);
+							TextView color =(TextView)findViewById(R.id.color_title);
+							
+							font.setTextColor(android.graphics.Color.LTGRAY);
+							color.setTextColor(android.graphics.Color.LTGRAY);
+							
+  							t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
+  							t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
+  							//t_subsfont.setText(String.valueOf(sub_font_state));
+  							t_subscolor.setText(color_text[sub_color_state]);
+  							
+  							
+  							
+  					    	Bfont_l.setEnabled(false);
+  	  						Bfont_r.setEnabled(false);
+  	  						Bcolor_l.setEnabled(false);
+  	  						Bcolor_r.setEnabled(false);
+  	  						Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+  	  						Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+  	  						Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+  	  						Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+  	  						return;
+  					}
+  				
   					Bfont_l.setOnClickListener(new View.OnClickListener() 
   					{
   						 public void onClick(View v) 
@@ -940,7 +970,6 @@ public class playermenu extends Activity {
 
 	@Override
     public void onPause() {
-        Log.d(TAG, "...........................onstop.........1237................");
         super.onPause();
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         m_storagemgr.unregisterListener(mListener);
@@ -993,7 +1022,7 @@ public class playermenu extends Activity {
     		    	    	if(sub_para.sub_id!=null)
     		    	    	{
     		    	    		//Log.i(TAG,"...................open....insub.......................... ");
-    		    	    		if(sub_para.sub_id.equals("INSUB"))
+    		    	    		if(sub_para.sub_id.filename.equals("INSUB"))
     		    	    			openFile(sub_para.sub_id);
     		    	    	}
     		    	    	
@@ -1268,7 +1297,7 @@ public class playermenu extends Activity {
 		
 		if(filepath==null)
 		{
-			Log.d(TAG, "----------------sub filepath is null---L-------------");
+			//Log.d(TAG, "----------------sub filepath is null---L-------------");
 			return;
 		}
 		
@@ -1349,28 +1378,31 @@ public class playermenu extends Activity {
 	        }
 	        public void onStorageStateChanged(String path, String oldState, String newState)
 	        {
-	        	Log.d(TAG, "..............onStorageStateChanged...................."+path+newState);
+	        	//Log.d(TAG, "..............onStorageStateChanged...................."+path+newState);
 	        	if (newState == null || path == null) 
 	        		return;
 	        	
 	        	if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0)
 	        	{
-	        		Log.d(TAG, "...........................unmounted........................."+path);
-	        		if(PlayList.getinstance().rootPath.startsWith(path))
+	        		//Log.d(TAG, "...........................unmounted........................."+path);
+	        		if(PlayList.getinstance().rootPath!=null)
 	        		{
-	        			Log.d(TAG, "...........................unmounted...2......................"+path);
-	        			Intent selectFileIntent = new Intent();
-	    				selectFileIntent.setClass(playermenu.this, FileList.class);
-	    				//close sub;
-	    				if(subTitleView!=null)
-	    					subTitleView.closeSubtitle();		
-	    				//stop play
-	    				backToFileList = true;
-	    				if(m_Amplayer != null)
-	    					Amplayer_stop();
-	    				PlayList.getinstance().rootPath=null;
-	    				startActivity(selectFileIntent);
-	    				playermenu.this.finish();
+		        		if(PlayList.getinstance().rootPath.startsWith(path))
+		        		{
+		        			//Log.d(TAG, "...........................unmounted...2......................"+path);
+		        			Intent selectFileIntent = new Intent();
+		    				selectFileIntent.setClass(playermenu.this, FileList.class);
+		    				//close sub;
+		    				if(subTitleView!=null)
+		    					subTitleView.closeSubtitle();		
+		    				//stop play
+		    				backToFileList = true;
+		    				if(m_Amplayer != null)
+		    					Amplayer_stop();
+		    				PlayList.getinstance().rootPath=null;
+		    				startActivity(selectFileIntent);
+		    				playermenu.this.finish();
+		        		}
 	        		}
 	        	}
 	        }
@@ -1379,7 +1411,7 @@ public class playermenu extends Activity {
 	    
 	    @Override
 	    public void onResume() {
-	    	Log.d(TAG, "...........................onResume.........1237................");
+	    	//Log.d(TAG, "...........................onResume.........1237................");
 	        super.onResume();
 	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 			m_storagemgr.registerListener(mListener);
