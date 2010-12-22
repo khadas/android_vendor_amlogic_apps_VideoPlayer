@@ -38,7 +38,7 @@ public class AudioMediaInfo {
 			type = "UNKNOWN";
 			break;
 		case AFORMAT_MPEG:
-			type = "MPEG";
+			type = "MP3";
 			break;
 		case AFORMAT_PCM_S16LE:
 			type = "PCM_S16LE";

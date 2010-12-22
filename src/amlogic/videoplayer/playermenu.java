@@ -170,19 +170,21 @@ public class playermenu extends Activity {
                     	public void onItemClick(AdapterView<?> arg0, View arg1,
             					int arg2, long arg3) {
             				// TODO Auto-generated method stub
-                    		try {
-                    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
-                    			Log.d("audiostream","change audio stream to: " + arg2);
-                    			
-                			} catch (RemoteException e) {
-                				e.printStackTrace();
-                			}
-                    		try {
-                    			m_Amplayer.GetMediaInfo();
-                    		} catch (RemoteException e) {
-                				e.printStackTrace();
-                			}
-                    		
+                    		if (bMediaInfo.getAudioTrackCount()>1)
+                    		{
+	                    		try {
+	                    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
+	                    			Log.d("audiostream","change audio stream to: " + arg2);
+	                    			
+	                			} catch (RemoteException e) {
+	                				e.printStackTrace();
+	                			}
+	                    		try {
+	                    			m_Amplayer.GetMediaInfo();
+	                    		} catch (RemoteException e) {
+	                				e.printStackTrace();
+	                			}
+                    		}
                     		otherbar.setVisibility(View.GONE);
                         	morbar.setVisibility(View.VISIBLE);
             			}	
@@ -478,7 +480,7 @@ public class playermenu extends Activity {
     
     public boolean onKeyDown(int keyCode, KeyEvent msg) 
     {
-        Log.i(TAG, "onKeyDown" + keyCode);
+        Log.i(TAG, "onKeyDown " + keyCode);
     	if (keyCode == KeyEvent.KEYCODE_POWER)
     	{
                 if (player_status == VideoInfo.PLAYER_RUNNING)
