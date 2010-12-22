@@ -517,6 +517,16 @@ public class playermenu extends Activity {
 				return super.onKeyDown(keyCode, msg);
     		}
     	}
+    	else if (keyCode == KeyEvent.KEYCODE_MENU) 
+    	{
+    		if (infobar.getVisibility() == View.VISIBLE)
+	    		hide_infobar();
+	    	else {
+	    		play.requestFocus();
+		    	show_menu();
+	    	}
+    		return (true);
+    	}
         else
 		 return super.onKeyDown(keyCode, msg);
     }
