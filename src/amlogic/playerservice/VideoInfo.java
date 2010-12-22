@@ -59,6 +59,6 @@ public class VideoInfo {
     public static final int PLAYER_PLAYEND  	= 0x30002;	
     public static final int PLAYER_STOPED   	= 0x30003; 
 	
-	public static final int PLAYER_EXIT   		= 0x40001; 
+	public static final int PLAYER_EXIT   		= 0x30004; 
 
 }
