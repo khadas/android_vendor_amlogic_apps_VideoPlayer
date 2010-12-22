@@ -752,7 +752,6 @@ public class playermenu extends Activity {
 					e.printStackTrace();
 				}
 				waitForHide();
-				progressSliding = false;
 			}
 			
 			public void onStartTrackingTouch(SeekBar seekBar) 
@@ -1012,7 +1011,7 @@ public class playermenu extends Activity {
     		switch(msg.what)
     		{
     			case VideoInfo.TIME_INFO_MSG:
-    				//Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
+    				Log.i(TAG,"get time "+secToTime((msg.arg1)/90000, false));
     		    	cur_time.setText(secToTime((msg.arg1)/90000, false));
     		    	total_time.setText(secToTime(msg.arg2, true));
     		    	curtime = msg.arg1/90000;
@@ -1113,6 +1112,9 @@ public class playermenu extends Activity {
 						INITOK = true;
 						if (setCodecMips() == 0)
 				        	Log.d(TAG, "setCodecMips Failed");
+						break;
+					case VideoInfo.PLAYER_SEARCHOK:
+						progressSliding = false;
 						break;
 					default:
 						break;
