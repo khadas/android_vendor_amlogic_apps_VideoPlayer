@@ -1009,16 +1009,16 @@ public class playermenu extends Activity {
     		switch(msg.what)
     		{
     			case VideoInfo.TIME_INFO_MSG:
-    				//Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
-    		    	cur_time.setText(secToTime((msg.arg1)/90000, false));
+    				//Log.i(TAG,"get time "+secToTime((msg.arg1)/1000));
+    		    	cur_time.setText(secToTime((msg.arg1)/1000, false));
     		    	total_time.setText(secToTime(msg.arg2, true));
-    		    	curtime = msg.arg1/90000;
+    		    	curtime = msg.arg1/1000;
     		    	totaltime = msg.arg2;
     		    	
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
     		    	{
-    		    		if((msg.arg1/90)>4600&&(msg.arg1/90)<=5300)
+    		    		if((msg.arg1)>4600&&(msg.arg1)<=5300)
     		    		{
     		    			sub_para.totalnum =subMange.getSubTotal();
     		    	    	if(sub_para.totalnum>0)
@@ -1038,8 +1038,8 @@ public class playermenu extends Activity {
     		    		}
     		    		if(subTitleView!=null&&sub_para.sub_id!=null)
     		    		{
-    		    			subTitleView.tick(msg.arg1/90);
-    		    			//Log.i(TAG,".............sub time.................. "+curtime/90);
+    		    			subTitleView.tick(msg.arg1);
+    		    			//Log.i(TAG,".............sub time.................. "+curtime);
     		    		}
     		    		
     		    	}
@@ -1047,7 +1047,7 @@ public class playermenu extends Activity {
 						myProgressBar.setProgress(0);
 					else {
 						if (!progressSliding)
-							myProgressBar.setProgress(msg.arg1/90000*100/totaltime);
+							myProgressBar.setProgress(msg.arg1/1000*100/totaltime);
 					}
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
