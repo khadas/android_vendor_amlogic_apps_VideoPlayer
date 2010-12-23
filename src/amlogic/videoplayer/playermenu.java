@@ -317,9 +317,7 @@ public class playermenu extends Activity {
 							
   							t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
   							t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
-  							//t_subsfont.setText(String.valueOf(sub_font_state));
-  							t_subscolor.setText(color_text[sub_color_state]);
-  							
+  			
   							
   							
   					    	Bfont_l.setEnabled(false);
@@ -1011,7 +1009,7 @@ public class playermenu extends Activity {
     		switch(msg.what)
     		{
     			case VideoInfo.TIME_INFO_MSG:
-    				Log.i(TAG,"get time "+secToTime((msg.arg1)/90000, false));
+    				//Log.i(TAG,"get time "+secToTime((msg.arg1)/90000));
     		    	cur_time.setText(secToTime((msg.arg1)/90000, false));
     		    	total_time.setText(secToTime(msg.arg2, true));
     		    	curtime = msg.arg1/90000;
@@ -1303,8 +1301,29 @@ public class playermenu extends Activity {
     	this.stopService(intent);
     	m_Amplayer = null;
     }
+    private String setSublanguage()
+    {
+    	String type=null;
+    	String able=getResources().getConfiguration().locale.getCountry();
+    	//Log.d(TAG, "-----------------------sub language-----------------------"+able);
+    		
+    	if(able.equals("TW"))  
+    		 type ="BIG5";
+    	else if(able.equals("JP"))
+    		  type ="cp932";
+    	else if(able.equals("KR"))
+    		  type ="cp949";
+    	else if(able.equals("IT")||able.equals("FR")||able.equals("DE"))
+    		  type ="iso88591";
+    	else
+    		  type ="GBK";
+    	
+    	return type;
+    }
     
-	private void openFile(SubID filepath)  {
+	private void openFile(SubID filepath)  
+	{
+		setSublanguage();
 		//closed last time used sub;
 		if(subTitleView!=null)
 			subTitleView.closeSubtitle();	
@@ -1317,7 +1336,7 @@ public class playermenu extends Activity {
 		
 		try {
 			
-			if(subTitleView.setFile(filepath, "GBK")==Subtitle.SUBTYPE.SUB_INVALID)
+			if(subTitleView.setFile(filepath,setSublanguage())==Subtitle.SUBTYPE.SUB_INVALID)
 			{
 			
 				return;
