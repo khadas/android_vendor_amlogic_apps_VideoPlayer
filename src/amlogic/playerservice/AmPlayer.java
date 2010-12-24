@@ -225,7 +225,7 @@ public class AmPlayer extends Service {
 			Log.i(TAG, "RegisterClientMessager has not be called. ");
 			return;
 		}
-		if (last_cur_time != current_time)
+		if (0 != full_time)
 		{
 			Message message = new Message();
 			message.what = VideoInfo.TIME_INFO_MSG;
