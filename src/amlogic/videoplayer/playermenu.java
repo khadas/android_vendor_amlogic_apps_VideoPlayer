@@ -115,6 +115,7 @@ public class playermenu extends Activity {
     		otherbar.setVisibility(View.GONE);
     		
     		morbar = (LinearLayout)findViewById(R.id.morebarLayout);
+    		morbar.requestFocus();
     		ImageButton panelortv = (ImageButton) findViewById(R.id.ImageButton01);
             panelortv.setOnClickListener(new View.OnClickListener() 
     	    {
@@ -148,6 +149,7 @@ public class playermenu extends Activity {
                     		 morbar.setVisibility(View.VISIBLE);
                     	}
                     });
+                    otherbar.requestFocus();
                 } 
     	    });
             ImageButton audiotrace = (ImageButton) findViewById(R.id.ImageButton03);
@@ -189,6 +191,7 @@ public class playermenu extends Activity {
                         	morbar.setVisibility(View.VISIBLE);
             			}	
                     });
+                    otherbar.requestFocus();
                 } 
     	    });
             ImageButton sutitle = (ImageButton) findViewById(R.id.ImageButton04);
@@ -207,6 +210,7 @@ public class playermenu extends Activity {
                 	subbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
                 	subtitle_control();
+                	subbar.requestFocus();
                 }
 
 				private void subtitle_control() {
@@ -422,6 +426,7 @@ public class playermenu extends Activity {
                          	morbar.setVisibility(View.VISIBLE);
                     	}
                     });    
+                    otherbar.requestFocus();
                 } 
     	    });
             ImageButton brigtness = (ImageButton) findViewById(R.id.ImageButton06);
@@ -462,6 +467,7 @@ public class playermenu extends Activity {
                         	morbar.setVisibility(View.VISIBLE);
                     	}
                     });
+                    otherbar.requestFocus();
                 } 
     	    }); 
             ImageButton backtovidebar = (ImageButton) findViewById(R.id.ImageButton07);
