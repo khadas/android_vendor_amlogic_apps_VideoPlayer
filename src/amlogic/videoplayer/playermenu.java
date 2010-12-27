@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -160,7 +162,7 @@ public class playermenu extends Activity {
                 	otherbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
                 	
-                	morebar_tileText.setText("audio trace");
+                	morebar_tileText.setText("audio track");
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                 	if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
                 		AudioTrackOperation.setAudioStream(bMediaInfo);
@@ -541,6 +543,13 @@ public class playermenu extends Activity {
         setContentView(R.layout.infobar);
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         closeScreenOffTimeout();
+        Intent it = this.getIntent();
+        if (it.getData() != null)
+        {
+        	List<String> paths = new ArrayList<String>();
+        	paths.add(it.getData().getPath());
+        	PlayList.getinstance().setlist(paths, 0);
+        }
         SettingsVP.init(this);
 		subinit();
 		initinfobar();
