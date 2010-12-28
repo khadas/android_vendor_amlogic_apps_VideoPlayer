@@ -14,15 +14,12 @@
 
 -keep class com.subtitleparser.SubtitleUtils {
 	public native int getInSubtitleTotalByJni();
-	public native int setInSubtitleNumberByJni(int  );
-	public native int getCurrentInSubtitleIndexByJni();
-	public native void FileChangedByJni(java.lang.String);
 }
 -keep class com.subtitleparser.subtypes.IdxSubApi {
-  native static com.subtitleparser.subtypes.RawData getIdxsubRawdata(int ); 
+    native static com.subtitleparser.subtypes.RawData getIdxsubRawdata(int ); 
 	native void setIdxFile(java.lang.String);
 }
 -keep class com.subtitleparser.subtypes.InSubApi {
 	native static com.subtitleparser.subtypes.RawData getrawdata(int ); 
-	native static SubData getdataByJni(int ); 
+	native int setInSubtitleNumberByJni(int  );
 }
