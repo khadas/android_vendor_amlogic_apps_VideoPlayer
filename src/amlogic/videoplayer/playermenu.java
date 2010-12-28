@@ -540,6 +540,8 @@ public class playermenu extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
+        foreground.setForeground(null);
         setContentView(R.layout.infobar);
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         closeScreenOffTimeout();
