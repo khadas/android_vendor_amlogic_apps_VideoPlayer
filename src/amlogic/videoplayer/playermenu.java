@@ -533,6 +533,20 @@ public class playermenu extends Activity {
 	    	}
     		return (true);
     	}
+    	else if (keyCode == KeyEvent.KEYCODE_AUDIOTRACK) 
+    	{
+    		videobar();
+            ImageButton audiotrace = (ImageButton) findViewById(R.id.ImageButton03);
+            audiotrace.requestFocusFromTouch();
+    		return (true);
+    	}
+    	else if (keyCode == KeyEvent.KEYCODE_SUBTITLE) 
+    	{
+    		videobar();
+    		ImageButton sutitle = (ImageButton) findViewById(R.id.ImageButton04);
+    		sutitle.requestFocusFromTouch();
+    		return (true);
+    	}
         else
 		 return super.onKeyDown(keyCode, msg);
     }
