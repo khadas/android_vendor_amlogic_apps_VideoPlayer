@@ -551,6 +551,7 @@ public class playermenu extends Activity {
         	PlayList.getinstance().setlist(paths, 0);
         }
         SettingsVP.init(this);
+        SettingsVP.setVideoLayoutMode();
 		subinit();
 		initinfobar();
 		

@@ -1,5 +1,12 @@
 package amlogic.playerservice;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,7 +16,9 @@ public class SettingsVP {
 
 	public static final String SETTING_INFOS = "SETTING_Infos";
 	private static SharedPreferences setting = null;
-	
+	private static String displaymode = "/sys/class/display/mode";
+	private static String video_axis = "/sys/class/video/axis";
+	private static String TAG = "SettingVideoPlayer";
 	
 	//==========preferences name==========
 	public static final String[] pref_name = { 
@@ -82,5 +91,73 @@ public class SettingsVP {
 		return setting.edit()
 		  		 .putBoolean(name, para)
 		  		 .commit();
+	}
+	
+	public static boolean setVideoLayoutMode()
+	{
+		int tmp;
+    	String buf = null;
+    	String dispMode = null;
+		File file = new File(displaymode);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		file = new File(video_axis);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		//read
+		try
+		{
+			BufferedReader in = new BufferedReader(new FileReader(displaymode), 32);
+			try
+			{
+				dispMode = in.readLine();
+				Log.d(TAG, "Current display mode: "+dispMode);
+				if (dispMode.equals("panel"))
+				{
+					buf = "0,0,800,480";
+				}
+				else if (dispMode.equals("480p"))
+				{
+					buf = "0,0,720,480";
+				}
+				else if (dispMode.equals("720p"))
+				{
+					buf = "0,0,1280,720";
+				}
+				else if (dispMode.equals("1080p"))
+				{
+					buf = "0,0,1920,1080";
+				}
+				else
+					buf = "0,0,1280,720";
+			} finally {
+    			in.close();
+    		} 
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when read "+displaymode);
+		} 
+		
+		//write
+		try
+		{
+			BufferedWriter out = new BufferedWriter(new FileWriter(video_axis), 32);
+    		try
+    		{
+    			out.write(buf);    
+    			Log.d(TAG, "set video window as:"+buf);
+    		} finally {
+				out.close();
+			}
+			 return true;
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when write "+video_axis);
+			return false;
+		}
 	}
 }
