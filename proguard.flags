@@ -22,4 +22,5 @@
 -keep class com.subtitleparser.subtypes.InSubApi {
 	native static com.subtitleparser.subtypes.RawData getrawdata(int ); 
 	native int setInSubtitleNumberByJni(int  );
+	native void closeInSub();
 }
