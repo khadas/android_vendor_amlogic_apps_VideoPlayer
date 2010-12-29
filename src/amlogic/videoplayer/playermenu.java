@@ -533,7 +533,7 @@ public class playermenu extends Activity {
 	    	}
     		return (true);
     	}
-    	else if (keyCode == KeyEvent.KEYCODE_AUDIOTRACK) 
+    	/*else if (keyCode == KeyEvent.KEYCODE_AUDIOTRACK) 
     	{
     		videobar();
             ImageButton audiotrace = (ImageButton) findViewById(R.id.ImageButton03);
@@ -546,7 +546,7 @@ public class playermenu extends Activity {
     		ImageButton sutitle = (ImageButton) findViewById(R.id.ImageButton04);
     		sutitle.requestFocusFromTouch();
     		return (true);
-    	}
+    	}*/
         else
 		 return super.onKeyDown(keyCode, msg);
     }
