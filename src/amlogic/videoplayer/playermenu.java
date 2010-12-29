@@ -33,6 +33,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.SystemProperties; 
 import android.provider.Settings;
@@ -99,6 +100,7 @@ public class playermenu extends Activity {
 	private String[] m_repeat= {"repeat list ","repeat one","",""};	
 	
         private boolean mSuspendFlag = false;
+        PowerManager.WakeLock mScreenLock = null;
 
     private void videobar() {
     		
@@ -500,6 +502,7 @@ public class playermenu extends Activity {
                         }
                 }
                 mSuspendFlag = true;
+                openScreenOffTimeout();
                 return true;
     	}
     	else if (keyCode == KeyEvent.KEYCODE_BACK) 
@@ -560,6 +563,9 @@ public class playermenu extends Activity {
         foreground.setForeground(null);
         setContentView(R.layout.infobar);
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
+        
+        mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
+        		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
         closeScreenOffTimeout();
         Intent it = this.getIntent();
         if (it.getData() != null)
@@ -881,6 +887,7 @@ public class playermenu extends Activity {
     
     protected void closeScreenOffTimeout()
     {
+    	/*
     	try {
 			ScreenOffTimeoutValue = Settings.System.getInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT);
 		} catch (SettingNotFoundException e) {
@@ -888,11 +895,14 @@ public class playermenu extends Activity {
 			e.printStackTrace();
 		}
     	Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, -1);
+    	*/
+    	mScreenLock.acquire();
     }
     
     protected void openScreenOffTimeout()
     {
-    	Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, ScreenOffTimeoutValue);
+    	mScreenLock.release();
+    	//Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, ScreenOffTimeoutValue);
     }
     
     protected void waitForHide()	//infobar auto hide
@@ -1026,6 +1036,7 @@ public class playermenu extends Activity {
                 }
             }
             mSuspendFlag = false;
+            closeScreenOffTimeout();
         }
         else{
             if (!backToFileList){
