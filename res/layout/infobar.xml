@@ -20,7 +20,7 @@
 	    	android:layout_width ="fill_parent"
 	    	android:textStyle="bold"
 	    	android:paddingLeft = "7dip"
-	    	android:layout_gravity="bottom" android:gravity="center|bottom" android:paddingTop="200dip" android:minHeight="310dip">
+	    	android:layout_gravity="bottom" android:gravity="center|bottom" android:paddingTop="200dip" android:minHeight="310dip" android:paddingBottom="15dip">
 	    </com.subtitleview.SubtitleView>
 	</LinearLayout>
 	<LinearLayout android:layout_width="wrap_content"
