@@ -312,31 +312,33 @@ public class playermenu extends Activity {
   					
   				
   					//Log.d(TAG, "******************************302*************************"+sub_para.sub_id.filename);
-  					if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
+  					if (sub_para.sub_id != null)
   					{
-  					//Log.d(TAG, "**************************305*********************"+sub_para.sub_id.filename);
-  							TextView font =(TextView)findViewById(R.id.font_title);
-							TextView color =(TextView)findViewById(R.id.color_title);
-							
-							font.setTextColor(android.graphics.Color.LTGRAY);
-							color.setTextColor(android.graphics.Color.LTGRAY);
-							
-  							t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
-  							t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
-  			
-  							
-  							
-  					    	Bfont_l.setEnabled(false);
-  	  						Bfont_r.setEnabled(false);
-  	  						Bcolor_l.setEnabled(false);
-  	  						Bcolor_r.setEnabled(false);
-  	  						Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
-  	  						Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
-  	  						Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
-  	  						Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
-  	  						return;
+	  					if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
+	  					{
+	  					//Log.d(TAG, "**************************305*********************"+sub_para.sub_id.filename);
+	  							TextView font =(TextView)findViewById(R.id.font_title);
+								TextView color =(TextView)findViewById(R.id.color_title);
+								
+								font.setTextColor(android.graphics.Color.LTGRAY);
+								color.setTextColor(android.graphics.Color.LTGRAY);
+								
+	  							t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
+	  							t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
+	  			
+	  							
+	  							
+	  					    	Bfont_l.setEnabled(false);
+	  	  						Bfont_r.setEnabled(false);
+	  	  						Bcolor_l.setEnabled(false);
+	  	  						Bcolor_r.setEnabled(false);
+	  	  						Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+	  	  						Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+	  	  						Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+	  	  						Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+	  	  						return;
+	  					}
   					}
-  				
   					Bfont_l.setOnClickListener(new View.OnClickListener() 
   					{
   						 public void onClick(View v) 
