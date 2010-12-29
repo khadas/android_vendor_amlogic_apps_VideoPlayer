@@ -17,6 +17,7 @@ public class SettingsVP {
 	public static final String SETTING_INFOS = "SETTING_Infos";
 	private static SharedPreferences setting = null;
 	private static String displaymode = "/sys/class/display/mode";
+	private static String displayaxis = "/sys/class/display/axis";
 	private static String video_axis = "/sys/class/video/axis";
 	private static String TAG = "SettingVideoPlayer";
 	
@@ -106,17 +107,26 @@ public class SettingsVP {
 		if (!file.exists()) {        	
         	return false;
         }
+		file = new File(displayaxis);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		
 		//read
 		try
 		{
 			BufferedReader in = new BufferedReader(new FileReader(displaymode), 32);
+			BufferedReader in_axis = new BufferedReader(new FileReader(displayaxis), 32);
 			try
 			{
 				dispMode = in.readLine();
 				Log.d(TAG, "Current display mode: "+dispMode);
 				if (dispMode.equals("panel"))
 				{
-					buf = "0,0,800,480";
+					String dispaxis = in_axis.readLine();
+					String[] axisstr = dispaxis.split(" ", 5);
+					buf = "0,0,"+axisstr[2]+","+axisstr[3];
+					Log.d(TAG, "Current display axis: "+buf);
 				}
 				else if (dispMode.equals("480p"))
 				{
@@ -134,6 +144,7 @@ public class SettingsVP {
 					buf = "0,0,1280,720";
 			} finally {
     			in.close();
+    			in_axis.close();
     		} 
 		}
 		catch (IOException e) {
