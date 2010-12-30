@@ -536,22 +536,22 @@ public class playermenu extends Activity {
 	    		play.requestFocus();
 		    	show_menu();
 	    	}
-    		return (true);
-    	}
-    	/*else if (keyCode == KeyEvent.KEYCODE_AUDIOTRACK) 
+			return (true);
+		}
+    	else if (keyCode == 29) 
     	{
     		videobar();
-            ImageButton audiotrace = (ImageButton) findViewById(R.id.ImageButton03);
-            audiotrace.requestFocusFromTouch();
+            ImageButton audiotrack = (ImageButton) findViewById(R.id.ImageButton03);
+            audiotrack.requestFocusFromTouch();
     		return (true);
     	}
-    	else if (keyCode == KeyEvent.KEYCODE_SUBTITLE) 
+    	else if (keyCode == 47) 
     	{
     		videobar();
     		ImageButton sutitle = (ImageButton) findViewById(R.id.ImageButton04);
     		sutitle.requestFocusFromTouch();
     		return (true);
-    	}*/
+    	}
         else
 		 return super.onKeyDown(keyCode, msg);
     }
@@ -1121,6 +1121,8 @@ public class playermenu extends Activity {
 								Amplayer_play();
     						PRE_NEXT_FLAG = 0;
     					}
+						if(subTitleView!=null)
+							subTitleView.closeSubtitle();
 						break;
 					case VideoInfo.PLAYER_STOPED:
 						/*new PlayThread().start();
@@ -1370,8 +1372,8 @@ public class playermenu extends Activity {
 	{
 		setSublanguage();
 		//closed last time used sub;
-		if(subTitleView!=null)
-			subTitleView.closeSubtitle();	
+		/*if(subTitleView!=null)
+			subTitleView.closeSubtitle();*/	
 		
 		if(filepath==null)
 		{
