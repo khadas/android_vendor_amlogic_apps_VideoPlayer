@@ -27,5 +27,5 @@
   <string name="str_rename_notice">文件名已经存在，是否要覆盖？</string>
   <string name="str_time_null">00:00:00</string>
   <string name="str_audio_stream">Audio Stream</string>
-  <string name="str_resume_play">Whether to resume this video from last position?</string>
+  <string name="str_resume_play">是否从断点播放？</string>
 </resources>

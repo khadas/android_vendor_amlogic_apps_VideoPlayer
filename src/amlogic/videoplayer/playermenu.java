@@ -1405,7 +1405,7 @@ public class playermenu extends Activity {
 		{
 			AlertDialog.Builder resumeBuilder = new AlertDialog.Builder(this);
 			resumeBuilder.setTitle("VideoPlayer")  
-				.setMessage("Whether to resume this video from last position?") 
+				.setMessage(R.string.str_resume_play) 
 				.setPositiveButton("OK",  
 					new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialog, int whichButton) {  
