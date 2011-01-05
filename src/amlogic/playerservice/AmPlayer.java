@@ -21,14 +21,6 @@ public class AmPlayer extends Service {
     private static int last_cur_time = -1;
     
     private int mPid = -1;
-    /**jni interface */
-    /*public static native int native_startcmd(String filename);
-    public static native int native_sendcmd(String cmd);
-    public native int native_reqstate();//!!!should not be static
-    public static native int native_setglobalalpha(int alpha);
-    public static native int native_getosdbpp();
-    public static native int native_enablecolorkey(short key_rgb565);
-    public static native int native_disablecolorkey();*/
     
   //TODO need api
 	private native int setMedia(String url,int loop,int playMode,int pos);//playMode:0,all,just default;
@@ -273,41 +265,4 @@ public class AmPlayer extends Service {
 		}
 	}
 	
-	/*public static void onUpdateAid(int total_audio_num, int audio_id, int audio_format,
-			int ifChange)
-	{
-		
-		Log.d("audiostream", "total num:"+total_audio_num +
-				"------- current id:" + audio_id +
-				"------- format:" +audio_format);
-		
-		if (ifChange > 0)
-		{
-			Log.d("audiostream","audio stream changed to: " + audio_id);
-			Message s_message = new Message();
-			s_message.what = VideoInfo.AUDIO_CHANGED_INFO_MSG;
-			s_message.arg1 = total_audio_num;
-			s_message.arg2 = audio_id;
-			
-			try {
-				mClient.send(s_message);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-		else
-		{
-			if (AudioTrackOperation.AudioStreamInfo.size() < total_audio_num)
-			{
-				String type = null;
-				type = AudioTrackOperation.getAudioFormat(audio_format);
-				AudioTrackOperation.ASInfo asinfo = new AudioTrackOperation.ASInfo();
-				asinfo.audio_id = audio_id;
-				asinfo.audio_format = type;
-				AudioTrackOperation.AudioStreamInfo.add(asinfo);
-				AudioTrackOperation.AudioStreamFormat.add(type);
-				Log.d("audiostream","AudioInfo.AudioStream.add: " + type);
-			}
-		}
-	}*/
 }

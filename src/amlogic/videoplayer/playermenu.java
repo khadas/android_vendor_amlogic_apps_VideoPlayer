@@ -45,7 +45,7 @@ import android.widget.*;
 
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
-	private static String codec_mips;
+	private static String codec_mips = null;
 	private static String InputFile = "/sys/class/audiodsp/codec_mips";
 	private static String OutputFile = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq";
 	
@@ -55,7 +55,6 @@ public class playermenu extends Activity {
 	private int position = 0;
 	private int cur_audio_stream = 0;
 	private int total_audio_num = 0;
-	private int ScreenOffTimeoutValue = 0;
 	private boolean backToFileList = false;
 	private boolean progressSliding = false;
 	private boolean INITOK = false;
@@ -866,6 +865,8 @@ public class playermenu extends Activity {
 		if (!file.exists()) {        	
         	return 0;
         }
+		if (codec_mips == null)
+			return 0;
     	try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
@@ -1152,6 +1153,21 @@ public class playermenu extends Activity {
 						InfoStr = getErrorInfo(msg.arg2);
 						Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_LONG)
 							.show();
+						if (msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
+								|| msg.arg2 == Errorno.DECODER_INIT_FAILED)
+						{
+							Intent selectFileIntent = new Intent();
+							selectFileIntent.setClass(playermenu.this, FileList.class);
+							//close sub;
+							if(subTitleView!=null)
+								subTitleView.closeSubtitle();	
+							//stop play
+							backToFileList = true;
+							if(m_Amplayer != null)
+								Amplayer_stop();
+							startActivity(selectFileIntent);
+							playermenu.this.finish();
+						}
 						break;
 					case VideoInfo.PLAYER_INITOK:
 						INITOK = true;
