@@ -52,12 +52,12 @@ jclass VideoMediaInfo_getClass(JNIEnv *env){
 jclass AudioTagInfo_getClass(JNIEnv *env){
     return (*env)->FindClass(env,"com/amlogic/media/AudioTagInfo");
 }
-
+*/
 jclass Intersub_getClass(JNIEnv *env){
-   return (*env)->FindClass(env,"com/amlogic/media/InternalSubtitleInfo");
+   return (*env)->FindClass(env,"amlogic/playerservice/InternalSubtitleInfo");
     
 }
-*/
+
 
 int onUpdate_player_info_java( JNIEnv *env,int pid,player_info_t * info)
 {
@@ -240,42 +240,50 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
          (*env)->SetObjectField(env,meta_obj,vinfo_id,vinfoArray);
      }
 #endif    
-     if(msgt->stream_info.has_audio>0 && msgt->stream_info.total_audio_num>0){
-         jclass ainfo_cls = AudioMediaInfo_getClass(env);
-         jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
-         if(!amid){                
-             LOGE("failed to get audio info constructor");
-             return meta_obj;
-         }
-         jobjectArray ainfoArray = (*env)->NewObjectArray(env,msgt->stream_info.total_audio_num,ainfo_cls, NULL);  
-         if(NULL == ainfoArray){                 
-            LOGE("failed to get audio info object");              
-            return meta_obj;       
-         }
-         
-         for(index = 0;index<msgt->stream_info.total_audio_num;index++){
-            jobject aobj = (*env)->NewObject(env,ainfo_cls, amid);
-            if(NULL ==aobj){
-                (*env)->DeleteLocalRef(env,ainfoArray);  
-                LOGE("failed to get audio info object");                 
-                return meta_obj;      
-            }
-            (*env)->SetIntField(env,aobj,\
-                (*env)->GetFieldID(env, ainfo_cls, "audio_format", "I"), (int)(msgt->audio_info[index]->aformat));
-            /*(*env)->SetIntField(env,aobj,\
-                (*env)->GetFieldID(env, ainfo_cls, "audio_channel", "I"), (int)(msgt->audio_info[index]->channel));
-            (*env)->SetIntField(env,aobj,\
-                (*env)->GetFieldID(env, ainfo_cls, "audio_samplerate", "I"), (int)(msgt->audio_info[index]->sample_rate));
-            (*env)->SetIntField(env,aobj,\
-                (*env)->GetFieldID(env, ainfo_cls, "bit_rate", "I"), (int)(msgt->audio_info[index]->bit_rate));*/
-            (*env)->SetIntField(env,aobj,\
-                (*env)->GetFieldID(env, ainfo_cls, "uid", "I"), (int)(msgt->audio_info[index]->id));
+	if(msgt->stream_info.has_audio>0 && msgt->stream_info.total_audio_num>0){
+		jclass ainfo_cls = AudioMediaInfo_getClass(env);
+		jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
+		if(!amid){                
+		 LOGE("failed to get audio info constructor");
+		 return meta_obj;
+		}
+		jobjectArray ainfoArray = (*env)->NewObjectArray(env,msgt->stream_info.total_audio_num,ainfo_cls, NULL);  
+		if(NULL == ainfoArray){                 
+		LOGE("failed to get audio info object");              
+		return meta_obj;       
+		}
+
+		for(index = 0;index<msgt->stream_info.total_audio_num;index++){
+		jobject aobj = (*env)->NewObject(env,ainfo_cls, amid);
+		if(NULL ==aobj){
+		    (*env)->DeleteLocalRef(env,ainfoArray);  
+		    LOGE("failed to get audio info object");                 
+		    return meta_obj;      
+		}
+		(*env)->SetIntField(env,aobj,\
+		    (*env)->GetFieldID(env, ainfo_cls, "audio_format", "I"), (int)(msgt->audio_info[index]->aformat));
+		/*(*env)->SetIntField(env,aobj,\
+		    (*env)->GetFieldID(env, ainfo_cls, "audio_channel", "I"), (int)(msgt->audio_info[index]->channel));
+		(*env)->SetIntField(env,aobj,\
+		    (*env)->GetFieldID(env, ainfo_cls, "audio_samplerate", "I"), (int)(msgt->audio_info[index]->sample_rate));
+		(*env)->SetIntField(env,aobj,\
+		    (*env)->GetFieldID(env, ainfo_cls, "bit_rate", "I"), (int)(msgt->audio_info[index]->bit_rate));*/
+		(*env)->SetIntField(env,aobj,\
+		    (*env)->GetFieldID(env, ainfo_cls, "uid", "I"), (int)(msgt->audio_info[index]->id));
 
 
-             (*env)->SetObjectArrayElement(env,ainfoArray,index, aobj);  
-            }  
-            (*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lamlogic/playerservice/AudioMediaInfo;"),ainfoArray);
-        }
+		(*env)->SetObjectArrayElement(env,ainfoArray,index, aobj);  
+		}  
+		(*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lamlogic/playerservice/AudioMediaInfo;"),ainfoArray);
+	}
+
+	//for insub num;
+    if(msgt->stream_info.total_sub_num>0)
+	{
+    	LOGI("================== 'in internal subtitle num:%d\n", msgt->stream_info.total_sub_num);
+    	jclass sub_cls =Intersub_getClass(env);
+        (*env)->SetStaticIntField(env,sub_cls,(*env)->GetStaticFieldID(env, sub_cls, "insub_num", "I"),(int)(msgt->stream_info.total_sub_num));
+    }
 #if 0               
         if(msgt->audio_info[0]->audio_tag!=NULL){
 

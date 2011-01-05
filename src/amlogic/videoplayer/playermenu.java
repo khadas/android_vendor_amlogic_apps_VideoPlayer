@@ -22,6 +22,7 @@ import amlogic.playerservice.ResumePlay;
 import amlogic.playerservice.ScreenMode;
 import amlogic.playerservice.SettingsVP;
 import amlogic.playerservice.VideoInfo;
+import amlogic.playerservice.InternalSubtitleInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -1109,6 +1110,9 @@ public class playermenu extends Activity {
 							e.printStackTrace();
 						}
 						play.setBackgroundResource(R.drawable.pause_button);
+						sub_para.totalnum =subMange.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
+						if(sub_para.totalnum>0)
+				    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
 						break;
 					case VideoInfo.PLAYER_PAUSE:
 						play.setBackgroundResource(R.drawable.play_button);

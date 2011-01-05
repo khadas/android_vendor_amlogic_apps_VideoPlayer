@@ -96,7 +96,6 @@ public class SettingsVP {
 	
 	public static boolean setVideoLayoutMode()
 	{
-		int tmp;
     	String buf = null;
     	String dispMode = null;
 		File file = new File(displaymode);
