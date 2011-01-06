@@ -13,7 +13,7 @@
 	<string name="str_vdisplay">display mode</string>
 	<string name="str_brightness">brightness setting</string>
 <string name="app_name">VideoPlayer</string>
-<string name="main_activity">PlayerMain</string>
+<string name="main_activity">媒体播放器</string>
   <string name="str_text">更改文件名为：</string>
   <string name="str_notice">注意！</string>
   <string name="str_ok">确定</string>

@@ -75,11 +75,13 @@ public class playermenu extends Activity {
 	private LinearLayout morbar = null;
 	private LinearLayout subbar = null;
 	private LinearLayout otherbar = null;
+	private AlertDialog confirm_dialog = null;
 	
 	Timer timer = new Timer();
 	Toast toast = null;
 	public MediaInfo bMediaInfo = null;
 	private static int PRE_NEXT_FLAG = 0;
+	private int resumeSecond = 8;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 	
 	//for subtitle
@@ -935,6 +937,50 @@ public class playermenu extends Activity {
     	timer.schedule(task, 3000);
     }
     
+    protected void ResumeCountdown()
+    {
+    	final Handler handler = new Handler(){   
+    		  
+            public void handleMessage(Message msg) {   
+                switch (msg.what) {       
+                case 0x3d:
+                	if (confirm_dialog.isShowing())
+                	{
+	                	if (resumeSecond > 0) {
+	                		confirm_dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+	                			.setText("Cancel"+" ( "+(--resumeSecond)+" )");
+	                		ResumeCountdown();
+	                	}
+	                	else
+	                	{
+	                		position = 0;
+				        	if (!NOT_FIRSTTIME)
+				    			StartPlayerService();
+				        	else
+				        		Amplayer_play();
+				        	confirm_dialog.dismiss();
+				        	resumeSecond = 8;
+	                	}
+                	}
+                    break;       
+                }       
+                super.handleMessage(msg);   
+            }
+               
+        };   
+        TimerTask task = new TimerTask(){   
+      
+            public void run() {   
+                Message message = new Message();       
+                message.what = 0x3d;       
+                handler.sendMessage(message);     
+            }   
+               
+        };   
+        Timer resumeTimer = new Timer();
+        resumeTimer.schedule(task, 1000);
+    }
+    
     protected void hide_infobar()
     {
     	infobar.setVisibility(View.GONE);
@@ -1423,8 +1469,8 @@ public class playermenu extends Activity {
 		Log.d(TAG, "resumePlay() pos is :"+pos);
 		if (pos > 0)
 		{
-			AlertDialog.Builder resumeBuilder = new AlertDialog.Builder(this);
-			resumeBuilder.setTitle("VideoPlayer")  
+			confirm_dialog = new AlertDialog.Builder(this)
+				.setTitle("VideoPlayer")  
 				.setMessage(R.string.str_resume_play) 
 				.setPositiveButton("OK",  
 					new DialogInterface.OnClickListener() {  
@@ -1433,10 +1479,11 @@ public class playermenu extends Activity {
 			                if (!NOT_FIRSTTIME)
 			        			StartPlayerService();
 			                else
-			                	Amplayer_play();
+			                	Amplayer_play();	
+			                resumeSecond = 8;
 			            }  
 			        })  
-			    .setNegativeButton("Cancel",  
+			    .setNegativeButton("Cancel" + " ( "+resumeSecond+" )",  
 				    new DialogInterface.OnClickListener() {  
 				        public void onClick(DialogInterface dialog, int whichButton) {  
 				        	position = 0;
@@ -1444,9 +1491,11 @@ public class playermenu extends Activity {
 				    			StartPlayerService();
 				        	else
 				        		Amplayer_play();
+				        	resumeSecond = 8;
 				        }  
 				    })  
 			    .show(); 
+			ResumeCountdown();
 			return pos;
 		}
 		if (!NOT_FIRSTTIME)
