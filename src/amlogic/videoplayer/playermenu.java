@@ -78,7 +78,6 @@ public class playermenu extends Activity {
 	
 	Timer timer = new Timer();
 	Toast toast = null;
-	public Handler myHandler;
 	public MediaInfo bMediaInfo = null;
 	private static int PRE_NEXT_FLAG = 0;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
@@ -1158,7 +1157,8 @@ public class playermenu extends Activity {
 						Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_LONG)
 							.show();
 						if (msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
-								|| msg.arg2 == Errorno.DECODER_INIT_FAILED)
+								|| msg.arg2 == Errorno.DECODER_INIT_FAILED
+								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT)
 						{
 							Intent selectFileIntent = new Intent();
 							selectFileIntent.setClass(playermenu.this, FileList.class);
