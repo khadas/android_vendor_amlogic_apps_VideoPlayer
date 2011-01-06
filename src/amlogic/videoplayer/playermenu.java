@@ -947,8 +947,9 @@ public class playermenu extends Activity {
                 	if (confirm_dialog.isShowing())
                 	{
 	                	if (resumeSecond > 0) {
+	                		String cancel = playermenu.this.getResources().getString(R.string.str_cancel);
 	                		confirm_dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-	                			.setText("Cancel"+" ( "+(--resumeSecond)+" )");
+	                			.setText(cancel+" ( "+(--resumeSecond)+" )");
 	                		ResumeCountdown();
 	                	}
 	                	else
@@ -1472,7 +1473,7 @@ public class playermenu extends Activity {
 			confirm_dialog = new AlertDialog.Builder(this)
 				.setTitle("VideoPlayer")  
 				.setMessage(R.string.str_resume_play) 
-				.setPositiveButton("OK",  
+				.setPositiveButton(R.string.str_ok,  
 					new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialog, int whichButton) {  
 			                position = pos;
@@ -1483,7 +1484,7 @@ public class playermenu extends Activity {
 			                resumeSecond = 8;
 			            }  
 			        })  
-			    .setNegativeButton("Cancel" + " ( "+resumeSecond+" )",  
+			    .setNegativeButton(playermenu.this.getResources().getString(R.string.str_cancel) + " ( "+resumeSecond+" )",  
 				    new DialogInterface.OnClickListener() {  
 				        public void onClick(DialogInterface dialog, int whichButton) {  
 				        	position = 0;

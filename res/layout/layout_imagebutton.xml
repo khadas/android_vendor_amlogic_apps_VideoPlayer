@@ -53,9 +53,9 @@
 			</LinearLayout>
 	
 			<LinearLayout android:id="@+id/sub_ok_on" android:layout_height="match_parent" android:layout_width="match_parent">
-			     <Button android:id="@+id/button_ok" android:text="@string/sub_ok" android:layout_width="150dp" android:layout_gravity="center" android:layout_marginLeft="30dp" android:layout_height="50dp" android:textSize="24px" android:textColor="@drawable/black">
+			     <Button android:id="@+id/button_ok" android:text="@string/str_ok" android:layout_width="150dp" android:layout_gravity="center" android:layout_marginLeft="30dp" android:layout_height="50dp" android:textSize="24px" android:textColor="@drawable/black">
 			      </Button>
-				<Button android:id="@+id/button_canncel" android:text="@string/sub_cancel" android:layout_width="150dp" android:layout_gravity="center" android:layout_height="50dp" android:textSize="24px" android:textColor="@drawable/black">
+				<Button android:id="@+id/button_canncel" android:text="@string/str_cancel" android:layout_width="150dp" android:layout_gravity="center" android:layout_height="50dp" android:textSize="24px" android:textColor="@drawable/black">
 				  </Button>
 			</LinearLayout>
 		</LinearLayout>
