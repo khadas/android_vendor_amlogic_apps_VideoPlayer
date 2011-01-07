@@ -91,7 +91,8 @@
     <LinearLayout
 	    android:orientation="horizontal" android:id="@+id/morebarLayout" android:layout_width="800dp" android:layout_height="70dp" android:layout_gravity="bottom|center_horizontal" android:background="@color/background">
 	
-		<ImageButton android:id="@+id/ImageButton07" android:layout_height="70dp" android:layout_width="110dp" android:layout_marginLeft="15dp" android:src="@drawable/barback"></ImageButton><ImageButton android:id="@+id/ImageButton01" android:layout_height="70dp" android:layout_width="110dp" android:src="@drawable/tvorpanel"></ImageButton>
+		<ImageButton android:id="@+id/ImageButton07" android:layout_height="70dp" android:layout_width="110dp" android:layout_marginLeft="15dp" android:src="@drawable/barback"></ImageButton>
+		<ImageButton android:id="@+id/ImageButton01" android:layout_height="70dp" android:layout_width="110dp" android:src="@drawable/resume_play"></ImageButton>
 		<ImageButton android:id="@+id/ImageButton02" android:layout_height="70dp" android:layout_width="110dp" android:src="@drawable/playmode"></ImageButton>
 		<ImageButton android:id="@+id/ImageButton03" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/audio_trace"></ImageButton>
 		<ImageButton android:id="@+id/ImageButton04" android:layout_width="110dp" android:layout_height="70dp" android:src="@drawable/subtitle"></ImageButton>

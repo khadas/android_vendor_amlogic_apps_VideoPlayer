@@ -53,7 +53,7 @@ public class playermenu extends Activity {
     /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
-	private int position = 0;
+	private int playPosition = 0;
 	private int cur_audio_stream = 0;
 	private int total_audio_num = 0;
 	private boolean backToFileList = false;
@@ -98,7 +98,8 @@ public class playermenu extends Activity {
 	private String color_text[]={ "white","yellow","blue"};
 	private String[] m_display = {"normal","full screen","4:3","16:9"};
 	private String[] m_brightness= {"1","2","3","4"};		
-	private String[] m_repeat= {"repeat list ","repeat one","",""};	
+	private String[] m_repeat= {"repeat list ","repeat one","",""};
+	private String[] m_resume= {"On","Off","",""};
 	
         private boolean mSuspendFlag = false;
         PowerManager.WakeLock mScreenLock = null;
@@ -126,7 +127,26 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                //	sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FAST_SWITCH"));
+                	otherbar.setVisibility(View.VISIBLE);
+                	morbar.setVisibility(View.GONE);
+                	morebar_tileText.setText("Resume Mode");
+                	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
+                    		R.layout.list_row, m_resume));
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    	{
+                    		 if (position == 0)
+                        		 SettingsVP.putParaBoolean("ResumeMode", true);
+                        	 else if (position == 1)
+                        		 SettingsVP.putParaBoolean("ResumeMode", false);
+                    		 
+                    		 otherbar.setVisibility(View.GONE);
+                    		 morbar.setVisibility(View.VISIBLE);
+                    	}
+                    });
+                    otherbar.requestFocus();
                 } 
     	    });
             
@@ -580,7 +600,14 @@ public class playermenu extends Activity {
 		subinit();
 		initinfobar();
 		
-        resumePlay();
+		if (SettingsVP.getParaBoolean("ResumeMode"))
+			resumePlay();
+		else {
+			if (!NOT_FIRSTTIME)
+    			StartPlayerService();
+        	else
+        		Amplayer_play();
+		}
     }
     
     protected void subinit()
@@ -954,7 +981,7 @@ public class playermenu extends Activity {
 	                	}
 	                	else
 	                	{
-	                		position = 0;
+	                		playPosition = 0;
 				        	if (!NOT_FIRSTTIME)
 				    			StartPlayerService();
 				        	else
@@ -1168,8 +1195,14 @@ public class playermenu extends Activity {
     					{
     						Log.d(TAG,"to play another file!");
 							new PlayThread().start();
-							if (resumePlay() == 0)
+							if (SettingsVP.getParaBoolean("ResumeMode"))
+							{
+								if (resumePlay() == 0)
+									Amplayer_play();
+							} else {
+								playPosition = 0;
 								Amplayer_play();
+							}
     						PRE_NEXT_FLAG = 0;
     					}
 						if(subTitleView!=null)
@@ -1190,6 +1223,8 @@ public class playermenu extends Activity {
 						} catch(RemoteException e) {
 							e.printStackTrace();
 						}
+						ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
+						playPosition = 0;
 						if (m_playmode == REPEATLIST)
 							PlayList.getinstance().movenext();
 						AudioTrackOperation.AudioStreamFormat.clear();
@@ -1307,7 +1342,7 @@ public class playermenu extends Activity {
 	            morbar.setVisibility(View.VISIBLE);
     		}
     	
-			m_Amplayer.Open(PlayList.getinstance().getcur(), position);
+			m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);
 			//reset sub;
 			subTitleView.setText("");
 			subinit();
@@ -1476,7 +1511,7 @@ public class playermenu extends Activity {
 				.setPositiveButton(R.string.str_ok,  
 					new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialog, int whichButton) {  
-			                position = pos;
+			                playPosition = pos;
 			                if (!NOT_FIRSTTIME)
 			        			StartPlayerService();
 			                else
@@ -1487,7 +1522,7 @@ public class playermenu extends Activity {
 			    .setNegativeButton(playermenu.this.getResources().getString(R.string.str_cancel) + " ( "+resumeSecond+" )",  
 				    new DialogInterface.OnClickListener() {  
 				        public void onClick(DialogInterface dialog, int whichButton) {  
-				        	position = 0;
+				        	playPosition = 0;
 				        	if (!NOT_FIRSTTIME)
 				    			StartPlayerService();
 				        	else
