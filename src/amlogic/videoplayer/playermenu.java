@@ -1111,7 +1111,7 @@ public class playermenu extends Activity {
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
     		    	{
-    		    		if((msg.arg1)>4600&&(msg.arg1)<=5300)
+    		    		/*if((msg.arg1)>4600&&(msg.arg1)<=5300)
     		    		{
     		    			sub_para.totalnum =subMange.getSubTotal();
     		    	    	if(sub_para.totalnum>0)
@@ -1128,7 +1128,7 @@ public class playermenu extends Activity {
     		    	    			openFile(sub_para.sub_id);
     		    	    	}
     		    	    	
-    		    		}
+    		    		}*/
     		    		if(subTitleView!=null&&sub_para.sub_id!=null)
     		    		{
     		    			subTitleView.tick(msg.arg1);
