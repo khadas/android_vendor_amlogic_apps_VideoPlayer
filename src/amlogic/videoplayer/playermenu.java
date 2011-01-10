@@ -580,8 +580,11 @@ public class playermenu extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        
+        //fixed bug for green line
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
         foreground.setForeground(null);
+        
         setContentView(R.layout.infobar);
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         
@@ -1531,6 +1534,7 @@ public class playermenu extends Activity {
 				        }  
 				    })  
 			    .show(); 
+			confirm_dialog.setOnDismissListener(new myAlertDialogDismiss());
 			ResumeCountdown();
 			return pos;
 		}
@@ -1553,6 +1557,20 @@ public class playermenu extends Activity {
         		e.printStackTrace();
         	}
 		}
+	}
+	
+	private class myAlertDialogDismiss implements DialogInterface.OnDismissListener
+	{
+
+		public void onDismiss(DialogInterface arg0) {
+			// TODO Auto-generated method stub
+			if (!NOT_FIRSTTIME)
+    			StartPlayerService();
+        	else
+        		Amplayer_play();
+        	resumeSecond = 8;
+		}
+		
 	}
 
 	 private final StorageEventListener mListener = new StorageEventListener() {
