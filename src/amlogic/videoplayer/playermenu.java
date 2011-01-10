@@ -581,6 +581,7 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
+        sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_BEFORE_VIDEO"));
         //fixed bug for green line
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
         foreground.setForeground(null);
@@ -1095,6 +1096,7 @@ public class playermenu extends Activity {
         StopPlayerService();
         setDefCodecMips();
         openScreenOffTimeout();
+        sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
         
         super.onDestroy();
     }
