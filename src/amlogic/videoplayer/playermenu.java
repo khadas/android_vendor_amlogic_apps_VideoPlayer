@@ -122,8 +122,8 @@ public class playermenu extends Activity {
     		
     		morbar = (LinearLayout)findViewById(R.id.morebarLayout);
     		morbar.requestFocus();
-    		ImageButton panelortv = (ImageButton) findViewById(R.id.ImageButton01);
-            panelortv.setOnClickListener(new View.OnClickListener() 
+    		ImageButton resume = (ImageButton) findViewById(R.id.ImageButton01);
+            resume.setOnClickListener(new View.OnClickListener() 
     	    {
                 public void onClick(View v) 
                 {
@@ -684,6 +684,7 @@ public class playermenu extends Activity {
 				toast.cancel();
 				toast.setText(filename);
 				toast.show();
+				playPosition = 0;
 				if(m_Amplayer == null)
 					return;
 				//stop play
@@ -703,6 +704,7 @@ public class playermenu extends Activity {
 				toast.cancel();
 				toast.setText(filename); 
 				toast.show();
+				playPosition = 0;
 				if(m_Amplayer == null)
 					return;
 				else
