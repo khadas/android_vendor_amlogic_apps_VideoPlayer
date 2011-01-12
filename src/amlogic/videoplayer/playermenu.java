@@ -1095,6 +1095,13 @@ public class playermenu extends Activity {
         	subTitleView.closeSubtitle();
         backToFileList = true;
         Amplayer_stop();
+        if(m_Amplayer != null)
+			try {
+				m_Amplayer.DisableColorKey();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         StopPlayerService();
         setDefCodecMips();
         openScreenOffTimeout();
