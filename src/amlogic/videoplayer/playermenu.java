@@ -1221,6 +1221,7 @@ public class playermenu extends Activity {
     					}
 						if(subTitleView!=null)
 							subTitleView.closeSubtitle();
+						sub_para.totalnum = 0;
 						break;
 					case VideoInfo.PLAYER_STOPED:
 						/*new PlayThread().start();
@@ -1526,22 +1527,22 @@ public class playermenu extends Activity {
 					new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialog, int whichButton) {  
 			                playPosition = pos;
-			                if (!NOT_FIRSTTIME)
+			                /*if (!NOT_FIRSTTIME)
 			        			StartPlayerService();
 			                else
 			                	Amplayer_play();	
-			                resumeSecond = 8;
+			                resumeSecond = 8;*/
 			            }  
 			        })  
 			    .setNegativeButton(playermenu.this.getResources().getString(R.string.str_cancel) + " ( "+resumeSecond+" )",  
 				    new DialogInterface.OnClickListener() {  
 				        public void onClick(DialogInterface dialog, int whichButton) {  
 				        	playPosition = 0;
-				        	if (!NOT_FIRSTTIME)
+				        	/*if (!NOT_FIRSTTIME)
 				    			StartPlayerService();
 				        	else
 				        		Amplayer_play();
-				        	resumeSecond = 8;
+				        	resumeSecond = 8;*/
 				        }  
 				    })  
 			    .show(); 
