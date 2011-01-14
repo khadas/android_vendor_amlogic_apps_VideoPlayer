@@ -15,8 +15,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 		</activity>
-
-    
 		<activity android:name="videobar"></activity>
 		<activity android:name="playermenu" 
 			android:label="@string/main_activity"

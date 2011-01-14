@@ -12,7 +12,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.subtitleparser.*;
-import com.subtitleparser.SubtitleUtils;
 import com.subtitleview.SubtitleView;
 import android.content.Context;
 import amlogic.playerservice.Errorno;
@@ -25,9 +24,11 @@ import amlogic.playerservice.VideoInfo;
 import amlogic.playerservice.InternalSubtitleInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -76,6 +77,7 @@ public class playermenu extends Activity {
 	private LinearLayout subbar = null;
 	private LinearLayout otherbar = null;
 	private AlertDialog confirm_dialog = null;
+	private BroadcastReceiver mReceiver = null;
 	
 	Timer timer = new Timer();
 	Toast toast = null;
@@ -100,6 +102,8 @@ public class playermenu extends Activity {
 	private String[] m_brightness= {"1","2","3","4"};		
 	private String[] m_repeat= {"repeat list ","repeat one","",""};
 	private String[] m_resume= {"On","Off","",""};
+	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
+		"com.amlogic.HdmiSwitch.HDMISWITCH_MODE_CHANGED";
 	
         private boolean mSuspendFlag = false;
         PowerManager.WakeLock mScreenLock = null;
@@ -569,8 +573,8 @@ public class playermenu extends Activity {
     	else if (keyCode == 47) 
     	{
     		videobar();
-    		ImageButton sutitle = (ImageButton) findViewById(R.id.ImageButton04);
-    		sutitle.requestFocusFromTouch();
+    		ImageButton subtitle = (ImageButton) findViewById(R.id.ImageButton04);
+    		subtitle.requestFocusFromTouch();
     		return (true);
     	}
         else
@@ -603,6 +607,21 @@ public class playermenu extends Activity {
         SettingsVP.setVideoLayoutMode();
 		subinit();
 		initinfobar();
+		IntentFilter intentFilter = new IntentFilter(ACTION_HDMISWITCH_MODE_CHANGED);
+		mReceiver = new BroadcastReceiver()
+		{
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (ACTION_HDMISWITCH_MODE_CHANGED.equals(intent.getAction())) {			 
+					Intent selectFileIntent = new Intent();
+					selectFileIntent.setClass(playermenu.this, FileList.class);	
+					backToFileList = true;
+					startActivity(selectFileIntent);
+					playermenu.this.finish();
+				}
+			}
+		};
+		registerReceiver(mReceiver, intentFilter);
 		
 		if (SettingsVP.getParaBoolean("ResumeMode"))
 			resumePlay();
@@ -1105,6 +1124,7 @@ public class playermenu extends Activity {
         StopPlayerService();
         setDefCodecMips();
         openScreenOffTimeout();
+        unregisterReceiver(mReceiver);
         sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
         
         super.onDestroy();
@@ -1190,16 +1210,7 @@ public class playermenu extends Activity {
     				switch(player_status)
     				{
 					case VideoInfo.PLAYER_RUNNING:
-						NOT_FIRSTTIME = true;
-						try {
-							bMediaInfo = m_Amplayer.GetMediaInfo();
-						} catch(RemoteException e) {
-							e.printStackTrace();
-						}
 						play.setBackgroundResource(R.drawable.pause_button);
-						sub_para.totalnum =subMange.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
-						if(sub_para.totalnum>0)
-				    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
 						break;
 					case VideoInfo.PLAYER_PAUSE:
 						play.setBackgroundResource(R.drawable.play_button);
@@ -1272,6 +1283,15 @@ public class playermenu extends Activity {
 						break;
 					case VideoInfo.PLAYER_INITOK:
 						INITOK = true;
+						NOT_FIRSTTIME = true;
+						try {
+							bMediaInfo = m_Amplayer.GetMediaInfo();
+						} catch(RemoteException e) {
+							e.printStackTrace();
+						}
+						sub_para.totalnum =subMange.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
+						if(sub_para.totalnum>0)
+				    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
 						if (setCodecMips() == 0)
 				        	Log.d(TAG, "setCodecMips Failed");
 						break;
