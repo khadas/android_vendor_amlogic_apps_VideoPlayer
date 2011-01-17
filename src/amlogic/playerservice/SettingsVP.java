@@ -16,10 +16,11 @@ public class SettingsVP {
 
 	public static final String SETTING_INFOS = "SETTING_Infos";
 	private static SharedPreferences setting = null;
-	private static String displaymode = "/sys/class/display/mode";
-	private static String displayaxis = "/sys/class/display/axis";
-	private static String video_axis = "/sys/class/video/axis";
+	private static String displaymode_path = "/sys/class/display/mode";
+	private static String displayaxis_path = "/sys/class/display/axis";
+	private static String video_axis_path = "/sys/class/video/axis";
 	private static String TAG = "SettingVideoPlayer";
+	public static String display_mode = null; 
 	
 	//==========preferences name==========
 	public static final String[] pref_name = { 
@@ -98,15 +99,15 @@ public class SettingsVP {
 	{
     	String buf = null;
     	String dispMode = null;
-		File file = new File(displaymode);
+		File file = new File(displaymode_path);
 		if (!file.exists()) {        	
         	return false;
         }
-		file = new File(video_axis);
+		file = new File(video_axis_path);
 		if (!file.exists()) {        	
         	return false;
         }
-		file = new File(displayaxis);
+		file = new File(displayaxis_path);
 		if (!file.exists()) {        	
         	return false;
         }
@@ -114,8 +115,8 @@ public class SettingsVP {
 		//read
 		try
 		{
-			BufferedReader in = new BufferedReader(new FileReader(displaymode), 32);
-			BufferedReader in_axis = new BufferedReader(new FileReader(displayaxis), 32);
+			BufferedReader in = new BufferedReader(new FileReader(displaymode_path), 32);
+			BufferedReader in_axis = new BufferedReader(new FileReader(displayaxis_path), 32);
 			try
 			{
 				dispMode = in.readLine();
@@ -141,6 +142,7 @@ public class SettingsVP {
 				}
 				else
 					buf = "0,0,1280,720";
+				display_mode = dispMode;
 			} finally {
     			in.close();
     			in_axis.close();
@@ -148,13 +150,13 @@ public class SettingsVP {
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			Log.e(TAG, "IOException when read "+displaymode);
+			Log.e(TAG, "IOException when read "+displaymode_path);
 		} 
 		
 		//write
 		try
 		{
-			BufferedWriter out = new BufferedWriter(new FileWriter(video_axis), 32);
+			BufferedWriter out = new BufferedWriter(new FileWriter(video_axis_path), 32);
     		try
     		{
     			out.write(buf);    
@@ -166,7 +168,7 @@ public class SettingsVP {
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			Log.e(TAG, "IOException when write "+video_axis);
+			Log.e(TAG, "IOException when write "+video_axis_path);
 			return false;
 		}
 	}

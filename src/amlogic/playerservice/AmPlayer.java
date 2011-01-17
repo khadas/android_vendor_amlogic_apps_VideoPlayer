@@ -66,7 +66,7 @@ public class AmPlayer extends Service {
 	public int setSubtitleOut( int sub_uid) { return setSubtitleOut(mPid,sub_uid);}
 	public int setAudioTrack(int track_uid) { return setAudioTrack(mPid,track_uid);}
 	public int setRepeat(int isRepeat) { return setRepeat(mPid,isRepeat);}
-	public Object getMetaInfo() {return getMetaInfo(mPid);}//can't be use now
+	public Object getMetaInfo() {return getMetaInfo(mPid);}
 	public int setTone(int tone) {return setTone(mPid, tone);}
 	
 	

@@ -195,46 +195,52 @@
     <LinearLayout
 	    android:orientation="horizontal" 
 	    android:id="@+id/morebarLayout" 
-	    android:layout_width="800dp" 
+	    android:layout_gravity="bottom" 
+	    android:background="@color/background" 
 	    android:layout_height="70dp" 
-	    android:layout_gravity="bottom|center_horizontal" 
-	    android:background="@color/background">
+	    android:layout_width="fill_parent">
 	
 		<ImageButton android:id="@+id/ImageButton07" 
-		android:layout_height="70dp" 
-		android:layout_width="110dp" 
-		android:layout_marginLeft="15dp" 
-		android:src="@drawable/barback">
+		android:src="@drawable/barback" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:layout_weight="1" android:layout_marginLeft="15dp">
 		</ImageButton>
 		<ImageButton android:id="@+id/ImageButton01" 
-		android:layout_height="70dp" 
-		android:layout_width="110dp" 
-		android:src="@drawable/resume_play">
+		android:src="@drawable/resume_play" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:layout_weight="1">
 		</ImageButton>
 		<ImageButton android:id="@+id/ImageButton02" 
-		android:layout_height="70dp" 
-		android:layout_width="110dp" 
-		android:src="@drawable/playmode">
+		android:src="@drawable/playmode" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_weight="1">
 		</ImageButton>
 		<ImageButton android:id="@+id/ImageButton03" 
-		android:layout_width="110dp" 
-		android:layout_height="70dp" 
-		android:src="@drawable/audio_trace">
+		android:src="@drawable/audio_trace" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_weight="1">
 		</ImageButton>
 		<ImageButton android:id="@+id/ImageButton04" 
-		android:layout_width="110dp" 
-		android:layout_height="70dp" 
-		android:src="@drawable/subtitle">
+		android:src="@drawable/subtitle" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_weight="1">
 		</ImageButton>
 		<ImageButton android:id="@+id/ImageButton05" 
-		android:layout_width="110dp" 
-		android:layout_height="70dp" 
-		android:src="@drawable/display">
+		android:src="@drawable/display" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_weight="1">
 		</ImageButton>
 		<ImageButton android:id="@+id/ImageButton06" 
-		android:layout_width="110dp" 
-		android:layout_height="70dp" 
-		android:src="@drawable/brightness">
+		android:src="@drawable/brightness" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_weight="1" android:layout_marginRight="15dp">
 		</ImageButton>
     
 	</LinearLayout>

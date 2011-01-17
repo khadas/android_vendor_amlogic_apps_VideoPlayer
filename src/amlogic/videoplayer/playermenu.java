@@ -125,6 +125,15 @@ public class playermenu extends Activity {
     		otherbar.setVisibility(View.GONE);
     		
     		morbar = (LinearLayout)findViewById(R.id.morebarLayout);
+    		if (SettingsVP.display_mode.equals("480p"))
+            {
+            	LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) morbar.getLayoutParams();
+            	linearParams.width = 710;
+            	linearParams.bottomMargin = 15;
+            	morbar.setLayoutParams(linearParams);
+            	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+            			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
     		morbar.requestFocus();
     		ImageButton resume = (ImageButton) findViewById(R.id.ImageButton01);
             resume.setOnClickListener(new View.OnClickListener() 
@@ -352,8 +361,6 @@ public class playermenu extends Activity {
 								
 	  							t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
 	  							t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
-	  			
-	  							
 	  							
 	  					    	Bfont_l.setEnabled(false);
 	  	  						Bfont_r.setEnabled(false);
@@ -508,7 +515,8 @@ public class playermenu extends Activity {
                 {
                 	setContentView(R.layout.infobar);
                 	initinfobar();
-                	getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                	if(!SettingsVP.display_mode.equals("480p"))
+                		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 } 
     	    }); 
     	}
@@ -667,6 +675,19 @@ public class playermenu extends Activity {
         ImageButton fastforword = (ImageButton)findViewById(R.id.FastForward);
         ImageButton fastreverse = (ImageButton)findViewById(R.id.FastReverse);
         infobar = (LinearLayout)findViewById(R.id.infobarLayout);
+        if (SettingsVP.display_mode.equals("480p"))
+        {
+        	infobar = (LinearLayout)findViewById(R.id.infobarLayout);
+        	LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
+        	linearParams.width = 700;
+        	linearParams.height = 90;
+        	linearParams.leftMargin = 13;
+        	linearParams.bottomMargin = 15;
+        	linearParams.gravity = -1;
+        	infobar.setLayoutParams(linearParams);
+        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
     	total_time = (TextView)findViewById(R.id.TextView04);
@@ -1044,7 +1065,8 @@ public class playermenu extends Activity {
     protected void show_menu()
     {
     	infobar.setVisibility(View.VISIBLE);
-    	getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	if(!SettingsVP.display_mode.equals("480p"))
+    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
     
     public boolean onTouchEvent (MotionEvent event)
