@@ -30,7 +30,7 @@
 				android:layout_height="56dp" 
 				android:textSize="24px" 
 				android:layout_width="348dp" 
-				android:text="@string/str_vsubtitle" 
+				android:text="@string/setting_subtitle" 
 				android:textColor="@drawable/white">
 			 	</TextView>
 			</LinearLayout>

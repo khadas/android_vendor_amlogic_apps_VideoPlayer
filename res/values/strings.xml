@@ -2,19 +2,27 @@
 <resources>
 	<string name="sub_font">font:</string>
     <string name="sub_color">color:</string>
+    <string name="color_white">White</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_blue">Blue</string>
     <string name="sub_switch">switch:</string>
     <string name="str_exit">exit</string>
-    <string name="str_vtvorpanel">output setting</string>
-	<string name="str_vplaymode">play mode</string>
-	<string name="str_vaudio">audio traces setting</string>
-	<string name="str_vsubtitle">subtitle setting</string>
-	<string name="str_vdisplay">display mode</string>
-	<string name="str_brightness">brightness setting</string>
+    <string name="setting_resume">Resume Mode</string>
+	<string name="setting_playmode">Play Mode</string>
+	<string name="setting_playmode_repeatall">Repeat All</string>
+	<string name="setting_playmode_repeatone">Repeat One</string>
+	<string name="setting_audiotrack">Audio Track</string>
+	<string name="setting_subtitle">Subtitle</string>
+	<string name="setting_displaymode">Display Mode</string>
+	<string name="setting_displaymode_normal">Normal</string>
+	<string name="setting_displaymode_fullscreen">Full Screen</string>
+	<string name="setting_brightness">Brightness</string>
 	<string name="app_name">VideoPlayer</string>
 	<string name="main_activity">VideoPlayer</string>
 	<string name="str_ok">OK</string>
 	<string name="str_cancel">Cancel</string>
 	<string name="str_time_null">00:00:00</string>
-	<string name="str_audio_stream">Audio Stream</string>
 	<string name="str_resume_play">Whether to resume this video from last position?</string>
+	<string name="str_on">On</string>
+	<string name="str_off">Off</string>
 </resources>

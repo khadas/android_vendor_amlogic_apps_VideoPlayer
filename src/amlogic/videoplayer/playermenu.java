@@ -97,11 +97,9 @@ public class playermenu extends Activity {
 	private TextView t_subsfont=null ;
 	private TextView t_subscolor=null ;
 	private TextView morebar_tileText =null;
-	private String color_text[]={ "white","yellow","blue"};
-	private String[] m_display = {"normal","full screen","4:3","16:9"};
+	
 	private String[] m_brightness= {"1","2","3","4"};		
-	private String[] m_repeat= {"repeat list ","repeat one","",""};
-	private String[] m_resume= {"On","Off","",""};
+	
 	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
 		"com.amlogic.HdmiSwitch.HDMISWITCH_MODE_CHANGED";
 	
@@ -142,8 +140,12 @@ public class playermenu extends Activity {
                 {
                 	otherbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
-                	morebar_tileText.setText("Resume Mode");
+                	morebar_tileText.setText(R.string.setting_resume);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                	String[] m_resume= {
+                			playermenu.this.getResources().getString(R.string.str_on),
+                			playermenu.this.getResources().getString(R.string.str_off)
+                			};
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row, m_resume));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -170,8 +172,12 @@ public class playermenu extends Activity {
                 {
                 	otherbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
-                	morebar_tileText.setText("play mode");
+                	morebar_tileText.setText(R.string.setting_playmode);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                	String[] m_repeat= {
+                			playermenu.this.getResources().getString(R.string.setting_playmode_repeatall),
+                			playermenu.this.getResources().getString(R.string.setting_playmode_repeatone)
+                			};
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row,m_repeat));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -190,15 +196,15 @@ public class playermenu extends Activity {
                     otherbar.requestFocus();
                 } 
     	    });
-            ImageButton audiotrace = (ImageButton) findViewById(R.id.ImageButton03);
-            audiotrace.setOnClickListener(new View.OnClickListener() 
+            ImageButton audiotrack = (ImageButton) findViewById(R.id.ImageButton03);
+            audiotrack.setOnClickListener(new View.OnClickListener() 
     	    {
                 public void onClick(View v) 
                 {
                 	otherbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
                 	
-                	morebar_tileText.setText("audio track");
+                	morebar_tileText.setText(R.string.setting_audiotrack);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                 	if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
                 		AudioTrackOperation.setAudioStream(bMediaInfo);
@@ -251,6 +257,12 @@ public class playermenu extends Activity {
                 	subbar.requestFocus();
                 }
 
+                String color_text[]={ 
+                		playermenu.this.getResources().getString(R.string.color_white),
+            			playermenu.this.getResources().getString(R.string.color_yellow),
+            			playermenu.this.getResources().getString(R.string.color_blue)
+            			};
+                
 				private void subtitle_control() {
 					t_subswitch =(TextView)findViewById(R.id.sub_swith111);
   					t_subsfont =(TextView)findViewById(R.id.sub_font111);
@@ -268,7 +280,7 @@ public class playermenu extends Activity {
 	                	
 	                
 	                if(sub_para.curid==sub_para.totalnum)
-							t_subswitch.setText("off");
+							t_subswitch.setText(R.string.str_off);
 						 else
 							t_subswitch.setText(String.valueOf(sub_para.curid+1)+"/"+String.valueOf(sub_para.totalnum));
   					
@@ -325,7 +337,7 @@ public class playermenu extends Activity {
    								sub_switch_state --;
    							
   							 if(sub_switch_state==sub_para.totalnum)
-  								t_subswitch.setText("off");
+  								t_subswitch.setText(R.string.str_off);
   							 else
   								t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));
    		                } 
@@ -340,7 +352,7 @@ public class playermenu extends Activity {
    								sub_switch_state ++;
    							
   							 if(sub_switch_state==sub_para.totalnum)
-  								t_subswitch.setText("off");
+  								t_subswitch.setText(R.string.str_off);
   							 else
   								t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));;
    		                } 
@@ -434,8 +446,14 @@ public class playermenu extends Activity {
                 	otherbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
                 	
-                	morebar_tileText.setText("display mode");
+                	morebar_tileText.setText(R.string.setting_displaymode);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                	String[] m_display= {
+                			playermenu.this.getResources().getString(R.string.setting_displaymode_normal),
+                			playermenu.this.getResources().getString(R.string.setting_displaymode_fullscreen),
+                			"16:9",
+                			"4:3"
+                			};
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row,m_display));
                     listView.setSelection(ScreenMode.getScreenMode());
@@ -475,7 +493,7 @@ public class playermenu extends Activity {
                 	
                 	otherbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
-                	morebar_tileText.setText("brightness setting");
+                	morebar_tileText.setText(R.string.setting_brightness);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row,m_brightness));

@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="sub_font">font:</string>
-    <string name="sub_color">color:</string>
-    <string name="sub_switch">switch:</string>
-    <string name="str_exit">exit</string>
-    <string name="str_vtvorpanel">output setting</string>
-	<string name="str_vplaymode">play mode</string>
-	<string name="str_vaudio">audio traces setting</string>
-	<string name="str_vsubtitle">subtitle setting</string>
-	<string name="str_vdisplay">display mode</string>
-	<string name="str_brightness">brightness setting</string>
+	<string name="sub_font">字体:</string>
+    <string name="sub_color">颜色:</string>
+    <string name="color_white">白</string>
+    <string name="color_yellow">黄</string>
+    <string name="color_blue">蓝</string>
+    <string name="sub_switch">切换:</string>
+    <string name="str_exit">退出</string>
+    <string name="setting_resume">断点播放</string>
+	<string name="setting_playmode">播放模式</string>
+	<string name="setting_playmode_repeatall">目录循环</string>
+	<string name="setting_playmode_repeatone">单首循环</string>
+	<string name="setting_audiotrack">音轨</string>
+	<string name="setting_subtitle">字幕</string>
+	<string name="setting_displaymode">显示模式</string>
+	<string name="setting_displaymode_normal">正常</string>
+	<string name="setting_displaymode_fullscreen">全屏</string>
+	<string name="setting_brightness">亮度</string>
 	<string name="app_name">VideoPlayer</string>
 	<string name="main_activity">媒体播放器</string>
 	<string name="str_ok">确定</string>
 	<string name="str_cancel">取消</string>
 	<string name="str_time_null">00:00:00</string>
-	<string name="str_audio_stream">Audio Stream</string>
 	<string name="str_resume_play">是否从断点播放？</string>
+	<string name="str_on">开</string>
+	<string name="str_off">关</string>
 </resources>
