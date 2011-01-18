@@ -1332,6 +1332,7 @@ public class playermenu extends Activity {
 						sub_para.totalnum =subMange.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
 						if(sub_para.totalnum>0)
 				    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
+						openFile(sub_para.sub_id);
 						if (setCodecMips() == 0)
 				        	Log.d(TAG, "setCodecMips Failed");
 						break;
