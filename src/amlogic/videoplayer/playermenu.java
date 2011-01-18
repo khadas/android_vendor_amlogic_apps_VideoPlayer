@@ -589,14 +589,14 @@ public class playermenu extends Activity {
 	    	}
 			return (true);
 		}
-    	else if (keyCode == 29) 
+    	else if (keyCode == 92) 
     	{
     		videobar();
             ImageButton audiotrack = (ImageButton) findViewById(R.id.ImageButton03);
             audiotrack.requestFocusFromTouch();
     		return (true);
     	}
-    	else if (keyCode == 47) 
+    	else if (keyCode == 93) 
     	{
     		videobar();
     		ImageButton subtitle = (ImageButton) findViewById(R.id.ImageButton04);
