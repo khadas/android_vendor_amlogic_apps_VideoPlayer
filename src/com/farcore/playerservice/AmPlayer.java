@@ -1,6 +1,6 @@
-package amlogic.playerservice;
+package com.farcore.playerservice;
 
-import amlogic.playerservice.Player;
+import com.farcore.playerservice.Player;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;

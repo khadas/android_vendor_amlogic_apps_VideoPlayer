@@ -1,6 +1,6 @@
-package amlogic.playerservice;
+package com.farcore.playerservice;
 
-import amlogic.playerservice.MediaInfo;
+import com.farcore.playerservice.MediaInfo;
 
 interface Player
 {

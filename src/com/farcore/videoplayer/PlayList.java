@@ -1,4 +1,4 @@
-package amlogic.videoplayer;
+package com.farcore.videoplayer;
 
 
 import java.util.List;

@@ -1,9 +1,9 @@
-package amlogic.videoplayer;
+package com.farcore.videoplayer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import amlogic.playerservice.MediaInfo;
+import com.farcore.playerservice.MediaInfo;
 import android.util.Log;
 
 public class AudioTrackOperation {

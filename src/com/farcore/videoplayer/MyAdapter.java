@@ -1,9 +1,10 @@
-package amlogic.videoplayer;
+package com.farcore.videoplayer;
 
 import java.io.File;
 import java.util.List;
 
-import amlogic.videoplayer.R;
+import com.farcore.videoplayer.R;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

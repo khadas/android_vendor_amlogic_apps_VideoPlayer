@@ -6,6 +6,7 @@
     <string name="color_yellow">黄</string>
     <string name="color_blue">蓝</string>
     <string name="sub_switch">切换:</string>
+    <string name="sub_no_subtitle">没有字幕!</string>
     <string name="str_exit">退出</string>
     <string name="setting_resume">断点播放</string>
 	<string name="setting_playmode">播放模式</string>

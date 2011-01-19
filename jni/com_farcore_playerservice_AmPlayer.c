@@ -4,7 +4,7 @@
 
 #include <android/log.h>
 
-#include "amlogic_playerservice_AmPlayer.h"
+#include "com_farcore_playerservice_AmPlayer.h"
 
 #include "sys_conf.h"
 #include "player.h"
@@ -28,33 +28,33 @@ static jclass gMplayerClazz = NULL;
 
 
 jclass MediaPlayer_getClass(JNIEnv *env) {
-    return (*env)->FindClass(env,"amlogic/playerservice/AmPlayer");
+    return (*env)->FindClass(env,"com/farcore/playerservice/AmPlayer");
 }
 /*
 jclass PlaybackState_getClass(JNIEnv *env){
 
-    return (*env)->FindClass(env,"com/amlogic/media/PlaybackState");
+    return (*env)->FindClass(env,"com/farcore/playerservice/PlaybackState");
 
 }*/
 
 jclass MediaInfo_getClass(JNIEnv *env){
-    return (*env)->FindClass(env,"amlogic/playerservice/MediaInfo");
+    return (*env)->FindClass(env,"com/farcore/playerservice/MediaInfo");
 }
 
 jclass AudioMediaInfo_getClass(JNIEnv *env){
-    return (*env)->FindClass(env,"amlogic/playerservice/AudioMediaInfo");
+    return (*env)->FindClass(env,"com/farcore/playerservice/AudioMediaInfo");
 }
 /*
 jclass VideoMediaInfo_getClass(JNIEnv *env){
-    return (*env)->FindClass(env,"com/amlogic/media/VideoMediaInfo");
+    return (*env)->FindClass(env,"com/farcore/playerservice/VideoMediaInfo");
 }
 
 jclass AudioTagInfo_getClass(JNIEnv *env){
-    return (*env)->FindClass(env,"com/amlogic/media/AudioTagInfo");
+    return (*env)->FindClass(env,"com/farcore/playerservice/AudioTagInfo");
 }
 */
 jclass Intersub_getClass(JNIEnv *env){
-   return (*env)->FindClass(env,"amlogic/playerservice/InternalSubtitleInfo");
+   return (*env)->FindClass(env,"com/farcore/playerservice/InternalSubtitleInfo");
     
 }
 
@@ -117,6 +117,7 @@ int _media_info_dump(media_info_t* minfo)
     LOGI("======||has video track?:%s\n",minfo->stream_info.has_video>0?"YES!":"NO!");
     LOGI("======||has audio track?:%s\n",minfo->stream_info.has_audio>0?"YES!":"NO!");    
     LOGI("======||duration:%d\n",minfo->stream_info.duration);
+	LOGI("======||seekable:%d\n",minfo->stream_info.seekable);
     if(minfo->stream_info.has_video && minfo->stream_info.total_video_num>0)
     {        
         LOGI("======||video counts:%d\n",minfo->stream_info.total_video_num);
@@ -191,6 +192,8 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     jmethodID constructor = (*env)->GetMethodID(env, meta_cls, "<init>", "()V");
     
     jobject meta_obj = (*env)->NewObject(env,meta_cls,constructor);
+	(*env)->SetIntField(env,meta_obj,\
+		(*env)->GetFieldID(env, meta_cls, "seekable", "I"), (int)(msgt->stream_info.seekable));
 #if 0
     (*env)->SetIntField(env,meta_obj,
         (*env)->GetFieldID(env, meta_cls, "filetype", "I"), (int)(msgt->stream_info.type));
@@ -235,7 +238,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
                  
          } 
 
-         jfieldID vinfo_id = (*env)->GetFieldID(env, meta_cls, "vinfo", "[Lamlogic/playerservice/VideoMediaInfo;"); 
+         jfieldID vinfo_id = (*env)->GetFieldID(env, meta_cls, "vinfo", "[Lcom/farcore/playerservice/VideoMediaInfo;"); 
        
          (*env)->SetObjectField(env,meta_obj,vinfo_id,vinfoArray);
      }
@@ -274,7 +277,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
 
 		(*env)->SetObjectArrayElement(env,ainfoArray,index, aobj);  
 		}  
-		(*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lamlogic/playerservice/AudioMediaInfo;"),ainfoArray);
+		(*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lcom/farcore/playerservice/AudioMediaInfo;"),ainfoArray);
 	}
 
 	//for insub num;
@@ -313,7 +316,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
                 (*env)->GetFieldID(env, tag_cls, "author", "Ljava/lang/String;"), author);                                     
 
             (*env)->SetObjectField(env,meta_obj,
-                (*env)->GetFieldID(env, meta_cls, "taginfo", "Lcom/amlogic/media/AudioTagInfo;"),tagobj);                     
+                (*env)->GetFieldID(env, meta_cls, "taginfo", "Lcom/farcore/playerservice/AudioTagInfo;"),tagobj);                     
 
 
     }
@@ -343,7 +346,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
 
         }  
         
-        (*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "sinfo", "[Lcom/amlogic/media/InternalSubtitleInfo;"),subArray);  
+        (*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "sinfo", "[Lcom/farcore/playerservice/InternalSubtitleInfo;"),subArray);  
     }
 #endif
     return meta_obj;  
@@ -354,11 +357,11 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
 
 #define FILENAME_LENGTH_MAX 2048  // 2k
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    addMediaSource
  * Signature: (Ljava/lang/String;III)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setMedia
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setMedia
   (JNIEnv *env, jobject obj, jstring url,jint isloop, jint pMode,jint st){    
 
     int pid = -1;   
@@ -437,13 +440,13 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setMedia
 
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    playMediaSource
  * Signature: Ljava/lang/String;II)I
  */
  
 
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_playMedia
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_playMedia
   (JNIEnv *env, jobject obj,jstring url, jint isloop, jint pMode,jint st){
     
     int pid = -1;    
@@ -520,11 +523,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_playMedia
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    closeMediaId
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_close
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_close
   (JNIEnv *env, jobject obj, jint pid){  
     if(pid>=0)  
         player_exit(pid);
@@ -534,11 +537,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_close
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    start
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_start
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_start
   (JNIEnv *env, jobject obj, jint pid){
 #if 0
     player_cmd_t cmd;
@@ -558,11 +561,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_start
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    pause
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_pause
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_pause
   (JNIEnv *env, jobject obj, jint pid){
     LOGI("player pause");
     player_pause(pid);
@@ -570,11 +573,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_pause
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    resume
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_resume
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_resume
   (JNIEnv *env, jobject obj, jint pid){
     LOGI("player resume");
     player_resume(pid);
@@ -582,22 +585,22 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_resume
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    seek
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_seek
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_seek
   (JNIEnv *env, jobject obj, jint pid, jint pos){
     player_timesearch(pid,pos);
     return 0;
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    stop
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_stop
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_stop
   (JNIEnv *env, jobject obj, jint pid){
     int ret = -1; 
     LOGI("player stop");
@@ -608,12 +611,12 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_stop
 
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    getMetaInfo
  * Signature: (I)Ljava/lang/Object;
  */
 
-JNIEXPORT jobject JNICALL Java_amlogic_playerservice_AmPlayer_getMetaInfo
+JNIEXPORT jobject JNICALL Java_com_farcore_playerservice_AmPlayer_getMetaInfo
   (JNIEnv *env, jobject obj, jint pid){
     media_info_t minfo;
     int ret = -1;
@@ -632,11 +635,11 @@ JNIEXPORT jobject JNICALL Java_amlogic_playerservice_AmPlayer_getMetaInfo
 
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    fastforward
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_fastforward
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_fastforward
   (JNIEnv *env, jobject obj, jint pid, jint speed){
     int ret = -1;
     ret = player_forward(pid, speed);
@@ -644,11 +647,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_fastforward
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    fastrewind
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_fastrewind
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_fastrewind
   (JNIEnv *env, jobject obj, jint pid, jint speed){
     int ret = -1;
     ret =player_backward(pid,speed);
@@ -657,11 +660,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_fastrewind
 
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    setAudioTrack
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setAudioTrack
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setAudioTrack
   (JNIEnv *env, jobject obj, jint pid, jint atrack_uid){
     
     player_aid(pid,atrack_uid);
@@ -669,51 +672,51 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setAudioTrack
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    setVolume
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setIVolume
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setIVolume
   (JNIEnv *env , jclass clazz, jint vol){
 	return 0;
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    mute
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_mute
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_mute
   (JNIEnv *env,jclass clazz){
     return 0;
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    unmute
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_unmute
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_unmute
   (JNIEnv *env, jclass clazz){
     return 0;
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    setVideoBlackOut
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setVideoBlackOut
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setVideoBlackOut
   (JNIEnv *env, jclass clazz, jint isBlackout){
     return 0;
 	
 }
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    setRepeat
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setRepeat
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setRepeat
   (JNIEnv *env, jobject obj, jint pid, jint isRepeat){
     jint ret = -1;
     if(isRepeat>0){
@@ -727,31 +730,31 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setRepeat
     return ret;
 }
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    setSubtitleOut
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setSubtitleOut
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setSubtitleOut
   (JNIEnv *env, jobject obj, jint pid, jint sub_uid){ 	
   	return 0;
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    setTone
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_setTone
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setTone
   (JNIEnv *env, jclass clazz, jint pid, jint tone){  	
   	return 0;
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    init
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_native_init
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_native_init
   (JNIEnv *env, jclass clazz){
     int ret =-1;
     ret = player_init();
@@ -765,11 +768,11 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_native_init
 }
 
 /*
- * Class:     com_amlogic_media_MediaPlayer
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    uninit
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_native_uninit
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_native_uninit
   (JNIEnv *env, jclass clazz){
     //int ret = -1;
     //ret = amadec_thread_exit();
@@ -792,7 +795,7 @@ JNIEXPORT jint JNICALL Java_amlogic_playerservice_AmPlayer_native_uninit
 }
 
 jint
-Java_amlogic_playerservice_AmPlayer_enablecolorkey(JNIEnv *env, jclass clazz, jshort key_rgb565) 
+Java_com_farcore_playerservice_AmPlayer_enablecolorkey(JNIEnv *env, jclass clazz, jshort key_rgb565) 
 {
     int ret = -1;
     short key = key_rgb565;
@@ -801,19 +804,19 @@ Java_amlogic_playerservice_AmPlayer_enablecolorkey(JNIEnv *env, jclass clazz, js
 }
 
 jint
-Java_amlogic_playerservice_AmPlayer_disablecolorkey(JNIEnv *env, jclass clazz) 
+Java_com_farcore_playerservice_AmPlayer_disablecolorkey(JNIEnv *env, jclass clazz) 
 {
     int ret = -1;
     ret = SYS_disable_colorkey();
     return ret;
 }
-JNIEXPORT jint Java_amlogic_playerservice_AmPlayer_setglobalalpha(JNIEnv *env, jclass clazz, jint alpha){
+JNIEXPORT jint Java_com_farcore_playerservice_AmPlayer_setglobalalpha(JNIEnv *env, jclass clazz, jint alpha){
     int ret = -1;
     ret = SYS_set_global_alpha(alpha);
     LOGI("set global alpha is %d",alpha);
     return ret;
 }
-JNIEXPORT jint Java_amlogic_playerservice_AmPlayer_getosdbpp(JNIEnv *env, jclass clazz){
+JNIEXPORT jint Java_com_farcore_playerservice_AmPlayer_getosdbpp(JNIEnv *env, jclass clazz){
     jint ret = -1;
     ret = SYS_get_osdbpp();
     LOGI("get osd bpp:%d",ret);
@@ -821,31 +824,31 @@ JNIEXPORT jint Java_amlogic_playerservice_AmPlayer_getosdbpp(JNIEnv *env, jclass
 }
 //
 static JNINativeMethod gMethods[] = {
-    {"setMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_amlogic_playerservice_AmPlayer_setMedia},   
-    {"playMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_amlogic_playerservice_AmPlayer_playMedia}, 
-    {"close",		"(I)I",					       	(void*)Java_amlogic_playerservice_AmPlayer_close},
-    {"start",			"(I)I",					       	(void*)Java_amlogic_playerservice_AmPlayer_start}, 
-    {"stop",			"(I)I",					       	(void*)Java_amlogic_playerservice_AmPlayer_stop},
-    {"pause",			"(I)I",					       	(void*)Java_amlogic_playerservice_AmPlayer_pause},
-    {"resume",			"(I)I",					       	(void*)Java_amlogic_playerservice_AmPlayer_resume},
-    {"seek",			"(II)I",						(void*)Java_amlogic_playerservice_AmPlayer_seek},
-    {"fastforward",	          	"(II)I",				(void*)Java_amlogic_playerservice_AmPlayer_fastforward},
-    {"fastrewind",	          	"(II)I",				(void*)Java_amlogic_playerservice_AmPlayer_fastrewind},      
-    {"setAudioTrack",          	"(II)I",				(void*)Java_amlogic_playerservice_AmPlayer_setAudioTrack},
-    {"setSubtitleOut",          	"(II)I",			(void*)Java_amlogic_playerservice_AmPlayer_setSubtitleOut},
-    {"setVideoBlackOut",       	"(I)I",					(void*)Java_amlogic_playerservice_AmPlayer_setVideoBlackOut},
-    {"setTone",           		"(II)I",					(void*)Java_amlogic_playerservice_AmPlayer_setTone},
-    {"setRepeat",           	"(II)I",					(void*)Java_amlogic_playerservice_AmPlayer_setRepeat},
-    {"setIVolume",              	"(I)I",					       	(void*)Java_amlogic_playerservice_AmPlayer_setIVolume},
-    {"getMetaInfo",              	"(I)Ljava/lang/Object;",				(void*)Java_amlogic_playerservice_AmPlayer_getMetaInfo},
-    {"mute",                   	"()I",					       	(void*)Java_amlogic_playerservice_AmPlayer_mute},
-    {"unmute",                 	"()I",					       	(void*)Java_amlogic_playerservice_AmPlayer_unmute},
-    {"native_init",			"()I",						(void*)Java_amlogic_playerservice_AmPlayer_native_init},
-    {"native_uninit",			"()I",					(void*)Java_amlogic_playerservice_AmPlayer_native_uninit},	
-    { "native_enablecolorkey", "(S)I",					(void*) Java_amlogic_playerservice_AmPlayer_enablecolorkey },
-    { "native_disablecolorkey", "()I",		            (void*) Java_amlogic_playerservice_AmPlayer_disablecolorkey },
-    { "native_setglobalalpha",              "(I)I",		                            (void*) Java_amlogic_playerservice_AmPlayer_setglobalalpha },   
-    { "native_getosdbpp",                   "()I",		                                    (void*) Java_amlogic_playerservice_AmPlayer_getosdbpp },   
+    {"setMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_com_farcore_playerservice_AmPlayer_setMedia},   
+    {"playMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_com_farcore_playerservice_AmPlayer_playMedia}, 
+    {"close",		"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_close},
+    {"start",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_start}, 
+    {"stop",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_stop},
+    {"pause",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_pause},
+    {"resume",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_resume},
+    {"seek",			"(II)I",						(void*)Java_com_farcore_playerservice_AmPlayer_seek},
+    {"fastforward",	          	"(II)I",				(void*)Java_com_farcore_playerservice_AmPlayer_fastforward},
+    {"fastrewind",	          	"(II)I",				(void*)Java_com_farcore_playerservice_AmPlayer_fastrewind},      
+    {"setAudioTrack",          	"(II)I",				(void*)Java_com_farcore_playerservice_AmPlayer_setAudioTrack},
+    {"setSubtitleOut",          	"(II)I",			(void*)Java_com_farcore_playerservice_AmPlayer_setSubtitleOut},
+    {"setVideoBlackOut",       	"(I)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setVideoBlackOut},
+    {"setTone",           		"(II)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setTone},
+    {"setRepeat",           	"(II)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setRepeat},
+    {"setIVolume",              	"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_setIVolume},
+    {"getMetaInfo",              	"(I)Ljava/lang/Object;",				(void*)Java_com_farcore_playerservice_AmPlayer_getMetaInfo},
+    {"mute",                   	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_mute},
+    {"unmute",                 	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_unmute},
+    {"native_init",			"()I",						(void*)Java_com_farcore_playerservice_AmPlayer_native_init},
+    {"native_uninit",			"()I",					(void*)Java_com_farcore_playerservice_AmPlayer_native_uninit},	
+    { "native_enablecolorkey", "(S)I",					(void*) Java_com_farcore_playerservice_AmPlayer_enablecolorkey },
+    { "native_disablecolorkey", "()I",		            (void*) Java_com_farcore_playerservice_AmPlayer_disablecolorkey },
+    { "native_setglobalalpha",              "(I)I",		                            (void*) Java_com_farcore_playerservice_AmPlayer_setglobalalpha },   
+    { "native_getosdbpp",                   "()I",		                                    (void*) Java_com_farcore_playerservice_AmPlayer_getosdbpp },   
         
 	
 };
@@ -871,8 +874,8 @@ int jniRegisterNativeMethods(JNIEnv* env,
 	return 0;
 }
 
-int register_amlogic_media_mediaplayer(JNIEnv *env) {
-	const char* const kClassPathName = "amlogic/playerservice/AmPlayer";
+int register_com_farcore_playerservice_mediaplayer(JNIEnv *env) {
+	const char* const kClassPathName = "com/farcore/playerservice/AmPlayer";
 
 	return jniRegisterNativeMethods(env,kClassPathName , gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
 }
@@ -891,7 +894,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved){
 	
     LOGI("GetEnv ok");    /* success -- return valid version number */   
     result = JNI_VERSION_1_4;   
-    register_amlogic_media_mediaplayer(env); 
+    register_com_farcore_playerservice_mediaplayer(env); 
     return result;
 }
 

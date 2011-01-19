@@ -6,6 +6,7 @@
     <string name="color_yellow">Yellow</string>
     <string name="color_blue">Blue</string>
     <string name="sub_switch">switch:</string>
+    <string name="sub_no_subtitle">No subtitle!</string>
     <string name="str_exit">exit</string>
     <string name="setting_resume">Resume Mode</string>
 	<string name="setting_playmode">Play Mode</string>

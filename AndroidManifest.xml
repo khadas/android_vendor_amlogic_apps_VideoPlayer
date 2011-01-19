@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="amlogic.videoplayer"
-      android:versionCode="1" android:versionName="1.63">
+      package="com.farcore.videoplayer"
+      android:versionCode="1" android:versionName="1.64">
       <supports-screens
       	android:largeScreens="true"
 		android:anyDensity="true" />
@@ -25,7 +25,7 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
 		</activity>
-<service android:exported="true" android:name="amlogic.playerservice.AmPlayer"></service>
+<service android:exported="true" android:name="com.farcore.playerservice.AmPlayer"></service>
 </application>
 
 

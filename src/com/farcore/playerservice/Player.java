@@ -1,33 +1,33 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: Player.aidl
+ * Original file: D:\\work\\VideoPlayer_Amplayer\\src\\com\\farcore\\playerservice\\Player.aidl
  */
-package amlogic.playerservice;
+package com.farcore.playerservice;
 public interface Player extends android.os.IInterface
 {
 /** Local-side IPC implementation stub class. */
-public static abstract class Stub extends android.os.Binder implements amlogic.playerservice.Player
+public static abstract class Stub extends android.os.Binder implements com.farcore.playerservice.Player
 {
-private static final java.lang.String DESCRIPTOR = "amlogic.playerservice.Player";
+private static final java.lang.String DESCRIPTOR = "com.farcore.playerservice.Player";
 /** Construct the stub at attach it to the interface. */
 public Stub()
 {
 this.attachInterface(this, DESCRIPTOR);
 }
 /**
- * Cast an IBinder object into an amlogic.playerservice.Player interface,
+ * Cast an IBinder object into an com.farcore.playerservice.Player interface,
  * generating a proxy if needed.
  */
-public static amlogic.playerservice.Player asInterface(android.os.IBinder obj)
+public static com.farcore.playerservice.Player asInterface(android.os.IBinder obj)
 {
 if ((obj==null)) {
 return null;
 }
 android.os.IInterface iin = (android.os.IInterface)obj.queryLocalInterface(DESCRIPTOR);
-if (((iin!=null)&&(iin instanceof amlogic.playerservice.Player))) {
-return ((amlogic.playerservice.Player)iin);
+if (((iin!=null)&&(iin instanceof com.farcore.playerservice.Player))) {
+return ((com.farcore.playerservice.Player)iin);
 }
-return new amlogic.playerservice.Player.Stub.Proxy(obj);
+return new com.farcore.playerservice.Player.Stub.Proxy(obj);
 }
 public android.os.IBinder asBinder()
 {
@@ -105,7 +105,7 @@ return true;
 case TRANSACTION_GetMediaInfo:
 {
 data.enforceInterface(DESCRIPTOR);
-amlogic.playerservice.MediaInfo _result = this.GetMediaInfo();
+com.farcore.playerservice.MediaInfo _result = this.GetMediaInfo();
 reply.writeNoException();
 if ((_result!=null)) {
 reply.writeInt(1);
@@ -194,7 +194,7 @@ return true;
 }
 return super.onTransact(code, data, reply, flags);
 }
-private static class Proxy implements amlogic.playerservice.Player
+private static class Proxy implements com.farcore.playerservice.Player
 {
 private android.os.IBinder mRemote;
 Proxy(android.os.IBinder remote)
@@ -330,17 +330,17 @@ _data.recycle();
 }
 return _result;
 }
-public amlogic.playerservice.MediaInfo GetMediaInfo() throws android.os.RemoteException
+public com.farcore.playerservice.MediaInfo GetMediaInfo() throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
-amlogic.playerservice.MediaInfo _result;
+com.farcore.playerservice.MediaInfo _result;
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
 mRemote.transact(Stub.TRANSACTION_GetMediaInfo, _data, _reply, 0);
 _reply.readException();
 if ((0!=_reply.readInt())) {
-_result = amlogic.playerservice.MediaInfo.CREATOR.createFromParcel(_reply);
+_result = com.farcore.playerservice.MediaInfo.CREATOR.createFromParcel(_reply);
 }
 else {
 _result = null;
@@ -516,7 +516,7 @@ public int Pause() throws android.os.RemoteException;
 public int Resume() throws android.os.RemoteException;
 public int Stop() throws android.os.RemoteException;
 public int Close() throws android.os.RemoteException;
-public amlogic.playerservice.MediaInfo GetMediaInfo() throws android.os.RemoteException;
+public com.farcore.playerservice.MediaInfo GetMediaInfo() throws android.os.RemoteException;
 public int SwitchAID(int id) throws android.os.RemoteException;
 public int SetColorKey(int color) throws android.os.RemoteException;
 public void DisableColorKey() throws android.os.RemoteException;

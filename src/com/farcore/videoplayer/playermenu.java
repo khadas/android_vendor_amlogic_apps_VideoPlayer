@@ -1,4 +1,4 @@
-package amlogic.videoplayer;
+package com.farcore.videoplayer;
 import android.os.storage.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,14 +14,7 @@ import java.util.TimerTask;
 import com.subtitleparser.*;
 import com.subtitleview.SubtitleView;
 import android.content.Context;
-import amlogic.playerservice.Errorno;
-import amlogic.playerservice.MediaInfo;
-import amlogic.playerservice.Player;
-import amlogic.playerservice.ResumePlay;
-import amlogic.playerservice.ScreenMode;
-import amlogic.playerservice.SettingsVP;
-import amlogic.playerservice.VideoInfo;
-import amlogic.playerservice.InternalSubtitleInfo;
+import com.farcore.playerservice.*;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -70,6 +63,8 @@ public class playermenu extends Activity {
   
     private SeekBar myProgressBar = null;
     private ImageButton play = null;
+    private ImageButton fastforword = null;
+    private ImageButton fastreverse = null;
 	private TextView cur_time = null;
 	private TextView total_time = null;
 	private LinearLayout infobar = null;
@@ -245,7 +240,7 @@ public class playermenu extends Activity {
                 {
                 	if(sub_para.totalnum<=0)
                 	{
-                		Toast toast =Toast.makeText(playermenu.this, "No subtitle!",Toast.LENGTH_SHORT );
+                		Toast toast =Toast.makeText(playermenu.this, R.string.sub_no_subtitle,Toast.LENGTH_SHORT );
                 		toast.setGravity(Gravity.BOTTOM,110,0);
                 		toast.setDuration(0x00000001);
                 		toast.show();
@@ -690,8 +685,8 @@ public class playermenu extends Activity {
         ImageButton preItem = (ImageButton)findViewById(R.id.PreBtn);
         ImageButton nextItem = (ImageButton)findViewById(R.id.NextBtn);
         play = (ImageButton)findViewById(R.id.PlayBtn);
-        ImageButton fastforword = (ImageButton)findViewById(R.id.FastForward);
-        ImageButton fastreverse = (ImageButton)findViewById(R.id.FastReverse);
+        fastforword = (ImageButton)findViewById(R.id.FastForward);
+        fastreverse = (ImageButton)findViewById(R.id.FastReverse);
         infobar = (LinearLayout)findViewById(R.id.infobarLayout);
         if (SettingsVP.display_mode.equals("480p"))
         {
@@ -1297,7 +1292,6 @@ public class playermenu extends Activity {
 						AudioTrackOperation.AudioStreamInfo.clear();
 						INITOK = false;
 						PRE_NEXT_FLAG = 1;
-						//Amplayer_play();
 						break;
 					case VideoInfo.PLAYER_ERROR:
 						String InfoStr = null;
@@ -1333,6 +1327,17 @@ public class playermenu extends Activity {
 						if(sub_para.totalnum>0)
 				    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
 						openFile(sub_para.sub_id);
+						if (bMediaInfo.seekable == 0)
+						{
+							myProgressBar.setEnabled(false);
+							fastforword.setEnabled(false);
+							fastreverse.setEnabled(false);
+						}
+						else {
+							myProgressBar.setEnabled(true);
+							fastforword.setEnabled(true);
+							fastreverse.setEnabled(true);
+						}
 						if (setCodecMips() == 0)
 				        	Log.d(TAG, "setCodecMips Failed");
 						break;
@@ -1511,7 +1516,7 @@ public class playermenu extends Activity {
     public void StartPlayerService()
     {
     	Intent intent = new Intent();
-    	ComponentName hcomponet = new ComponentName("amlogic.videoplayer","amlogic.playerservice.AmPlayer");
+    	ComponentName hcomponet = new ComponentName("com.farcore.videoplayer","com.farcore.playerservice.AmPlayer");
     	intent.setComponent(hcomponet);
     	this.startService(intent);
     	this.bindService(intent, m_PlayerConn, BIND_AUTO_CREATE);
@@ -1521,7 +1526,7 @@ public class playermenu extends Activity {
     {
     	this.unbindService(m_PlayerConn);
     	Intent intent = new Intent();
-    	ComponentName hcomponet = new ComponentName("amlogic.videoplayer","amlogic.playerservice.AmPlayer");
+    	ComponentName hcomponet = new ComponentName("com.farcore.videoplayer","com.farcore.playerservice.AmPlayer");
     	intent.setComponent(hcomponet);
     	this.stopService(intent);
     	m_Amplayer = null;
@@ -1548,28 +1553,16 @@ public class playermenu extends Activity {
     
 	private void openFile(SubID filepath)  
 	{
-		setSublanguage();
-		//closed last time used sub;
-		/*if(subTitleView!=null)
-			subTitleView.closeSubtitle();*/	
+		setSublanguage();	
 		
 		if(filepath==null)
-		{
-			//Log.d(TAG, "----------------sub filepath is null---L-------------");
 			return;
-		}
 		
 		try {
-			
 			if(subTitleView.setFile(filepath,setSublanguage())==Subtitle.SUBTYPE.SUB_INVALID)
-			{
-			
 				return;
-			}
 		} catch (Exception e) {
-			
 			Log.d(TAG, "open:errrrrrrrrrrrrrrr");
-
 			e.printStackTrace();
 		}
 	
@@ -1582,28 +1575,18 @@ public class playermenu extends Activity {
 		if (pos > 0)
 		{
 			confirm_dialog = new AlertDialog.Builder(this)
-				.setTitle("VideoPlayer")  
+				.setTitle(R.string.setting_resume)  
 				.setMessage(R.string.str_resume_play) 
 				.setPositiveButton(R.string.str_ok,  
 					new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialog, int whichButton) {  
 			                playPosition = pos;
-			                /*if (!NOT_FIRSTTIME)
-			        			StartPlayerService();
-			                else
-			                	Amplayer_play();	
-			                resumeSecond = 8;*/
 			            }  
 			        })  
 			    .setNegativeButton(playermenu.this.getResources().getString(R.string.str_cancel) + " ( "+resumeSecond+" )",  
 				    new DialogInterface.OnClickListener() {  
 				        public void onClick(DialogInterface dialog, int whichButton) {  
 				        	playPosition = 0;
-				        	/*if (!NOT_FIRSTTIME)
-				    			StartPlayerService();
-				        	else
-				        		Amplayer_play();
-				        	resumeSecond = 8;*/
 				        }  
 				    })  
 			    .show(); 
@@ -1687,7 +1670,6 @@ public class playermenu extends Activity {
 	    
 	    @Override
 	    public void onResume() {
-	    	//Log.d(TAG, "...........................onResume.........1237................");
 	        super.onResume();
 	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 			m_storagemgr.registerListener(mListener);
@@ -1700,6 +1682,5 @@ class subview_set{
 	public int curid;
 	public int color;
 	public int font; 
-	//public String filepath;
 	public SubID sub_id;
 }

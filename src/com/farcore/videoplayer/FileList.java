@@ -1,4 +1,4 @@
-package amlogic.videoplayer;
+package com.farcore.videoplayer;
 
 import android.os.storage.*;
 import java.io.File;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import amlogic.videoplayer.R;
+import com.farcore.videoplayer.R;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
@@ -356,8 +356,8 @@ public class FileList extends ListActivity {
         {
 	        case MENU_ABOUT:
 			try {
-				Toast.makeText(FileList.this, " Amlogic VideoPlayer \n Version: " +
-	        			FileList.this.getPackageManager().getPackageInfo("amlogic.videoplayer", 0).versionName,
+				Toast.makeText(FileList.this, " VideoPlayer \n Version: " +
+	        			FileList.this.getPackageManager().getPackageInfo("com.farcore.videoplayer", 0).versionName,
 	        			Toast.LENGTH_SHORT)
 	        			.show();
 			} catch (NameNotFoundException e) {

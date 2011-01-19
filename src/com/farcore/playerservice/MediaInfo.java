@@ -1,6 +1,6 @@
-package amlogic.playerservice;
+package com.farcore.playerservice;
 
-import amlogic.playerservice.AudioMediaInfo;
+import com.farcore.playerservice.AudioMediaInfo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -49,5 +49,5 @@ public class MediaInfo {
 
 
 	public AudioMediaInfo[] ainfo;
-	
+	public int seekable;
 }

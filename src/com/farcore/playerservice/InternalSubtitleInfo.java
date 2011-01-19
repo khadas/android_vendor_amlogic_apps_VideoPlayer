@@ -1,4 +1,4 @@
-package amlogic.playerservice;
+package com.farcore.playerservice;
 
 import android.util.Log;
 
