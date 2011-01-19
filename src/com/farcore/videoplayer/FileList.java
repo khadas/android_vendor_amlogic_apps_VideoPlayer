@@ -78,41 +78,36 @@ public class FileList extends ListActivity {
 	        	
 	        	if(newState.compareTo("mounted") == 0)
 	        	{
-	        		
-	        		if(PlayList.getinstance().rootPath==null||PlayList.getinstance().rootPath.equals(root_path))
-	        		{
-	        			//Log.d(TAGl, "....................................mounted.................................");
+	        		if(PlayList.getinstance().rootPath==null 
+	        		|| PlayList.getinstance().rootPath.equals(root_path))
 	        			BrowserFile(root_path); 
-	        		}
-	        		
 	        	}
-	        	else if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0)
+	        	else if(newState.compareTo("unmounted") == 0
+	        			|| newState.compareTo("removed") == 0)
 	        	{
-	        		//Log.d(TAGl, ".........unmounted..1........"+PlayList.getinstance().rootPath+" "+path);
-	        		if(PlayList.getinstance().rootPath.startsWith(path)||PlayList.getinstance().rootPath.equals(root_path))
-	        		{
-	        			//Log.d(TAGl, "....................................unmounted..2..............................."+path);
+	        		if(PlayList.getinstance().rootPath.startsWith(path)
+	        		|| PlayList.getinstance().rootPath.equals(root_path))
 	        			BrowserFile(root_path); 
-	        		}
 	        	}
 	        	
 	        }
 	        
-	    };
+	};
 	    
-	    @Override
-	    public void onResume() {
-	        super.onResume();
-	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-			m_storagemgr.registerListener(mListener);
-	    }
-	    
-	    @Override
-	    public void onPause() {
-	        super.onPause();
-	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-	        m_storagemgr.unregisterListener(mListener);
-	    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+		m_storagemgr.registerListener(mListener);
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+        m_storagemgr.unregisterListener(mListener);
+    }
+    
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -163,7 +158,6 @@ public class FileList extends ListActivity {
                 	{
                 			FileList.this.finish();
                 			PlayList.getinstance().rootPath =null;
-                		
                 	}
                 }
                 
@@ -181,7 +175,7 @@ public class FileList extends ListActivity {
 	    paths=new ArrayList<String>();
 	    searchFile(file);
 	    if(listFiles.isEmpty()) {
-	    	Toast.makeText(FileList.this, "No files!", Toast.LENGTH_SHORT).show();
+	    	Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
 	    	paths =currentlist;
 	    	return;
 	    }
@@ -239,7 +233,7 @@ public class FileList extends ListActivity {
 	
 	    if(the_Files == null)
 	    {
-		  Toast.makeText(FileList.this, "No files!", Toast.LENGTH_SHORT).show();
+		  Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
 		  return;
 		 }
 
@@ -247,20 +241,14 @@ public class FileList extends ListActivity {
 	    {
 	    	File tempF = the_Files[i];
 	    	
-	    	
 	    	if (tempF.isDirectory())
 	    	{
 	    		if(!tempF.isHidden())
-	    		{
-	    		    listFiles.add(tempF);
-	    		}
-	    			    	
-
+	    		    listFiles.add(tempF);   	
 	    	} 
 	    	else
 	    	{
-	    		try 
-	    		{
+	    		try {
 	    			listFiles.add(tempF);
 	    		} 
 	    		catch (Exception e) {
@@ -275,11 +263,7 @@ public class FileList extends ListActivity {
 		File file = new File(paths.get(position));
 	    currentlist =paths;
 	    if(file.isDirectory()) 
-	    {
 	    	BrowserFile(paths.get(position));
-	    	
-	    	//return;
-	    }
 	    else 
 	    {
 	    	file = new File(file.getParent());
@@ -293,7 +277,6 @@ public class FileList extends ListActivity {
 			 PlayList.getinstance().setlist(paths, position);
 			 
 	    	showvideobar();
-	    	
 	    }
 	}
 
@@ -301,11 +284,9 @@ public class FileList extends ListActivity {
 		//* new an Intent object and ponit a class to start
 		Intent intent = new Intent();
 		intent.setClass(FileList.this, playermenu.class);
-		//* start an new Activity 
+
 		startActivity(intent);
-		//* close old Activity */
 		FileList.this.finish();
-		
 	}
 	
 	public void filterDir(File file)
@@ -346,7 +327,7 @@ public class FileList extends ListActivity {
     private final int MENU_ABOUT = 0;
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        menu.add(0, MENU_ABOUT, 0, "About");
+        menu.add(0, MENU_ABOUT, 0, R.string.str_about);
         return true;
     }
     
@@ -355,15 +336,15 @@ public class FileList extends ListActivity {
         switch (item.getItemId()) 
         {
 	        case MENU_ABOUT:
-			try {
-				Toast.makeText(FileList.this, " VideoPlayer \n Version: " +
-	        			FileList.this.getPackageManager().getPackageInfo("com.farcore.videoplayer", 0).versionName,
-	        			Toast.LENGTH_SHORT)
-	        			.show();
-			} catch (NameNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				try {
+					Toast.makeText(FileList.this, " VideoPlayer \n Version: " +
+		        			FileList.this.getPackageManager().getPackageInfo("com.farcore.videoplayer", 0).versionName,
+		        			Toast.LENGTH_SHORT)
+		        			.show();
+				} catch (NameNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	        	return true;
         }
         return false;

@@ -7,6 +7,7 @@
     <string name="color_blue">蓝</string>
     <string name="sub_switch">切换:</string>
     <string name="sub_no_subtitle">没有字幕!</string>
+    <string name="str_no_file">没有文件!</string>
     <string name="str_exit">退出</string>
     <string name="setting_resume">断点播放</string>
 	<string name="setting_playmode">播放模式</string>
@@ -26,4 +27,5 @@
 	<string name="str_resume_play">是否从断点播放？</string>
 	<string name="str_on">开</string>
 	<string name="str_off">关</string>
+	<string name="str_about">关于</string>
 </resources>

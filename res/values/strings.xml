@@ -7,6 +7,7 @@
     <string name="color_blue">Blue</string>
     <string name="sub_switch">switch:</string>
     <string name="sub_no_subtitle">No subtitle!</string>
+    <string name="str_no_file">No file!</string>
     <string name="str_exit">exit</string>
     <string name="setting_resume">Resume Mode</string>
 	<string name="setting_playmode">Play Mode</string>
@@ -26,4 +27,5 @@
 	<string name="str_resume_play">Whether to resume this video from last position?</string>
 	<string name="str_on">On</string>
 	<string name="str_off">Off</string>
+	<string name="str_about">About</string>
 </resources>
