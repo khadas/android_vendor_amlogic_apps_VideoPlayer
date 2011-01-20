@@ -1332,11 +1332,15 @@ public class playermenu extends Activity {
 							myProgressBar.setEnabled(false);
 							fastforword.setEnabled(false);
 							fastreverse.setEnabled(false);
+							fastforword.setBackgroundResource(R.drawable.ff_disable);
+							fastreverse.setBackgroundResource(R.drawable.rewind_disable);
 						}
 						else {
 							myProgressBar.setEnabled(true);
 							fastforword.setEnabled(true);
 							fastreverse.setEnabled(true);
+							fastforword.setBackgroundResource(R.drawable.forward_button);
+							fastreverse.setBackgroundResource(R.drawable.reverse_button);
 						}
 						if (setCodecMips() == 0)
 				        	Log.d(TAG, "setCodecMips Failed");

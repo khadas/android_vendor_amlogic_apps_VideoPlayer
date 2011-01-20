@@ -15,7 +15,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 		</activity>
-		<activity android:name="videobar"></activity>
 		<activity android:name="playermenu" 
 			android:label="@string/main_activity"
 			android:screenOrientation="landscape">
@@ -25,10 +24,10 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
 		</activity>
-<service android:exported="true" android:name="com.farcore.playerservice.AmPlayer"></service>
-</application>
-
-
+		<service android:exported="true" 
+			android:name="com.farcore.playerservice.AmPlayer">
+		</service>
+	</application>
 
 <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 </manifest> 
