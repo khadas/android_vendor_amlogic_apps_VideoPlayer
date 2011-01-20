@@ -63,7 +63,7 @@ public class FileList extends ListActivity {
 	
 	private TextView tileText;
 	private File file;
-	private static String TAGl = "playermenu";
+	private static String TAG = "player_FileList";
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)
@@ -87,7 +87,7 @@ public class FileList extends ListActivity {
 	        	{
 	        		if(PlayList.getinstance().rootPath.startsWith(path)
 	        		|| PlayList.getinstance().rootPath.equals(root_path))
-	        			BrowserFile(root_path); 
+	        			BrowserFile(root_path);
 	        	}
 	        	
 	        }
@@ -97,6 +97,12 @@ public class FileList extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
+        if( !(new File(PlayList.getinstance().rootPath).exists()))
+		{
+			PlayList.getinstance().rootPath =root_path;
+			BrowserFile(PlayList.getinstance().rootPath);
+		}
+        
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 		m_storagemgr.registerListener(mListener);
     }
@@ -115,8 +121,8 @@ public class FileList extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 	    
-         if(PlayList.getinstance().rootPath==null)
-	    	PlayList.getinstance().rootPath =root_path;
+		if(PlayList.getinstance().rootPath==null)
+			PlayList.getinstance().rootPath =root_path;
 	    	
 	    BrowserFile(PlayList.getinstance().rootPath);
 	    
@@ -156,8 +162,8 @@ public class FileList extends ListActivity {
                 		BrowserFile(currenturl);
                 	else
                 	{
-                			FileList.this.finish();
-                			PlayList.getinstance().rootPath =null;
+            			FileList.this.finish();
+            			PlayList.getinstance().rootPath =null;
                 	}
                 }
                 
@@ -179,6 +185,7 @@ public class FileList extends ListActivity {
 	    	paths =currentlist;
 	    	return;
 	    }
+	    Log.d(TAG, "BrowserFile():"+filePath);
 	    PlayList.getinstance().rootPath =filePath;
 	    
 	    File [] fs = new File[listFiles.size()];
@@ -320,8 +327,6 @@ public class FileList extends ListActivity {
 	    	paths.add(tempF.getPath());
 	    }
 	}
-	
-    private static final String TAG = "Amplayer";
     
     //option menu
     private final int MENU_ABOUT = 0;
