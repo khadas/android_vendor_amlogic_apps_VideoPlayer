@@ -207,6 +207,22 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_native_1setglobal
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_native_1getosdbpp
   (JNIEnv *, jclass);
 
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    enable_freescale
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable_1freescale
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    disable_freescale
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescale
+  (JNIEnv *, jclass, jint);
+
 #ifdef __cplusplus
 }
 #endif

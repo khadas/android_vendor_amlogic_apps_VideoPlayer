@@ -822,6 +822,21 @@ JNIEXPORT jint Java_com_farcore_playerservice_AmPlayer_getosdbpp(JNIEnv *env, jc
     LOGI("get osd bpp:%d",ret);
     return ret;
 }
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable_1freescale(JNIEnv *env, jclass class, jint cfg){
+	jint ret = -1;
+    ret = enable_freescale(cfg);
+    LOGI("enable freeacale:%d\n", ret);
+    return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescale(JNIEnv *env, jclass class, jint cfg){
+	jint ret = -1;
+    ret = disable_freescale(cfg);
+    LOGI("disable freeacale:%d\n", ret);
+    return ret;
+}
+
 //
 static JNINativeMethod gMethods[] = {
     {"setMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_com_farcore_playerservice_AmPlayer_setMedia},   

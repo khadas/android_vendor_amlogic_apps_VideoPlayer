@@ -55,6 +55,7 @@ public class playermenu extends Activity {
 	private boolean INITOK = false;
 	private boolean FF_FLAG = false;
 	private boolean NOT_FIRSTTIME = false;
+	private static final int MID_FREESCALE = 0x10001;
     
     //for repeat mode;
     private static int m_playmode = 1;
@@ -606,7 +607,8 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
-        sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_BEFORE_VIDEO"));
+        //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_BEFORE_VIDEO"));
+        AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
         foreground.setForeground(null);
@@ -1160,7 +1162,8 @@ public class playermenu extends Activity {
         setDefCodecMips();
         openScreenOffTimeout();
         unregisterReceiver(mReceiver);
-        sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
+        //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
+        AmPlayer.enable_freescale(MID_FREESCALE);
         
         super.onDestroy();
     }

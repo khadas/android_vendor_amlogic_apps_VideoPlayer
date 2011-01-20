@@ -54,6 +54,8 @@ public class AmPlayer extends Service {
     public static native int native_disablecolorkey();
     public static native int native_setglobalalpha(int alpha);
     public static native int native_getosdbpp();
+    public static native int enable_freescale(int cfg);
+    public static native int disable_freescale(int cfg);
 
     public int start() { return start(mPid);}
 	public int pause() { return pause(mPid);}
