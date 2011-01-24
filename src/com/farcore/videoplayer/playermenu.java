@@ -104,7 +104,7 @@ public class playermenu extends Activity {
 
     private void videobar() {
     		
-    		setContentView(R.layout.layout_imagebutton);
+    		setContentView(R.layout.layout_morebar);
     		
     		subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
         	subTitleView.setTextColor(sub_para.color);
@@ -234,8 +234,9 @@ public class playermenu extends Activity {
                     otherbar.requestFocus();
                 } 
     	    });
-            ImageButton sutitle = (ImageButton) findViewById(R.id.ImageButton04);
-            sutitle.setOnClickListener(new View.OnClickListener() 
+            
+            ImageButton subtitle = (ImageButton) findViewById(R.id.ImageButton04);
+            subtitle.setOnClickListener(new View.OnClickListener() 
     	    {
                 public void onClick(View v) 
                 {
@@ -254,10 +255,10 @@ public class playermenu extends Activity {
                 }
 
                 String color_text[]={ 
-                		playermenu.this.getResources().getString(R.string.color_white),
-            			playermenu.this.getResources().getString(R.string.color_yellow),
-            			playermenu.this.getResources().getString(R.string.color_blue)
-            			};
+            		playermenu.this.getResources().getString(R.string.color_white),
+        			playermenu.this.getResources().getString(R.string.color_yellow),
+        			playermenu.this.getResources().getString(R.string.color_blue)
+            	};
                 
 				private void subtitle_control() {
 					t_subswitch =(TextView)findViewById(R.id.sub_swith111);
@@ -291,17 +292,17 @@ public class playermenu extends Activity {
   		                	sub_para.curid = sub_switch_state;
   		                	sub_para.font = sub_font_state;
   		                	
-  		             	  if(sub_para.curid==sub_para.totalnum )
-  		             		   sub_para.sub_id =null;
-  		             	  else
-  		             		   sub_para.sub_id =subMange.getSubID(sub_para.curid);
-  		             	  
-  		             	  if(sub_color_state==0)
-  		             		    sub_para.color =android.graphics.Color.WHITE;
-  		             	  else if(sub_color_state==1) 
-  		             		  	sub_para.color =android.graphics.Color.YELLOW;
-  		             	  else
-  		             		  	sub_para.color =android.graphics.Color.BLUE;
+						    if(sub_para.curid==sub_para.totalnum )
+							    sub_para.sub_id =null;
+						    else
+							    sub_para.sub_id =subMange.getSubID(sub_para.curid);
+						  
+						    if(sub_color_state==0)
+							    sub_para.color =android.graphics.Color.WHITE;
+						    else if(sub_color_state==1) 
+							  	sub_para.color =android.graphics.Color.YELLOW;
+						    else
+							  	sub_para.color =android.graphics.Color.BLUE;
   		             	  
   		                	subbar.setVisibility(View.GONE);
   		                	videobar();
@@ -325,69 +326,67 @@ public class playermenu extends Activity {
   					ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
   					Bswitch_l.setOnClickListener(new View.OnClickListener() 
   					{
-  						 public void onClick(View v) 
+  						public void onClick(View v) 
    		                {
-  							 if(sub_switch_state <= 0)
+  							if(sub_switch_state <= 0)
   								sub_switch_state =sub_para.totalnum;
-   							 else
+   							else
    								sub_switch_state --;
    							
-  							 if(sub_switch_state==sub_para.totalnum)
+  							if(sub_switch_state==sub_para.totalnum)
   								t_subswitch.setText(R.string.str_off);
-  							 else
+  							else
   								t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));
    		                } 
   					});
   					Bswitch_r.setOnClickListener(new View.OnClickListener() 
   					{
-  						 public void onClick(View v) 
+  						public void onClick(View v) 
    		                {
   							if(sub_switch_state >= sub_para.totalnum)
   								sub_switch_state =0;
-   							 else
+   							else
    								sub_switch_state ++;
    							
-  							 if(sub_switch_state==sub_para.totalnum)
+  							if(sub_switch_state==sub_para.totalnum)
   								t_subswitch.setText(R.string.str_off);
-  							 else
+  							else
   								t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));;
    		                } 
   					});
   					
   				
-  					//Log.d(TAG, "******************************302*************************"+sub_para.sub_id.filename);
   					if (sub_para.sub_id != null)
   					{
 	  					if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
 	  					{
-	  					//Log.d(TAG, "**************************305*********************"+sub_para.sub_id.filename);
-	  							TextView font =(TextView)findViewById(R.id.font_title);
-								TextView color =(TextView)findViewById(R.id.color_title);
-								
-								font.setTextColor(android.graphics.Color.LTGRAY);
-								color.setTextColor(android.graphics.Color.LTGRAY);
-								
-	  							t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
-	  							t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
-	  							
-	  					    	Bfont_l.setEnabled(false);
-	  	  						Bfont_r.setEnabled(false);
-	  	  						Bcolor_l.setEnabled(false);
-	  	  						Bcolor_r.setEnabled(false);
-	  	  						Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
-	  	  						Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
-	  	  						Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
-	  	  						Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
-	  	  						return;
+  							TextView font =(TextView)findViewById(R.id.font_title);
+							TextView color =(TextView)findViewById(R.id.color_title);
+							
+							font.setTextColor(android.graphics.Color.LTGRAY);
+							color.setTextColor(android.graphics.Color.LTGRAY);
+							
+  							t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
+  							t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
+  							
+  					    	Bfont_l.setEnabled(false);
+  	  						Bfont_r.setEnabled(false);
+  	  						Bcolor_l.setEnabled(false);
+  	  						Bcolor_r.setEnabled(false);
+  	  						Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+  	  						Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+  	  						Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+  	  						Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+  	  						return;
 	  					}
   					}
   					Bfont_l.setOnClickListener(new View.OnClickListener() 
   					{
-  						 public void onClick(View v) 
+  						public void onClick(View v) 
    		                {
-  							 if(sub_font_state > 12)
+  							if(sub_font_state > 12)
   							    sub_font_state =sub_font_state-2;
-  							 else
+  							else
   								sub_font_state =30;
   							 
   							t_subsfont.setText(String.valueOf(sub_font_state));
@@ -396,7 +395,7 @@ public class playermenu extends Activity {
   					});
   					Bfont_r.setOnClickListener(new View.OnClickListener() 
   					{
-  						 public void onClick(View v) 
+  						public void onClick(View v) 
    		                {
   							if(sub_font_state < 30)
   							    sub_font_state =sub_font_state +2;
@@ -409,11 +408,11 @@ public class playermenu extends Activity {
   					
   					Bcolor_l.setOnClickListener(new View.OnClickListener() 
   					{
-  						 public void onClick(View v) 
+  						public void onClick(View v) 
    		                {
-  							 if(sub_color_state<= 0)
+  							if(sub_color_state<= 0)
   								sub_color_state=2;
-   							 else 
+   							else 
    								sub_color_state-- ;
    							 
    							t_subscolor.setText(color_text[sub_color_state]);
@@ -421,11 +420,11 @@ public class playermenu extends Activity {
   					});
   					Bcolor_r.setOnClickListener(new View.OnClickListener() 
   					{
-  						 public void onClick(View v) 
+  						public void onClick(View v) 
    		                {
-  							 if(sub_color_state>=2)
+  							if(sub_color_state>=2)
    								sub_color_state=0;
-    						  else 
+    						else 
     							sub_color_state++ ;
     							 
   							t_subscolor.setText(color_text[sub_color_state]);
@@ -608,7 +607,13 @@ public class playermenu extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
         //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_BEFORE_VIDEO"));
-        AmPlayer.disable_freescale(MID_FREESCALE);
+        WindowManager wm = getWindowManager(); 
+        Display display = wm.getDefaultDisplay(); 
+        int hei = display.getHeight();
+        int wid = display.getWidth();
+        Log.d(TAG, ".....display.getHeight:"+hei+".....display.getWidth:"+wid);
+        if (hei == 480 && wid == 800)
+        	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
         foreground.setForeground(null);
@@ -1163,7 +1168,12 @@ public class playermenu extends Activity {
         openScreenOffTimeout();
         unregisterReceiver(mReceiver);
         //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
-        AmPlayer.enable_freescale(MID_FREESCALE);
+        WindowManager wm = getWindowManager(); 
+        Display display = wm.getDefaultDisplay(); 
+        int hei = display.getHeight();
+        int wid = display.getWidth();
+        if (hei == 480 && wid == 800)
+        	AmPlayer.enable_freescale(MID_FREESCALE);
         
         super.onDestroy();
     }
@@ -1210,30 +1220,8 @@ public class playermenu extends Activity {
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
     		    	{
-    		    		/*if((msg.arg1)>4600&&(msg.arg1)<=5300)
-    		    		{
-    		    			sub_para.totalnum =subMange.getSubTotal();
-    		    	    	if(sub_para.totalnum>0)
-    		    	    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
-    		    	    	else
-    		    	    		sub_para.sub_id =null;
-    		    	    	
-    		    	    	//Log.d(TAG,".......................sub......path.................... "+sub_para.filepath);
-    		    	    	
-    		    	    	if(sub_para.sub_id!=null)
-    		    	    	{
-    		    	    		//Log.i(TAG,"...................open....insub.......................... ");
-    		    	    		if(sub_para.sub_id.filename.equals("INSUB"))
-    		    	    			openFile(sub_para.sub_id);
-    		    	    	}
-    		    	    	
-    		    		}*/
     		    		if(subTitleView!=null&&sub_para.sub_id!=null)
-    		    		{
     		    			subTitleView.tick(msg.arg1);
-    		    			//Log.i(TAG,".............sub time.................. "+curtime);
-    		    		}
-    		    		
     		    	}
     		    	if (totaltime == 0)
 						myProgressBar.setProgress(0);
@@ -1298,7 +1286,7 @@ public class playermenu extends Activity {
 						break;
 					case VideoInfo.PLAYER_ERROR:
 						String InfoStr = null;
-						InfoStr = getErrorInfo(msg.arg2);
+						InfoStr = Errorno.getErrorInfo(msg.arg2);
 						Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_LONG)
 							.show();
 						if (msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
@@ -1361,7 +1349,7 @@ public class playermenu extends Activity {
     				break;
     			case VideoInfo.HAS_ERROR_MSG:
 					String errStr = null;
-					errStr = getErrorInfo(msg.arg2);
+					errStr = Errorno.getErrorInfo(msg.arg2);
 					Toast.makeText(playermenu.this, errStr, Toast.LENGTH_LONG)
 						.show();
     				break;
@@ -1372,47 +1360,6 @@ public class playermenu extends Activity {
     	}
     });
     
-    private String getErrorInfo(int errID)
-    {
-    	String errStr = null;
-    	switch (errID)
-    	{
-			case Errorno.PLAYER_UNSUPPORT:
-				errStr = "Unsupport Video and Audio format";
-				break;
-			case Errorno.PLAYER_UNSUPPORT_VIDEO:
-				errStr = "Unsupport Video format";
-				break;
-			case Errorno.PLAYER_UNSUPPORT_AUDIO:
-				errStr = "Unsupport Audio format";
-				break;
-			case Errorno.FFMPEG_OPEN_FAILED:
-				errStr = "Open file ( "+PlayList.getinstance().getcur()+" ) failed";
-				break;	
-			case  Errorno.FFMPEG_PARSE_FAILED:
-				errStr = "Parser file ( "+PlayList.getinstance().getcur()+" ) failed";
-				break;
-			case  Errorno.DECODER_INIT_FAILED:
-				errStr = "Decode Init failed";
-				break;
-			case  Errorno.PLAYER_NO_VIDEO:
-				errStr = "file have no video";
-				break;
-			case  Errorno.PLAYER_NO_AUDIO:
-				errStr = "file have no audio";
-				break;
-			case  Errorno.PLAYER_SET_NOVIDEO:
-				errStr = "set playback without video";
-				break;
-			case  Errorno.PLAYER_SET_NOAUDIO:
-				errStr = "set playback without audio";
-				break;
-			default:
-				errStr = "Unknow Error";
-				break;
-    	}
-    	return errStr;
-    }
 	
     public Player m_Amplayer = null;
     private void Amplayer_play()
