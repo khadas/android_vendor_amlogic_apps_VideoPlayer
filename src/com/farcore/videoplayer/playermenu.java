@@ -1301,7 +1301,13 @@ public class playermenu extends Activity {
 							//stop play
 							backToFileList = true;
 							if(m_Amplayer != null)
-								Amplayer_stop();
+							{
+								try	{
+									m_Amplayer.Close();
+								} catch(RemoteException e) {
+									e.printStackTrace();
+								}
+							}
 							startActivity(selectFileIntent);
 							playermenu.this.finish();
 						}
