@@ -446,8 +446,8 @@ public class playermenu extends Activity {
                 	String[] m_display= {
                 			playermenu.this.getResources().getString(R.string.setting_displaymode_normal),
                 			playermenu.this.getResources().getString(R.string.setting_displaymode_fullscreen),
-                			"16:9",
-                			"4:3"
+                			"4:3",
+                			"16:9"
                 			};
                     listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
                     		R.layout.list_row,m_display));
