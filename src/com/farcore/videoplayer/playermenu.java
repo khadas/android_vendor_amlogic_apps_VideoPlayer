@@ -983,22 +983,14 @@ public class playermenu extends Activity {
     
     protected void closeScreenOffTimeout()
     {
-    	/*
-    	try {
-			ScreenOffTimeoutValue = Settings.System.getInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT);
-		} catch (SettingNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, -1);
-    	*/
-    	mScreenLock.acquire();
+    	if(mScreenLock.isHeld() == false)
+    		mScreenLock.acquire();
     }
     
     protected void openScreenOffTimeout()
     {
-    	mScreenLock.release();
-    	//Settings.System.putInt(getContentResolver(), System.SCREEN_OFF_TIMEOUT, ScreenOffTimeoutValue);
+    	if(mScreenLock.isHeld() == true)
+    		mScreenLock.release();
     }
     
     protected void waitForHide()	//infobar auto hide
