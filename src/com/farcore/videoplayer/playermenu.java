@@ -566,12 +566,23 @@ public class playermenu extends Activity {
     			if(m_Amplayer == null)
 					return (true);
     			//close sub
-    			if(subTitleView!=null)
+    			/*if(subTitleView!=null)
     				subTitleView.closeSubtitle();	
     			//stop play
     			backToFileList = true;
-    			Amplayer_stop();
-				return super.onKeyDown(keyCode, msg);
+    			Amplayer_stop();*/
+    			Intent selectFileIntent = new Intent();
+				selectFileIntent.setClass(playermenu.this, FileList.class);
+				//close sub;
+				if(subTitleView!=null)
+					subTitleView.closeSubtitle();	
+				//stop play
+				backToFileList = true;
+				if(m_Amplayer != null)
+					Amplayer_stop();
+				startActivity(selectFileIntent);
+				playermenu.this.finish();
+				return true;//super.onKeyDown(keyCode, msg);
     		}
     	}
     	else if (keyCode == KeyEvent.KEYCODE_MENU) 
@@ -607,12 +618,12 @@ public class playermenu extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
         //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_BEFORE_VIDEO"));
-        WindowManager wm = getWindowManager(); 
+        /*WindowManager wm = getWindowManager(); 
         Display display = wm.getDefaultDisplay(); 
         int hei = display.getHeight();
         int wid = display.getWidth();
-        Log.d(TAG, ".....display.getHeight:"+hei+".....display.getWidth:"+wid);
-        if (hei == 480 && wid == 800)
+        Log.d(TAG, ".....display.getHeight:"+hei+".....display.getWidth:"+wid);*/
+        if (AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
@@ -1160,11 +1171,12 @@ public class playermenu extends Activity {
         openScreenOffTimeout();
         unregisterReceiver(mReceiver);
         //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
-        WindowManager wm = getWindowManager(); 
+        /*WindowManager wm = getWindowManager(); 
         Display display = wm.getDefaultDisplay(); 
         int hei = display.getHeight();
         int wid = display.getWidth();
-        if (hei == 480 && wid == 800)
+        if (hei == 480 && wid == 800)*/
+        if (AmPlayer.getProductType() == 1)
         	AmPlayer.enable_freescale(MID_FREESCALE);
         
         super.onDestroy();

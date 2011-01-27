@@ -223,6 +223,14 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable_1freescale
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescale
   (JNIEnv *, jclass, jint);
 
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    getProductType
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_getProductType
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif

@@ -3,6 +3,10 @@ LIBPLAYER_PATH := $(LOCAL_PATH)/../../LibPlayer
 
 include $(CLEAR_VARS)
 
+ifeq ($(BUILD_ID),MID)
+	LOCAL_CFLAGS += -DENABLE_FREE_SCALE
+endif
+
 LOCAL_MODULE    := libamplayerjni
 LOCAL_SRC_FILES := com_farcore_playerservice_AmPlayer.c sys_conf.c
 LOCAL_ARM_MODE := arm

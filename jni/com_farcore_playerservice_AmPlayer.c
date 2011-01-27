@@ -837,6 +837,19 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescal
     return ret;
 }
 
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_getProductType(JNIEnv *env, jclass class)
+{
+	int ret;
+#ifdef ENABLE_FREE_SCALE
+	LOGI("ENABLE_FREE_SCALE defined!\n");
+	ret = 1;
+#else
+	LOGI("ENABLE_FREE_SCALE not define!\n");
+	ret = 0;
+#endif
+	return ret;
+}
+
 //
 static JNINativeMethod gMethods[] = {
     {"setMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_com_farcore_playerservice_AmPlayer_setMedia},   
