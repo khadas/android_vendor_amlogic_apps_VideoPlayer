@@ -1251,6 +1251,7 @@ public class playermenu extends Activity {
 						if(subTitleView!=null)
 							subTitleView.closeSubtitle();
 						sub_para.totalnum = 0;
+						InternalSubtitleInfo.setInsubNum(0);
 						break;
 					case VideoInfo.PLAYER_STOPED:
 						/*new PlayThread().start();

@@ -3,7 +3,7 @@ package com.farcore.playerservice;
 import android.util.Log;
 
 public class InternalSubtitleInfo {
-	private static String TAG = "playermenu";
+	private static String TAG = "InternalSubtitleInfo";
 /*	public static final int UID_SUBTITLE_OFF = 0xFFFF;
 
 	public int getUid() {
@@ -26,6 +26,12 @@ public class InternalSubtitleInfo {
 	public static int getInsubNum()
 	{
 		Log.d(TAG, "*******************return sub num**********************"+insub_num);
+		return insub_num;
+	}
+	
+	public static int setInsubNum(int num)
+	{
+		insub_num = num;
 		return insub_num;
 	}
 	
