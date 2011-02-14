@@ -42,7 +42,7 @@ public class AudioMediaInfo {
 			type = "MP3";
 			break;
 		case AFORMAT_PCM_S16LE:
-			type = "PCM_S16LE";
+			type = "PCM";
 			break;
 		case AFORMAT_AAC:
 			type = "AAC";

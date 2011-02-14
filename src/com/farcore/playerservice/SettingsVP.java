@@ -136,7 +136,7 @@ public class SettingsVP {
 				{
 					buf = "0,0,1280,720";
 				}
-				else if (dispMode.equals("1080p"))
+				else if (dispMode.equals("1080p") || dispMode.equals("lvds1080p"))
 				{
 					buf = "0,0,1920,1080";
 				}
