@@ -19,6 +19,7 @@ public class SettingsVP {
 	private static String displaymode_path = "/sys/class/display/mode";
 	private static String displayaxis_path = "/sys/class/display/axis";
 	private static String video_axis_path = "/sys/class/video/axis";
+	private static String video_layout_disable = "/sys/class/video/disable_video";
 	private static String TAG = "SettingVideoPlayer";
 	public static String display_mode = null; 
 	
@@ -169,6 +170,82 @@ public class SettingsVP {
 		catch (IOException e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+video_axis_path);
+			return false;
+		}
+	}
+	
+	public static boolean disableVideoLayout()
+	{
+    	String ifDisable = null;
+		File file = new File(video_layout_disable);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		
+		//read
+		try
+		{
+			BufferedReader in = new BufferedReader(new FileReader(video_layout_disable), 32);
+			try
+			{
+				ifDisable = in.readLine();
+				if (ifDisable.equals("1"))
+				{
+					Log.d(TAG, "video layout now is disable. ");
+					return false;
+				}
+				
+			} finally {
+				in.close();
+    		} 
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when read "+video_layout_disable);
+		} 
+		
+		//write
+		try
+		{
+			BufferedWriter out = new BufferedWriter(new FileWriter(video_layout_disable), 32);
+    		try
+    		{
+    			out.write("1");    
+    			Log.d(TAG, "disable video layout ok.");
+    		} finally {
+				out.close();
+			}
+			 return true;
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when write "+video_layout_disable);
+			return false;
+		}
+	}
+	
+	public static boolean enableVideoLayout()
+	{
+		File file = new File(video_layout_disable);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		
+		try
+		{
+			BufferedWriter out = new BufferedWriter(new FileWriter(video_layout_disable), 32);
+    		try
+    		{
+    			out.write("0");    
+    			Log.d(TAG, "enable video layout ok.");
+    		} finally {
+				out.close();
+			}
+			 return true;
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when write "+video_layout_disable);
 			return false;
 		}
 	}

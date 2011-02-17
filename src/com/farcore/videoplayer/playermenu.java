@@ -644,6 +644,7 @@ public class playermenu extends Activity {
         }
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
+        SettingsVP.enableVideoLayout();
 		subinit();
 		initinfobar();
 		IntentFilter intentFilter = new IntentFilter(ACTION_HDMISWITCH_MODE_CHANGED);
@@ -1169,6 +1170,7 @@ public class playermenu extends Activity {
         StopPlayerService();
         setDefCodecMips();
         openScreenOffTimeout();
+        SettingsVP.disableVideoLayout();
         unregisterReceiver(mReceiver);
         //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
         /*WindowManager wm = getWindowManager(); 
