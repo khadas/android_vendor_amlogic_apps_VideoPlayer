@@ -19,7 +19,7 @@
 	<string name="setting_displaymode_normal">正常</string>
 	<string name="setting_displaymode_fullscreen">全屏</string>
 	<string name="setting_brightness">亮度</string>
-	<string name="app_name">VideoPlayer</string>
+	<string name="app_name">媒体播放器</string>
 	<string name="main_activity">媒体播放器</string>
 	<string name="str_ok">确定</string>
 	<string name="str_cancel">取消</string>
