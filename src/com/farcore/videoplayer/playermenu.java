@@ -34,6 +34,8 @@ import android.os.SystemProperties;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
+import android.database.Cursor;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -638,9 +640,34 @@ public class playermenu extends Activity {
         Intent it = this.getIntent();
         if (it.getData() != null)
         {
-        	List<String> paths = new ArrayList<String>();
-        	paths.add(it.getData().getPath());
-        	PlayList.getinstance().setlist(paths, 0);
+        	if (it.getData().getScheme().equals("file"))
+        	{
+        		List<String> paths = new ArrayList<String>();
+                paths.add(it.getData().getPath());
+                PlayList.getinstance().setlist(paths, 0);
+        	}
+        	else
+        	{
+                Cursor cursor = managedQuery(it.getData(), null, null, null, null);
+                cursor.moveToFirst();
+
+                int index = cursor.getColumnIndex(MediaStore.Video.Media.DATA);
+                if ((index == -1) || (cursor.getCount() <= 0)) {
+                    Log.d(TAG, "Cursor empty or failed\n"); 
+                }
+                else {
+                    List<String> paths = new ArrayList<String>();
+                    cursor.moveToFirst();
+
+                    paths.add(cursor.getString(index));
+                    PlayList.getinstance().setlist(paths, 0);
+
+                    Log.d(TAG, "index = " + index);
+                    Log.d(TAG, "From content providor DATA:" + cursor.getString(index));
+                    Log.d(TAG, " -- MIME_TYPE :" + 
+                    		cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)));
+                }
+        	}
         }
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
@@ -1178,7 +1205,7 @@ public class playermenu extends Activity {
         int hei = display.getHeight();
         int wid = display.getWidth();
         if (hei == 480 && wid == 800)*/
-        if (AmPlayer.getProductType() == 1)
+        if (AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         
         super.onDestroy();
