@@ -752,7 +752,17 @@ public class playermenu extends Activity {
     	total_time = (TextView)findViewById(R.id.TextView04);
     	cur_time.setText(secToTime(curtime, false));
     	total_time.setText(secToTime(totaltime, true));
-        
+    	if (bMediaInfo != null)
+    	{
+	    	if (bMediaInfo.seekable == 0)
+			{
+				myProgressBar.setEnabled(false);
+				fastforword.setEnabled(false);
+				fastreverse.setEnabled(false);
+				fastforword.setBackgroundResource(R.drawable.ff_disable);
+				fastreverse.setBackgroundResource(R.drawable.rewind_disable);
+			}
+    	}
     	
         browser.setOnClickListener(new ImageButton.OnClickListener()
     	{
