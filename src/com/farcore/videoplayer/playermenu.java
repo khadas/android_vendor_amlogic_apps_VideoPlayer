@@ -1288,7 +1288,7 @@ public class playermenu extends Activity {
 						if (PRE_NEXT_FLAG == 1 || (!backToFileList) )
     					{
     						Log.d(TAG,"to play another file!");
-							new PlayThread().start();
+							//new PlayThread().start();
 							if (SettingsVP.getParaBoolean("ResumeMode"))
 							{
 								if (resumePlay() == 0)
