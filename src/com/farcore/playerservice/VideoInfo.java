@@ -16,7 +16,8 @@ public class VideoInfo {
 	* decoder not running
 	******************************/
     public static final int PLAYER_INITING  	= 0x10001;
-    public static final int PLAYER_INITOK   	= 0x10002;	
+	public static final int PLAYER_TYPE_REDY  	= 0x10002;
+    public static final int PLAYER_INITOK   	= 0x10003;	
 
 	/******************************
 	* 0x2000x: 
