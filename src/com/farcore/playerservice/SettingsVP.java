@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.view.WindowManager;
 
 public class SettingsVP {
 
@@ -46,14 +47,15 @@ public class SettingsVP {
 											   "filetime8",
 											   "filetime9",
 											   "ResumeMode",
-											   "PlayMode",
+											   "Brightness",
 											   };
 	
 	
-	public static void init(Context ct)
+	public static void init(Activity act)
 	{
-		setting = ct.getSharedPreferences(SettingsVP.SETTING_INFOS, 
+		setting = act.getSharedPreferences(SettingsVP.SETTING_INFOS, 
 												Activity.MODE_PRIVATE);
+		init_brightness(act);
 	}
 	
 	public static Boolean getParaBoolean(String name)
@@ -247,6 +249,29 @@ public class SettingsVP {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+video_layout_disable);
 			return false;
+		}
+	}
+	
+	public static void init_brightness(Activity act)
+	{
+		WindowManager.LayoutParams lp = act.getWindow().getAttributes();
+		int position = getParaInt("Brightness");
+		switch(position)
+		{
+		case 0:
+			lp.screenBrightness = 0.2f;
+			break;
+		case 1:
+			lp.screenBrightness = 0.5f;
+			break;
+		case 2:
+			lp.screenBrightness = 0.7f;
+			break;
+		case 3:
+			lp.screenBrightness = 1.0f;
+			break;	 
+		default:
+		    break;
 		}
 	}
 }

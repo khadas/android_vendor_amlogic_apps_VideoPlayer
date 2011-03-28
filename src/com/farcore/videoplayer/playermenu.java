@@ -144,8 +144,10 @@ public class playermenu extends Activity {
                 			playermenu.this.getResources().getString(R.string.str_on),
                 			playermenu.this.getResources().getString(R.string.str_off)
                 			};
-                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
-                    		R.layout.list_row, m_resume));
+                	MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
+                    		R.layout.list_row, m_resume);
+                    la.setSelectItem(SettingsVP.getParaBoolean("ResumeMode") ? 0 : 1);
+                    listView.setAdapter(la);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -176,8 +178,10 @@ public class playermenu extends Activity {
                 			playermenu.this.getResources().getString(R.string.setting_playmode_repeatall),
                 			playermenu.this.getResources().getString(R.string.setting_playmode_repeatone)
                 			};
-                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
-                    		R.layout.list_row,m_repeat));
+                    MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
+                    		R.layout.list_row, m_repeat);
+                    la.setSelectItem(m_playmode - 1);
+                    listView.setAdapter(la);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -206,9 +210,10 @@ public class playermenu extends Activity {
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                 	if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
                 		AudioTrackOperation.setAudioStream(bMediaInfo);
-                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
-                    		R.layout.list_row,
-                    		AudioTrackOperation.AudioStreamFormat));
+                    MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
+                    		R.layout.list_row, AudioTrackOperation.AudioStreamFormat);
+                    la.setSelectItem(cur_audio_stream);
+                    listView.setAdapter(la);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	public void onItemClick(AdapterView<?> arg0, View arg1,
@@ -219,7 +224,7 @@ public class playermenu extends Activity {
 	                    		try {
 	                    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
 	                    			Log.d("audiostream","change audio stream to: " + arg2);
-	                    			
+	                    			cur_audio_stream = arg2;
 	                			} catch (RemoteException e) {
 	                				e.printStackTrace();
 	                			}
@@ -451,9 +456,10 @@ public class playermenu extends Activity {
                 			"4:3",
                 			"16:9"
                 			};
-                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
-                    		R.layout.list_row,m_display));
-                    listView.setSelection(ScreenMode.getScreenMode());
+                    MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
+                    		R.layout.list_row, m_display);
+                    la.setSelectItem(ScreenMode.getScreenMode());
+                    listView.setAdapter(la);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -492,8 +498,10 @@ public class playermenu extends Activity {
                 	morbar.setVisibility(View.GONE);
                 	morebar_tileText.setText(R.string.setting_brightness);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
-                    listView.setAdapter(new ArrayAdapter<String>(playermenu.this, 
-                    		R.layout.list_row,m_brightness));
+                    MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
+                    		R.layout.list_row, m_brightness);
+                    la.setSelectItem(SettingsVP.getParaInt("Brightness"));
+                    listView.setAdapter(la);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -516,8 +524,9 @@ public class playermenu extends Activity {
                         		  break;
                         	 }
                         	 getWindow().setAttributes(lp);
-                    		otherbar.setVisibility(View.GONE);
-                        	morbar.setVisibility(View.VISIBLE);
+                        	 SettingsVP.putParaInt("Brightness", position);
+                        	 otherbar.setVisibility(View.GONE);
+                        	 morbar.setVisibility(View.VISIBLE);
                     	}
                     });
                     otherbar.requestFocus();
@@ -1302,6 +1311,7 @@ public class playermenu extends Activity {
 						if(subTitleView!=null)
 							subTitleView.closeSubtitle();
 						sub_para.totalnum = 0;
+						cur_audio_stream = 0;
 						InternalSubtitleInfo.setInsubNum(0);
 						break;
 					case VideoInfo.PLAYER_STOPED:
@@ -1335,7 +1345,8 @@ public class playermenu extends Activity {
 							.show();
 						if (msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
 								|| msg.arg2 == Errorno.DECODER_INIT_FAILED
-								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT)
+								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT
+								|| msg.arg2 == Errorno.PLAYER_RD_FAILED)
 						{
 							Intent selectFileIntent = new Intent();
 							selectFileIntent.setClass(playermenu.this, FileList.class);
