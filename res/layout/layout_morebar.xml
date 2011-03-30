@@ -204,7 +204,7 @@
 		android:src="@drawable/barback" 
 		android:layout_height="wrap_content" 
 		android:layout_width="wrap_content" 
-		android:layout_weight="1" android:layout_marginLeft="15dp">
+		android:layout_weight="1">
 		</ImageButton>
 		<ImageButton android:id="@+id/ImageButton01" 
 		android:src="@drawable/resume_play" 
@@ -240,8 +240,12 @@
 		android:src="@drawable/brightness" 
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
-		android:layout_weight="1" android:layout_marginRight="15dp">
+		android:layout_weight="1">
 		</ImageButton>
-    
-	</LinearLayout>
+    	<ImageButton android:id="@+id/ImageButton08" 
+    	android:layout_width="wrap_content" 
+    	android:layout_height="wrap_content" 
+    	android:layout_weight="1" android:src="@drawable/mediainfo">
+    	</ImageButton>
+</LinearLayout>
 </LinearLayout>

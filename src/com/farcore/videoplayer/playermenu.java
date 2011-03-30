@@ -543,6 +543,36 @@ public class playermenu extends Activity {
                 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 } 
     	    }); 
+            
+            ImageButton fileinformation = (ImageButton) findViewById(R.id.ImageButton08);
+            fileinformation.setOnClickListener(new View.OnClickListener() 
+    	    {
+                public void onClick(View v) 
+                {
+                	String fileinf = playermenu.this.getResources().getString(R.string.str_file_name)
+                			+ "\t: " + bMediaInfo.getFileName(PlayList.getinstance().getcur()) + "\n" 
+                			+ playermenu.this.getResources().getString(R.string.str_file_format)
+                			+ "\t: " + bMediaInfo.getFileType() + "\n"
+                			+ playermenu.this.getResources().getString(R.string.str_file_size)
+                			+ "\t: " + bMediaInfo.getFileSize() + "\n"
+                			+ playermenu.this.getResources().getString(R.string.str_file_resolution)
+                			+ "\t: " + bMediaInfo.getResolution() + "\n"
+                			+ playermenu.this.getResources().getString(R.string.str_file_duration)
+                			+ "\t: " + secToTime(bMediaInfo.duration, true) + "\n" 
+                			;
+                	AlertDialog fi = new AlertDialog.Builder(playermenu.this)
+    				.setTitle(R.string.str_file_information)  
+    				.setMessage(fileinf) 
+    				.setPositiveButton(R.string.str_ok,  
+						new DialogInterface.OnClickListener() {  
+				            public void onClick(DialogInterface dialog, int whichButton) {  
+				            	dialog.dismiss();
+				            	morbar.setVisibility(View.VISIBLE);
+				            }  
+				        })
+    			    .show(); 
+                } 
+    	    }); 
     	}
     
     public boolean onKeyDown(int keyCode, KeyEvent msg) 
@@ -1612,22 +1642,6 @@ public class playermenu extends Activity {
 		if (!NOT_FIRSTTIME)
 			StartPlayerService();
 		return pos;
-	}
-	
-	public class PlayThread extends Thread
-	{
-		public void run()
-		{
-			super.run();
-			try
-        	{
-        		Thread.sleep(600);
-        	}
-        	catch (InterruptedException e)
-        	{
-        		e.printStackTrace();
-        	}
-		}
 	}
 	
 	private class myAlertDialogDismiss implements DialogInterface.OnDismissListener

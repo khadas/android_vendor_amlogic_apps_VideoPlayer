@@ -28,4 +28,10 @@
 	<string name="str_on">开</string>
 	<string name="str_off">关</string>
 	<string name="str_about">关于</string>
+	<string name="str_file_information">文件信息</string>
+	<string name="str_file_name">名称</string>
+	<string name="str_file_format">格式</string>
+	<string name="str_file_size">大小</string>
+	<string name="str_file_resolution">分辨率</string>
+	<string name="str_file_duration">片长</string>
 </resources>

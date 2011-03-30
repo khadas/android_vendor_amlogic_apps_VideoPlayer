@@ -194,14 +194,14 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     jobject meta_obj = (*env)->NewObject(env,meta_cls,constructor);
 	(*env)->SetIntField(env,meta_obj,\
 		(*env)->GetFieldID(env, meta_cls, "seekable", "I"), (int)(msgt->stream_info.seekable));
-#if 0
-    (*env)->SetIntField(env,meta_obj,
-        (*env)->GetFieldID(env, meta_cls, "filetype", "I"), (int)(msgt->stream_info.type));
-    (*env)->SetLongField(env,meta_obj,
-        (*env)->GetFieldID(env, meta_cls, "filesize", "J"), msgt->stream_info.file_size); 
-    (*env)->SetIntField(env,meta_obj,
-        (*env)->GetFieldID(env, meta_cls, "duration", "I"), msgt->stream_info.duration); 
+	jfieldID id_filetype = (*env)->GetFieldID(env, meta_cls, "filetype", "I");
+    (*env)->SetIntField(env, meta_obj, id_filetype, (int)(msgt->stream_info.type));
 
+    (*env)->SetLongField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "filesize", "J"), msgt->stream_info.file_size); 
+    (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "duration", "I"), msgt->stream_info.duration); 
+	(*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "width", "I"), msgt->video_info[0]->width); 
+	(*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "height", "I"), msgt->video_info[0]->height); 
+#if 0
     
     if(msgt->stream_info.total_video_num >0){      
          jclass vinfo_cls = VideoMediaInfo_getClass(env);
