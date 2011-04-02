@@ -636,14 +636,123 @@ public class playermenu extends Activity {
 	    	}
 			return (true);
 		}
-    	else if (keyCode == 92) 
+    	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)//play or pause 
+    	{
+			// TODO Auto-generated method stub
+			if (player_status == VideoInfo.PLAYER_RUNNING)
+			{
+				try	{
+					m_Amplayer.Pause();
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			else if (player_status == VideoInfo.PLAYER_PAUSE)
+			{
+				try	{
+					m_Amplayer.Resume();
+				} catch(RemoteException e)	{
+					e.printStackTrace();
+				}
+			}
+			else if (player_status == VideoInfo.PLAYER_SEARCHING)
+			{
+				try	{
+					if (FF_FLAG)
+						m_Amplayer.FastForward(0);
+					else
+						m_Amplayer.BackForward(0);
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+		
+			return (true);
+		}
+    	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS)//play previous movie 
+    	{
+			// TODO Auto-generated method stub
+			if (!INITOK)
+				return false;
+			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+			String filename = PlayList.getinstance().moveprev();
+			toast.cancel();
+			toast.setText(filename);
+			toast.show();
+			playPosition = 0;
+			if(m_Amplayer == null)
+				return false; 
+			//stop play
+			else
+				Amplayer_stop();
+			PRE_NEXT_FLAG = 1;
+		  		 		
+    	}
+    	else if(keyCode == KeyEvent.KEYCODE_MEDIA_NEXT)//play next movie 
+    	{
+			// TODO Auto-generated method stub
+			if (!INITOK)
+				return false;
+			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+			String filename = PlayList.getinstance().movenext();
+			toast.cancel();
+			toast.setText(filename); 
+			toast.show();
+			playPosition = 0;
+			if(m_Amplayer == null)
+				return false;
+			else
+				Amplayer_stop();
+			PRE_NEXT_FLAG = 1;		    		   		
+    	}
+    	else if(keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD)//FF
+    	{
+			if (!INITOK)
+				return false;
+			if (player_status == VideoInfo.PLAYER_SEARCHING)
+			{
+				try	{
+					m_Amplayer.FastForward(0);
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				try	{
+					m_Amplayer.FastForward(2);
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+				FF_FLAG = true;
+			}		 
+    	}
+    	else if(keyCode == KeyEvent.KEYCODE_MEDIA_REWIND)//FB
+    	{
+			// TODO Auto-generated method stub
+			if (!INITOK)
+				return false;
+			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+			String filename = PlayList.getinstance().moveprev();
+			toast.cancel();
+			toast.setText(filename);
+			toast.show();
+			playPosition = 0;
+			if(m_Amplayer == null)
+				return false;
+			//stop play
+			else
+				Amplayer_stop();
+			PRE_NEXT_FLAG = 1;	
+    	}
+    	else if (keyCode == KeyEvent.KEYCODE_7) 
     	{
     		videobar();
             ImageButton audiotrack = (ImageButton) findViewById(R.id.ImageButton03);
             audiotrack.requestFocusFromTouch();
     		return (true);
     	}
-    	else if (keyCode == 93) 
+    	else if (keyCode == KeyEvent.KEYCODE_DEL) 
     	{
     		videobar();
     		ImageButton subtitle = (ImageButton) findViewById(R.id.ImageButton04);
@@ -652,6 +761,7 @@ public class playermenu extends Activity {
     	}
         else
 		 return super.onKeyDown(keyCode, msg);
+    	return (true);
     }
     
     public void onCreate(Bundle savedInstanceState) {

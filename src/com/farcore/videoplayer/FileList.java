@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.farcore.videoplayer.R;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -286,7 +288,33 @@ public class FileList extends ListActivity {
 	    	showvideobar();
 	    }
 	}
-
+    public boolean onKeyDown(int keyCode, KeyEvent event) { 
+        if (keyCode == KeyEvent.KEYCODE_BACK) {        	
+            if(paths == null) 
+            {
+            	FileList.this.finish();
+            	PlayList.getinstance().rootPath =null;
+            }
+            else
+            {
+            	if(paths.isEmpty())
+            	{
+            		FileList.this.finish();
+            		PlayList.getinstance().rootPath =null;
+            	}
+            	file = new File(paths.get(0).toString());
+            	currenturl =file.getParentFile().getParent();
+            	if(file.getParent().compareToIgnoreCase(root_path)!=0)
+            		BrowserFile(currenturl);
+            	else
+            	{
+        			FileList.this.finish();
+        			PlayList.getinstance().rootPath =null;
+            	}
+            }                   
+        }
+        return true; 
+    }
 	private void showvideobar() {
 		//* new an Intent object and ponit a class to start
 		Intent intent = new Intent();
