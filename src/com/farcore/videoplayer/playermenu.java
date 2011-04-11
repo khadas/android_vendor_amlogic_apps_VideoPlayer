@@ -23,14 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.PowerManager;
-import android.os.RemoteException;
-import android.os.SystemProperties; 
+import android.os.*;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
@@ -96,7 +89,7 @@ public class playermenu extends Activity {
 	private TextView t_subscolor=null ;
 	private TextView morebar_tileText =null;
 	
-	private String[] m_brightness= {"1","2","3","4"};		
+	private String[] m_brightness= {"1","2","3","4","5","6"};		
 	
 	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
 		"com.amlogic.HdmiSwitch.HDMISWITCH_MODE_CHANGED";
@@ -493,40 +486,75 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	
                 	otherbar.setVisibility(View.VISIBLE);
                 	morbar.setVisibility(View.GONE);
                 	morebar_tileText.setText(R.string.setting_brightness);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
                     MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
                     		R.layout.list_row, m_brightness);
-                    la.setSelectItem(SettingsVP.getParaInt("Brightness"));
+					int mBrightness = 0;
+					try {
+						mBrightness = Settings.System.getInt(playermenu.this.getContentResolver(), 
+						       Settings.System.SCREEN_BRIGHTNESS);
+					} catch (SettingNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					int item;
+					if (mBrightness <= (android.os.Power.BRIGHTNESS_DIM + 10))
+						item = 0;
+					else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.2f))
+						item = 1;
+					else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.4f))
+						item = 2;
+					else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.6f))
+						item = 3;
+					else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.8f))
+						item = 4;
+					else
+						item = 5;
+                    la.setSelectItem(item);
                     listView.setAdapter(la);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
-                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    		 WindowManager.LayoutParams lp = getWindow().getAttributes();	
-                        	 switch(position)
-                        	 {
-                        	 case 0:
-                        		 lp.screenBrightness = 0.2f;
-                        		 break;
-                        	 case 1:
-                        		 lp.screenBrightness = 0.5f;
-                        		 break;
-                        	 case 2:
-                        		 lp.screenBrightness = 0.7f;
-                        		 break;
-                        	 case 3:
-                        		 lp.screenBrightness = 1.0f;
-                        		 break;	 
-                        	 default:
-                        		  break;
-                        	 }
-                        	 getWindow().setAttributes(lp);
-                        	 SettingsVP.putParaInt("Brightness", position);
-                        	 otherbar.setVisibility(View.GONE);
-                        	 morbar.setVisibility(View.VISIBLE);
+                    	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							int brightness;
+                        	switch(position)
+                        	{
+                        	case 0:
+                        	 	brightness = android.os.Power.BRIGHTNESS_DIM + 10;
+                        		break;
+                        	case 1:
+                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.2f);
+                        		break;
+                        	case 2:
+                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.4f);
+                        	 	break;
+                        	case 3:
+                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.6f);
+                        	 	break;	 
+							case 4:
+                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.8f);
+                        	 	break;
+							case 5:
+                        		brightness = android.os.Power.BRIGHTNESS_ON;
+                        	 	break;
+                        	default:
+								brightness = android.os.Power.BRIGHTNESS_DIM + 30;
+                        		break;
+                        	}
+                        	try {
+					            IPowerManager power = IPowerManager.Stub.asInterface(
+					                ServiceManager.getService("power"));
+					            if (power != null) {
+					                power.setBacklightBrightness(brightness);
+									Settings.System.putInt(playermenu.this.getContentResolver(), 
+				                    		Settings.System.SCREEN_BRIGHTNESS, brightness);
+					            }
+					        } catch (RemoteException doe) {
+					        }  
+                        	otherbar.setVisibility(View.GONE);
+                        	morbar.setVisibility(View.VISIBLE);
                     	}
                     });
                     otherbar.requestFocus();

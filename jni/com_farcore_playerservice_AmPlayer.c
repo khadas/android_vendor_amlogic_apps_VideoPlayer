@@ -203,48 +203,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
 		(*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "width", "I"), msgt->video_info[0]->width); 
 		(*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "height", "I"), msgt->video_info[0]->height); 
 	}
-#if 0
-    
-    if(msgt->stream_info.total_video_num >0){      
-         jclass vinfo_cls = VideoMediaInfo_getClass(env);
-         jmethodID vmid = (*env)->GetMethodID(env,vinfo_cls, "<init>", "()V");
-         if(!vmid){   
-            LOGE("failed to get video info constructor");    
-            return meta_obj;
-         }
-         jobjectArray vinfoArray = (*env)->NewObjectArray(env,msgt->stream_info.total_video_num,vinfo_cls, NULL);  
-         if(NULL == vinfoArray){                
-            LOGE("failed to get video info object");   
-            return meta_obj;
-         }
-        
-         for(index = 0;index<msgt->stream_info.total_video_num;index++){
-            jobject vobj = (*env)->NewObject(env,vinfo_cls, vmid);
-            if(NULL ==vobj){
-                LOGI("failed to get video info object");                
-                (*env)->DeleteLocalRef(env,vinfoArray);  
-                return meta_obj;
-            }
-            (*env)->SetIntField(env,vobj,
-                (*env)->GetFieldID(env, vinfo_cls, "video_format", "I"), msgt->video_info[index]->format);
-            (*env)->SetIntField(env,vobj,\
-                (*env)->GetFieldID(env, vinfo_cls, "video_w", "I"), msgt->video_info[index]->width);
-            (*env)->SetIntField(env,vobj,\
-                (*env)->GetFieldID(env, vinfo_cls, "video_h", "I"), msgt->video_info[index]->height);
-            (*env)->SetIntField(env,vobj,\
-                (*env)->GetFieldID(env, vinfo_cls, "bit_rate", "I"), msgt->video_info[index]->bit_rate);
-            (*env)->SetIntField(env,vobj,\
-                (*env)->GetFieldID(env, vinfo_cls, "uid", "I"), msgt->video_info[index]->id);
-
-             (*env)->SetObjectArrayElement(env,vinfoArray,index, vobj);                    
-                 
-         } 
-
-         jfieldID vinfo_id = (*env)->GetFieldID(env, meta_cls, "vinfo", "[Lcom/farcore/playerservice/VideoMediaInfo;"); 
-       
-         (*env)->SetObjectField(env,meta_obj,vinfo_id,vinfoArray);
-     }
-#endif    
+	
 	if(msgt->stream_info.has_audio>0 && msgt->stream_info.total_audio_num>0){
 		jclass ainfo_cls = AudioMediaInfo_getClass(env);
 		jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
