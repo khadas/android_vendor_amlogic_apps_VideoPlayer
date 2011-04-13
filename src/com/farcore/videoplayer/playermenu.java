@@ -796,7 +796,6 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
-        //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_BEFORE_VIDEO"));
         /*WindowManager wm = getWindowManager(); 
         Display display = wm.getDefaultDisplay(); 
         int hei = display.getHeight();
@@ -1266,10 +1265,10 @@ public class playermenu extends Activity {
 	                	else
 	                	{
 	                		playPosition = 0;
-				        	if (!NOT_FIRSTTIME)
+				        	/*if (!NOT_FIRSTTIME)
 				    			StartPlayerService();
 				        	else
-				        		Amplayer_play();
+				        		Amplayer_play();*/
 				        	confirm_dialog.dismiss();
 				        	resumeSecond = 8;
 	                	}
@@ -1386,12 +1385,6 @@ public class playermenu extends Activity {
         openScreenOffTimeout();
         SettingsVP.disableVideoLayout();
         unregisterReceiver(mReceiver);
-        //sendBroadcast( new Intent("com.amlogic.HdmiSwitch.FREESCALE_AFTER_VIDEO"));
-        /*WindowManager wm = getWindowManager(); 
-        Display display = wm.getDefaultDisplay(); 
-        int hei = display.getHeight();
-        int wid = display.getWidth();
-        if (hei == 480 && wid == 800)*/
         if (AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         
