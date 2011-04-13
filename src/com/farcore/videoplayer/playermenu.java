@@ -1468,6 +1468,7 @@ public class playermenu extends Activity {
 								Amplayer_play();
 							}
     						PRE_NEXT_FLAG = 0;
+							progressSliding = false;
     					}
 						if(subTitleView!=null)
 							subTitleView.closeSubtitle();
