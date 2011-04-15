@@ -311,9 +311,10 @@ public class FileList extends ListActivity {
         			FileList.this.finish();
         			PlayList.getinstance().rootPath =null;
             	}
-            }                   
+            }  
+            return true;                 
         }
-        return true; 
+        return super.onKeyDown(keyCode, event); 
     }
 	private void showvideobar() {
 		//* new an Intent object and ponit a class to start
