@@ -8,6 +8,7 @@ ifeq ($(BUILD_ID),MID)
 endif
 
 LOCAL_MODULE    := libamplayerjni
+LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := com_farcore_playerservice_AmPlayer.c sys_conf.c
 LOCAL_ARM_MODE := arm
 LOCAL_C_INCLUDES := $(LIBPLAYER_PATH)/amplayer/player/include \
