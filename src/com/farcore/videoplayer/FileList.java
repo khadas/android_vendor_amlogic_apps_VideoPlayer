@@ -274,7 +274,7 @@ public class FileList extends ListActivity {
 	    	BrowserFile(paths.get(position));
 	    else 
 	    {
-		stopMediaPlayer();
+		//stopMediaPlayer();
 	    	file = new File(file.getParent());
 	    	filterDir(file);
 	    	PlayList.getinstance().rootPath= file.getPath();

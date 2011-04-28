@@ -1587,6 +1587,12 @@ public class playermenu extends Activity {
     public Player m_Amplayer = null;
     private void Amplayer_play()
     {
+        // stop music player    
+        Intent intent = new Intent();
+        intent.setAction("com.android.music.musicservicecommand.pause");
+        intent.putExtra("command", "stop");
+        this.sendBroadcast(intent);
+
     	try
 		{
     		//if otherbar is visable;hide it 
