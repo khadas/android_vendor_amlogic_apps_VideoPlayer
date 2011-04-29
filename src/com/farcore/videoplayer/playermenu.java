@@ -33,6 +33,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import android.content.res.Resources;
 
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
@@ -1670,11 +1671,13 @@ public class playermenu extends Activity {
 			Log.d(TAG,"to play files!");
 			try
 			{
-				int color = ((Color.red(R.color.keycolor) >> 3) << 11) 
-					| ((Color.green(R.color.keycolor) >> 2) << 5)
-					| ((Color.blue(R.color.keycolor) >> 3) << 0);
-				m_Amplayer.SetColorKey(color);
-				Log.d(TAG, "set colorkey() color=" + color);
+				Resources res = getResources();
+				int color = res.getColor(R.color.keycolor);
+				int keycolor = ((Color.red(color) >> 3) << 11)
+					| ((Color.green(color) >> 2) << 5)
+					| ((Color.blue(color) >> 3) << 0);
+				m_Amplayer.SetColorKey(keycolor);
+				Log.d(TAG, "set colorkey() color=" + keycolor );
 			}
 			catch(RemoteException e)
 			{
@@ -1705,31 +1708,33 @@ public class playermenu extends Activity {
     	this.startService(intent);
     	this.bindService(intent, m_PlayerConn, BIND_AUTO_CREATE);
 
-        // Set view background colors after color key is enabled
-        LinearLayout layout;
+      // Set view background colors after color key is enabled
+      LinearLayout layout;
+			Resources res = getResources();
+			int color = res.getColor(R.color.keycolor);
 
-        layout = (LinearLayout) findViewById(R.id.BaseLayout1);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.keycolor);
+      layout = (LinearLayout) findViewById(R.id.BaseLayout1);
+			if (layout != null)
+				layout.setBackgroundColor(color);
 
-        layout = (LinearLayout) findViewById(R.id.BaseLayout2);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.keycolor);
+      layout = (LinearLayout) findViewById(R.id.BaseLayout2);
+			if (layout != null)
+				layout.setBackgroundColor(color);
     }
     
     public void StopPlayerService()
     {
-
         // Restore view background colors before color key is disabled
         LinearLayout layout;
-
+				Resources res = getResources();
+				int color = res.getColor(R.color.background);
         layout = (LinearLayout) findViewById(R.id.BaseLayout1);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.background);
+				if (layout != null)
+					layout.setBackgroundColor(color);
 
         layout = (LinearLayout) findViewById(R.id.BaseLayout2);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.background);
+				if (layout != null)
+					layout.setBackgroundColor(color);
 
     	this.unbindService(m_PlayerConn);
     	Intent intent = new Intent();
