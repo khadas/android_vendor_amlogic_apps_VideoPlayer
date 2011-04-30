@@ -4,5 +4,5 @@
   <drawable name="black">#000000</drawable>
   <drawable name="blue">#0000FF</drawable>
 <color name="background">#000000</color>
-<color name="keycolor">#083000</color>
+<color name="keycolor">#000400</color>
 </resources>
