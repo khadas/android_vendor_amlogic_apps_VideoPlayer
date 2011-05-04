@@ -645,6 +645,12 @@ public class playermenu extends Activity {
 				//close sub;
 				if(subTitleView!=null)
 					subTitleView.closeSubtitle();	
+				// Hide the view with key color
+				LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
+				if (layout != null) {
+					layout.setVisibility(View.INVISIBLE);
+					layout.invalidate();
+				}
 				//stop play
 				backToFileList = true;
 				if(m_Amplayer != null)
