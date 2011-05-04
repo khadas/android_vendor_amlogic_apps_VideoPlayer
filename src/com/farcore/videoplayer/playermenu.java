@@ -28,7 +28,6 @@ import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.*;
@@ -1670,9 +1669,9 @@ public class playermenu extends Activity {
 			Log.d(TAG,"to play files!");
 			try
 			{
-				int color = ((Color.red(R.color.keycolor) >> 3) << 11) 
-					| ((Color.green(R.color.keycolor) >> 2) << 5)
-					| ((Color.blue(R.color.keycolor) >> 3) << 0);
+				final short color = ((0x8 >> 3) << 11) 
+									| ((0x30 >> 2) << 5) 
+									| ((0x8 >> 3) << 0);
 				m_Amplayer.SetColorKey(color);
 				Log.d(TAG, "set colorkey() color=" + color);
 			}
@@ -1704,33 +1703,10 @@ public class playermenu extends Activity {
     	intent.setComponent(hcomponet);
     	this.startService(intent);
     	this.bindService(intent, m_PlayerConn, BIND_AUTO_CREATE);
-
-        // Set view background colors after color key is enabled
-        LinearLayout layout;
-
-        layout = (LinearLayout) findViewById(R.id.BaseLayout1);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.keycolor);
-
-        layout = (LinearLayout) findViewById(R.id.BaseLayout2);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.keycolor);
     }
     
     public void StopPlayerService()
     {
-
-        // Restore view background colors before color key is disabled
-        LinearLayout layout;
-
-        layout = (LinearLayout) findViewById(R.id.BaseLayout1);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.background);
-
-        layout = (LinearLayout) findViewById(R.id.BaseLayout2);
-	if (layout != null)
-	        layout.setBackgroundColor(R.color.background);
-
     	this.unbindService(m_PlayerConn);
     	Intent intent = new Intent();
     	ComponentName hcomponet = new ComponentName("com.farcore.videoplayer","com.farcore.playerservice.AmPlayer");

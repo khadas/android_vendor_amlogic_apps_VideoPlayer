@@ -3,6 +3,5 @@
   <drawable name="white">#FFFFFFFF</drawable>
   <drawable name="black">#000000</drawable>
   <drawable name="blue">#0000FF</drawable>
-<color name="background">#000000</color>
-<color name="keycolor">#083000</color>
+<color name="background">#083008</color>
 </resources>
