@@ -766,18 +766,23 @@ public class playermenu extends Activity {
 			// TODO Auto-generated method stub
 			if (!INITOK)
 				return false;
-			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
-			String filename = PlayList.getinstance().moveprev();
-			toast.cancel();
-			toast.setText(filename);
-			toast.show();
-			playPosition = 0;
-			if(m_Amplayer == null)
-				return false;
-			//stop play
+			if (player_status == VideoInfo.PLAYER_SEARCHING)
+			{
+				try	{
+					m_Amplayer.BackForward(0);
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+			}
 			else
-				Amplayer_stop();
-			PRE_NEXT_FLAG = 1;	
+			{
+				try	{
+					m_Amplayer.BackForward(2);
+				} catch(RemoteException e) {
+					e.printStackTrace();
+				}
+				FF_FLAG = false;
+			}
     	}
     	else if (keyCode == KeyEvent.KEYCODE_7) 
     	{
