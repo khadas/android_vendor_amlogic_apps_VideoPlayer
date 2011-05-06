@@ -17,6 +17,7 @@
 	<string name="setting_subtitle">Subtitle</string>
 	<string name="setting_displaymode">Display Mode</string>
 	<string name="setting_displaymode_normal">Normal</string>
+	<string name="setting_displaymode_normal_noscaleup">No Scale Up</string>
 	<string name="setting_displaymode_fullscreen">Full Screen</string>
 	<string name="setting_brightness">Brightness</string>
 	<string name="app_name">VideoPlayer</string>

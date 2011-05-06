@@ -17,6 +17,7 @@
 	<string name="setting_subtitle">字幕</string>
 	<string name="setting_displaymode">显示模式</string>
 	<string name="setting_displaymode_normal">正常</string>
+	<string name="setting_displaymode_normal_noscaleup">正常不放大</string>
 	<string name="setting_displaymode_fullscreen">全屏</string>
 	<string name="setting_brightness">亮度</string>
 	<string name="app_name">媒体播放器</string>

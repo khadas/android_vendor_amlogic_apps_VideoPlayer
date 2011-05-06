@@ -17,6 +17,7 @@ public class ScreenMode {
 	public static final int FULLSTRETCH = 1;
 	public static final int RATIO4_3 = 2;
 	public static final int RATIO16_9 = 3;
+	public static final int NORMAL_NOSCALEUP = 4;
 	
 	public static int getScreenMode()
 	{

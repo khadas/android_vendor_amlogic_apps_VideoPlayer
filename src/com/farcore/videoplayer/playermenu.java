@@ -447,7 +447,8 @@ public class playermenu extends Activity {
                 			playermenu.this.getResources().getString(R.string.setting_displaymode_normal),
                 			playermenu.this.getResources().getString(R.string.setting_displaymode_fullscreen),
                 			"4:3",
-                			"16:9"
+                			"16:9",
+                			playermenu.this.getResources().getString(R.string.setting_displaymode_normal_noscaleup),
                 			};
                     MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
                     		R.layout.list_row, m_display);
@@ -470,6 +471,9 @@ public class playermenu extends Activity {
                     			break;
                     		case ScreenMode.RATIO16_9:
                     			ScreenMode.setScreenMode("3");
+                    			break;
+                    		case ScreenMode.NORMAL_NOSCALEUP:
+                    			ScreenMode.setScreenMode("4");
                     			break;
                     		default:
                     			break;
