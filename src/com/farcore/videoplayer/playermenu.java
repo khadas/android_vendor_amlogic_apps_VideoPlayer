@@ -825,6 +825,10 @@ public class playermenu extends Activity {
         setContentView(R.layout.infobar);
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         
+		infobar = (LinearLayout)findViewById(R.id.infobarLayout);
+		if (infobar != null)
+			infobar.setVisibility(View.GONE);
+
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
         closeScreenOffTimeout();
@@ -889,6 +893,9 @@ public class playermenu extends Activity {
         	else
         		Amplayer_play();
 		}
+
+		if (infobar != null)
+			infobar.setVisibility(View.VISIBLE);
     }
     
     protected void subinit()
