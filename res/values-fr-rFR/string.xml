@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sub_font">Police:</string>
+    <string name="sub_color">Couleur:</string>
+    <string name="color_white">Blanc</string>
+    <string name="color_yellow">Jaune</string>
+    <string name="color_blue">Bleu</string>
+    <string name="sub_switch">Basculer:</string>
+    <string name="sub_no_subtitle">Aucun sous-titre!</string>
+    <string name="str_no_file">Aucun fichier trouv��!</string>
+    <string name="str_exit">Quitter</string>
+    <string name="setting_resume">Mode de reprise</string>
+    <string name="setting_playmode">Mode de lecture</string>
+    <string name="setting_playmode_repeatall">Tout répéter</string>
+    <string name="setting_playmode_repeatone">Répéter un</string>
+    <string name="setting_audiotrack">Piste audio</string>
+    <string name="setting_subtitle">Sous-titre</string>
+    <string name="setting_displaymode">Mode d\'affichage</string>
+    <string name="setting_displaymode_normal">Normal</string>
+    <string name="setting_displaymode_normal_noscaleup">No Scale Up</string>
+    <string name="setting_displaymode_fullscreen">Plein écran</string>
+    <string name="setting_brightness">Luminosité</string>
+    <string name="app_name">Lecteur vidéo</string>
+    <string name="main_activity">Lecteur vidéo</string>
+    <string name="str_ok">Ok</string>
+    <string name="str_cancel">Annuler</string>
+    <string name="str_time_null">00:00:00</string>
+    <string name="str_resume_play">Reprendre cette vidéo depuis la dernière position?</string>
+    <string name="str_on">Activé</string>
+    <string name="str_off">Désactivé</string>
+    <string name="str_about">A propos de</string>
+    <string name="str_file_information">Informations sur le fichier</string>
+    <string name="str_file_name">Nom</string>
+    <string name="str_file_format">Format</string>
+    <string name="str_file_size">Taille</string>
+    <string name="str_file_resolution">Résolution</string>
+    <string name="str_file_duration">Durée</string>
+</resources>

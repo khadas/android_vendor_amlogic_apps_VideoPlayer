@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sub_font">Schriftart:</string>
+    <string name="sub_color">Farbe:</string>
+    <string name="color_white">Weiss</string>
+    <string name="color_yellow">Gelb</string>
+    <string name="color_blue">Blau</string>
+    <string name="sub_switch">Schalter:</string>
+    <string name="sub_no_subtitle">Keine Untertitel!</string>
+    <string name="str_no_file">Keine Dateien gefunden!</string>
+    <string name="str_exit">Verlassen</string>
+    <string name="setting_resume">Fortsetzungsmodus</string>
+    <string name="setting_playmode">Abspielmodus</string>
+    <string name="setting_playmode_repeatall">Alle wiederholen</string>
+    <string name="setting_playmode_repeatone">Eine wiederholen</string>
+    <string name="setting_audiotrack">Audiospur</string>
+    <string name="setting_subtitle">Untertitel</string>
+    <string name="setting_displaymode">Anzeigemodus</string>
+    <string name="setting_displaymode_normal">Normal</string>
+    <string name="setting_displaymode_normal_noscaleup">No Scale Up</string>
+    <string name="setting_displaymode_fullscreen">Vollschirm</string>
+    <string name="setting_brightness">Helligkeit</string>
+    <string name="app_name">VideoPlayer</string>
+    <string name="main_activity">VideoPlayer</string>
+    <string name="str_ok">OK</string>
+    <string name="str_cancel">Löschen</string>
+    <string name="str_time_null">00:00:00</string>
+    <string name="str_resume_play">Dieses Video ab der letzten Stelle fortsetzen?</string>
+    <string name="str_on">Ein</string>
+    <string name="str_off">Aus</string>
+    <string name="str_about">Über</string>
+    <string name="str_file_information">Dateieninfos</string>
+    <string name="str_file_name">Name</string>
+    <string name="str_file_format">Format</string>
+    <string name="str_file_size">Größe</string>
+    <string name="str_file_resolution">Auflösung</string>
+    <string name="str_file_duration">Dauer</string>
+</resources>

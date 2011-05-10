@@ -67,6 +67,7 @@ public class playermenu extends Activity {
 	private LinearLayout morbar = null;
 	private LinearLayout subbar = null;
 	private LinearLayout otherbar = null;
+	private LinearLayout infodialog = null;
 	private AlertDialog confirm_dialog = null;
 	private BroadcastReceiver mReceiver = null;
 	
@@ -112,7 +113,10 @@ public class playermenu extends Activity {
     		otherbar = (LinearLayout)findViewById(R.id.LinearLayout_other);
     		morebar_tileText = (TextView)findViewById(R.id.more_title);
     		otherbar.setVisibility(View.GONE);
-    		
+
+			infodialog = (LinearLayout)findViewById(R.id.dialog_layout);
+			infodialog.setVisibility(View.GONE);
+			
     		morbar = (LinearLayout)findViewById(R.id.morebarLayout);
     		if (SettingsVP.display_mode.equals("480p"))
             {
@@ -581,6 +585,7 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
+                	/*
                 	String fileinf = playermenu.this.getResources().getString(R.string.str_file_name)
                 			+ "\t: " + bMediaInfo.getFileName(PlayList.getinstance().getcur()) + "\n" 
                 			+ playermenu.this.getResources().getString(R.string.str_file_format)
@@ -591,7 +596,7 @@ public class playermenu extends Activity {
                 			+ "\t: " + bMediaInfo.getResolution() + "\n"
                 			+ playermenu.this.getResources().getString(R.string.str_file_duration)
                 			+ "\t: " + secToTime(bMediaInfo.duration, true) + "\n" 
-                			;
+                			;	
                 	AlertDialog fi = new AlertDialog.Builder(playermenu.this)
     				.setTitle(R.string.str_file_information)  
     				.setMessage(fileinf) 
@@ -602,7 +607,50 @@ public class playermenu extends Activity {
 				            	morbar.setVisibility(View.VISIBLE);
 				            }  
 				        })
-    			    .show(); 
+    			    .show();
+					*/
+					infodialog.setVisibility(View.VISIBLE);
+					morbar.setVisibility(View.GONE);
+					TextView title = (TextView)findViewById(R.id.info_title);
+					title.setText(R.string.str_file_information);
+					
+					String fileinf = null;
+					TextView filename = (TextView)findViewById(R.id.filename);
+                	fileinf = playermenu.this.getResources().getString(R.string.str_file_name)
+        			+ "\t: " + bMediaInfo.getFileName(PlayList.getinstance().getcur());
+					filename.setText(fileinf);
+
+					TextView filetype = (TextView)findViewById(R.id.filetype);
+                	fileinf = playermenu.this.getResources().getString(R.string.str_file_format)
+        			+ "\t: " + bMediaInfo.getFileType();
+					filetype.setText(fileinf);
+					
+					TextView filesize = (TextView)findViewById(R.id.filesize);
+                	fileinf = playermenu.this.getResources().getString(R.string.str_file_size)
+        			+ "\t: " + bMediaInfo.getFileSize();
+					filesize.setText(fileinf);
+					
+					TextView resolution = (TextView)findViewById(R.id.resolution);
+                	fileinf = playermenu.this.getResources().getString(R.string.str_file_resolution)
+        			+ "\t: " + bMediaInfo.getResolution();
+                	resolution.setText(fileinf);
+					
+					TextView duration = (TextView)findViewById(R.id.duration);
+                	fileinf = playermenu.this.getResources().getString(R.string.str_file_duration)
+        			+ "\t: " + secToTime(bMediaInfo.duration, true);
+					duration.setText(fileinf);
+					
+					Button ok = (Button)findViewById(R.id.info_ok);
+					ok.setText("OK");
+					ok.setOnClickListener(new View.OnClickListener() 
+					{
+					    public void onClick(View v) 
+						{
+                        	infodialog.setVisibility(View.GONE);
+                        	morbar.setVisibility(View.VISIBLE);
+						}
+					});
+					infodialog.requestFocus();								
                 } 
     	    }); 
     	}
@@ -1622,6 +1670,8 @@ public class playermenu extends Activity {
     		{	
     			if(otherbar.getVisibility() == View.VISIBLE)
     				otherbar.setVisibility(View.GONE);
+    			if(infodialog.getVisibility() == View.VISIBLE)
+    				infodialog.setVisibility(View.GONE);
     			if(subbar.getVisibility() == View.VISIBLE)
     				subbar.setVisibility(View.GONE);
     			
