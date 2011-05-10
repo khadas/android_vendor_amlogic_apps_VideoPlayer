@@ -168,7 +168,7 @@
 			android:textColor="@drawable/white" 
 			android:textSize="24px"></TextView>
 		  <ListView android:id="@+id/AudioListView" 
-			  android:layout_width="327dp" 
+			  android:layout_width="326dp" 
 			  android:layout_height="232dp" 
 			  android:layout_marginLeft="12dp" 
 			  android:divider="@color/background" 
