@@ -53,6 +53,7 @@ public class playermenu extends Activity {
 	private static final int MID_FREESCALE = 0x10001;
     
     //for repeat mode;
+	private boolean playmode_switch = true;
     private static int m_playmode = 1;
     private static final int REPEATLIST = 1;
     private static final int REPEATONE = 2;
@@ -163,38 +164,44 @@ public class playermenu extends Activity {
     	    });
             
             ImageButton playmode = (ImageButton) findViewById(R.id.ImageButton02);
-            playmode.setOnClickListener(new View.OnClickListener() 
-    	    {
-                public void onClick(View v) 
-                {
-                	otherbar.setVisibility(View.VISIBLE);
-                	morbar.setVisibility(View.GONE);
-                	morebar_tileText.setText(R.string.setting_playmode);
-                	ListView listView = (ListView)findViewById(R.id.AudioListView);
-                	String[] m_repeat= {
-                			playermenu.this.getResources().getString(R.string.setting_playmode_repeatall),
-                			playermenu.this.getResources().getString(R.string.setting_playmode_repeatone)
-                			};
-                    MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
-                    		R.layout.list_row, m_repeat);
-                    la.setSelectItem(m_playmode - 1);
-                    listView.setAdapter(la);
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            if(playmode_switch) {
+                playmode.setOnClickListener(new View.OnClickListener() 
+        	    {
+                    public void onClick(View v) 
                     {
-                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                    	{
-                    		 if (position == 0)
-                        		 m_playmode = REPEATLIST;
-                        	 else if (position == 1)
-                        		 m_playmode = REPEATONE;
-                    		 
-                    		 otherbar.setVisibility(View.GONE);
-                    		 morbar.setVisibility(View.VISIBLE);
-                    	}
-                    });
-                    otherbar.requestFocus();
-                } 
-    	    });
+                    	otherbar.setVisibility(View.VISIBLE);
+                    	morbar.setVisibility(View.GONE);
+                    	morebar_tileText.setText(R.string.setting_playmode);
+                    	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                    	String[] m_repeat= {
+                    			playermenu.this.getResources().getString(R.string.setting_playmode_repeatall),
+                    			playermenu.this.getResources().getString(R.string.setting_playmode_repeatone)
+                    			};
+                        MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
+                        		R.layout.list_row, m_repeat);
+                        la.setSelectItem(m_playmode - 1);
+                        listView.setAdapter(la);
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                        {
+                        	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                        	{
+                        		 if (position == 0)
+                            		 m_playmode = REPEATLIST;
+                            	 else if (position == 1)
+                            		 m_playmode = REPEATONE;
+                        		 
+                        		 otherbar.setVisibility(View.GONE);
+                        		 morbar.setVisibility(View.VISIBLE);
+                        	}
+                        });
+                        otherbar.requestFocus();
+                    } 
+        	    });
+            }
+            else {
+            	playmode.setImageDrawable(getResources().getDrawable(R.drawable.mode_disable));
+            }
+
             ImageButton audiotrack = (ImageButton) findViewById(R.id.ImageButton03);
             audiotrack.setOnClickListener(new View.OnClickListener() 
     	    {
@@ -890,6 +897,7 @@ public class playermenu extends Activity {
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
         closeScreenOffTimeout();
         Intent it = this.getIntent();
+        playmode_switch = true;
         if (it.getData() != null)
         {
         	if (it.getData().getScheme().equals("file"))
@@ -913,7 +921,8 @@ public class playermenu extends Activity {
 
                     paths.add(cursor.getString(index));
                     PlayList.getinstance().setlist(paths, 0);
-
+                    
+                    playmode_switch = false;
                     Log.d(TAG, "index = " + index);
                     Log.d(TAG, "From content providor DATA:" + cursor.getString(index));
                     Log.d(TAG, " -- MIME_TYPE :" + 
