@@ -89,7 +89,7 @@ public class playermenu extends Activity {
 	private TextView t_subsfont=null ;
 	private TextView t_subscolor=null ;
 	private TextView morebar_tileText =null;
-	
+	private boolean touchVolFlag = false;
 	private String[] m_brightness= {"1","2","3","4","5","6"};		
 	
 	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
@@ -654,11 +654,20 @@ public class playermenu extends Activity {
                 } 
     	    }); 
     	}
-    
+	public boolean onKeyUp(int keyCode, KeyEvent msg) 
+    {	
+		if(keyCode == KeyEvent.KEYCODE_UNKNOWN){
+			touchVolFlag = false;
+			waitForHide();
+		}
+		return true;
+    }
     public boolean onKeyDown(int keyCode, KeyEvent msg) 
     {
         Log.i(TAG, "onKeyDown " + keyCode);
-    	if (keyCode == KeyEvent.KEYCODE_POWER)
+		if(keyCode == KeyEvent.KEYCODE_UNKNOWN){
+			touchVolFlag = true;
+    	}else if (keyCode == KeyEvent.KEYCODE_POWER)
     	{
                 if (player_status == VideoInfo.PLAYER_RUNNING)
                 {
@@ -1304,10 +1313,12 @@ public class playermenu extends Activity {
         };   
         TimerTask task = new TimerTask(){   
       
-            public void run() {   
+            public void run() {
+				if(!touchVolFlag){
                 Message message = new Message();       
                 message.what = 0x3c;       
-                handler.sendMessage(message);     
+                handler.sendMessage(message);  
+				}				
             }   
                
         };   
