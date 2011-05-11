@@ -1542,6 +1542,7 @@ public class playermenu extends Activity {
 						play.setBackgroundResource(R.drawable.pause_button);
 						break;
 					case VideoInfo.PLAYER_PAUSE:
+					case VideoInfo.PLAYER_SEARCHING:	
 						play.setBackgroundResource(R.drawable.play_button);
 						break;
 					case VideoInfo.PLAYER_EXIT:						
