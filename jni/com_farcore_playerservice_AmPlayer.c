@@ -58,6 +58,9 @@ jclass Intersub_getClass(JNIEnv *env){
     
 }
 
+jclass DivxInfo_getClass(JNIEnv *env){
+  return (*env)->FindClass(env, "com/farcore/playerservice/DivxInfo");
+}
 
 int onUpdate_player_info_java( JNIEnv *env,int pid,player_info_t * info)
 {
@@ -172,9 +175,33 @@ int _media_info_dump(media_info_t* minfo)
             }
         }
     }
+    
     LOGI("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     return 0;
 }
+
+jobject DivxInfoContext_create(JNIEnv *env, drm_t* info){
+  jclass meta_cls = DivxInfo_getClass(env);
+  if(NULL == meta_cls){
+    LOGE("failed to get DivxInfo class");
+    return NULL;
+  }
+  
+  jmethodID constructor = (*env)->GetMethodID(env, meta_cls, "<init>", "()V");
+  jobject meta_obj = (*env)->NewObject(env, meta_cls, constructor);
+
+  jstring regCode = (*env)->NewStringUTF(env,info->drm_reg_code);
+  (*env)->SetObjectField(env, meta_obj, 
+      (*env)->GetFieldID(env, meta_cls, "RegCode","Ljava/lang/String;"), regCode);
+
+  (*env)->SetIntField(env, meta_obj,
+      (*env)->GetFieldID(env, meta_cls, "CheckValue", "I"), info->drm_check_value);
+
+
+
+  return meta_obj;
+}
+
 jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     
     int index = 0;
@@ -594,6 +621,23 @@ JNIEXPORT jobject JNICALL Java_com_farcore_playerservice_AmPlayer_getMetaInfo
     return meta_obj;
 }
 
+/**
+ * Class : com_farcode_playerservice_MediaPlayer
+ * Method: getDivxInfo
+ * Signature: (I)Ljava/lang/Object
+ */
+JNIEXPORT jobject JNICALL Java_com_farcore_playerservice_AmPlayer_getDivxInfo
+(JNIEnv* env, jobject obj, jint pid){
+  drm_t *info;
+  jobject meta_obj = NULL;
+  LOGI("Get Divx Info");
+  info = drm_get_info();
+  
+  meta_obj = DivxInfoContext_create(env, info);
+
+  return meta_obj;
+
+}
 
 /*
  * Class:     com_farcore_playerservice_MediaPlayer
@@ -830,6 +874,7 @@ static JNINativeMethod gMethods[] = {
     {"setRepeat",           	"(II)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setRepeat},
     {"setIVolume",              	"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_setIVolume},
     {"getMetaInfo",              	"(I)Ljava/lang/Object;",				(void*)Java_com_farcore_playerservice_AmPlayer_getMetaInfo},
+    {"getDivxInfo",        "(I)Ljava/lang/Object",         (void*)Java_com_farcore_playerservice_AmPlayer_getDivxInfo},
     {"mute",                   	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_mute},
     {"unmute",                 	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_unmute},
     {"native_init",			"()I",						(void*)Java_com_farcore_playerservice_AmPlayer_native_init},

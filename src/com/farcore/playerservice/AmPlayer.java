@@ -40,6 +40,7 @@ public class AmPlayer extends Service {
 	private native int setAudioTrack(int pid,int track_uid);
 	private native int setRepeat(int pid, int isRepeat);
 	private native Object getMetaInfo(int pid);
+    private native Object getDivxInfo(int pid);
 
 	private static native int setTone(int pid, int tone);
 	private static native int setIVolume(int vol);
@@ -70,6 +71,7 @@ public class AmPlayer extends Service {
 	public int setAudioTrack(int track_uid) { return setAudioTrack(mPid,track_uid);}
 	public int setRepeat(int isRepeat) { return setRepeat(mPid,isRepeat);}
 	public Object getMetaInfo() {return getMetaInfo(mPid);}
+    public Object getDivxInfo() {return getDivxInfo(mPid);}
 	public int setTone(int tone) {return setTone(mPid, tone);}
 	
 	
@@ -154,6 +156,10 @@ public class AmPlayer extends Service {
 			return (MediaInfo)getMetaInfo();
 		}
 		
+        public DivxInfo GetDivxInfo() throws RemoteException{
+          return (DivxInfo)getDivxInfo();
+        }
+
 		public int SwitchAID(int id) throws RemoteException {
 			setAudioTrack(id);
 			Log.d("audiostream","aid: " + id);
@@ -246,6 +252,15 @@ public class AmPlayer extends Service {
 				s_message.arg2 = error_no;
 				error_no = 0;
 			}
+            if(player_status == VideoInfo.DIVX_AUTHOR_ERR)
+            {
+              Log.d(TAG, "Divx author failed");
+            }
+            if(player_status == VideoInfo.DIVX_EXPIRED)
+            {
+              Log.d(TAG, "Divx expired");
+            }
+
 			Log.d(TAG,"player status changed to: " + Integer.toHexString(player_status));
 			try {
 				mClient.send(s_message);

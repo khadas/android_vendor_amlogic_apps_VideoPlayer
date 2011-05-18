@@ -47,6 +47,9 @@ public class Errorno{
     public static final int FFMPEG_EMP_POINTER 		=	-0x03000003;
     public static final int FFMPEG_NO_FILE 			=   -0x03000004;
     
+    public static final int DIVX_SUCCESS            =   0;
+    public static final int DIVX_AUTHOR_ERR         =   -0x04000001;
+
     public static String getErrorInfo(int errID)
     {
     	String errStr = null;
@@ -82,6 +85,9 @@ public class Errorno{
 			case  Errorno.PLAYER_SET_NOAUDIO:
 				errStr = "set playback without audio";
 				break;
+            case Errorno.DIVX_AUTHOR_ERR:
+                errStr = "This player is not authorized to play this video";
+                break;
 			default:
 				errStr = "Unknow Error";
 				break;

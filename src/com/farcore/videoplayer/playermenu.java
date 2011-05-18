@@ -33,6 +33,7 @@ import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
+
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
 	private static String codec_mips = null;
@@ -1653,6 +1654,20 @@ public class playermenu extends Activity {
 					case VideoInfo.PLAYER_SEARCHOK:
 						progressSliding = false;
 						break;
+                    case VideoInfo.DIVX_AUTHOR_ERR:
+                        Log.d(TAG, "Authorize Error");                        
+                        DivxInfo divxInfo;
+                       try{
+                          divxInfo  = m_Amplayer.GetDivxInfo();
+                          Toast.makeText(playermenu.this, divxInfo.GetRegistrationString(), Toast.LENGTH_LONG).show();
+                       }catch(RemoteException e){
+                         e.printStackTrace();
+                       }
+                                                break;
+                    case VideoInfo.DIVX_EXPIRED:
+                        Log.d(TAG, "Authorize Expired");
+                        Toast.makeText(playermenu.this, "Authorze Expired", Toast.LENGTH_LONG).show();
+                        break;
 					default:
 						break;
     				}

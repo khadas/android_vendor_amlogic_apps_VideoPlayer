@@ -44,4 +44,11 @@ public class VideoInfo {
 	
 	public static final int PLAYER_EXIT   		= 0x30004; 
 
+    /********************************
+     * 0x4000x
+     * divx about
+     * ******************************/
+    public static final int DIVX_AUTHOR_ERR     = 0x40001;
+    public static final int DIVX_EXPIRED        = 0x40002;
+
 }

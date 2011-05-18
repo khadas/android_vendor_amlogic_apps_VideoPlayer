@@ -116,6 +116,21 @@ reply.writeInt(0);
 }
 return true;
 }
+case TRANSACTION_GetDivxInfo:
+{
+data.enforceInterface(DESCRIPTOR);
+com.farcore.playerservice.DivxInfo _result = this.GetDivxInfo();
+reply.writeNoException();
+if ((_result!=null)) {
+reply.writeInt(1);
+_result.writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE);
+}
+else {
+reply.writeInt(0);
+}
+return true;
+
+}
 case TRANSACTION_SwitchAID:
 {
 data.enforceInterface(DESCRIPTOR);
@@ -352,6 +367,29 @@ _data.recycle();
 }
 return _result;
 }
+public com.farcore.playerservice.DivxInfo GetDivxInfo() throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+com.farcore.playerservice.DivxInfo _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_GetDivxInfo, _data, _reply, 0);
+_reply.readException();
+if ((0!=_reply.readInt())) {
+_result = com.farcore.playerservice.DivxInfo.CREATOR.createFromParcel(_reply);
+}
+else {
+_result = null;
+}
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+
+}
 public int SwitchAID(int id) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
@@ -508,6 +546,8 @@ static final int TRANSACTION_Seek = (android.os.IBinder.FIRST_CALL_TRANSACTION +
 static final int TRANSACTION_FastForward = (android.os.IBinder.FIRST_CALL_TRANSACTION + 13);
 static final int TRANSACTION_BackForward = (android.os.IBinder.FIRST_CALL_TRANSACTION + 14);
 static final int TRANSACTION_RegisterClientMessager = (android.os.IBinder.FIRST_CALL_TRANSACTION + 15);
+static final int TRANSACTION_GetDivxInfo = (android.os.IBinder.FIRST_CALL_TRANSACTION + 16);
+
 }
 public int Init() throws android.os.RemoteException;
 public int Open(java.lang.String filepath, int position) throws android.os.RemoteException;
@@ -525,4 +565,6 @@ public int Seek(int time) throws android.os.RemoteException;
 public int FastForward(int speed) throws android.os.RemoteException;
 public int BackForward(int speed) throws android.os.RemoteException;
 public int RegisterClientMessager(android.os.IBinder hbinder) throws android.os.RemoteException;
+public com.farcore.playerservice.DivxInfo GetDivxInfo() throws android.os.RemoteException;
+
 }
