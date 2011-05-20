@@ -1655,19 +1655,70 @@ public class playermenu extends Activity {
 						progressSliding = false;
 						break;
                     case VideoInfo.DIVX_AUTHOR_ERR:
-                        Log.d(TAG, "Authorize Error");                        
-                        DivxInfo divxInfo;
-                       try{
+                        Log.d(TAG, "Authorize Error");                                                
+                        try{
+                          DivxInfo divxInfo;
                           divxInfo  = m_Amplayer.GetDivxInfo();
-                          Toast.makeText(playermenu.this, divxInfo.GetRegistrationString(), Toast.LENGTH_LONG).show();
+                          new AlertDialog.Builder(playermenu.this)
+                            .setTitle("Authorization Error")
+                            .setMessage("This player is not authorized to play this DivX protected video")
+                            .setPositiveButton(R.string.str_ok,
+                                new DialogInterface.OnClickListener(){
+                                  public void onClick(DialogInterface dialog, int whichButton){
+                                    finish();
+                                  }
+                                })
+                            .show();
+
                        }catch(RemoteException e){
                          e.printStackTrace();
                        }
-                                                break;
+                       break;
                     case VideoInfo.DIVX_EXPIRED:
                         Log.d(TAG, "Authorize Expired");
-                        Toast.makeText(playermenu.this, "Authorze Expired", Toast.LENGTH_LONG).show();
+                        try{
+                          DivxInfo divxInfo;
+                          divxInfo = m_Amplayer.GetDivxInfo();
+                          String s = "This rental has "+msg.arg2+" views left\nDo you want to use one of your "+msg.arg2+" views now"; 
+                          new AlertDialog.Builder(playermenu.this)
+                            .setTitle("View DivX(R) VOD Rental")
+                            .setMessage(s)
+                            .setPositiveButton(R.string.str_ok,
+                                new DialogInterface.OnClickListener(){
+                                  public void onClick(DialogInterface dialog, int whichButton){
+                                    finish();
+                                  }
+                            }).show();
+                        }catch(RemoteException e){
+                          e.printStackTrace();
+                        }
+
                         break;
+                    case VideoInfo.DIVX_RENTAL:
+                        Log.d(TAG, "Authorize rental");
+                        try{
+                          DivxInfo divxInfo;
+                          divxInfo = m_Amplayer.GetDivxInfo();
+                          String s = "This rental has "+msg.arg2+" views left\nDo you want to use one of your "+msg.arg2+" views now?"; 
+                          new AlertDialog.Builder(playermenu.this)
+                            .setTitle("View DivX(R) VOD Rental")
+                            .setMessage(s)
+                            .setPositiveButton(R.string.str_ok,
+                                new DialogInterface.OnClickListener(){
+                                  public void onClick(DialogInterface dialog, int whichButton){
+                                    finish();
+                                  }
+                            })
+                            .setNegativeButton(R.string.str_cancel,
+                                new DialogInterface.OnClickListener(){
+                                  public void onClick(DialogInterface dialog, int whichButton){
+                                    finish();
+                                  }
+                            })
+                            .show();                           
+                        }catch(RemoteException e){
+                          e.printStackTrace();
+                        }
 					default:
 						break;
     				}
