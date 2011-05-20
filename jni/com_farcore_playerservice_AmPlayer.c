@@ -68,7 +68,7 @@ int onUpdate_player_info_java( JNIEnv *env,int pid,player_info_t * info)
         LOGI("call java update method in JNI env 1");  
         (*env)->CallStaticVoidMethod(env, gMplayerClazz, gPostMid, pid,
             info->status, info->full_time, info->current_ms,info->last_time,
-            info->error_no);
+            info->error_no, info->drm_rental);
         LOGI("call java update method in JNI env 2");    
         return 0;
     }
@@ -365,7 +365,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setMedia
     
 
     
-    gPostMid = (*env)->GetStaticMethodID(env, gMplayerClazz, "onUpdateState", "(IIIIII)V");
+    gPostMid = (*env)->GetStaticMethodID(env, gMplayerClazz, "onUpdateState", "(IIIIIII)V");
     if(gPostMid){
         LOGI("get update state object id");
     }else{
@@ -450,7 +450,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_playMedia
     
 
     
-    gPostMid = (*env)->GetStaticMethodID(env, gMplayerClazz, "onUpdateState", "(IIIIII)V");
+    gPostMid = (*env)->GetStaticMethodID(env, gMplayerClazz, "onUpdateState", "(IIIIIII)V");
     if(gPostMid){
         LOGI("get update state object id");
     }else{

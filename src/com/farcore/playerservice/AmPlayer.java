@@ -219,7 +219,7 @@ public class AmPlayer extends Service {
     }
 
 	public static void onUpdateState(int pid, int status, int full_time,
-			int current_time, int last_time, int error_no)
+			int current_time, int last_time, int error_no, int param)
 	{
 		if (null == mClient)
 		{
@@ -247,6 +247,7 @@ public class AmPlayer extends Service {
 			Message s_message = new Message();
 			s_message.what = VideoInfo.STATUS_CHANGED_INFO_MSG;
 			s_message.arg1 = player_status;
+			s_message.arg2 = param;
 			if (player_status == VideoInfo.PLAYER_ERROR)
 			{
 				s_message.arg2 = error_no;
