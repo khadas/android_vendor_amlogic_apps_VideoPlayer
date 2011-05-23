@@ -3,5 +3,8 @@
   <drawable name="white">#FFFFFFFF</drawable>
   <drawable name="black">#000000</drawable>
   <drawable name="blue">#0000FF</drawable>
-<color name="background">#083008</color>
+  <drawable name="trans">#00000000</drawable>
+
+  <color name="background">#083008</color>
+  <color name="transparent_background">#00000000</color>
 </resources>

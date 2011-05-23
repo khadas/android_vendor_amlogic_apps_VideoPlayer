@@ -1,0 +1,5 @@
+<resources>
+    <style name="theme_trans" parent="android:Theme">
+        <item name="android:windowBackground">@drawable/trans</item>
+    </style>
+</resources>

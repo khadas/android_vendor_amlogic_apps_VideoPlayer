@@ -26,7 +26,6 @@ import android.content.ServiceConnection;
 import android.os.*;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-import android.provider.Settings.System;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -52,6 +51,7 @@ public class playermenu extends Activity {
 	private boolean FF_FLAG = false;
 	private boolean NOT_FIRSTTIME = false;
 	private static final int MID_FREESCALE = 0x10001;
+	private boolean fb32 = false;
     
     //for repeat mode;
 	private boolean playmode_switch = true;
@@ -101,8 +101,11 @@ public class playermenu extends Activity {
         PowerManager.WakeLock mScreenLock = null;
 
     private void videobar() {
-    		
-    		setContentView(R.layout.layout_morebar);
+       if (fb32) {
+        	setContentView(R.layout.layout_morebar32);
+       } else {
+        	setContentView(R.layout.layout_morebar);
+       }
     		
     		subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
         	subTitleView.setTextColor(sub_para.color);
@@ -581,7 +584,11 @@ public class playermenu extends Activity {
     	    {
                 public void onClick(View v) 
                 {
-                	setContentView(R.layout.infobar);
+                	if (fb32) {
+                		setContentView(R.layout.infobar32);
+                	} else {
+                        	setContentView(R.layout.infobar);
+                	}
                 	initinfobar();
                 	if(!SettingsVP.display_mode.equals("480p"))
                 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -694,7 +701,11 @@ public class playermenu extends Activity {
     		if (morbar!=null) 
 	        {
 	        	morbar=null;
-	        	setContentView(R.layout.infobar);
+			if (fb32) {
+                                setContentView(R.layout.infobar32);
+                        } else {
+                                setContentView(R.layout.infobar);
+                        }
 	        	initinfobar();
 	        	return(true);
 	          
@@ -873,6 +884,12 @@ public class playermenu extends Activity {
     }
     
     public void onCreate(Bundle savedInstanceState) {
+	fb32 = SystemProperties.get("sys.fb.bits", "16").equals("32");
+
+	if (fb32) {
+		setTheme(R.style.theme_trans);
+	}
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
@@ -887,7 +904,11 @@ public class playermenu extends Activity {
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
         foreground.setForeground(null);
         
-        setContentView(R.layout.infobar);
+	if (fb32) {
+                setContentView(R.layout.infobar32);
+        } else {
+        	setContentView(R.layout.infobar);
+        }
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         
 		infobar = (LinearLayout)findViewById(R.id.infobarLayout);
