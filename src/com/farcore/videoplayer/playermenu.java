@@ -967,20 +967,14 @@ public class playermenu extends Activity {
     
     protected void subinit()
     {
-    
     	subMange = new SubtitleUtils(PlayList.getinstance().getcur());
     	sub_para= new subview_set();
          
-    	sub_para.totalnum =subMange.getSubTotal();
-    	//sub_para.totalnum =0;
-    	sub_para.curid =0;
-    	sub_para.color =android.graphics.Color.WHITE;
+    	sub_para.totalnum = 0;//subMange.getSubTotal();
+    	sub_para.curid = 0;// subMange.getCurrentInSubtitleIndexByJni();
+    	sub_para.color = android.graphics.Color.WHITE;
     	sub_para.font=20;
-    	if(sub_para.totalnum>0)
-    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
-    	else
-    		sub_para.sub_id =null;
-    
+        sub_para.sub_id =null;
     }
     
     protected void initinfobar()
@@ -1630,8 +1624,13 @@ public class playermenu extends Activity {
 							e.printStackTrace();
 						}
 						sub_para.totalnum =subMange.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
-						if(sub_para.totalnum>0)
-				    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
+                    	sub_para.curid = subMange.getCurrentInSubtitleIndexByJni();
+                    	if(sub_para.curid == 0xff)
+                    	    sub_para.curid = sub_para.totalnum ;
+                    	if(sub_para.totalnum > 0)
+                    		sub_para.sub_id = subMange.getSubID(sub_para.curid);
+                    	else
+                    		sub_para.sub_id = null;
 						openFile(sub_para.sub_id);
 						if (bMediaInfo.seekable == 0)
 						{
@@ -1771,7 +1770,7 @@ public class playermenu extends Activity {
 			subinit();
 			subTitleView.setTextColor(sub_para.color);
 	    	subTitleView.setTextSize(sub_para.font);
-	    	openFile(sub_para.sub_id);
+	    	//openFile(sub_para.sub_id);
 	    	
 	    	
 		}
