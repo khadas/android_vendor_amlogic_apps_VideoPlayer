@@ -115,13 +115,14 @@ public class AmPlayer extends Service {
 			mPid = setMedia( filepath, 0, 0, position);
 			if (mPid < 0)
 				Log.e(TAG, "get pid failed after setMedia");
-			else
-				start();
+			//else
+				//start();
 			return 0;
 		}
 
 		public int Play() throws RemoteException {
 			//startGetStates();
+			start();
 			return 0;
 		}
 

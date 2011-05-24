@@ -57,6 +57,7 @@ public class MediaInfo {
 	public int duration;
 	private int width;
 	private int height;
+    public int drm_check;
 	
 	public String getFileName(String path)
 	{

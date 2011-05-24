@@ -1644,6 +1644,17 @@ public class playermenu extends Activity {
 						} catch(RemoteException e) {
 							e.printStackTrace();
 						}
+                        
+						if(bMediaInfo.drm_check == 0){
+							try
+							{
+								m_Amplayer.Play();
+							}
+							catch(RemoteException e)
+							{
+								e.printStackTrace();
+							}
+						}
 						sub_para.totalnum =subMange.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
                     	sub_para.curid = subMange.getCurrentInSubtitleIndexByJni();
                     	if(sub_para.curid == 0xff)
@@ -1685,7 +1696,23 @@ public class playermenu extends Activity {
                             .setPositiveButton(R.string.str_ok,
                                 new DialogInterface.OnClickListener(){
                                   public void onClick(DialogInterface dialog, int whichButton){
-                                    finish();
+                                    Intent selectFileIntent = new Intent();
+                    				selectFileIntent.setClass(playermenu.this, FileList.class);
+                    				//close sub;
+                    				if(subTitleView!=null)
+                    					subTitleView.closeSubtitle();	
+                    				// Hide the view with key color
+                    				LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
+                    				if (layout != null) {
+                    					layout.setVisibility(View.INVISIBLE);
+                    					layout.invalidate();
+                    				}
+                    				//stop play
+                    				backToFileList = true;
+                    				if(m_Amplayer != null)
+                    					Amplayer_stop();
+                    				startActivity(selectFileIntent);
+                                    playermenu.this.finish();
                                   }
                                 })
                             .show();
@@ -1706,7 +1733,23 @@ public class playermenu extends Activity {
                             .setPositiveButton(R.string.str_ok,
                                 new DialogInterface.OnClickListener(){
                                   public void onClick(DialogInterface dialog, int whichButton){
-                                    finish();
+                                    Intent selectFileIntent = new Intent();
+                    				selectFileIntent.setClass(playermenu.this, FileList.class);
+                    				//close sub;
+                    				if(subTitleView!=null)
+                    					subTitleView.closeSubtitle();	
+                    				// Hide the view with key color
+                    				LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
+                    				if (layout != null) {
+                    					layout.setVisibility(View.INVISIBLE);
+                    					layout.invalidate();
+                    				}
+                    				//stop play
+                    				backToFileList = true;
+                    				if(m_Amplayer != null)
+                    					Amplayer_stop();
+                    				startActivity(selectFileIntent);
+                                    playermenu.this.finish();
                                   }
                             }).show();
                         }catch(RemoteException e){
@@ -1726,13 +1769,37 @@ public class playermenu extends Activity {
                             .setPositiveButton(R.string.str_ok,
                                 new DialogInterface.OnClickListener(){
                                   public void onClick(DialogInterface dialog, int whichButton){
-                                    finish();
+								  	//finish();
+                                    try
+									{
+										m_Amplayer.Play();
+									}
+									catch(RemoteException e)
+									{
+										e.printStackTrace();
+									}
                                   }
                             })
                             .setNegativeButton(R.string.str_cancel,
                                 new DialogInterface.OnClickListener(){
                                   public void onClick(DialogInterface dialog, int whichButton){
-                                    finish();
+                                    Intent selectFileIntent = new Intent();
+                    				selectFileIntent.setClass(playermenu.this, FileList.class);
+                    				//close sub;
+                    				if(subTitleView!=null)
+                    					subTitleView.closeSubtitle();	
+                    				// Hide the view with key color
+                    				LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
+                    				if (layout != null) {
+                    					layout.setVisibility(View.INVISIBLE);
+                    					layout.invalidate();
+                    				}
+                    				//stop play
+                    				backToFileList = true;
+                    				if(m_Amplayer != null)
+                    					Amplayer_stop();
+                    				startActivity(selectFileIntent);
+                                    playermenu.this.finish();
                                   }
                             })
                             .show();                           
@@ -1799,14 +1866,14 @@ public class playermenu extends Activity {
 		{
 			e.printStackTrace();
 		}
-		try
+		/*try
 		{
 			m_Amplayer.Play();
 		}
 		catch(RemoteException e)
 		{
 			e.printStackTrace();
-		}
+		}*/
     }
     
     private void Amplayer_stop()
