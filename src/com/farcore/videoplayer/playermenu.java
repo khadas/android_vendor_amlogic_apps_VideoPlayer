@@ -954,6 +954,7 @@ public class playermenu extends Activity {
         }
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
+	SettingsVP.setRotation();
         SettingsVP.enableVideoLayout();
 		subinit();
 		initinfobar();
