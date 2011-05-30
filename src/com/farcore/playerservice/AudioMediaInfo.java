@@ -24,8 +24,10 @@ public class AudioMediaInfo {
     public static final int AFORMAT_WMA  = 14;
     public static final int AFORMAT_WMAPRO   = 15;
     public static final int AFORMAT_PCM_BLURAY = 16;
-    public static final int AFORMAT_MAX    = 17;
-    
+    public static final int AFORMAT_ALAC = 17;
+    public static final int AFORMAT_VORBIS = 18;
+    public static final int AFORMAT_UNSUPPORT = 19;
+    public static final int AFORMAT_MAX    = 20;
     
 	public int getUid() {
 		return uid;
@@ -88,6 +90,15 @@ public class AudioMediaInfo {
 			break;
 		case AFORMAT_PCM_BLURAY:
 			type = "PCM_BLURAY";
+			break;
+		case AFORMAT_ALAC:
+			type = "ALAC";
+			break;
+		case AFORMAT_VORBIS:
+			type = "VORBIS";
+			break;
+		case AFORMAT_UNSUPPORT:
+			type = "UNSUPPORT";
 			break;
 		case AFORMAT_MAX:
 			type = "MAX";
