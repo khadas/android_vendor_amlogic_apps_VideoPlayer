@@ -122,6 +122,8 @@ public class FileList extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 	    
+	    currentlist = new ArrayList<String>();
+	    
 		if(PlayList.getinstance().rootPath==null)
 			PlayList.getinstance().rootPath =root_path;
 	    	
@@ -183,7 +185,9 @@ public class FileList extends ListActivity {
 	    searchFile(file);
 	    if(listFiles.isEmpty()) {
 	    	Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
-	    	paths =currentlist;
+	    	//paths =currentlist;
+	    	paths.clear();
+	    	paths.addAll(currentlist);
 	    	return;
 	    }
 	    Log.d(TAG, "BrowserFile():"+filePath);
@@ -269,22 +273,27 @@ public class FileList extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l,View v,int position,long id) {
 		File file = new File(paths.get(position));
-	    currentlist =paths;
+		currentlist.clear();
+		currentlist.addAll(paths);
+	    //currentlist =paths;
 	    if(file.isDirectory()) 
 	    	BrowserFile(paths.get(position));
 	    else 
 	    {
 		//stopMediaPlayer();
-	    	file = new File(file.getParent());
-	    	filterDir(file);
-	    	PlayList.getinstance().rootPath= file.getPath();
-	    	int dircount =listFiles.size()-listVideos.size();
+	    	//file = new File(file.getParent());
+	    	int pos = filterDir(file);
+	    	//Log.i(TAG, "play path:"+file.getPath()+", pos:"+Integer.toString(pos));
+	    	if(pos < 0) 
+	    		return;
+	    	PlayList.getinstance().rootPath= file.getParent();
+	    	//int dircount =listFiles.size()-listVideos.size();
 	    	
-	    	if(dircount>=0&&(position-dircount)>=0)
-			 PlayList.getinstance().setlist(paths, position-dircount);
-			else
-			 PlayList.getinstance().setlist(paths, position);
-			 
+	    	//if(dircount>=0&&(position-dircount)>=0)
+			//PlayList.getinstance().setlist(paths, position-dircount);
+			//else
+			//PlayList.getinstance().setlist(paths, position);
+	    	PlayList.getinstance().setlist(paths, pos);
 	    	showvideobar();
 	    }
 	}
@@ -325,14 +334,17 @@ public class FileList extends ListActivity {
 		FileList.this.finish();
 	}
 	
-	public void filterDir(File file)
+	public int filterDir(File file)
 	{
+		int pos = -1;
 	    File[] the_Files;
-	    the_Files = file.listFiles(new MyFilter(extensions));
+	    File parent = new File(file.getParent());
+	    the_Files = parent.listFiles(new MyFilter(extensions));
 	
 	    if(the_Files == null)
-	    	return;
+	    	return pos;
 	    
+	    pos = 0;
 	    listVideos = new ArrayList<File>();
 	    for(int i=0;i<the_Files.length;i++) 
 	    {
@@ -353,8 +365,12 @@ public class FileList extends ListActivity {
 	    
 	    for(int i=0;i<fs.length;i++) {
 	    	File tempF = fs[i];
+	    	if(tempF.getPath().equals(file.getPath())) {
+	    		pos = i;
+	    	}
 	    	paths.add(tempF.getPath());
 	    }
+	    return pos;
 	}
     
     //option menu
