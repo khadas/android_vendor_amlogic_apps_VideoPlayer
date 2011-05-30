@@ -229,7 +229,7 @@ public class AmPlayer extends Service {
 		}
 		if (0 != full_time)
 		{
-			Message message = new Message();
+			Message message = Message.obtain();
 			message.what = VideoInfo.TIME_INFO_MSG;
 			message.arg1 = current_time;
 			message.arg2 = full_time;
@@ -245,7 +245,7 @@ public class AmPlayer extends Service {
 		if(player_status != status)
 		{
 			player_status = status;
-			Message s_message = new Message();
+			Message s_message = Message.obtain();
 			s_message.what = VideoInfo.STATUS_CHANGED_INFO_MSG;
 			s_message.arg1 = player_status;
 			s_message.arg2 = param;
@@ -273,7 +273,7 @@ public class AmPlayer extends Service {
 		
 		if (error_no != 0)
 		{
-			Message e_message = new Message();
+			Message e_message = Message.obtain();
 			e_message.what = VideoInfo.HAS_ERROR_MSG;
 			e_message.arg2 = error_no;
 			Log.d(TAG,"player has error: " + error_no);

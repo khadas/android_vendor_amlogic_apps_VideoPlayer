@@ -1341,7 +1341,7 @@ public class playermenu extends Activity {
       
             public void run() {
 				if(!touchVolFlag){
-                Message message = new Message();       
+                Message message = Message.obtain();       
                 message.what = 0x3c;       
                 handler.sendMessage(message);  
 				}				
@@ -1389,7 +1389,7 @@ public class playermenu extends Activity {
         TimerTask task = new TimerTask(){   
       
             public void run() {   
-                Message message = new Message();       
+                Message message = Message.obtain();       
                 message.what = 0x3d;       
                 handler.sendMessage(message);     
             }   
