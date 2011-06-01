@@ -56,7 +56,7 @@ public class Errorno{
     	switch (errID)
     	{
 			case Errorno.PLAYER_UNSUPPORT:
-				errStr = "Unsupport Video and Audio format";
+				errStr = "Unsupport Media";
 				break;
 			case Errorno.PLAYER_UNSUPPORT_VIDEO:
 				errStr = "Unsupport Video format";
