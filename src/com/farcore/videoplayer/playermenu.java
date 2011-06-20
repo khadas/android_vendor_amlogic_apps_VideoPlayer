@@ -6,10 +6,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import android.os.SystemProperties;
 
 import com.subtitleparser.*;
 import com.subtitleview.SubtitleView;
@@ -998,6 +1000,23 @@ public class playermenu extends Activity {
     	sub_para.font=20;
         sub_para.sub_id =null;
     }
+
+	
+   private static String do_exec(String[] cmd) {   
+        String s = "\n";         
+        try {   
+            java.lang.Process p = Runtime.getRuntime().exec(cmd);   
+            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));   
+            String line = null;   
+            while ((line = in.readLine()) != null) {   
+                s += line + "\n";                  
+            }   
+        } catch (IOException e) {             
+            e.printStackTrace();   
+        }   
+        return cmd.toString();        
+    }  	
+	   
     
     protected void initinfobar()
     {
@@ -1522,7 +1541,7 @@ public class playermenu extends Activity {
             finish();
         }
     }
-    
+
 	//=========================================================
     private Messenger m_PlayerMsg = new Messenger(new Handler()
     {
@@ -1536,6 +1555,13 @@ public class playermenu extends Activity {
     		    	total_time.setText(secToTime(msg.arg2, true));
     		    	curtime = msg.arg1/1000;
     		    	totaltime = msg.arg2;
+
+    				 boolean mVfdDisplay = SystemProperties.getBoolean("hw.vfd", false); 
+    			     if(mVfdDisplay ){			    	 
+    				          String[] cmdtest ={ "/system/bin/sh", "-c", "echo"+" "+cur_time.getText().toString().substring(1)+" "+"> /sys/devices/platform/m1-vfd.0/led" };
+    				          do_exec(cmdtest);
+    				 }    		    	
+    		    	
     		    	
     		    	//for subtitle tick;
     		    	if (player_status == VideoInfo.PLAYER_RUNNING)
@@ -1583,6 +1609,13 @@ public class playermenu extends Activity {
 						sub_para.totalnum = 0;
 						cur_audio_stream = 0;
 						InternalSubtitleInfo.setInsubNum(0);
+
+	    				 boolean mVfdDisplay_exit = SystemProperties.getBoolean("hw.vfd", false); 
+	    			     if(mVfdDisplay_exit ){    			    	 
+	    				          String[] cmdtest ={ "/system/bin/sh", "-c", "echo"+" "+"0:00:00"+" "+"> /sys/devices/platform/m1-vfd.0/led" };
+	    				          do_exec(cmdtest);
+	    				 } 						
+						
 						break;
 					case VideoInfo.PLAYER_STOPED:
 						/*new PlayThread().start();
