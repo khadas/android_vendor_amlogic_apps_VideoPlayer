@@ -3,9 +3,9 @@ LIBPLAYER_PATH := $(LOCAL_PATH)/../../LibPlayer
 
 include $(CLEAR_VARS)
 
-ifeq ($(BUILD_ID),MID)
+#ifeq ($(BUILD_ID),MID)
 	LOCAL_CFLAGS += -DENABLE_FREE_SCALE
-endif
+#endif
 
 LOCAL_MODULE    := libamplayerjni
 LOCAL_MODULE_TAGS := optional
