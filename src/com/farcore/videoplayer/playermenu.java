@@ -682,9 +682,16 @@ public class playermenu extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent msg) 
     {
         Log.i(TAG, "onKeyDown " + keyCode);
+        
+        if(keyCode != KeyEvent.KEYCODE_UNKNOWN){
+        	if (infobar.getVisibility() == View.VISIBLE)
+        		waitForHide();
+        }
+        
 		if(keyCode == KeyEvent.KEYCODE_UNKNOWN){
 			touchVolFlag = true;
-    	}else if (keyCode == KeyEvent.KEYCODE_POWER)
+    	} 
+		else if (keyCode == KeyEvent.KEYCODE_POWER)
     	{
                 if (player_status == VideoInfo.PLAYER_RUNNING)
                 {
@@ -742,19 +749,28 @@ public class playermenu extends Activity {
 				return true;//super.onKeyDown(keyCode, msg);
     		}
     	}
-    	else if (keyCode == KeyEvent.KEYCODE_MENU) 
+    	else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) 
     	{
     		if (infobar.getVisibility() == View.VISIBLE)
 	    		hide_infobar();
 	    	else {
 	    		play.requestFocus();
 		    	show_menu();
+		    	waitForHide();
 	    	}
 			return (true);
 		}
     	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)//play or pause 
     	{
 			// TODO Auto-generated method stub
+    		play.requestFocus();
+    		
+    		if (infobar.getVisibility() != View.VISIBLE)
+    		{
+	    		show_menu();
+	    		waitForHide();
+    		}
+    		
 			if (player_status == VideoInfo.PLAYER_RUNNING)
 			{
 				try	{
@@ -790,6 +806,15 @@ public class playermenu extends Activity {
 			// TODO Auto-generated method stub
 			if (!INITOK)
 				return false;
+	        ImageButton preItem = (ImageButton)findViewById(R.id.PreBtn);
+	        preItem.requestFocus();
+    		
+    		if (infobar.getVisibility() != View.VISIBLE)
+    		{
+	    		show_menu();
+	    		waitForHide();
+    		}
+	        
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().moveprev();
 			toast.cancel();
@@ -809,6 +834,15 @@ public class playermenu extends Activity {
 			// TODO Auto-generated method stub
 			if (!INITOK)
 				return false;
+	        ImageButton nextItem = (ImageButton)findViewById(R.id.NextBtn);
+	        nextItem.requestFocus();
+
+    		if (infobar.getVisibility() != View.VISIBLE)
+    		{
+	    		show_menu();
+	    		waitForHide();
+    		}
+    		
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().movenext();
 			toast.cancel();
@@ -825,6 +859,15 @@ public class playermenu extends Activity {
     	{
 			if (!INITOK)
 				return false;
+			
+			fastforword.requestFocus();
+			
+			if (infobar.getVisibility() != View.VISIBLE)
+    		{
+	    		show_menu();
+	    		waitForHide();
+    		}
+			
 			if (player_status == VideoInfo.PLAYER_SEARCHING)
 			{
 				try	{
@@ -848,6 +891,15 @@ public class playermenu extends Activity {
 			// TODO Auto-generated method stub
 			if (!INITOK)
 				return false;
+			
+			fastreverse.requestFocus();
+			
+			if (infobar.getVisibility() != View.VISIBLE)
+    		{
+	    		show_menu();
+	    		waitForHide();
+    		}
+    		
 			if (player_status == VideoInfo.PLAYER_SEARCHING)
 			{
 				try	{
