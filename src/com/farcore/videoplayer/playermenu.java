@@ -8,7 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.os.SystemProperties;
@@ -16,6 +18,7 @@ import android.os.SystemProperties;
 import com.subtitleparser.*;
 import com.subtitleview.SubtitleView;
 import android.content.Context;
+
 import com.farcore.playerservice.*;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,6 +35,7 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.*;
+//import android.view.View.OnKeyListener;
 import android.widget.*;
 
 
@@ -47,6 +51,13 @@ public class playermenu extends Activity {
 	private int playPosition = 0;
 	private int cur_audio_stream = 0;
 	private int total_audio_num = 0;
+	
+	private final int PLAY_RESUME = 0;
+	private final int PLAY_MODE = 1;
+	private final int AUDIOTRACK = 2;
+	private final int DISPLAY = 3;
+	private final int BRIGHTNESS = 4;
+	
 	private boolean backToFileList = false;
 	private boolean progressSliding = false;
 	private boolean INITOK = false;
@@ -102,7 +113,91 @@ public class playermenu extends Activity {
         private boolean mSuspendFlag = false;
         PowerManager.WakeLock mScreenLock = null;
 
-    private void videobar() {
+    private SimpleAdapter getMorebarListAdapter(int id, int pos) {
+        return new SimpleAdapter(this,
+        		getMorebarListData(id, pos), R.layout.list_row,        		
+                new String[]{"item_name", "item_sel"},        		
+                new int[]{R.id.Text01, R.id.imageview,});  
+    }
+        
+    private List<? extends Map<String, ?>> getMorebarListData(int id, int pos) {
+		// TODO Auto-generated method stub
+    	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();  
+    	Map<String, Object> map;
+    	
+    	switch (id){
+			case PLAY_RESUME:
+    		case PLAY_MODE:
+    	    	map = new HashMap<String, Object>();     		
+    	    	map.put("item_name", playermenu.this.getResources().getString(R.string.str_on));
+    	    	map.put("item_sel", R.drawable.item_img_unsel);  
+    	    	list.add(map);
+    	    	map = new HashMap<String, Object>();     		
+    	    	map.put("item_name", playermenu.this.getResources().getString(R.string.str_off));
+    	    	map.put("item_sel", R.drawable.item_img_unsel);  
+    	    	list.add(map);
+    	    	
+    	    	list.get(pos).put("item_sel", R.drawable.item_img_sel);
+    			break;
+    		
+    		case AUDIOTRACK:
+    			if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
+            		AudioTrackOperation.setAudioStream(bMediaInfo);
+    			int size_as = AudioTrackOperation.AudioStreamFormat.size();
+    			for(int i=0;i<size_as;i++){
+        	    	map = new HashMap<String, Object>();     		
+        	    	map.put("item_name", AudioTrackOperation.AudioStreamFormat.get(i));
+        	    	map.put("item_sel", R.drawable.item_img_unsel);  
+        	    	list.add(map);    				
+    			}
+    			list.get(pos).put("item_sel", R.drawable.item_img_sel);
+    			break;
+
+    		case DISPLAY:
+    	    	map = new HashMap<String, Object>();     		
+    	    	map.put("item_name", playermenu.this.getResources().getString(R.string.setting_displaymode_normal));
+    	    	map.put("item_sel", R.drawable.item_img_unsel);  
+    	    	list.add(map);
+    	    	map = new HashMap<String, Object>();     		
+    	    	map.put("item_name", playermenu.this.getResources().getString(R.string.setting_displaymode_fullscreen));
+    	    	map.put("item_sel", R.drawable.item_img_unsel);  
+    	    	list.add(map);
+    	    	map = new HashMap<String, Object>();     		
+    	    	map.put("item_name", "4:3");
+    	    	map.put("item_sel", R.drawable.item_img_unsel);  
+    	    	list.add(map);
+    	    	map = new HashMap<String, Object>();     		
+    	    	map.put("item_name", "16:9");
+    	    	map.put("item_sel", R.drawable.item_img_unsel);  
+    	    	list.add(map);
+    	    	map = new HashMap<String, Object>();     		
+    	    	map.put("item_name", playermenu.this.getResources().getString(R.string.setting_displaymode_normal_noscaleup));
+    	    	map.put("item_sel", R.drawable.item_img_unsel);  
+    	    	list.add(map);
+    	    	
+    	    	list.get(pos).put("item_sel", R.drawable.item_img_sel);
+    			break;
+    			
+    		case BRIGHTNESS:
+    			int size_bgh = m_brightness.length;
+    			for(int i=0;i<size_bgh;i++){
+        	    	map = new HashMap<String, Object>();     		
+        	    	map.put("item_name", m_brightness[i].toString());
+        	    	map.put("item_sel", R.drawable.item_img_unsel);  
+        	    	list.add(map);    				
+    			}
+    			
+    			list.get(pos).put("item_sel", R.drawable.item_img_sel);
+    			break; 
+    			
+    		default:
+    			break ;
+    	}
+    	
+		return list;
+	}
+
+	private void videobar() {
        if (fb32) {
         	setContentView(R.layout.layout_morebar32);
        } else {
@@ -144,6 +239,7 @@ public class playermenu extends Activity {
                 	morbar.setVisibility(View.GONE);
                 	morebar_tileText.setText(R.string.setting_resume);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                	/*
                 	String[] m_resume= {
                 			playermenu.this.getResources().getString(R.string.str_on),
                 			playermenu.this.getResources().getString(R.string.str_off)
@@ -152,9 +248,11 @@ public class playermenu extends Activity {
                     		R.layout.list_row, m_resume);
                     la.setSelectItem(SettingsVP.getParaBoolean("ResumeMode") ? 0 : 1);
                     listView.setAdapter(la);
+                    */
+                	listView.setAdapter(getMorebarListAdapter(PLAY_RESUME, SettingsVP.getParaBoolean("ResumeMode") ? 0 : 1));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
-                    	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     	{
                     		 if (position == 0)
                         		 SettingsVP.putParaBoolean("ResumeMode", true);
@@ -179,14 +277,19 @@ public class playermenu extends Activity {
                     	morbar.setVisibility(View.GONE);
                     	morebar_tileText.setText(R.string.setting_playmode);
                     	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                    	/*
                     	String[] m_repeat= {
                     			playermenu.this.getResources().getString(R.string.setting_playmode_repeatall),
                     			playermenu.this.getResources().getString(R.string.setting_playmode_repeatone)
                     			};
+                    	
                         MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
                         		R.layout.list_row, m_repeat);
                         la.setSelectItem(m_playmode - 1);
                         listView.setAdapter(la);
+                        */
+                    	listView.setAdapter(getMorebarListAdapter(PLAY_MODE, m_playmode-1));
+
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                         {
                         	 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -200,6 +303,7 @@ public class playermenu extends Activity {
                         		 morbar.setVisibility(View.VISIBLE);
                         	}
                         });
+                        
                         otherbar.requestFocus();
                     } 
         	    });
@@ -218,12 +322,15 @@ public class playermenu extends Activity {
                 	
                 	morebar_tileText.setText(R.string.setting_audiotrack);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                	/*
                 	if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
                 		AudioTrackOperation.setAudioStream(bMediaInfo);
                     MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
                     		R.layout.list_row, AudioTrackOperation.AudioStreamFormat);
                     la.setSelectItem(cur_audio_stream);
                     listView.setAdapter(la);
+                    */
+                	listView.setAdapter(getMorebarListAdapter(AUDIOTRACK, cur_audio_stream));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	public void onItemClick(AdapterView<?> arg0, View arg1,
@@ -422,7 +529,6 @@ public class playermenu extends Activity {
   							t_subsfont.setText(String.valueOf(sub_font_state));
    		                } 
   					});
-  					
   					Bcolor_l.setOnClickListener(new View.OnClickListener() 
   					{
   						public void onClick(View v) 
@@ -460,6 +566,7 @@ public class playermenu extends Activity {
                 	
                 	morebar_tileText.setText(R.string.setting_displaymode);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
+                	/*
                 	String[] m_display= {
                 			playermenu.this.getResources().getString(R.string.setting_displaymode_normal),
                 			playermenu.this.getResources().getString(R.string.setting_displaymode_fullscreen),
@@ -471,6 +578,8 @@ public class playermenu extends Activity {
                     		R.layout.list_row, m_display);
                     la.setSelectItem(ScreenMode.getScreenMode());
                     listView.setAdapter(la);
+                    */
+                	listView.setAdapter(getMorebarListAdapter(DISPLAY, ScreenMode.getScreenMode()));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -511,8 +620,6 @@ public class playermenu extends Activity {
                 	morbar.setVisibility(View.GONE);
                 	morebar_tileText.setText(R.string.setting_brightness);
                 	ListView listView = (ListView)findViewById(R.id.AudioListView);
-                    MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
-                    		R.layout.list_row, m_brightness);
 					int mBrightness = 0;
 					try {
 						mBrightness = Settings.System.getInt(playermenu.this.getContentResolver(), 
@@ -534,8 +641,13 @@ public class playermenu extends Activity {
 						item = 4;
 					else
 						item = 5;
+					/*
+                    MyListAdapter la = new MyListAdapter<String>(playermenu.this, 
+                    		R.layout.list_row, m_brightness);
                     la.setSelectItem(item);
                     listView.setAdapter(la);
+                    */
+					listView.setAdapter(getMorebarListAdapter(BRIGHTNESS, item));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                     	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
