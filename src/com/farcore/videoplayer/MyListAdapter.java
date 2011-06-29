@@ -18,6 +18,7 @@ public class MyListAdapter<T> extends ArrayAdapter{
 	public MyListAdapter(Context context, int textViewResourceId,
 			Object[] objects) {
 		super(context, textViewResourceId, objects);
+		
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -38,6 +39,7 @@ public class MyListAdapter<T> extends ArrayAdapter{
 				v.setBackgroundColor(Color.GREEN);
 			}
 		}
+		
 		else {
 			v.setSelected(false);
 			v.setPressed(false);

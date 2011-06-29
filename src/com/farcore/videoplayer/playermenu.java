@@ -556,6 +556,7 @@ public class playermenu extends Activity {
 				
 				} 
     	    });
+            
             ImageButton display = (ImageButton) findViewById(R.id.ImageButton05);
             display.setOnClickListener(new View.OnClickListener() 
     	    {
@@ -611,6 +612,7 @@ public class playermenu extends Activity {
                     otherbar.requestFocus();
                 } 
     	    });
+            
             ImageButton brigtness = (ImageButton) findViewById(R.id.ImageButton06);
             brigtness.setOnClickListener(new View.OnClickListener() 
     	    {
@@ -693,6 +695,7 @@ public class playermenu extends Activity {
                     otherbar.requestFocus();
                 } 
     	    }); 
+            
             ImageButton backtovidebar = (ImageButton) findViewById(R.id.ImageButton07);
             backtovidebar.setOnClickListener(new View.OnClickListener() 
     	    {
@@ -704,6 +707,8 @@ public class playermenu extends Activity {
                         	setContentView(R.layout.infobar);
                 	}
                 	initinfobar();
+                	ImageButton morebtn = (ImageButton)findViewById(R.id.moreBtn);
+                	morebtn.requestFocus();
                 	if(!SettingsVP.display_mode.equals("480p"))
                 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 } 
@@ -1149,8 +1154,11 @@ public class playermenu extends Activity {
         		Amplayer_play();
 		}
 
-		if (infobar != null)
+		if (infobar != null){
 			infobar.setVisibility(View.VISIBLE);
+			ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
+			browser.requestFocus();
+		}
     }
     
     protected void subinit()
@@ -1198,6 +1206,7 @@ public class playermenu extends Activity {
         fastforword = (ImageButton)findViewById(R.id.FastForward);
         fastreverse = (ImageButton)findViewById(R.id.FastReverse);
         infobar = (LinearLayout)findViewById(R.id.infobarLayout);
+        //browser.requestFocus();
         if (SettingsVP.display_mode.equals("480p"))
         {
         	infobar = (LinearLayout)findViewById(R.id.infobarLayout);
