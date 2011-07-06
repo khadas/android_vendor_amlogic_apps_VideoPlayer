@@ -180,7 +180,9 @@ int _media_info_dump(media_info_t* minfo)
     return 0;
 }
 
+#if 0
 jobject DivxInfoContext_create(JNIEnv *env, drm_t* info){
+
   jclass meta_cls = DivxInfo_getClass(env);
   if(NULL == meta_cls){
     LOGE("failed to get DivxInfo class");
@@ -198,9 +200,10 @@ jobject DivxInfoContext_create(JNIEnv *env, drm_t* info){
       (*env)->GetFieldID(env, meta_cls, "CheckValue", "I"), info->drm_check_value);
 
 
-
   return meta_obj;
+
 }
+#endif
 
 jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     
@@ -622,6 +625,7 @@ JNIEXPORT jobject JNICALL Java_com_farcore_playerservice_AmPlayer_getMetaInfo
     return meta_obj;
 }
 
+#if 0
 /**
  * Class : com_farcode_playerservice_MediaPlayer
  * Method: getDivxInfo
@@ -639,7 +643,7 @@ JNIEXPORT jobject JNICALL Java_com_farcore_playerservice_AmPlayer_getDivxInfo
   return meta_obj;
 
 }
-
+#endif
 /*
  * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    fastforward
@@ -875,7 +879,7 @@ static JNINativeMethod gMethods[] = {
     {"setRepeat",           	"(II)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setRepeat},
     {"setIVolume",              	"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_setIVolume},
     {"getMetaInfo",              	"(I)Ljava/lang/Object;",				(void*)Java_com_farcore_playerservice_AmPlayer_getMetaInfo},
-    {"getDivxInfo",        "(I)Ljava/lang/Object",         (void*)Java_com_farcore_playerservice_AmPlayer_getDivxInfo},
+//    {"getDivxInfo",        "(I)Ljava/lang/Object",         (void*)Java_com_farcore_playerservice_AmPlayer_getDivxInfo},
     {"mute",                   	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_mute},
     {"unmute",                 	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_unmute},
     {"native_init",			"()I",						(void*)Java_com_farcore_playerservice_AmPlayer_native_init},
