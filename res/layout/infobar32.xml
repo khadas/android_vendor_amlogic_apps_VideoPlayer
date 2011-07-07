@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/BaseLayout1" 
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" 
     android:gravity="bottom" 
     android:background="@color/transparent_background">
+
+<VideoView
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:id="@+id/VideoView">
+</VideoView>
+
+<LinearLayout     android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:gravity="bottom" 
+    android:background="@color/transparent_background">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			android:id="@+id/subtitleLayout"
 	    	android:layout_height="wrap_content"
@@ -113,4 +126,5 @@
 			 </ImageButton>
 	 	</LinearLayout>
 	</LinearLayout>
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>
