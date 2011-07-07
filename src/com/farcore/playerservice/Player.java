@@ -176,6 +176,16 @@ reply.writeNoException();
 reply.writeInt(_result);
 return true;
 }
+case TRANSACTION_Set3Dmode:
+{
+data.enforceInterface(DESCRIPTOR);
+int _arg0;
+_arg0 = data.readInt();
+int _result = this.Set3Dmode(_arg0);
+reply.writeNoException();
+reply.writeInt(_result);
+return true;
+}
 case TRANSACTION_FastForward:
 {
 data.enforceInterface(DESCRIPTOR);
@@ -475,6 +485,24 @@ _data.recycle();
 }
 return _result;
 }
+public int Set3Dmode(int mode) throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(mode);
+mRemote.transact(Stub.TRANSACTION_Set3Dmode, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+}
 public int FastForward(int speed) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
@@ -547,6 +575,7 @@ static final int TRANSACTION_FastForward = (android.os.IBinder.FIRST_CALL_TRANSA
 static final int TRANSACTION_BackForward = (android.os.IBinder.FIRST_CALL_TRANSACTION + 14);
 static final int TRANSACTION_RegisterClientMessager = (android.os.IBinder.FIRST_CALL_TRANSACTION + 15);
 static final int TRANSACTION_GetDivxInfo = (android.os.IBinder.FIRST_CALL_TRANSACTION + 16);
+static final int TRANSACTION_Set3Dmode = (android.os.IBinder.FIRST_CALL_TRANSACTION + 17);
 
 }
 public int Init() throws android.os.RemoteException;
@@ -562,6 +591,7 @@ public int SetColorKey(int color) throws android.os.RemoteException;
 public void DisableColorKey() throws android.os.RemoteException;
 public int GetOsdBpp() throws android.os.RemoteException;
 public int Seek(int time) throws android.os.RemoteException;
+public int Set3Dmode(int mode) throws android.os.RemoteException;
 public int FastForward(int speed) throws android.os.RemoteException;
 public int BackForward(int speed) throws android.os.RemoteException;
 public int RegisterClientMessager(android.os.IBinder hbinder) throws android.os.RemoteException;

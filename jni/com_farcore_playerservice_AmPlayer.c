@@ -120,7 +120,7 @@ int _media_info_dump(media_info_t* minfo)
     LOGI("======||has video track?:%s\n",minfo->stream_info.has_video>0?"YES!":"NO!");
     LOGI("======||has audio track?:%s\n",minfo->stream_info.has_audio>0?"YES!":"NO!");    
     LOGI("======||duration:%d\n",minfo->stream_info.duration);
-	LOGI("======||seekable:%d\n",minfo->stream_info.seekable);
+    LOGI("======||seekable:%d\n",minfo->stream_info.seekable);
     if(minfo->stream_info.has_video && minfo->stream_info.total_video_num>0)
     {        
         LOGI("======||video counts:%d\n",minfo->stream_info.total_video_num);
@@ -222,61 +222,61 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     jmethodID constructor = (*env)->GetMethodID(env, meta_cls, "<init>", "()V");
     
     jobject meta_obj = (*env)->NewObject(env,meta_cls,constructor);
-	(*env)->SetIntField(env,meta_obj,\
-		(*env)->GetFieldID(env, meta_cls, "seekable", "I"), (int)(msgt->stream_info.seekable));
-	jfieldID id_filetype = (*env)->GetFieldID(env, meta_cls, "filetype", "I");
+    (*env)->SetIntField(env,meta_obj,\
+        (*env)->GetFieldID(env, meta_cls, "seekable", "I"), (int)(msgt->stream_info.seekable));
+    jfieldID id_filetype = (*env)->GetFieldID(env, meta_cls, "filetype", "I");
     (*env)->SetIntField(env, meta_obj, id_filetype, (int)(msgt->stream_info.type));
 
     (*env)->SetLongField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "filesize", "J"), msgt->stream_info.file_size); 
     (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "duration", "I"), msgt->stream_info.duration); 
     (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "drm_check", "I"), msgt->stream_info.drm_check); 
-	if (msgt->stream_info.has_video && msgt->stream_info.total_video_num>0) { 
-		(*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "width", "I"), msgt->video_info[0]->width); 
-		(*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "height", "I"), msgt->video_info[0]->height); 
-	}
-	
-	if(msgt->stream_info.has_audio>0 && msgt->stream_info.total_audio_num>0){
-		jclass ainfo_cls = AudioMediaInfo_getClass(env);
-		jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
-		if(!amid){                
-		 LOGE("failed to get audio info constructor");
-		 return meta_obj;
-		}
-		jobjectArray ainfoArray = (*env)->NewObjectArray(env,msgt->stream_info.total_audio_num,ainfo_cls, NULL);  
-		if(NULL == ainfoArray){                 
-		LOGE("failed to get audio info object");              
-		return meta_obj;       
-		}
+    if (msgt->stream_info.has_video && msgt->stream_info.total_video_num>0) { 
+        (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "width", "I"), msgt->video_info[0]->width); 
+        (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "height", "I"), msgt->video_info[0]->height); 
+    }
+    
+    if(msgt->stream_info.has_audio>0 && msgt->stream_info.total_audio_num>0){
+        jclass ainfo_cls = AudioMediaInfo_getClass(env);
+        jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
+        if(!amid){                
+         LOGE("failed to get audio info constructor");
+         return meta_obj;
+        }
+        jobjectArray ainfoArray = (*env)->NewObjectArray(env,msgt->stream_info.total_audio_num,ainfo_cls, NULL);  
+        if(NULL == ainfoArray){                 
+        LOGE("failed to get audio info object");              
+        return meta_obj;       
+        }
 
-		for(index = 0;index<msgt->stream_info.total_audio_num;index++){
-		jobject aobj = (*env)->NewObject(env,ainfo_cls, amid);
-		if(NULL ==aobj){
-		    (*env)->DeleteLocalRef(env,ainfoArray);  
-		    LOGE("failed to get audio info object");                 
-		    return meta_obj;      
-		}
-		(*env)->SetIntField(env,aobj,\
-		    (*env)->GetFieldID(env, ainfo_cls, "audio_format", "I"), (int)(msgt->audio_info[index]->aformat));
-		/*(*env)->SetIntField(env,aobj,\
-		    (*env)->GetFieldID(env, ainfo_cls, "audio_channel", "I"), (int)(msgt->audio_info[index]->channel));
-		(*env)->SetIntField(env,aobj,\
-		    (*env)->GetFieldID(env, ainfo_cls, "audio_samplerate", "I"), (int)(msgt->audio_info[index]->sample_rate));
-		(*env)->SetIntField(env,aobj,\
-		    (*env)->GetFieldID(env, ainfo_cls, "bit_rate", "I"), (int)(msgt->audio_info[index]->bit_rate));*/
-		(*env)->SetIntField(env,aobj,\
-		    (*env)->GetFieldID(env, ainfo_cls, "uid", "I"), (int)(msgt->audio_info[index]->id));
+        for(index = 0;index<msgt->stream_info.total_audio_num;index++){
+        jobject aobj = (*env)->NewObject(env,ainfo_cls, amid);
+        if(NULL ==aobj){
+            (*env)->DeleteLocalRef(env,ainfoArray);  
+            LOGE("failed to get audio info object");                 
+            return meta_obj;      
+        }
+        (*env)->SetIntField(env,aobj,\
+            (*env)->GetFieldID(env, ainfo_cls, "audio_format", "I"), (int)(msgt->audio_info[index]->aformat));
+        /*(*env)->SetIntField(env,aobj,\
+            (*env)->GetFieldID(env, ainfo_cls, "audio_channel", "I"), (int)(msgt->audio_info[index]->channel));
+        (*env)->SetIntField(env,aobj,\
+            (*env)->GetFieldID(env, ainfo_cls, "audio_samplerate", "I"), (int)(msgt->audio_info[index]->sample_rate));
+        (*env)->SetIntField(env,aobj,\
+            (*env)->GetFieldID(env, ainfo_cls, "bit_rate", "I"), (int)(msgt->audio_info[index]->bit_rate));*/
+        (*env)->SetIntField(env,aobj,\
+            (*env)->GetFieldID(env, ainfo_cls, "uid", "I"), (int)(msgt->audio_info[index]->id));
 
 
-		(*env)->SetObjectArrayElement(env,ainfoArray,index, aobj);  
-		}  
-		(*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lcom/farcore/playerservice/AudioMediaInfo;"),ainfoArray);
-	}
+        (*env)->SetObjectArrayElement(env,ainfoArray,index, aobj);  
+        }  
+        (*env)->SetObjectField(env,meta_obj,(*env)->GetFieldID(env, meta_cls, "ainfo", "[Lcom/farcore/playerservice/AudioMediaInfo;"),ainfoArray);
+    }
 
-	//for insub num;
+    //for insub num;
     if(msgt->stream_info.total_sub_num>0)
-	{
-    	LOGI("================== 'in internal subtitle num:%d\n", msgt->stream_info.total_sub_num);
-    	jclass sub_cls =Intersub_getClass(env);
+    {
+        LOGI("================== 'in internal subtitle num:%d\n", msgt->stream_info.total_sub_num);
+        jclass sub_cls =Intersub_getClass(env);
         (*env)->SetStaticIntField(env,sub_cls,(*env)->GetStaticFieldID(env, sub_cls, "insub_num", "I"),(int)(msgt->stream_info.total_sub_num));
     }
 #if 0               
@@ -379,7 +379,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setMedia
     const char * pname = (*env)->GetStringUTFChars(env,url, NULL);     
     if(NULL == pname)
     {
-        LOGE("failed to change jstring to standard string");	
+        LOGE("failed to change jstring to standard string");    
         return -1;
     }
 
@@ -426,7 +426,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setMedia
     
     (*env)->ReleaseStringUTFChars(env,url, pname);
     return pid;
-			
+            
 }
   
 
@@ -465,7 +465,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_playMedia
     const char * pname = (*env)->GetStringUTFChars(env,url, NULL);     
     if(NULL == pname)
     {
-        LOGE("failed to change jstring to standard string");	
+        LOGE("failed to change jstring to standard string");    
         return -1;
     }
 
@@ -480,7 +480,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_playMedia
     _plCtrl.file_name = strndup(pname,FILENAME_LENGTH_MAX);
     _plCtrl.video_index = -1;//MUST
     _plCtrl.audio_index = -1;//MUST
-	_plCtrl.hassub = 1;
+    _plCtrl.hassub = 1;
     if(pMode == 1){
         _plCtrl.nosound = 1;
         SYS_set_tsync_enable(0);//if no sound,can set to be 0
@@ -546,9 +546,9 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_start
     
     return ret;
 #else
-	LOGI("player start play");
+    LOGI("player start play");
     player_start_play(pid);
-	return 0;
+    return 0;
 #endif
 }
 
@@ -585,6 +585,19 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_seek
   (JNIEnv *env, jobject obj, jint pid, jint pos){
     player_timesearch(pid,pos);
     return 0;
+}
+
+/*
+ * Class:     com_farcore_playerservice_MediaPlayer
+ * Method:    set3Dmode
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dmode
+  (JNIEnv *env, jobject obj, jint pid, jint mode){
+    player_stop(pid);
+    int ret = SYS_set_3D_mode(mode);
+    player_start_play(pid);
+    return ret;
 }
 
 /*
@@ -688,7 +701,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setAudioTrack
  */
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setIVolume
   (JNIEnv *env , jclass clazz, jint vol){
-	return 0;
+    return 0;
 }
 
 /*
@@ -719,7 +732,7 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_unmute
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setVideoBlackOut
   (JNIEnv *env, jclass clazz, jint isBlackout){
     return 0;
-	
+    
 }
 /*
  * Class:     com_farcore_playerservice_MediaPlayer
@@ -745,8 +758,8 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setRepeat
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setSubtitleOut
-  (JNIEnv *env, jobject obj, jint pid, jint sub_uid){ 	
-  	return 0;
+  (JNIEnv *env, jobject obj, jint pid, jint sub_uid){   
+    return 0;
 }
 
 /*
@@ -755,8 +768,8 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setSubtitleOut
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setTone
-  (JNIEnv *env, jclass clazz, jint pid, jint tone){  	
-  	return 0;
+  (JNIEnv *env, jclass clazz, jint pid, jint tone){     
+    return 0;
 }
 
 /*
@@ -834,14 +847,14 @@ JNIEXPORT jint Java_com_farcore_playerservice_AmPlayer_getosdbpp(JNIEnv *env, jc
 }
 
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable_1freescale(JNIEnv *env, jclass class, jint cfg){
-	jint ret = -1;
+    jint ret = -1;
     ret = enable_freescale(cfg);
     LOGI("enable freeacale:%d\n", ret);
     return ret;
 }
 
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescale(JNIEnv *env, jclass class, jint cfg){
-	jint ret = -1;
+    jint ret = -1;
     ret = disable_freescale(cfg);
     LOGI("disable freeacale:%d\n", ret);
     return ret;
@@ -849,47 +862,48 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescal
 
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_getProductType(JNIEnv *env, jclass class)
 {
-	int ret;
+    int ret;
 #ifdef ENABLE_FREE_SCALE
-	LOGI("ENABLE_FREE_SCALE defined!\n");
-	ret = 1;
+    LOGI("ENABLE_FREE_SCALE defined!\n");
+    ret = 1;
 #else
-	LOGI("ENABLE_FREE_SCALE not define!\n");
-	ret = 0;
+    LOGI("ENABLE_FREE_SCALE not define!\n");
+    ret = 0;
 #endif
-	return ret;
+    return ret;
 }
 
 //
 static JNINativeMethod gMethods[] = {
-    {"setMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_com_farcore_playerservice_AmPlayer_setMedia},   
-    {"playMedia",	    	"(Ljava/lang/String;III)I",	   		(void*)Java_com_farcore_playerservice_AmPlayer_playMedia}, 
-    {"close",		"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_close},
-    {"start",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_start}, 
-    {"stop",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_stop},
-    {"pause",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_pause},
-    {"resume",			"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_resume},
-    {"seek",			"(II)I",						(void*)Java_com_farcore_playerservice_AmPlayer_seek},
-    {"fastforward",	          	"(II)I",				(void*)Java_com_farcore_playerservice_AmPlayer_fastforward},
-    {"fastrewind",	          	"(II)I",				(void*)Java_com_farcore_playerservice_AmPlayer_fastrewind},      
-    {"setAudioTrack",          	"(II)I",				(void*)Java_com_farcore_playerservice_AmPlayer_setAudioTrack},
-    {"setSubtitleOut",          	"(II)I",			(void*)Java_com_farcore_playerservice_AmPlayer_setSubtitleOut},
-    {"setVideoBlackOut",       	"(I)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setVideoBlackOut},
-    {"setTone",           		"(II)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setTone},
-    {"setRepeat",           	"(II)I",					(void*)Java_com_farcore_playerservice_AmPlayer_setRepeat},
-    {"setIVolume",              	"(I)I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_setIVolume},
-    {"getMetaInfo",              	"(I)Ljava/lang/Object;",				(void*)Java_com_farcore_playerservice_AmPlayer_getMetaInfo},
+    {"setMedia",            "(Ljava/lang/String;III)I",         (void*)Java_com_farcore_playerservice_AmPlayer_setMedia},   
+    {"playMedia",           "(Ljava/lang/String;III)I",         (void*)Java_com_farcore_playerservice_AmPlayer_playMedia}, 
+    {"close",       "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_close},
+    {"start",           "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_start}, 
+    {"stop",            "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_stop},
+    {"pause",           "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_pause},
+    {"resume",          "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_resume},
+    {"seek",            "(II)I",                        (void*)Java_com_farcore_playerservice_AmPlayer_seek},
+    {"set3Dmode",        "(II)I",                       (void*)Java_com_farcore_playerservice_AmPlayer_set3Dmode},
+    {"fastforward",             "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_fastforward},
+    {"fastrewind",              "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_fastrewind},      
+    {"setAudioTrack",           "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_setAudioTrack},
+    {"setSubtitleOut",              "(II)I",            (void*)Java_com_farcore_playerservice_AmPlayer_setSubtitleOut},
+    {"setVideoBlackOut",        "(I)I",                 (void*)Java_com_farcore_playerservice_AmPlayer_setVideoBlackOut},
+    {"setTone",                 "(II)I",                    (void*)Java_com_farcore_playerservice_AmPlayer_setTone},
+    {"setRepeat",               "(II)I",                    (void*)Java_com_farcore_playerservice_AmPlayer_setRepeat},
+    {"setIVolume",                  "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_setIVolume},
+    {"getMetaInfo",                 "(I)Ljava/lang/Object;",                (void*)Java_com_farcore_playerservice_AmPlayer_getMetaInfo},
 //    {"getDivxInfo",        "(I)Ljava/lang/Object",         (void*)Java_com_farcore_playerservice_AmPlayer_getDivxInfo},
-    {"mute",                   	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_mute},
-    {"unmute",                 	"()I",					       	(void*)Java_com_farcore_playerservice_AmPlayer_unmute},
-    {"native_init",			"()I",						(void*)Java_com_farcore_playerservice_AmPlayer_native_init},
-    {"native_uninit",			"()I",					(void*)Java_com_farcore_playerservice_AmPlayer_native_uninit},	
-    { "native_enablecolorkey", "(S)I",					(void*) Java_com_farcore_playerservice_AmPlayer_enablecolorkey },
-    { "native_disablecolorkey", "()I",		            (void*) Java_com_farcore_playerservice_AmPlayer_disablecolorkey },
-    { "native_setglobalalpha",              "(I)I",		                            (void*) Java_com_farcore_playerservice_AmPlayer_setglobalalpha },   
-    { "native_getosdbpp",                   "()I",		                                    (void*) Java_com_farcore_playerservice_AmPlayer_getosdbpp },   
+    {"mute",                    "()I",                          (void*)Java_com_farcore_playerservice_AmPlayer_mute},
+    {"unmute",                  "()I",                          (void*)Java_com_farcore_playerservice_AmPlayer_unmute},
+    {"native_init",         "()I",                      (void*)Java_com_farcore_playerservice_AmPlayer_native_init},
+    {"native_uninit",           "()I",                  (void*)Java_com_farcore_playerservice_AmPlayer_native_uninit},  
+    { "native_enablecolorkey", "(S)I",                  (void*) Java_com_farcore_playerservice_AmPlayer_enablecolorkey },
+    { "native_disablecolorkey", "()I",                  (void*) Java_com_farcore_playerservice_AmPlayer_disablecolorkey },
+    { "native_setglobalalpha",              "(I)I",                                 (void*) Java_com_farcore_playerservice_AmPlayer_setglobalalpha },   
+    { "native_getosdbpp",                   "()I",                                          (void*) Java_com_farcore_playerservice_AmPlayer_getosdbpp },   
         
-	
+    
 };
 
 
@@ -898,25 +912,25 @@ int jniRegisterNativeMethods(JNIEnv* env,
                              const JNINativeMethod* gMethods,
                              int numMethods)
 {
-	jclass clazz;
+    jclass clazz;
 
-	LOGI("Registering %s natives\n", className);
-	clazz = (*env)->FindClass(env,className);
-	if (clazz == NULL) {
-	    LOGE("Native registration unable to find class '%s'\n", className);
-	return -1;
-	}
-	if ((*env)->RegisterNatives(env,clazz, gMethods, numMethods) < 0) {
-	    LOGE("RegisterNatives failed for '%s'\n", className);
-	return -1;
-	}
-	return 0;
+    LOGI("Registering %s natives\n", className);
+    clazz = (*env)->FindClass(env,className);
+    if (clazz == NULL) {
+        LOGE("Native registration unable to find class '%s'\n", className);
+    return -1;
+    }
+    if ((*env)->RegisterNatives(env,clazz, gMethods, numMethods) < 0) {
+        LOGE("RegisterNatives failed for '%s'\n", className);
+    return -1;
+    }
+    return 0;
 }
 
 int register_com_farcore_playerservice_mediaplayer(JNIEnv *env) {
-	const char* const kClassPathName = "com/farcore/playerservice/AmPlayer";
+    const char* const kClassPathName = "com/farcore/playerservice/AmPlayer";
 
-	return jniRegisterNativeMethods(env,kClassPathName , gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
+    return jniRegisterNativeMethods(env,kClassPathName , gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
 }
 
 
@@ -930,7 +944,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved){
         return -1;  
     }
     gJavaVm = vm;//    
-	
+    
     LOGI("GetEnv ok");    /* success -- return valid version number */   
     result = JNI_VERSION_1_4;   
     register_com_farcore_playerservice_mediaplayer(env); 
@@ -939,14 +953,14 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved){
 
 void JNI_OnUnload(JavaVM* vm, void* reserved)
 {
-	JNIEnv* env = NULL;
+    JNIEnv* env = NULL;
 
     if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
         LOGE("GetEnv failed!");
         return;
     }
-	if(gMplayerClazz != NULL)
-    	(*env)->DeleteGlobalRef(env, gMplayerClazz);
-	
-	return;
+    if(gMplayerClazz != NULL)
+        (*env)->DeleteGlobalRef(env, gMplayerClazz);
+    
+    return;
 }

@@ -20,6 +20,7 @@ interface Player
 	int GetOsdBpp();
 
 	int Seek(int time);
+	int Set3Dmode(int mode);
 	int FastForward(int speed);
 	int BackForward(int speed);
 	

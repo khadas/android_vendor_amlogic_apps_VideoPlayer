@@ -33,6 +33,7 @@ public class AmPlayer extends Service {
 	private native int seek(int pid,int pos);//in second
 	private native int stop(int pid);
 	private native int close(int pid);
+	private native int set3Dmode(int pid, int mode);//0 off, 1...10 mode
 
 	private native int fastforward(int pid,int speed);
 	private native int fastrewind(int pid,int speed);
@@ -63,6 +64,7 @@ public class AmPlayer extends Service {
 	public int pause() { return pause(mPid);}
 	public int resume() { return resume(mPid);}
 	public int seek(int pos) { return seek(mPid,pos);}
+	public int set3Dmode(int mode) { return set3Dmode(mPid,mode);}
 	public int stop() { return stop(mPid);}
 	public int close() { return close(mPid);}
 	public int fastforward(int speed) { return fastforward(mPid,speed);}
@@ -193,6 +195,11 @@ public class AmPlayer extends Service {
 
 		public int Seek(int time) throws RemoteException {
 			seek(time);
+			return 0;
+		}
+		
+		public int Set3Dmode(int mode) throws RemoteException {
+			set3Dmode(mode);
 			return 0;
 		}
 

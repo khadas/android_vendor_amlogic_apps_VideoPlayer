@@ -3,8 +3,12 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include  <linux/fb.h>
-
+#include <errno.h>
 #include "sys_conf.h"
+#include <cutils/log.h>
+#include <dlfcn.h> 
+#include <sys/ioctl.h>
+#include <fcntl.h>
 
 static int set_fb0_blank(int blank)
 {
@@ -19,12 +23,12 @@ static int set_fb0_blank(int blank)
         close(fd);
         return 0;
     }
-    return -1;   				
+    return -1;                  
 }
 
 int SYS_disable_osd0(void)
 {
-    set_fb0_blank(1);	
+    set_fb0_blank(1);   
     return 0;
 }
 
@@ -46,7 +50,7 @@ int SYS_enable_osd0(void)
 
 
 #ifndef FBIOPUT_OSD_SET_GBL_ALPHA
-#define  FBIOPUT_OSD_SET_GBL_ALPHA	0x4500
+#define  FBIOPUT_OSD_SET_GBL_ALPHA  0x4500
 #endif
 
 int SYS_enable_colorkey(short key_rgb565)
@@ -86,13 +90,13 @@ int SYS_set_black_policy(int blackout)
     fd=open(path, O_CREAT|O_RDWR | O_TRUNC, 0644);
     if(fd>=0)
     {
-    	sprintf(bcmd,"%d",blackout);
-    	bytes = write(fd,bcmd,strlen(bcmd));
-    	close(fd);
-    	return 0;
+        sprintf(bcmd,"%d",blackout);
+        bytes = write(fd,bcmd,strlen(bcmd));
+        close(fd);
+        return 0;
     }
     return -1;
-	
+    
 }
 
 int SYS_get_black_policy()
@@ -103,11 +107,11 @@ int SYS_get_black_policy()
     char  bcmd[16];
     fd=open(path, O_RDONLY);
     if(fd>=0)
-    {    	
-    	read(fd,bcmd,sizeof(bcmd));       
+    {       
+        read(fd,bcmd,sizeof(bcmd));       
         black_out = strtol(bcmd, NULL, 16);       
         black_out &= 0x1;
-    	close(fd);    	
+        close(fd);      
     }
     return black_out;
 
@@ -121,13 +125,13 @@ int SYS_set_tsync_enable(int enable)
     fd=open(path, O_CREAT|O_RDWR | O_TRUNC, 0644);
     if(fd>=0)
     {
-    	sprintf(bcmd,"%d",enable);
-    	write(fd,bcmd,strlen(bcmd));
-    	close(fd);
-    	return 0;
+        sprintf(bcmd,"%d",enable);
+        write(fd,bcmd,strlen(bcmd));
+        close(fd);
+        return 0;
     }
     return -1;
-	
+    
 }
 
 int SYS_set_global_alpha(int alpha){
@@ -193,4 +197,125 @@ int SYS_set_video_fullscreen(){
         return 0;
     }
     return -1;      
+}
+
+static int AddVfmPath(char *path)
+{
+    FILE * fp;
+    
+    fp = fopen("/sys/class/vfm/map", "w");
+    
+    if(fp != NULL) {
+        fprintf(fp, "%s", path);
+    } else {
+        LOGE("VideoPlayer open /sys/class/vfm/map ERROR(%s)!!\n", strerror(errno));
+        fclose(fp);
+        return -1;
+    }
+
+    fclose(fp);
+    return 0;
+}
+static int RmVfmDefPath(void)
+{
+    int fd, ret;
+    char str[]="rm default";
+    
+    fd = open("/sys/class/vfm/map", O_RDWR);
+
+    if(fd < 0) {
+        LOGE("VideoPlayer open /sys/class/vfm/map ERROR(%s)!!\n",strerror(errno));
+            close(fd);
+            return 0;
+    } else {
+        ret = write(fd, str, sizeof(str));
+    }
+    close(fd);
+    return ret;
+}
+
+static int Open3DPpmgr(int commd)
+{
+    int ppmgrfd = open("/dev/ppmgr", O_RDWR);
+
+    if(ppmgrfd < 0) {
+
+        LOGE("VideoPlayer open ppmgr, error (%s)\n", strerror(errno));
+        return ppmgrfd;
+    }
+    int ret = -1;
+    switch((int)commd)
+    {
+        case 0:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_DISABLE);
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("VideoPlayer 3D fucntion (0: Disalbe!!)\n");
+            #endif
+            break;
+        case 1:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_LR));
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("VideoPlayer 3D fucntion (4: L/R!!)\n");
+            #endif
+            break;
+        case 2:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_BT));
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("=VDIN CPP=> 3D fucntion (5: B/T!!)\n");
+            #endif
+            break;
+        case 3:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_LR_SWITCH));
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("VideoPlayer 3D fucntion (6: LR SWITCH!!)\n");
+            #endif
+            break;
+        case 4:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_3D_TO_2D_L));
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("VideoPlayer 3D function (8: 3D_TO_2D_L!!)\n");
+            #endif
+            break;
+        case 5:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_3D_TO_2D_R));
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("VideoPlayer 3D function (9: 3D_TO_2D_R!!)\n");
+            #endif
+            break;
+        case 6:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_2D_TO_3D));
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("VideoPlayer 3D fucntion (3: 2D->3D!!)\n");
+            #endif
+            break;
+        case 7:
+            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_FIELD_DEPTH));
+            #ifdef LOGD_3D_FUNCTION
+            LOGD("=VDIN CPP=> 3D function (7: FIELD_DEPTH!!)\n");
+            #endif
+            break;
+    }
+
+    if(ret < 0)
+        LOGE("VideoPlayer set 3D function error");
+    close(ppmgrfd);
+    return ret;
+}
+
+int SYS_set_3D_mode(int mode)
+{
+    RmVfmDefPath();
+    int ret = -1;
+    switch(mode) {
+        case 0:
+            ret = AddVfmPath("add default decoder amvideo");
+            Open3DPpmgr(0);//disable
+            break;
+
+        case 1:
+            ret = AddVfmPath("add default decoder ppmgr amvideo");
+            Open3DPpmgr(mode);
+            break;
+    }
+    return ret;
 }
