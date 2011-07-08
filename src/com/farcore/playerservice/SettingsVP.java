@@ -16,13 +16,14 @@ public class SettingsVP {
 
 	public static final String SETTING_INFOS = "SETTING_Infos";
 	private static SharedPreferences setting = null;
+	private static String video_rotate_path = "/sys/class/ppmgr/angle";
 	private static String displaymode_path = "/sys/class/display/mode";
 	private static String displayaxis_path = "/sys/class/display/axis";
 	private static String video_axis_path = "/sys/class/video/axis";
 	private static String video_layout_disable = "/sys/class/video/disable_video";
-	private static String rotation_path = "/sys/class/ppmgr/angle";
 	private static String TAG = "SettingVideoPlayer";
 	public static String display_mode = null; 
+	public static String panel_resolution = null;
 	
 	//==========preferences name==========
 	public static final String[] pref_name = { 
@@ -122,10 +123,13 @@ public class SettingsVP {
 			{
 				dispMode = in.readLine();
 				Log.d(TAG, "Current display mode: "+dispMode);
+				String dispaxis = in_axis.readLine();
+				String[] axisstr = dispaxis.split(" ", 5);
+				
+				panel_resolution = axisstr[2]+"x"+axisstr[3];
+				Log.d(TAG, "Panel resolution: "+panel_resolution);
 				if (dispMode.equals("panel"))
 				{
-					String dispaxis = in_axis.readLine();
-					String[] axisstr = dispaxis.split(" ", 5);
 					buf = "0,0,"+axisstr[2]+","+axisstr[3];
 					Log.d(TAG, "Current display axis: "+buf);
 				}
@@ -176,11 +180,11 @@ public class SettingsVP {
 	
 	public static boolean disableVideoLayout()
 	{
-	    	String ifDisable = null;
+    	String ifDisable = null;
 		File file = new File(video_layout_disable);
 		if (!file.exists()) {        	
-        		return false;
-        	}
+        	return false;
+        }
 		
 		//read
 		try
@@ -197,7 +201,7 @@ public class SettingsVP {
 				
 			} finally {
 				in.close();
-    			} 
+    		} 
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -208,14 +212,14 @@ public class SettingsVP {
 		try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(video_layout_disable), 32);
-	    		try
-    			{
-    				out.write("1");    
-    				Log.d(TAG, "disable video layout ok.");
-	    		} finally {
+    		try
+    		{
+    			out.write("1");    
+    			Log.d(TAG, "disable video layout ok.");
+    		} finally {
 				out.close();
 			}
-			return true;
+			 return true;
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -228,17 +232,17 @@ public class SettingsVP {
 	{
 		File file = new File(video_layout_disable);
 		if (!file.exists()) {        	
-        		return false;
-        	}
+        	return false;
+        }
 		
 		try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(video_layout_disable), 32);
-    			try
-    			{
-    				out.write("0");    
-	    			Log.d(TAG, "enable video layout ok.");
-    			} finally {
+    		try
+    		{
+    			out.write("0");    
+    			Log.d(TAG, "enable video layout ok.");
+    		} finally {
 				out.close();
 			}
 			 return true;
@@ -250,29 +254,59 @@ public class SettingsVP {
 		}
 	}
 
-	public static boolean setRotation()
+	public static boolean setVideoRotateAngle(int angle)
 	{
-		File file = new File(rotation_path);
-		if (!file.exists()) {
-			return false;
-		}
-
+    	String buf = null;
+    	String angle_str = null;
+		File file = new File(video_rotate_path);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		
+		//read
 		try
 		{
-                        BufferedWriter out = new BufferedWriter(new FileWriter(rotation_path), 32);
-                        try
-                        {
-                                out.write("0");
-                                Log.d(TAG, "Set rotation ok.");
-                        } finally {
-                                out.close();
-                        }
-                        return true;
-                }
-                catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        Log.e(TAG, "IOException when write "+rotation_path);
-                        return false;
-                }
+			BufferedReader in = new BufferedReader(new FileReader(video_rotate_path), 32);
+			try
+			{
+				angle_str = in.readLine();
+				Log.d(TAG, angle_str);
+				if(angle_str.startsWith("current angel is ")) {
+	                String temp = angle_str.substring(17, 18);
+	                Log.d(TAG, "read angle is " + temp);
+					if((temp != null) && (angle != Integer.parseInt(temp))){
+						buf = Integer.toString(angle);
+						Log.d(TAG, buf);
+					}
+				}
+			} finally {
+    			in.close();
+    		} 
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when read " + video_rotate_path);
+		} 
+		if(buf == null) {
+			return false;
+		}
+		//write
+		try
+		{
+			BufferedWriter out = new BufferedWriter(new FileWriter(video_rotate_path), 32);
+    		try
+    		{
+    			Log.d(TAG, "write :"+buf);
+    			out.write(buf);
+    		} finally {
+				out.close();
+			}
+			 return true;
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when write " + video_rotate_path);
+			return false;
+		}
 	}
 }

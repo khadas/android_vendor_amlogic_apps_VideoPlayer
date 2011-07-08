@@ -1,45 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" 
-    android:gravity="bottom" 
     android:background="@color/background"> 
     
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			android:id="@+id/Frame_more"
-	    	android:gravity="center"
-	    	android:orientation="horizontal" android:clipChildren="false"
-	    	android:layout_alignParentBottom="true" 
-	    	android:layout_gravity="bottom" 
-	    	android:layout_width="fill_parent" 
-	    	android:layout_height="match_parent">
-	    <LinearLayout android:layout_width="348dp" 
-	    android:layout_height="304dp" 
+    <LinearLayout 
+        android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
 	    android:id="@+id/LinearLayout_sub" 
 	    android:orientation="vertical" 
 	    android:background="@drawable/minding_bk" 
-	    android:layout_gravity="center">
-     
-			<LinearLayout android:layout_width="wrap_content" 
+	    android:layout_gravity="center"
+	    android:gravity="center">
+	    
+	    <LinearLayout 
+	        android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
 			android:id="@+id/sub_title" 
 			android:layout_gravity="center_horizontal">
-				<TextView android:id="@+id/TextView01" 
+			
+			<TextView
+			    android:id="@+id/TextView01" 
 				android:gravity="center" 
 				android:layout_height="56dp" 
 				android:textSize="24px" 
-				android:layout_width="348dp" 
+				android:layout_width="wrap_content" 
 				android:text="@string/setting_subtitle" 
 				android:textColor="@drawable/white">
-			 	</TextView>
-			</LinearLayout>
-	
-			<LinearLayout android:layout_width="wrap_content" 
+			</TextView>
+		</LinearLayout>
+		
+		<LinearLayout
+		    android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
 			android:id="@+id/sub_switch" 
-			android:layout_gravity="center_horizontal">
-				<TextView android:id="@+id/TextView01" 
+			android:orientation="horizontal" 
+			android:layout_gravity="center_horizontal"
+		    android:layout_marginLeft="10dp" 
+		    android:layout_marginRight="10dp">
+			
+			<TextView
+			    android:id="@+id/TextView01" 
 				android:gravity="left|center" 
 				android:layout_width="86dp" 
 				android:layout_height="60dp" 
@@ -47,31 +49,43 @@
 				android:text="@string/sub_switch" 
 				android:layout_marginLeft="6dp" 
 				android:textColor="@drawable/black">
-			 	</TextView>
-				<ImageButton android:id="@+id/switch_l" 
+			 </TextView>
+			 
+			 <ImageButton
+			    android:id="@+id/switch_l" 
 				android:layout_width="72dp" 
 				android:layout_height="60dp" 
 				android:src="@drawable/sub_larrow">
-			 	</ImageButton>
-		     	<TextView android:layout_width="94dp" 
+			</ImageButton>
+			
+			<TextView 
+			    android:layout_width="94dp" 
 		     	android:gravity="center" 
 		     	android:layout_height="60dp" 
 		     	android:id="@+id/sub_swith111" 
 		     	android:textSize="24px" 
 		     	android:textColor="@drawable/black">
-		    	</TextView>
-		     	<ImageButton android:id="@+id/switch_r" 
+		    </TextView>
+		    
+		    <ImageButton 
+		        android:id="@+id/switch_r" 
 		     	android:layout_width="72dp" 
 		     	android:layout_height="60dp" 
 		     	android:src="@drawable/sub_rarrow">
-		     	 </ImageButton>
-			</LinearLayout>
-    
-		    <LinearLayout android:layout_width="wrap_content" 
+		    </ImageButton>
+		</LinearLayout>
+		
+		<LinearLayout 
+		    android:layout_width="wrap_content" 
 		    android:layout_height="wrap_content" 
 		    android:id="@+id/sub_font" 
-		    android:layout_gravity="center_horizontal">
-				<TextView android:layout_width="86dp" 
+		    android:orientation="horizontal" 
+		    android:layout_gravity="center_horizontal"
+		    android:layout_marginLeft="10dp" 
+		    android:layout_marginRight="10dp">
+		    
+		    <TextView
+		        android:layout_width="86dp" 
 				android:layout_height="60dp" 
 				android:gravity="left|center" 
 				android:textSize="24px" 
@@ -79,31 +93,41 @@
 				android:layout_marginLeft="6dp" 
 				android:textColor="@drawable/black" 
 				android:id="@+id/font_title">
-			 	</TextView>
-				<ImageButton android:id="@+id/font_l" 
+			</TextView>
+			<ImageButton 
+			    android:id="@+id/font_l" 
 				android:layout_width="72dp" 
 				android:layout_height="60dp" 
 				android:src="@drawable/sub_larrow">
-			 	</ImageButton>
-		     	<TextView android:layout_width="94dp" 
+			</ImageButton>
+			
+			<TextView 
+			    android:layout_width="94dp" 
 		     	android:layout_height="60dp" 
 		     	android:gravity="center" 
 		     	android:textSize="24px" 
 		     	android:id="@+id/sub_font111" 
 		     	android:textColor="@drawable/black">
-		    	</TextView>
-		     	<ImageButton android:id="@+id/font_r" 
+		    </TextView>
+		    <ImageButton 
+		        android:id="@+id/font_r" 
 		     	android:layout_width="72dp" 
 		     	android:layout_height="60dp" 
 		     	android:src="@drawable/sub_rarrow">
-		     	 </ImageButton>
-			</LinearLayout>
-	
-			<LinearLayout android:layout_width="wrap_content" 
+		    </ImageButton>
+		</LinearLayout>
+		
+		<LinearLayout 
+		    android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
 			android:id="@+id/sub_color" 
-			android:layout_gravity="center_horizontal">
-				<TextView android:layout_width="86dp" 
+			android:orientation="horizontal" 
+			android:layout_gravity="center_horizontal"
+		    android:layout_marginLeft="10dp" 
+		    android:layout_marginRight="10dp">
+			
+			<TextView 
+			    android:layout_width="86dp" 
 				android:layout_height="60dp" 
 				android:gravity="left|center" 
 				android:textSize="24px" 
@@ -111,84 +135,108 @@
 				android:layout_marginLeft="6dp" 
 				android:textColor="@drawable/black" 
 				android:id="@+id/color_title">
-			 	</TextView>
-				<ImageButton android:id="@+id/color_l" 
+			</TextView>
+			
+			<ImageButton 
+			    android:id="@+id/color_l" 
 				android:layout_width="72dp" 
 				android:layout_height="60dp" 
 				android:src="@drawable/sub_larrow">
-			 	</ImageButton>
-		     	<TextView android:layout_width="94dp" 
+			</ImageButton>
+			
+			<TextView 
+			    android:layout_width="94dp" 
 		     	android:layout_height="60dp" 
 		     	android:gravity="center" 
 		     	android:textSize="24px" 
 		     	android:id="@+id/sub_color111" 
 		     	android:textColor="@drawable/black">
-		    	</TextView>
-		     	<ImageButton android:id="@+id/color_r" 
+		    </TextView>
+		    
+		    <ImageButton 
+		        android:id="@+id/color_r" 
 		     	android:layout_width="72dp" 
 		     	android:layout_height="60dp" 
 		     	android:src="@drawable/sub_rarrow">
-		     	 </ImageButton>
-			</LinearLayout>
-	
-			<LinearLayout android:id="@+id/sub_ok_on" 
-			android:layout_height="match_parent" 
-			android:layout_width="match_parent">
-			     <Button android:id="@+id/button_ok" 
-			     android:text="@string/str_ok" 
-			     android:layout_width="150dp" 
-			     android:layout_gravity="center" 
-			     android:layout_marginLeft="30dp" 
-			     android:layout_height="50dp" 
-			     android:textSize="24px" 
-			     android:textColor="@drawable/black">
-			      </Button>
-				<Button android:id="@+id/button_canncel" 
-				android:text="@string/str_cancel" 
-				android:layout_width="150dp" 
-				android:layout_gravity="center" 
-				android:layout_height="50dp" 
-				android:textSize="24px" 
-				android:textColor="@drawable/black">
-				  </Button>
-			</LinearLayout>
+		    </ImageButton>
 		</LinearLayout>
 		
-	    <LinearLayout android:id="@+id/LinearLayout_other" 
-			android:orientation="vertical" 
-			android:background="@drawable/minding_bk" 
-			android:layout_height="304dp" 
-			android:layout_width="348dp" 
-			android:layout_gravity="center">
-		  <TextView android:layout_width="wrap_content" 
+		<LinearLayout 
+		    android:id="@+id/sub_ok_on" 
+		    android:orientation="horizontal" 
+			android:layout_height="match_parent" 
+			android:layout_width="match_parent"
+			android:layout_gravity="center" 
+			android:gravity="center" >
+			
+			<Button 
+			    android:id="@+id/button_ok" 
+			    android:text="@string/str_ok" 
+			    android:layout_width="120dp" 
+			    android:layout_gravity="center" 
+			    android:layout_marginRight="20dp" 
+			    android:layout_height="wrap_content" 
+			    android:textSize="24px" 
+			    android:textColor="@drawable/black">
+			</Button>
+			
+			<Button 
+			    android:id="@+id/button_canncel" 
+				android:text="@string/str_cancel" 
+				android:layout_width="120dp" 
+				android:layout_gravity="center" 
+				android:layout_height="wrap_content" 
+				android:textSize="24px" 
+				android:textColor="@drawable/black">
+			</Button>
+		</LinearLayout>
+	</LinearLayout>
+	
+	<LinearLayout 
+	    android:id="@+id/LinearLayout_other" 
+	    android:orientation="vertical" 
+	    android:background="@drawable/minding_bk" 
+	    android:layout_height="wrap_content" 
+	    android:layout_width="wrap_content" 
+	    android:layout_gravity="center"
+	    android:gravity="center">
+	    <TextView 
+	        android:layout_width="wrap_content" 
 			android:id="@+id/more_title" 
 			android:layout_gravity="center" 
 			android:layout_height="56dp" 
 			android:gravity="center" 
 			android:textColor="@drawable/white" 
-			android:textSize="24px"></TextView>
-		  <ListView android:id="@+id/AudioListView" 
-			  android:layout_width="326dp" 
-			  android:layout_height="232dp" 
-			  android:layout_marginLeft="12dp" 
-			  android:divider="@color/background" 
-			  android:cacheColorHint="#00000000">
-		  </ListView>
-		</LinearLayout>
+			android:textSize="24px">
+		</TextView>
 		
-	    <LinearLayout	
+		<ListView 
+		    android:id="@+id/AudioListView" 
+		    android:layout_width="340dp" 
+		    android:layout_height="wrap_content" 
+		    android:layout_marginLeft="4dp" 
+		    android:layout_marginRight="4dp" 
+		    android:layout_marginBottom="4dp" 
+		    android:divider="@color/background" 
+		    android:cacheColorHint="#00000000"
+		    android:gravity="center">
+		</ListView>
+	</LinearLayout>
+	
+	<LinearLayout	
 		android:id="@+id/dialog_layout"
 		android:orientation="vertical"
 		android:background="@drawable/dialog_bk" 
-		android:layout_width="520dp"
-		android:layout_height="300dp"
-		android:layout_gravity="center">
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+	    android:layout_gravity="center"
+	    android:gravity="center">
 		
 		<TextView
 			android:id="@+id/info_title" 
 			android:layout_gravity="center" 
 			android:layout_width="wrap_content" 
-			android:layout_height="55dp" 
+			android:layout_height="54dp" 
 			android:gravity="center" 
 			android:textColor="@drawable/white" 
 			android:textSize="20px">
@@ -196,11 +244,11 @@
 		
 		<LinearLayout	
 		    android:orientation="vertical"
-		    android:layout_width="500dp"
-		    android:layout_height="175dp"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
 		    android:layout_gravity="center"
-		    android:layout_marginTop="10dp"
-		    android:layout_marginLeft="10dp">
+		    android:layout_marginLeft="10dp" 
+		    android:layout_marginRight="10dp">
 		
 		    <TextView
 			    android:id="@+id/filename" 
@@ -245,89 +293,146 @@
 		<LinearLayout	
 		    android:orientation="vertical"
 		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content">
+		    android:layout_height="52dp">
 		    <Button
 			    android:id="@+id/info_ok" 
 			    android:layout_gravity="center" 
-			    android:layout_width="160dp" 
+			    android:layout_width="120dp" 
 			    android:layout_height="wrap_content" 
 			    android:gravity="center" 
 			    android:textColor="@drawable/black" 
 			    android:textSize="20px">
 		    </Button>
 		</LinearLayout>
-	    </LinearLayout>
-		
-		<com.subtitleview.SubtitleView
-	    	android:id="@+id/subTitle_more"
-	    	android:layout_height = "wrap_content"
-	    	android:layout_width ="fill_parent"
-	    	android:gravity="center"
-	    	android:textStyle="bold"
-	    	android:paddingLeft = "7dip"
-	    	android:layout_gravity="bottom|center" 
-	    	android:paddingTop="200dip" 
-	    	android:minHeight="310dip">
+	</LinearLayout>
+
+    <LinearLayout
+	    android:orientation="vertical" 
+	    android:layout_gravity="bottom" 
+	    android:layout_height="wrap_content" 
+	    android:layout_width="fill_parent">
+	    
+	    <com.subtitleview.SubtitleView
+	        android:id="@+id/subTitle_more"
+	        android:layout_height = "wrap_content"
+	        android:layout_width ="fill_parent"
+	        android:gravity="center"
+	        android:textStyle="bold"
+	        android:paddingLeft = "7dip"
+	        android:layout_gravity="center"
+	        android:paddingBottom="20dip">
 	    </com.subtitleview.SubtitleView>
 	    
-	</FrameLayout>
-	
-   
-    
-    <LinearLayout
-	    android:orientation="horizontal" 
-	    android:id="@+id/morebarLayout" 
-	    android:layout_gravity="bottom" 
-	    android:background="@color/background" 
-	    android:layout_height="70dp" 
-	    android:layout_width="fill_parent">
-	
-		<ImageButton android:id="@+id/ImageButton07" 
-		android:src="@drawable/barback" 
-		android:layout_height="wrap_content" 
-		android:layout_width="wrap_content" 
-		android:layout_weight="1">
-		</ImageButton>
-		<ImageButton android:id="@+id/ImageButton01" 
-		android:src="@drawable/resume_play" 
-		android:layout_height="wrap_content" 
-		android:layout_width="wrap_content" 
-		android:layout_weight="1">
-		</ImageButton>
-		<ImageButton android:id="@+id/ImageButton02" 
-		android:src="@drawable/playmode" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:layout_weight="1">
-		</ImageButton>
-		<ImageButton android:id="@+id/ImageButton03" 
-		android:src="@drawable/audio_trace" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:layout_weight="1">
-		</ImageButton>
-		<ImageButton android:id="@+id/ImageButton04" 
-		android:src="@drawable/subtitle" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:layout_weight="1">
-		</ImageButton>
-		<ImageButton android:id="@+id/ImageButton05" 
-		android:src="@drawable/display" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:layout_weight="1">
-		</ImageButton>
-		<ImageButton android:id="@+id/ImageButton06" 
-		android:src="@drawable/brightness" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:layout_weight="1">
-		</ImageButton>
-    	<ImageButton android:id="@+id/ImageButton08" 
-    	android:layout_width="wrap_content" 
-    	android:layout_height="wrap_content" 
-    	android:layout_weight="1" android:src="@drawable/mediainfo">
-    	</ImageButton>
-</LinearLayout>
-</LinearLayout>
+	    <LinearLayout
+	        android:orientation="horizontal" 
+	        android:id="@+id/morebarLayout" 
+	        android:layout_gravity="center" 
+	        android:background="@drawable/movie_play_bk" 
+	        android:layout_height="wrap_content" 
+	        android:layout_width="fill_parent"
+	        android:gravity="center">
+	        
+	        <ImageButton 
+	            android:id="@+id/BackBtn" 
+	            android:src="@drawable/barback" 
+	            android:background="@drawable/btn_button"
+	            android:layout_marginLeft="4dp"
+	            android:layout_height="wrap_content" 
+	            android:layout_width="wrap_content" 
+	            android:layout_weight="1"
+	            android:gravity="center">
+	        </ImageButton>
+	        
+	        <ImageButton 
+		        android:id="@+id/ResumeBtn" 
+		        android:src="@drawable/resume" 
+		        android:background="@drawable/btn_button"
+		        android:layout_height="wrap_content" 
+		        android:layout_width="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton
+		        android:id="@+id/PlaymodeBtn" 
+		        android:src="@drawable/mode" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton
+		        android:id="@+id/ChaptersBtn" 
+		        android:src="@drawable/chapters" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton
+		        android:id="@+id/Play3DBtn" 
+		        android:src="@drawable/play_3d" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton
+		        android:id="@+id/ChangetrackBtn" 
+		        android:src="@drawable/change_track" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton
+		        android:id="@+id/SubtitleBtn" 
+		        android:src="@drawable/fondsetup" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton 
+		        android:id="@+id/DisplayBtn" 
+		        android:src="@drawable/diplay" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton
+		        android:id="@+id/BrightnessBtn" 
+		        android:src="@drawable/brightness" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>
+		    
+		    <ImageButton
+    	        android:id="@+id/InfoBtn" 
+    	        android:layout_width="wrap_content" 
+    	        android:layout_height="wrap_content" 
+    	        android:layout_marginRight="4dp"
+    	        android:layout_weight="1"
+    	        android:src="@drawable/info"
+    	        android:background="@drawable/btn_button"
+    	        android:gravity="center">
+    	    </ImageButton>
+    	</LinearLayout>
+    </LinearLayout>
+</FrameLayout>

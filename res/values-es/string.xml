@@ -20,6 +20,17 @@
     <string name="setting_displaymode_normal_noscaleup">No Scale Up</string>
     <string name="setting_displaymode_fullscreen">Pantalla completa</string>
     <string name="setting_brightness">Brillo</string>
+    <string name="setting_3d_mode">Play 3D Mode</string>
+    <string name="setting_3d_diable">OFF</string>
+    <string name="setting_3d_lr">L/R</string>
+    <string name="setting_3d_bt">B/T</string>
+    <string name="setting_3d_lr_switch">LR Switch</string>
+    <string name="setting_3d_2d_l">3D-2D-L</string>
+    <string name="setting_3d_2d_r">3D-2D-R</string>
+    <string name="setting_3d_2d">3D-2D</string>
+    <string name="setting_3d_field_depth">Field Depth</string>
+    <string name="setting_play_chapters">Play Chapters</string>
+    <string name="setting_chapters">Chapters</string>
     <string name="app_name">Reproductor vídeo</string>
     <string name="main_activity">Reproductor vídeo</string>
     <string name="str_ok">Ok</string>
