@@ -594,7 +594,9 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_seek
  */
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dmode
   (JNIEnv *env, jobject obj, jint pid, jint mode){
-    player_stop(pid);
+	player_stop_async(pid);
+	//player_stop(pid);
+
     int ret = SYS_set_3D_mode(mode);
     player_start_play(pid);
     return ret;

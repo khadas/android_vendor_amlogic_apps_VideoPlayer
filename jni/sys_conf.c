@@ -309,11 +309,13 @@ int SYS_set_3D_mode(int mode)
     switch(mode) {
         case 0:
             ret = AddVfmPath("add default decoder amvideo");
+			usleep(100);
             Open3DPpmgr(0);//disable
             break;
 
-        case 1:
+        default:
             ret = AddVfmPath("add default decoder ppmgr amvideo");
+			usleep(100);
             Open3DPpmgr(mode);
             break;
     }
