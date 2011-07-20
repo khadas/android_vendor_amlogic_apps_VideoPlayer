@@ -1150,10 +1150,6 @@ public class playermenu extends Activity {
 		
         mWindowManager = getWindowManager();
         setAngleTable();
-        int getRotation = mWindowManager.getDefaultDisplay().getRotation();
-        Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
-        if((getRotation >= 0) && (getRotation <= 3))
-        	SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
         
 		if (SettingsVP.getParaBoolean("ResumeMode"))
 			resumePlay();
@@ -1686,6 +1682,7 @@ public class playermenu extends Activity {
         setDefCodecMips();
         openScreenOffTimeout();
         SettingsVP.disableVideoLayout();
+        SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
         if (AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
@@ -2262,6 +2259,10 @@ public class playermenu extends Activity {
 	    public void onResume() {
 	        super.onResume();
 
+        int getRotation = mWindowManager.getDefaultDisplay().getRotation();
+        Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
+        if((getRotation >= 0) && (getRotation <= 3))
+        	SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
 	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 			m_storagemgr.registerListener(mListener);
 	    }
