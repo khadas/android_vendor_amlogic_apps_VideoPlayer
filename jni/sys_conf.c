@@ -209,7 +209,6 @@ static int AddVfmPath(char *path)
         fprintf(fp, "%s", path);
     } else {
         LOGE("VideoPlayer open /sys/class/vfm/map ERROR(%s)!!\n", strerror(errno));
-        fclose(fp);
         return -1;
     }
 
