@@ -59,6 +59,7 @@ public class FileList extends ListActivity {
 								"rm,rmvb," +
 								"ts," +
 								"tp," +
+								"mvc," +
 								"vc1," +
 								"vob," +
 								"wm,wmv";
