@@ -1443,7 +1443,6 @@ public class playermenu extends Activity {
 	
     private String catShowFilePath(String path) {
     	String text = null;
-    	/*
     	if(path.startsWith("/mnt/flash"))
     		text=path.replaceFirst("/mnt/flash","/mnt/flash");
     	else if(path.startsWith("/mnt/sda"))
@@ -1452,7 +1451,6 @@ public class playermenu extends Activity {
     		text=path.replaceFirst("/mnt/sdb","/mnt/sdb");
     	else if(path.startsWith("/mnt/sdcard"))
     		text=path.replaceFirst("/mnt/sdcard","/mnt/sdcard");
-		*/	
     	return text;
     }
     

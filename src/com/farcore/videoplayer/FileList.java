@@ -229,16 +229,30 @@ public class FileList extends ListActivity {
 		 }
 		    
 	    tileText =(TextView) findViewById(R.id.TextView_path);
-	    if(filePath.startsWith("/mnt/flash"))
+	    /*if(filePath.startsWith("/mnt/flash"))
 	    	filePath=filePath.replaceFirst("/mnt/flash","/mnt/nand");
 	    else if(filePath.startsWith("/mnt/sda"))
 	    	filePath=filePath.replaceFirst("/mnt/sda","/mnt/usb sda");
 	    else if(filePath.startsWith("/mnt/sdb"))
-	    	filePath=filePath.replaceFirst("/mnt/sdb","/mnt/usb sdb");
-	    tileText.setText(filePath);
+	    	filePath=filePath.replaceFirst("/mnt/sdb","/mnt/usb sdb");*/
+	    tileText.setText(catShowFilePath(filePath));
 	    setListAdapter(new MyAdapter(this,items,paths));
 	}
 
+    private String catShowFilePath(String path) {
+    	String text = null;
+    	
+    	if(path.startsWith("/mnt/flash"))
+    		text=path.replaceFirst("/mnt/flash","/mnt/nand");
+    	else if(path.startsWith("/mnt/sda"))
+    		text=path.replaceFirst("/mnt/sda","/mnt/usb sda");
+    	else if(path.startsWith("/mnt/sdb"))
+    		text=path.replaceFirst("/mnt/sdb","/mnt/usb sdb");
+    	//else if(path.startsWith("/mnt/sdcard"))
+    		//text=path.replaceFirst("/mnt/sdcard","sdcard");
+    	return text;
+    }
+    
 	public void searchFile(File file)
 	{
 	    File[] the_Files;
