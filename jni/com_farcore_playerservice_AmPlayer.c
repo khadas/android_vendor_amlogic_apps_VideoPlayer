@@ -698,6 +698,22 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setAudioTrack
 
 /*
  * Class:     com_farcore_playerservice_MediaPlayer
+ * Method:    setAudioTrack
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setAudioChannel
+  (JNIEnv *env, jobject obj, jint pid, jint aud_channel){
+	if(aud_channel == 0)
+		audio_stereo(pid);
+	else if(aud_channel == 1)
+		audio_left_mono(pid) ;
+	else if(aud_channel == 2)
+		audio_right_mono(pid);
+    return 0;
+}
+
+/*
+ * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    setVolume
  * Signature: (I)I
  */

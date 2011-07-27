@@ -1,6 +1,7 @@
 package com.farcore.playerservice;
 
 import com.farcore.playerservice.MediaInfo;
+import com.farcore.playerservice.DivxInfo;
 
 interface Player
 {
@@ -13,7 +14,9 @@ interface Player
 	int Stop();
 	int Close();
 	MediaInfo GetMediaInfo();
+	DivxInfo GetDivxInfo();
 	int SwitchAID(int id);
+	int SwitchAudioChannel(int id);
 
 	int  SetColorKey(int color);
 	void DisableColorKey();

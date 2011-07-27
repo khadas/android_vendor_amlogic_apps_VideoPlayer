@@ -103,6 +103,15 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setSubtitleOut
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setAudioTrack
   (JNIEnv *, jobject, jint, jint);
 
+
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    setAudioChannel
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_setAudioChannel
+  (JNIEnv *, jobject, jint, jint);
+
 /*
  * Class:     com_farcore_playerservice_AmPlayer
  * Method:    setRepeat
