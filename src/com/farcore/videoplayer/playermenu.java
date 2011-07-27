@@ -52,7 +52,8 @@ public class playermenu extends Activity {
 	private int playPosition = 0;
 	private int cur_audio_stream = 0;
 	private int total_audio_num = 0;
-
+	private int cur_audio_channel = 0;
+	
     private final int PLAY_RESUME = 0;
     private final int PLAY_MODE = 1;
     private final int AUDIOTRACK = 2;
@@ -60,6 +61,7 @@ public class playermenu extends Activity {
     private final int BRIGHTNESS = 4;
 	private final int PLAY3D = 5;
 	private final int PLAYCHAPTERS = 6;
+	private final int AUDIO_CHANNEL = 7;
 
 	private boolean backToFileList = false;
 	private boolean progressSliding = false;
@@ -257,7 +259,24 @@ public class playermenu extends Activity {
 				list.get(pos).put("item_sel", R.drawable.item_img_sel);
 			    break;
 			case PLAYCHAPTERS:
-			    break;		
+			    break;	
+			
+            case AUDIO_CHANNEL:
+				map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.str_stereo_auidochannel));
+                map.put("item_sel", R.drawable.item_img_unsel);
+				list.add(map);
+				map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.str_left_auidochannel));
+                map.put("item_sel", R.drawable.item_img_unsel);
+				list.add(map);
+				map = new HashMap<String, Object>();
+				map.put("item_name", getResources().getString(R.string.str_right_auidochannel));
+                map.put("item_sel", R.drawable.item_img_unsel);
+				list.add(map);
+ 
+				list.get(pos).put("item_sel", R.drawable.item_img_sel);
+	
             default:
                 break;
         }
@@ -445,7 +464,34 @@ public class playermenu extends Activity {
                 otherbar.requestFocus();
             } 
     	});
-
+/*
+		ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannel);
+		audiochannel.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				otherbar.setVisibility(View.VISIBLE);
+    			morbar.setVisibility(View.GONE);
+    			morebar_tileText.setText(R.string.setting_audiochannel);
+    			ListView listView = (ListView)findViewById(R.id.AudioListView);
+                listView.setAdapter(getMorebarListAdapter(AUDIO_CHANNEL, cur_audio_channel));
+    			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
+				    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+						Log.d(TAG,"set audio channel "+String.valueOf(arg2));
+						cur_audio_channel = arg2;
+						try
+						{
+							m_Amplayer.SwitchAudioChannel(cur_audio_channel);
+						}
+						catch (RemoteException e) {
+							e.printStackTrace();
+						}
+						otherbar.setVisibility(View.GONE);
+				    	morbar.setVisibility(View.VISIBLE);
+				    }	
+				});
+				otherbar.requestFocus();
+			}
+		});
+*/
     	ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
     	audiotrack.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {

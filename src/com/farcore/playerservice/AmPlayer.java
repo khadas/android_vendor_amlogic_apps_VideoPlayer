@@ -39,6 +39,7 @@ public class AmPlayer extends Service {
 	private native int fastrewind(int pid,int speed);
 	private native int setSubtitleOut(int pid, int sub_uid);
 	private native int setAudioTrack(int pid,int track_uid);
+	private native int setAudioChannel(int pid,int channel_id);
 	private native int setRepeat(int pid, int isRepeat);
 	private native Object getMetaInfo(int pid);
     private native Object getDivxInfo(int pid);
@@ -71,6 +72,7 @@ public class AmPlayer extends Service {
 	public int fastrewind(int speed) { return fastrewind(mPid,speed);}
 	public int setSubtitleOut( int sub_uid) { return setSubtitleOut(mPid,sub_uid);}
 	public int setAudioTrack(int track_uid) { return setAudioTrack(mPid,track_uid);}
+	public int setAudioChannel(int channel_id) { return setAudioChannel(mPid,channel_id);}
 	public int setRepeat(int isRepeat) { return setRepeat(mPid,isRepeat);}
 	public Object getMetaInfo() {return getMetaInfo(mPid);}
     public Object getDivxInfo() {return getDivxInfo(mPid);}
@@ -166,6 +168,12 @@ public class AmPlayer extends Service {
 		public int SwitchAID(int id) throws RemoteException {
 			setAudioTrack(id);
 			Log.d("audiostream","aid: " + id);
+			return 0;
+		}
+
+		public int SwitchAudioChannel(int id) throws RemoteException {
+			setAudioChannel(id);
+			Log.d("audiochannel ","select channel: " + id);
 			return 0;
 		}
 

@@ -46,4 +46,8 @@
     <string name="str_file_size">Size</string>
     <string name="str_file_resolution">Resolution</string>
     <string name="str_file_duration">Duration</string>
+	<string name="setting_audiochannel">Audio Chanel</string>
+	<string name="str_left_auidochannel">Left Mono</string>
+	<string name="str_right_auidochannel">Right Mono</string>
+	<string name="str_stereo_auidochannel">Stereo</string>
 </resources>
