@@ -1749,7 +1749,6 @@ public class playermenu extends Activity {
                 }
             }
             mSuspendFlag = false;
-            closeScreenOffTimeout();
         }
         else {
             if (!backToFileList){
@@ -2302,11 +2301,12 @@ public class playermenu extends Activity {
 	    @Override
 	    public void onResume() {
 	        super.onResume();
+            closeScreenOffTimeout();
 
-        int getRotation = mWindowManager.getDefaultDisplay().getRotation();
-        Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
-        if((getRotation >= 0) && (getRotation <= 3))
-        	SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+	        int getRotation = mWindowManager.getDefaultDisplay().getRotation();
+	        Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
+	        if((getRotation >= 0) && (getRotation <= 3))
+	        	SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
 	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 			m_storagemgr.registerListener(mListener);
 	    }
