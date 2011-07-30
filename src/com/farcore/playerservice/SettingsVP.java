@@ -193,7 +193,7 @@ public class SettingsVP {
 			try
 			{
 				ifDisable = in.readLine();
-				if (ifDisable.equals("1"))
+				if (ifDisable.equals("2"))
 				{
 					Log.d(TAG, "video layout now is disable. ");
 					return false;
@@ -214,7 +214,7 @@ public class SettingsVP {
 			BufferedWriter out = new BufferedWriter(new FileWriter(video_layout_disable), 32);
     		try
     		{
-    			out.write("1");    
+    			out.write("2");    
     			Log.d(TAG, "disable video layout ok.");
     		} finally {
 				out.close();
