@@ -1096,15 +1096,33 @@ public class playermenu extends Activity {
                 FF_FLAG = false;
             }
         } 
-    	else if (keyCode == KeyEvent.KEYCODE_7) {
+    	else if (keyCode == KeyEvent.KEYCODE_MEDIA_REPEAT) {
     		videobar();
-            ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
-            audiotrack.requestFocusFromTouch();
+    		ImageButton subtitle = (ImageButton) findViewById(R.id.PlaymodeBtn);
+    		subtitle.requestFocusFromTouch();
     		return (true);
     	}
-    	else if (keyCode == KeyEvent.KEYCODE_DEL) {
+      	else if (keyCode == KeyEvent.KEYCODE_MEDIA_INFO) {
+    		videobar();
+    		ImageButton subtitle = (ImageButton) findViewById(R.id.InfoBtn);
+    		subtitle.requestFocusFromTouch();
+    		return (true);
+    	}
+      	else if (keyCode == KeyEvent.KEYCODE_MEDIA_RATIO) {
+    		videobar();
+    		ImageButton subtitle = (ImageButton) findViewById(R.id.DisplayBtn);
+    		subtitle.requestFocusFromTouch();
+    		return (true);
+    	}
+      	else if (keyCode == KeyEvent.KEYCODE_MEDIA_SUB_T) {
     		videobar();
     		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
+    		subtitle.requestFocusFromTouch();
+    		return (true);
+    	}
+      	else if (keyCode == KeyEvent.KEYCODE_MEDIA_AUDIO) {
+    		videobar();
+    		ImageButton subtitle = (ImageButton) findViewById(R.id.ChangetrackBtn);
     		subtitle.requestFocusFromTouch();
     		return (true);
     	}
