@@ -38,31 +38,7 @@ public class FileList extends ListActivity {
 	private List<String> currentlist=null;
 	private String currenturl = null;
 	private String root_path = "/mnt";
-	private String extensions = "3gp," +
-								"asf," +
-								"avi," +
-								"dat," +
-								"divx," +
-								"f4v," +
-								"flv," +
-								"h264," +
-								"iso," +
-								"lst," +
-								"m2ts," +
-								"m4v," +
-								"mkv," +
-								"mp2," +
-								"mp4," +
-								"mov," +
-								"mpe,mpeg,mpg," +
-								"mts," +
-								"rm,rmvb," +
-								"ts," +
-								"tp," +
-								"mvc," +
-								"vc1," +
-								"vob," +
-								"wm,wmv";
+	private String extensions ;
 	
 	private TextView tileText;
 	private File file;
@@ -120,6 +96,8 @@ public class FileList extends ListActivity {
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		extensions = getResources().getString(R.string.support_video_extensions);
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 	    
