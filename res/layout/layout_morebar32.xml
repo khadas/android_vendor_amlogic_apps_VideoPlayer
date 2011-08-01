@@ -43,8 +43,8 @@
 			android:id="@+id/sub_switch" 
 			android:orientation="horizontal" 
 			android:layout_gravity="center_horizontal"
-		    android:layout_marginLeft="10dp" 
-		    android:layout_marginRight="10dp">
+		    android:layout_marginLeft="60dp" 
+		    android:layout_marginRight="60dp">
 			
 			<TextView
 			    android:id="@+id/TextView01" 
@@ -87,8 +87,8 @@
 		    android:id="@+id/sub_font" 
 		    android:orientation="horizontal" 
 		    android:layout_gravity="center_horizontal"
-		    android:layout_marginLeft="10dp" 
-		    android:layout_marginRight="10dp">
+		    android:layout_marginLeft="60dp" 
+		    android:layout_marginRight="60dp">
 		    
 		    <TextView
 		        android:layout_width="86dp" 
@@ -129,8 +129,8 @@
 			android:id="@+id/sub_color" 
 			android:orientation="horizontal" 
 			android:layout_gravity="center_horizontal"
-		    android:layout_marginLeft="10dp" 
-		    android:layout_marginRight="10dp">
+		    android:layout_marginLeft="60dp" 
+		    android:layout_marginRight="60dp">
 			
 			<TextView 
 			    android:layout_width="86dp" 
