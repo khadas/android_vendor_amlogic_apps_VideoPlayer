@@ -1880,6 +1880,7 @@ public class playermenu extends Activity {
 						Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_LONG)
 							.show();
 						if (msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
+								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT_VCODEC
 								|| msg.arg2 == Errorno.DECODER_INIT_FAILED
 								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT
 								|| msg.arg2 == Errorno.PLAYER_RD_FAILED) {

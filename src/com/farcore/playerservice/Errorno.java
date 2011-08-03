@@ -2,8 +2,7 @@ package com.farcore.playerservice;
 
 import com.farcore.videoplayer.PlayList;
 
-public class Errorno{
-	
+public class Errorno{	
     // error no
     public static final int PLAYER_SUCCESS 			=	0;
     public static final int PLAYER_FAILED  			=	-0x02000001;
@@ -40,6 +39,8 @@ public class Errorno{
 	public static final int PLAYER_NO_AUDIO  		= 	-0x02000045;
 	public static final int PLAYER_SET_NOVIDEO  	= 	-0x02000046;
 	public static final int PLAYER_SET_NOAUDIO  	= 	-0x02000047;
+	public static final int PLAYER_FFFB_UNSUPPORT   =   -0x02000048;
+	public static final int PLAYER_UNSUPPORT_VCODEC =   -0x02000049;
 
     public static final int FFMPEG_SUCCESS 			=   0;
     public static final int FFMPEG_OPEN_FAILED 		=   -0x03000001;
@@ -52,7 +53,7 @@ public class Errorno{
 
     public static String getErrorInfo(int errID)
     {
-    	String errStr = null;
+    	String errStr = null;		
     	switch (errID)
     	{
 			case Errorno.PLAYER_UNSUPPORT:
@@ -88,6 +89,13 @@ public class Errorno{
             case Errorno.DIVX_AUTHOR_ERR:
                 errStr = "This player is not authorized to play this video";
                 break;
+				
+			case Errorno.PLAYER_UNSUPPORT_VCODEC:
+				errStr = "Unsupport Video codec";				
+				break;
+			case Errorno.PLAYER_FFFB_UNSUPPORT:
+				errStr = "Unsupport ff/fb";
+				break;
 			default:
 				errStr = "Unknow Error";
 				break;
