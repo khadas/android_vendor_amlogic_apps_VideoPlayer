@@ -46,4 +46,8 @@
     <string name="str_file_size">大小</string>
     <string name="str_file_resolution">分辨率</string>
     <string name="str_file_duration">片长</string>
+    <string name="setting_audiochannel">音频声道</string>
+	<string name="str_left_auidochannel">左声道</string>
+	<string name="str_right_auidochannel">右声道</string>
+	<string name="str_stereo_auidochannel">立体声</string>
 </resources>

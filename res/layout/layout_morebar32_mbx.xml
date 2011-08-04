@@ -380,7 +380,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
-		    
+		    <!--
 		    <ImageButton
 		        android:id="@+id/Play3DBtn" 
 		        android:src="@drawable/play_3d" 
@@ -390,7 +390,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
-		    
+		    -->
 		    <ImageButton
 		        android:id="@+id/ChangetrackBtn" 
 		        android:src="@drawable/change_track" 
@@ -420,7 +420,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
-		    
+		    <!--
 		    <ImageButton
 		        android:id="@+id/BrightnessBtn" 
 		        android:src="@drawable/brightness" 
@@ -430,6 +430,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
+			-->
 		    <ImageButton
 		        android:id="@+id/AudioChannelBtn" 
 		        android:src="@drawable/audio_channel" 

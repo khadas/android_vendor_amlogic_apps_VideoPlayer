@@ -3,14 +3,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" 
-    android:background="@color/transparent_background"> 
+    android:background="@color/background"> 
     
-    <VideoView
-    	  android:id="@+id/video_view"
-        android:layout_height="fill_parent"
-        android:layout_width="fill_parent">
-    </VideoView>
-
     <LinearLayout 
         android:layout_width="wrap_content" 
 	    android:layout_height="wrap_content" 
@@ -235,6 +229,8 @@
 		android:background="@drawable/dialog_bk" 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:layout_marginLeft="60dp" 
+		android:layout_marginRight="60dp"
 	    android:layout_gravity="center"
 	    android:gravity="center">
 		
@@ -243,8 +239,6 @@
 			android:layout_gravity="center" 
 			android:layout_width="wrap_content" 
 			android:layout_height="54dp" 
-			android:layout_marginLeft="60dp" 
-			android:layout_marginRight="60dp"
 			android:gravity="center" 
 			android:textColor="@drawable/white" 
 			android:textSize="20px">
@@ -380,7 +374,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
-		    
+		  <!--  
 		    <ImageButton
 		        android:id="@+id/Play3DBtn" 
 		        android:src="@drawable/play_3d" 
@@ -390,7 +384,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
-		    
+		    -->
 		    <ImageButton
 		        android:id="@+id/ChangetrackBtn" 
 		        android:src="@drawable/change_track" 
@@ -420,7 +414,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
-		    
+		    	  <!--  
 		    <ImageButton
 		        android:id="@+id/BrightnessBtn" 
 		        android:src="@drawable/brightness" 
@@ -430,6 +424,7 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
+			-->
 		    <ImageButton
 		        android:id="@+id/AudioChannelBtn" 
 		        android:src="@drawable/audio_channel" 

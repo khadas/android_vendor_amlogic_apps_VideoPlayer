@@ -286,9 +286,23 @@ public class playermenu extends Activity {
 
     private void videobar() {
         if (fb32) {
-            setContentView(R.layout.layout_morebar32);
+			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
+            {
+				setContentView(R.layout.layout_morebar32);
+			}
+			else
+			{
+				setContentView(R.layout.layout_morebar32_mbx);
+			}
         } else {
-            setContentView(R.layout.layout_morebar);
+			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
+            {
+				setContentView(R.layout.layout_morebar);
+			}
+			else
+			{
+				setContentView(R.layout.layout_morebar_mbx);
+			}
         }
     	
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
@@ -376,7 +390,8 @@ public class playermenu extends Activity {
     	else {
     		playmode.setImageDrawable(getResources().getDrawable(R.drawable.mode_disable));
     	}
-
+		if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
+        {
     	ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
     	play3d.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
@@ -464,8 +479,8 @@ public class playermenu extends Activity {
                 otherbar.requestFocus();
             } 
     	});
-/*
-		ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannel);
+		}
+		ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannelBtn);
 		audiochannel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				otherbar.setVisibility(View.VISIBLE);
@@ -491,7 +506,7 @@ public class playermenu extends Activity {
 				otherbar.requestFocus();
 			}
 		});
-*/
+
     	ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
     	audiotrack.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
@@ -736,7 +751,8 @@ public class playermenu extends Activity {
                 otherbar.requestFocus();
             } 
     	});
-    	
+    	if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
+        {
     	ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
     	brigtness.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
@@ -811,7 +827,7 @@ public class playermenu extends Activity {
 				otherbar.requestFocus();
 			} 
     	}); 
-    	
+    	}
     	ImageButton backtovidebar = (ImageButton) findViewById(R.id.BackBtn);
     	backtovidebar.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {

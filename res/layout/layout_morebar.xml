@@ -424,7 +424,15 @@
 		        android:layout_weight="1"
 		        android:gravity="center">
 		    </ImageButton>
-		    
+		    <ImageButton
+		        android:id="@+id/AudioChannelBtn" 
+		        android:src="@drawable/audio_channel" 
+		        android:background="@drawable/btn_button"
+		        android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content" 
+		        android:layout_weight="1"
+		        android:gravity="center">
+		    </ImageButton>		    
 		    <ImageButton
     	        android:id="@+id/InfoBtn" 
     	        android:layout_width="wrap_content" 
