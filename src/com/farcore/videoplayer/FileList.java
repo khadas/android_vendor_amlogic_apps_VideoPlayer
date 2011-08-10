@@ -193,7 +193,8 @@ public class FileList extends ListActivity {
 	    		else if((!tpath.equals("/mnt/sdcard"))&&tpath.startsWith("/mnt/sd"))
 	    			 tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
 	    		//delete used folder
-	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure")))
+	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure"))&&
+	    			(!tpath.equals("/mnt/obb")))
 	    		{
 	    			items.add(tmppath);
 	    	    	paths.add(tempF.getPath());
