@@ -24,32 +24,10 @@ public class SettingsVP {
 	private static String TAG = "SettingVideoPlayer";
 	public static String display_mode = null; 
 	public static String panel_resolution = null;
-	
-	//==========preferences name==========
-	public static final String[] pref_name = { 
-											   "filename0",
-											   "filename1",
-											   "filename2",
-											   "filename3",
-											   "filename4",
-											   "filename5",
-											   "filename6",
-											   "filename7",
-											   "filename8",
-											   "filename9",
-											   "filetime0",
-											   "filetime1",
-											   "filetime2",
-											   "filetime3",
-											   "filetime4",
-											   "filetime5",
-											   "filetime6",
-											   "filetime7",
-											   "filetime8",
-											   "filetime9",
-											   "ResumeMode",
-											   };
-	
+	public static int panel_width = 0;
+	public static int panel_height = 0;
+	public static final String RESUME_MODE = "ResumeMode";
+	public static final String DISPLAY_MODE = "DisplayMode";
 	
 	public static void init(Activity act)
 	{
@@ -127,6 +105,8 @@ public class SettingsVP {
 				String[] axisstr = dispaxis.split(" ", 5);
 				
 				panel_resolution = axisstr[2]+"x"+axisstr[3];
+				panel_width = Integer.parseInt(axisstr[2]);
+				panel_height = Integer.parseInt(axisstr[3]);
 				Log.d(TAG, "Panel resolution: "+panel_resolution);
 				if (dispMode.equals("panel"))
 				{

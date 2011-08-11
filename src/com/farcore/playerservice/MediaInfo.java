@@ -7,7 +7,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class MediaInfo {
-	
     public static final Parcelable.Creator<MediaInfo> CREATOR = new
     Parcelable.Creator<MediaInfo>() {
     	public MediaInfo createFromParcel(Parcel in) {
@@ -22,7 +21,6 @@ public class MediaInfo {
 
     public void writeToParcel(Parcel reply, int parcelableWriteReturnValue) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public boolean hasAudioTrack() {
@@ -30,7 +28,7 @@ public class MediaInfo {
 	}
 
     public int getAudioTrackCount() {
-    	if (ainfo == null)
+    	if(ainfo == null)
     		return 0;
 		return ainfo.length;
 	}
@@ -40,15 +38,14 @@ public class MediaInfo {
     }
     
     public AudioMediaInfo getAudioTrack(int idx) {
-    	if (ainfo == null)
+    	if(ainfo == null)
     		return null;
     	
-    	if (idx < 0 || idx >= ainfo.length)
+    	if(idx < 0 || idx >= ainfo.length)
     		return null;
     	
     	return ainfo[idx];
     }
-
 
 	public AudioMediaInfo[] ainfo;
 	public int seekable;
@@ -59,24 +56,28 @@ public class MediaInfo {
 	private int height;
     public int drm_check;
 	
-	public String getFileName(String path)
-	{
+	public String getFileName(String path) {
 		File f = new File(path);
 		String filename = f.getName();
 		filename = filename.substring(0, filename.lastIndexOf("."));
 		return filename;
 	}
 	
-	public String getResolution()
-	{
+	public String getResolution() {
 		return width + "*" + height;
 	}
 	
-	public String getFileType()
-	{
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public String getFileType() {
 		String str_type = "UNKNOWN";
-		switch (filetype)
-		{
+		switch(filetype) {
 		case 0:
 			break;
 		case 1:
@@ -136,20 +137,17 @@ public class MediaInfo {
 		return str_type;
 	}
 	
-	public String getFileSize()
-	{
+	public String getFileSize() {
 		long fs = filesize;
 		String str_size = "0";
-		if (fs <= 1024)
+		if(fs <= 1024)
 			str_size = "1KB";
-		else if (fs <= 1024 * 1024)
-		{
+		else if(fs <= 1024 * 1024) {
 			fs /= 1024;
 			fs += 1;
 			str_size = fs + "KB";
 		}
-		else if (fs > 1024 * 1024)
-		{
+		else if (fs > 1024 * 1024) {
 			fs /= 1024*1024;
 			fs += 1;
 			str_size = fs + "MB";

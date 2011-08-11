@@ -39,6 +39,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import android.graphics.Typeface;
 
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
@@ -64,13 +65,15 @@ public class playermenu extends Activity {
 	private final int AUDIO_CHANNEL = 7;
 
 	private boolean backToFileList = false;
-	private boolean progressSliding = false;
+	//private boolean progressSliding = false;
 	private boolean INITOK = false;
 	private boolean FF_FLAG = false;
 	private boolean NOT_FIRSTTIME = false;
 	private static final int MID_FREESCALE = 0x10001;
     private boolean fb32 = false;
     
+    private boolean seek = false;
+    private int seek_cur_time = 0;
     //for repeat mode;
 	private boolean playmode_switch = true;
     private static int m_playmode = 1;
@@ -99,9 +102,9 @@ public class playermenu extends Activity {
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 	
 	//for subtitle
-	private SubtitleUtils subMange = null;
-	private SubtitleView  subTitleView = null;
-	private subview_set   sub_para = null;
+	private SubtitleUtils subtitleUtils = null;
+	private SubtitleView subTitleView = null;
+	private subview_set sub_para = null;
 	private int sub_switch_state = 0;
 	private int sub_font_state = 0;
 	private int sub_color_state = 0;
@@ -143,19 +146,29 @@ public class playermenu extends Activity {
 	PowerManager.WakeLock mScreenLock = null;
 
 	public void setAngleTable() {
-		if(SystemProperties.get("ro.sf.hwrotation").equals("90")) {
+		String hwrotation = SystemProperties.get("ro.sf.hwrotation");
+		if(hwrotation == null) {
+			angle_table[0] = 0;
+			angle_table[1] = 1;
+			angle_table[2] = 2;
+			angle_table[3] = 3;
+			Log.e(TAG, "setAngleTable, Can not get hw rotation!");
+			return;
+		}
+		
+		if(hwrotation.equals("90")) {
 			angle_table[0] = 1;
 			angle_table[1] = 2;
 			angle_table[2] = 3;
 			angle_table[3] = 0;
 		}
-		else if(SystemProperties.get("ro.sf.hwrotation").equals("180")) {
+		else if(hwrotation.equals("180")) {
 			angle_table[0] = 2;
 			angle_table[1] = 3;
 			angle_table[2] = 0;
 			angle_table[3] = 1;
 		}
-		else if(SystemProperties.get("ro.sf.hwrotation").equals("270")) {
+		else if(hwrotation.equals("270")) {
 			angle_table[0] = 3;
 			angle_table[1] = 0;
 			angle_table[2] = 1;
@@ -283,31 +296,38 @@ public class playermenu extends Activity {
 
         return list;
     }
-
+	
     private void videobar() {
-        if (fb32) {
-			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
-            {
+        if(fb32) {
+			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true)) {
 				setContentView(R.layout.layout_morebar32);
 			}
-			else
-			{
+			else {
 				setContentView(R.layout.layout_morebar32_mbx);
 			}
-        } else {
-			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
-            {
+        } 
+		else {
+			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true)) {
 				setContentView(R.layout.layout_morebar);
 			}
-			else
-			{
+			else {
 				setContentView(R.layout.layout_morebar_mbx);
 			}
         }
+        FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
+    	if (SettingsVP.display_mode.equals("480p")) {
+    		FrameLayout.LayoutParams linearParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+    		linearParams.width = 720;
+    		linearParams.height = 480;
+    		linearParams.gravity = -1;
+    		baselayout2.setLayoutParams(linearParams);
+    	}
     	
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
+    	subTitleView.setGravity(Gravity.CENTER);
     	subTitleView.setTextColor(sub_para.color);
     	subTitleView.setTextSize(sub_para.font);
+    	subTitleView.setTextStyle(Typeface.BOLD);
     	openFile(sub_para.sub_id);
 		
 		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
@@ -320,43 +340,27 @@ public class playermenu extends Activity {
 		infodialog = (LinearLayout)findViewById(R.id.dialog_layout);
 		infodialog.setVisibility(View.GONE);
     	morbar = (LinearLayout)findViewById(R.id.morebarLayout);
-    	if (SettingsVP.display_mode.equals("480p")) {
-    		LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) morbar.getLayoutParams();
-    		if(SettingsVP.panel_resolution.equals("800x600")) {
-    			linearParams.width = 720;
-    			linearParams.bottomMargin = 140;
-    		}
-    		else if(SettingsVP.panel_resolution.equals("800x480")) {
-    			linearParams.width = 720;
-    			linearParams.bottomMargin = 10;
-    		}
-    		else {
-    			linearParams.width = 720;
-    			linearParams.bottomMargin = 140;
-    		}
-    		morbar.setLayoutParams(linearParams);
-    		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-    				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    	}
     	morbar.requestFocus();
     	
     	ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
     	resume.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
 			    otherbar.setVisibility(View.VISIBLE);
+			    subTitleView.setViewStatus(false);
 				morbar.setVisibility(View.GONE);
 				morebar_tileText.setText(R.string.setting_resume);
 				
 				ListView listView = (ListView)findViewById(R.id.AudioListView);
-                listView.setAdapter(getMorebarListAdapter(PLAY_RESUME, SettingsVP.getParaBoolean("ResumeMode")
+                listView.setAdapter(getMorebarListAdapter(PLAY_RESUME, SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE)
                     ? 0 : 1));
 				listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					    if (position == 0)
-						    SettingsVP.putParaBoolean("ResumeMode", true);
+						    SettingsVP.putParaBoolean(SettingsVP.RESUME_MODE, true);
 						else if (position == 1)
-						    SettingsVP.putParaBoolean("ResumeMode", false);
+						    SettingsVP.putParaBoolean(SettingsVP.RESUME_MODE, false);
 						otherbar.setVisibility(View.GONE);
+						subTitleView.setViewStatus(true);
 						morbar.setVisibility(View.VISIBLE);
 					}
 				});
@@ -369,6 +373,7 @@ public class playermenu extends Activity {
     		playmode.setOnClickListener(new View.OnClickListener() {
     			public void onClick(View v) {
     				otherbar.setVisibility(View.VISIBLE);
+    				subTitleView.setViewStatus(false);
     				morbar.setVisibility(View.GONE);
     				morebar_tileText.setText(R.string.setting_playmode);
     				ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -380,6 +385,7 @@ public class playermenu extends Activity {
     				    	else if (position == 1)
     				    		m_playmode = REPEATONE;
     				    	otherbar.setVisibility(View.GONE);
+    				    	subTitleView.setViewStatus(true);
     				    	morbar.setVisibility(View.VISIBLE);
     				    }
     				});
@@ -396,6 +402,7 @@ public class playermenu extends Activity {
     	play3d.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
                 otherbar.setVisibility(View.VISIBLE);
+				subTitleView.setViewStatus(false);
                 morbar.setVisibility(View.GONE);
                 	
                 morebar_tileText.setText(R.string.setting_3d_mode);
@@ -473,6 +480,7 @@ public class playermenu extends Activity {
                     			break;
                     	}
                     	otherbar.setVisibility(View.GONE);
+						subTitleView.setViewStatus(true);
                     	morbar.setVisibility(View.VISIBLE);
                     }
                 });    
@@ -484,6 +492,7 @@ public class playermenu extends Activity {
 		audiochannel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				otherbar.setVisibility(View.VISIBLE);
+				subTitleView.setViewStatus(false);
     			morbar.setVisibility(View.GONE);
     			morebar_tileText.setText(R.string.setting_audiochannel);
     			ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -500,17 +509,19 @@ public class playermenu extends Activity {
 							e.printStackTrace();
 						}
 						otherbar.setVisibility(View.GONE);
+						subTitleView.setViewStatus(true);
 				    	morbar.setVisibility(View.VISIBLE);
 				    }	
 				});
 				otherbar.requestFocus();
 			}
 		});
-
+    	
     	ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
     	audiotrack.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
     			otherbar.setVisibility(View.VISIBLE);
+    			subTitleView.setViewStatus(false);
     			morbar.setVisibility(View.GONE);
     			morebar_tileText.setText(R.string.setting_audiotrack);
     			ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -534,6 +545,7 @@ public class playermenu extends Activity {
     			    		}
     			    	}
     			    	otherbar.setVisibility(View.GONE);
+    			    	subTitleView.setViewStatus(true);
     			    	morbar.setVisibility(View.VISIBLE);
     			    }	
     			});
@@ -552,6 +564,7 @@ public class playermenu extends Activity {
     				return;
     			}
     			subbar.setVisibility(View.VISIBLE);
+    			subTitleView.setViewStatus(false);
     			morbar.setVisibility(View.GONE);
     			subtitle_control();
     			subbar.requestFocus();
@@ -595,7 +608,7 @@ public class playermenu extends Activity {
     			    	if(sub_para.curid==sub_para.totalnum )
     			    		sub_para.sub_id =null;
     			    	else
-    			    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
+    			    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
     			    	
     			    	if(sub_color_state==0)
     			    		sub_para.color =android.graphics.Color.WHITE;
@@ -605,6 +618,7 @@ public class playermenu extends Activity {
     			    		sub_para.color =android.graphics.Color.BLUE;
     			    	
     			    	subbar.setVisibility(View.GONE);
+    			    	subTitleView.setViewStatus(true);
     			    	videobar();
     			    } 
     			});
@@ -612,6 +626,7 @@ public class playermenu extends Activity {
     			cancel.setOnClickListener(new View.OnClickListener() {
   		            public void onClick(View v) {
   		            	subbar.setVisibility(View.GONE);
+  		            	subTitleView.setViewStatus(true);
   		            	videobar();
   		            } 
   		        });
@@ -718,6 +733,7 @@ public class playermenu extends Activity {
     	display.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
                 otherbar.setVisibility(View.VISIBLE);
+                subTitleView.setViewStatus(false);
                 morbar.setVisibility(View.GONE);
                 	
                 morebar_tileText.setText(R.string.setting_displaymode);
@@ -727,24 +743,30 @@ public class playermenu extends Activity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     	switch (position) {
                     		case ScreenMode.NORMAL:
+                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL);
                     			ScreenMode.setScreenMode("0");
                     			break;
                     		case ScreenMode.FULLSTRETCH:
+                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.FULLSTRETCH);
                     			ScreenMode.setScreenMode("1");
                     			break;
                     		case ScreenMode.RATIO4_3:
+                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO4_3);
                     			ScreenMode.setScreenMode("2");
                     			break;
                     		case ScreenMode.RATIO16_9:
+                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO16_9);
                     			ScreenMode.setScreenMode("3");
                     			break;
                             case ScreenMode.NORMAL_NOSCALEUP:
+                            	SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL_NOSCALEUP);
                                 ScreenMode.setScreenMode("4");
                     			break;
                     		default:
                     			break;
                     	}
                     	otherbar.setVisibility(View.GONE);
+                    	subTitleView.setViewStatus(true);
                     	morbar.setVisibility(View.VISIBLE);
                     }
                 });    
@@ -757,6 +779,7 @@ public class playermenu extends Activity {
     	brigtness.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
                 otherbar.setVisibility(View.VISIBLE);
+                subTitleView.setViewStatus(false);
                 morbar.setVisibility(View.GONE);
                 morebar_tileText.setText(R.string.setting_brightness);
                 ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -821,6 +844,7 @@ public class playermenu extends Activity {
                         catch (RemoteException doe) {
 					    }  
                         otherbar.setVisibility(View.GONE);
+                        subTitleView.setViewStatus(true);
                         morbar.setVisibility(View.VISIBLE);
                     }
                 });
@@ -831,6 +855,8 @@ public class playermenu extends Activity {
     	ImageButton backtovidebar = (ImageButton) findViewById(R.id.BackBtn);
     	backtovidebar.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
+    			if(!SettingsVP.display_mode.equals("480p"))
+    				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 if (fb32) {
                     setContentView(R.layout.infobar32);
                 } else {
@@ -839,8 +865,6 @@ public class playermenu extends Activity {
                 initinfobar();
                 ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
                 morebtn.requestFocus();
-    			if(!SettingsVP.display_mode.equals("480p"))
-    				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     		} 
     	}); 
     	
@@ -848,6 +872,7 @@ public class playermenu extends Activity {
     	fileinformation.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
 				infodialog.setVisibility(View.VISIBLE);
+				subTitleView.setViewStatus(false);
 				morbar.setVisibility(View.GONE);
 				TextView title = (TextView)findViewById(R.id.info_title);
 				title.setText(R.string.str_file_information);
@@ -883,6 +908,7 @@ public class playermenu extends Activity {
 				ok.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
                         infodialog.setVisibility(View.GONE);
+                        subTitleView.setViewStatus(true);
                         morbar.setVisibility(View.VISIBLE);
 					}
 				});
@@ -900,8 +926,6 @@ public class playermenu extends Activity {
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
-        Log.i(TAG, "onKeyDown " + keyCode);
-
         if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
             if (infobar.getVisibility() == View.VISIBLE)
                 waitForHide();
@@ -946,7 +970,7 @@ public class playermenu extends Activity {
 					subTitleView.closeSubtitle();	
                 if (!fb32) {
                     // Hide the view with key color
-                    LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
+                    FrameLayout layout = (FrameLayout) findViewById(R.id.BaseLayout1);
                     if (layout != null) {
                         layout.setVisibility(View.INVISIBLE);
                         layout.invalidate();
@@ -1150,27 +1174,28 @@ public class playermenu extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         fb32 = SystemProperties.get("sys.fb.bits", "16").equals("32");
 
-        if (fb32) {
+        if(fb32) {
             setTheme(R.style.theme_trans);
         }
 
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        if (AmPlayer.getProductType() == 1)
+        if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
         foreground.setForeground(null);
-
-        if (fb32) {
+        
+        if(fb32) {
             setContentView(R.layout.infobar32);
-        } else {
+        } 
+        else {
             setContentView(R.layout.infobar);
         }
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
 
         infobar = (LinearLayout) findViewById(R.id.infobarLayout);
-        if (infobar != null)
+        if(infobar != null)
             infobar.setVisibility(View.GONE);
 
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
@@ -1178,8 +1203,8 @@ public class playermenu extends Activity {
         closeScreenOffTimeout();
         Intent it = this.getIntent();
         playmode_switch = true;
-        if (it.getData() != null) {
-        	if (it.getData().getScheme().equals("file")) {
+        if(it.getData() != null) {
+        	if(it.getData().getScheme().equals("file")) {
         		List<String> paths = new ArrayList<String>();
                 paths.add(it.getData().getPath());
                 PlayList.getinstance().setlist(paths, 0);
@@ -1189,8 +1214,8 @@ public class playermenu extends Activity {
                 cursor.moveToFirst();
 
                 int index = cursor.getColumnIndex(MediaStore.Video.Media.DATA);
-                if ((index == -1) || (cursor.getCount() <= 0)) {
-                    Log.d(TAG, "Cursor empty or failed\n"); 
+                if((index == -1) || (cursor.getCount() <= 0)) {
+                    Log.e(TAG, "Cursor empty or failed\n"); 
                 }
                 else {
                     List<String> paths = new ArrayList<String>();
@@ -1211,13 +1236,18 @@ public class playermenu extends Activity {
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
         SettingsVP.enableVideoLayout();
+        if(SettingsVP.display_mode.equals("480p")) {
+        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
 		subinit();
+		displayinit();
 		initinfobar();
 		IntentFilter intentFilter = new IntentFilter(ACTION_HDMISWITCH_MODE_CHANGED);
 		mReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				if (ACTION_HDMISWITCH_MODE_CHANGED.equals(intent.getAction())) {			 
+				if(ACTION_HDMISWITCH_MODE_CHANGED.equals(intent.getAction())) {			 
 					Intent selectFileIntent = new Intent();
 					selectFileIntent.setClass(playermenu.this, FileList.class);	
 					backToFileList = true;
@@ -1228,27 +1258,53 @@ public class playermenu extends Activity {
 		};
 		registerReceiver(mReceiver, intentFilter);
 		
-        mWindowManager = getWindowManager();
+		mWindowManager = getWindowManager();
         setAngleTable();
+        seek = false;
+        seek_cur_time = 0;
         
-		if (SettingsVP.getParaBoolean("ResumeMode"))
+		if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
 			resumePlay();
 		else {
-			if (!NOT_FIRSTTIME)
+			if(!NOT_FIRSTTIME)
     			StartPlayerService();
         	else
         		Amplayer_play();
 		}
 
-        if (infobar != null) {
+        if(infobar != null) {
             infobar.setVisibility(View.VISIBLE);
             ImageButton browser = (ImageButton) findViewById(R.id.BrowserBtn);
             browser.requestFocus();
         }
     }
     
+    private void displayinit() {
+    	int mode = SettingsVP.getParaInt(SettingsVP.DISPLAY_MODE);
+    	switch (mode) {
+		case ScreenMode.NORMAL:
+			ScreenMode.setScreenMode("0");
+			break;
+		case ScreenMode.FULLSTRETCH:
+			ScreenMode.setScreenMode("1");
+			break;
+		case ScreenMode.RATIO4_3:
+			ScreenMode.setScreenMode("2");
+			break;
+		case ScreenMode.RATIO16_9:
+			ScreenMode.setScreenMode("3");
+			break;
+        case ScreenMode.NORMAL_NOSCALEUP:
+            ScreenMode.setScreenMode("4");
+			break;
+		default:
+			Log.e(TAG, "load display mode para error!");
+			break;
+		}
+    }
+    
     protected void subinit() {
-        subMange = new SubtitleUtils(PlayList.getinstance().getcur());
+        subtitleUtils = new SubtitleUtils(PlayList.getinstance().getcur());
         sub_para = new subview_set();
          
         sub_para.totalnum = 0;
@@ -1275,10 +1331,31 @@ public class playermenu extends Activity {
     }
     
     protected void initinfobar() {
+	    LinearLayout.LayoutParams linearParams = null;
     	//set subtitle
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle);
+    	subTitleView.setGravity(Gravity.CENTER);
     	subTitleView.setTextColor(sub_para.color);
     	subTitleView.setTextSize(sub_para.font);
+    	subTitleView.setTextStyle(Typeface.BOLD);
+
+        if(SettingsVP.display_mode.equals("480p")) {
+        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
+        	if(SettingsVP.panel_resolution.equals("800x600")) {
+            	linearParams.width = 720;
+            	linearParams.bottomMargin = 130;
+        	}
+        	else if(SettingsVP.panel_resolution.equals("800x480")) {
+            	linearParams.width = 720;
+            	linearParams.bottomMargin = 10;
+        	}
+        	else {
+            	linearParams.width = 720;
+            	linearParams.bottomMargin = 130;
+        	}
+        	linearParams.gravity = -1;
+        	subTitleView.setLayoutParams(linearParams);
+        }
     	openFile(sub_para.sub_id);
 	
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
@@ -1289,42 +1366,30 @@ public class playermenu extends Activity {
         fastforword = (ImageButton)findViewById(R.id.FastForward);
         fastreverse = (ImageButton)findViewById(R.id.FastReverse);
         infobar = (LinearLayout)findViewById(R.id.infobarLayout);
-        if (SettingsVP.display_mode.equals("480p"))
-        {
-        	infobar = (LinearLayout)findViewById(R.id.infobarLayout);
-        	LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
+        if(SettingsVP.display_mode.equals("480p")) {
+        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
         	if(SettingsVP.panel_resolution.equals("800x600")) {
-            	linearParams.width = 710;
-            	linearParams.height = 90;
-            	linearParams.leftMargin = 5;
-            	linearParams.bottomMargin = 140;
+            	linearParams.width = 720;
+            	linearParams.bottomMargin = 130;
         	}
         	else if(SettingsVP.panel_resolution.equals("800x480")) {
-            	linearParams.width = 710;
-            	linearParams.height = 90;
-            	linearParams.leftMargin = 5;
+            	linearParams.width = 720;
             	linearParams.bottomMargin = 10;
         	}
         	else {
-            	linearParams.width = 710;
-            	linearParams.height = 90;
-            	linearParams.leftMargin = 5;
-            	linearParams.bottomMargin = 140;
+            	linearParams.width = 720;
+            	linearParams.bottomMargin = 130;
         	}
         	linearParams.gravity = -1;
         	infobar.setLayoutParams(linearParams);
-        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
     	total_time = (TextView)findViewById(R.id.TextView04);
     	cur_time.setText(secToTime(curtime, false));
     	total_time.setText(secToTime(totaltime, true));
-    	if (bMediaInfo != null)
-    	{
-	    	if (bMediaInfo.seekable == 0)
-			{
+    	if(bMediaInfo != null) {
+	    	if(bMediaInfo.seekable == 0) {
 				myProgressBar.setEnabled(false);
 				fastforword.setEnabled(false);
 				fastreverse.setEnabled(false);
@@ -1333,10 +1398,8 @@ public class playermenu extends Activity {
 			}
     	}
     	
-        browser.setOnClickListener(new ImageButton.OnClickListener()
-    	{
-			public void onClick(View v) 
-			{
+        browser.setOnClickListener(new ImageButton.OnClickListener() {
+			public void onClick(View v) {
 			// TODO Auto-generated method stub
 				Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
@@ -1355,7 +1418,7 @@ public class playermenu extends Activity {
         preItem.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (!INITOK)
+				if(!INITOK)
 					return;
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().moveprev();
@@ -1375,7 +1438,7 @@ public class playermenu extends Activity {
         nextItem.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (!INITOK)
+				if(!INITOK)
 					return;
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().movenext();
@@ -1391,29 +1454,28 @@ public class playermenu extends Activity {
 			}
         });
         
-        if (player_status == VideoInfo.PLAYER_RUNNING)
+        if(player_status == VideoInfo.PLAYER_RUNNING)
 			play.setImageResource(R.drawable.pause);
         play.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (player_status == VideoInfo.PLAYER_RUNNING)
-				{
+				if(player_status == VideoInfo.PLAYER_RUNNING) {
 					try	{
 						m_Amplayer.Pause();
-					} catch(RemoteException e) {
+					} 
+					catch(RemoteException e) {
 						e.printStackTrace();
 					}
 				}
-				else if (player_status == VideoInfo.PLAYER_PAUSE)
-				{
+				else if(player_status == VideoInfo.PLAYER_PAUSE) {
 					try	{
 						m_Amplayer.Resume();
-					} catch(RemoteException e)	{
+					} 
+					catch(RemoteException e)	{
 						e.printStackTrace();
 					}
 				}
-				else if (player_status == VideoInfo.PLAYER_SEARCHING)
-				{
+				else if(player_status == VideoInfo.PLAYER_SEARCHING) {
 					try	{
 						if (FF_FLAG)
 							m_Amplayer.FastForward(0);
@@ -1428,21 +1490,21 @@ public class playermenu extends Activity {
                 
         fastforword.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
-				if (!INITOK)
+				if(!INITOK)
 					return;
-				if (player_status == VideoInfo.PLAYER_SEARCHING)
-				{
+				if(player_status == VideoInfo.PLAYER_SEARCHING) {
 					try	{
 						m_Amplayer.FastForward(0);
-					} catch(RemoteException e) {
+					} 
+					catch(RemoteException e) {
 						e.printStackTrace();
 					}
 				}
-				else
-				{
+				else {
 					try	{
 						m_Amplayer.FastForward(2);
-					} catch(RemoteException e) {
+					} 
+					catch(RemoteException e) {
 						e.printStackTrace();
 					}
 					FF_FLAG = true;
@@ -1452,21 +1514,21 @@ public class playermenu extends Activity {
         
         fastreverse.setOnClickListener(new Button.OnClickListener(){
 			public void onClick(View v) {
-				if (!INITOK)
+				if(!INITOK)
 					return;
-				if (player_status == VideoInfo.PLAYER_SEARCHING)
-				{
+				if(player_status == VideoInfo.PLAYER_SEARCHING) {
 					try	{
 						m_Amplayer.BackForward(0);
-					} catch(RemoteException e) {
+					} 
+					catch(RemoteException e) {
 						e.printStackTrace();
 					}
 				}
-				else
-				{
+				else {
 					try	{
 						m_Amplayer.BackForward(2);
-					} catch(RemoteException e) {
+					} 
+					catch(RemoteException e) {
 						e.printStackTrace();
 					}
 					FF_FLAG = false;
@@ -1474,47 +1536,45 @@ public class playermenu extends Activity {
 			}
         });
         
-        more.setOnClickListener(new ImageButton.OnClickListener()
-    	{
-			public void onClick(View v) 
-			{
+        more.setOnClickListener(new ImageButton.OnClickListener() {
+			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				videobar();
 			}
 		});
         
-        if (curtime != 0)
+        if(curtime != 0)
         	myProgressBar.setProgress(curtime*100/totaltime);
-        myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() 
-        {
-    
-			public void onStopTrackingTouch(SeekBar seekBar) 
-			{
+        myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
 				int dest = myProgressBar.getProgress();
 				int pos = totaltime * dest / 100;
-				try
-				{
-					m_Amplayer.Seek(pos);
+
+				try {
+					if(m_Amplayer != null) {
+				        seek = true;
+				        seek_cur_time = curtime;
+				        //Log.d(TAG, "seek curtime: " + curtime);
+						m_Amplayer.Seek(pos);
+					}
 				}
-				catch(RemoteException e)
-				{
+				catch(RemoteException e) {
+			        seek = false;
+			        seek_cur_time = 0;
 					e.printStackTrace();
 				}
 				waitForHide();
 			}
 			
-			public void onStartTrackingTouch(SeekBar seekBar) 
-			{
+			public void onStartTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
 				timer.cancel();
-				progressSliding = true;
+				//progressSliding = true;
 			}
 			
-			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) 
-			{
+			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
 				// TODO Auto-generated method stub
-				
 			}
 		});
         
@@ -1534,16 +1594,15 @@ public class playermenu extends Activity {
     	return text;
     }
     
-    public static int setCodecMips()
-	{
+    public static int setCodecMips() {
     	int tmp;
     	String buf = null;
 		File file = new File(InputFile);
-		if (!file.exists()) {        	
+		if(!file.exists()) {        	
         	return 0;
         }
 		file = new File(OutputFile);
-		if (!file.exists()) {        	
+		if(!file.exists()) {        	
         	return 0;
         }
 		//read
@@ -1554,11 +1613,12 @@ public class playermenu extends Activity {
 				Log.d(TAG, "file content:"+codec_mips);
 				tmp = Integer.parseInt(codec_mips)*2;
 				buf = Integer.toString(tmp);
-			} finally {
+			} 
+			finally {
     			in.close();
     		} 
 		}
-		catch (IOException e) {
+		catch(IOException e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when read "+InputFile);
 		} 
@@ -1569,7 +1629,8 @@ public class playermenu extends Activity {
     		try {
     			out.write(buf);    
     			Log.d(TAG, "set codec mips ok:"+buf);
-    		} finally {
+    		} 
+			finally {
 				out.close();
 			}
 			 return 1;
@@ -1583,17 +1644,18 @@ public class playermenu extends Activity {
     
     public static int setDefCodecMips() {
     	File file = new File(OutputFile);
-		if (!file.exists()) {        	
+		if(!file.exists()) {        	
         	return 0;
         }
-		if (codec_mips == null)
+		if(codec_mips == null)
 			return 0;
     	try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
     		try {
     			out.write(codec_mips);    
     			Log.d(TAG, "set codec mips ok:"+codec_mips);
-    		} finally {
+    		} 
+			finally {
 				out.close();
 			}
 			 return 1;
@@ -1617,6 +1679,7 @@ public class playermenu extends Activity {
     
     protected void waitForHide() {
     	final Handler handler = new Handler(){   
+    		  
             public void handleMessage(Message msg) {   
                 switch (msg.what) {       
                 case 0x3c:       
@@ -1628,8 +1691,9 @@ public class playermenu extends Activity {
                
         };   
         TimerTask task = new TimerTask(){   
+      
             public void run() {   
-                if (!touchVolFlag) {
+                if(!touchVolFlag) {
                     Message message = Message.obtain();
                     message.what = 0x3c;       
                     handler.sendMessage(message);     
@@ -1647,8 +1711,8 @@ public class playermenu extends Activity {
             public void handleMessage(Message msg) {   
                 switch (msg.what) {       
                 case 0x3d:
-                	if (confirm_dialog.isShowing()) {
-	                	if (resumeSecond > 0) {
+                	if(confirm_dialog.isShowing()) {
+	                	if(resumeSecond > 0) {
 	                		String cancel = playermenu.this.getResources().getString(R.string.str_cancel);
 	                		confirm_dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
 	                			.setText(cancel+" ( "+(--resumeSecond)+" )");
@@ -1680,6 +1744,8 @@ public class playermenu extends Activity {
     
     protected void hide_infobar() {
     	infobar.setVisibility(View.GONE);
+		if(subTitleView!=null)
+			subTitleView.redraw();
     	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
     			WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
@@ -1692,8 +1758,8 @@ public class playermenu extends Activity {
     
     public boolean onTouchEvent (MotionEvent event) {
     	super.onTouchEvent(event);
-    	if (event.getAction() == MotionEvent.ACTION_DOWN) {
-	    	if (infobar.getVisibility() == View.VISIBLE)
+    	if(event.getAction() == MotionEvent.ACTION_DOWN) {
+	    	if(infobar.getVisibility() == View.VISIBLE)
 	    		hide_infobar();
 	    	else {
 		    	show_menu();
@@ -1708,15 +1774,15 @@ public class playermenu extends Activity {
 		int hour = 0;
 		int minute = 0;
 		int second = 0;
-		if (i <= 0) {
-			if (isTotalTime && i<0)
+		if(i <= 0) {
+			if(isTotalTime && i<0)
 				return "99:59:59";
 			else
 				return "00:00:00";
 		}
 		else {
 			minute = i/60;
-			if (minute < 60) {
+			if(minute < 60) {
 				second = i%60;
 				retStr = "00:" + unitFormat(minute) + ":" + unitFormat(second);
 			}
@@ -1734,7 +1800,7 @@ public class playermenu extends Activity {
 	
 	private String unitFormat(int i) {
 		String retStr = null;
-		if (i >= 0 && i < 10)
+		if(i >= 0 && i < 10)
 			retStr = "0" + Integer.toString(i);
 		else
 			retStr = Integer.toString(i);
@@ -1752,7 +1818,8 @@ public class playermenu extends Activity {
         if(m_Amplayer != null)
 			try {
 				m_Amplayer.DisableColorKey();
-			} catch (RemoteException e) {
+			} 
+			catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -1762,7 +1829,7 @@ public class playermenu extends Activity {
         SettingsVP.disableVideoLayout();
         SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
-        if (AmPlayer.getProductType() == 1) //1:MID 0:other
+        if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         
         super.onDestroy();
@@ -1773,8 +1840,8 @@ public class playermenu extends Activity {
         super.onPause();
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         m_storagemgr.unregisterListener(mListener);
-        if (mSuspendFlag){
-            if (player_status == VideoInfo.PLAYER_RUNNING) {
+        if(mSuspendFlag){
+            if(player_status == VideoInfo.PLAYER_RUNNING) {
                 try{
                     m_Amplayer.Pause();
                 } 
@@ -1783,9 +1850,10 @@ public class playermenu extends Activity {
                 }
             }
             mSuspendFlag = false;
+            closeScreenOffTimeout();
         }
         else {
-            if (!backToFileList){
+            if(!backToFileList){
 			    PlayList.getinstance().rootPath =null;
             }
             finish();
@@ -1804,7 +1872,7 @@ public class playermenu extends Activity {
     		    	totaltime = msg.arg2;
     		    	
                     boolean mVfdDisplay = SystemProperties.getBoolean("hw.vfd", false);
-                    if (mVfdDisplay) {
+                    if(mVfdDisplay) {
                         String[] cmdtest = {
                             "/system/bin/sh",
                             "-c",
@@ -1816,15 +1884,23 @@ public class playermenu extends Activity {
                     }
 
     		    	//for subtitle tick;
-    		    	if (player_status == VideoInfo.PLAYER_RUNNING) {
+    		    	if(player_status == VideoInfo.PLAYER_RUNNING) {
     		    		if(subTitleView!=null&&sub_para.sub_id!=null)
     		    			subTitleView.tick(msg.arg1);
     		    	}
-    		    	if (totaltime == 0)
+    		    	if(totaltime == 0)
 						myProgressBar.setProgress(0);
 					else {
-						if (!progressSliding)
-							myProgressBar.setProgress(msg.arg1/1000*100/totaltime);
+						if(seek && (curtime <= (seek_cur_time+2))) {
+							//Log.d(TAG, "count curtime: " + curtime);
+							return;
+						}
+						//Log.d(TAG, "curtime: " + curtime);
+	
+						seek = false;
+						seek_cur_time = 0;
+						//if(!progressSliding)
+						myProgressBar.setProgress(msg.arg1/1000*100/totaltime);
 					}
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
@@ -1839,18 +1915,19 @@ public class playermenu extends Activity {
 						play.setImageResource(R.drawable.play);
 						break;
 					case VideoInfo.PLAYER_EXIT:						
-						if (PRE_NEXT_FLAG == 1 || (!backToFileList) ) {
+						if(PRE_NEXT_FLAG == 1 || (!backToFileList) ) {
     						Log.d(TAG,"to play another file!");
 							//new PlayThread().start();
-							if (SettingsVP.getParaBoolean("ResumeMode")) {
+							if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE)) {
 								if (resumePlay() == 0)
 									Amplayer_play();
-							} else {
+							}
+							else {
 								playPosition = 0;
 								Amplayer_play();
 							}
     						PRE_NEXT_FLAG = 0;
-							progressSliding = false;
+							//progressSliding = false;
     					}
 						if(subTitleView!=null)
 							subTitleView.closeSubtitle();
@@ -1859,7 +1936,7 @@ public class playermenu extends Activity {
 						InternalSubtitleInfo.setInsubNum(0);
 						
 						boolean mVfdDisplay_exit = SystemProperties.getBoolean("hw.vfd", false);
-						if (mVfdDisplay_exit) {
+						if(mVfdDisplay_exit) {
 						    String[] cmdtest = {
                                     "/system/bin/sh",
                                     "-c",
@@ -1883,7 +1960,7 @@ public class playermenu extends Activity {
 						}
 						ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
 						playPosition = 0;
-						if (m_playmode == REPEATLIST)
+						if(m_playmode == REPEATLIST)
 							PlayList.getinstance().movenext();
 						AudioTrackOperation.AudioStreamFormat.clear();
 						AudioTrackOperation.AudioStreamInfo.clear();
@@ -1895,11 +1972,12 @@ public class playermenu extends Activity {
 						InfoStr = Errorno.getErrorInfo(msg.arg2);
 						Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_LONG)
 							.show();
-						if (msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
-								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT_VCODEC
+						Log.d(TAG, "Player error, msg.arg2 = " + Integer.toString(msg.arg2));
+						if(msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
 								|| msg.arg2 == Errorno.DECODER_INIT_FAILED
 								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT
-								|| msg.arg2 == Errorno.PLAYER_RD_FAILED) {
+								|| msg.arg2 == Errorno.PLAYER_RD_FAILED
+								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT_VCODEC) {
 							Intent selectFileIntent = new Intent();
 							selectFileIntent.setClass(playermenu.this, FileList.class);
 							//close sub;
@@ -1928,7 +2006,13 @@ public class playermenu extends Activity {
 						catch(RemoteException e) {
 							e.printStackTrace();
 						}
-						if (bMediaInfo.drm_check == 0) {
+						if((bMediaInfo != null) && (subTitleView != null)) {
+							subTitleView.setDisplayResolution(
+									SettingsVP.panel_width, SettingsVP.panel_height);
+							subTitleView.setVideoResolution(
+									bMediaInfo.getWidth(), bMediaInfo.getHeight());
+						}
+						if(bMediaInfo.drm_check == 0) {
 						    try {
 							    m_Amplayer.Play();
                             } 
@@ -1936,16 +2020,16 @@ public class playermenu extends Activity {
                                 e.printStackTrace();
                             }
                         }
-						sub_para.totalnum =subMange.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
-						sub_para.curid = subMange.getCurrentInSubtitleIndexByJni();
-						if (sub_para.curid == 0xff)
+						sub_para.totalnum =subtitleUtils.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
+						sub_para.curid = subtitleUtils.getCurrentInSubtitleIndexByJni();
+						if(sub_para.curid == 0xff)
 						    sub_para.curid = sub_para.totalnum;
 						if(sub_para.totalnum>0)
-				    		sub_para.sub_id =subMange.getSubID(sub_para.curid);
+				    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
 						else
 						    sub_para.sub_id = null;
 						openFile(sub_para.sub_id);
-						if (bMediaInfo.seekable == 0) {
+						if(bMediaInfo.seekable == 0) {
 							myProgressBar.setEnabled(false);
 							fastforword.setEnabled(false);
 							fastreverse.setEnabled(false);
@@ -1959,11 +2043,11 @@ public class playermenu extends Activity {
 							fastforword.setImageResource(R.drawable.ff);
 							fastreverse.setImageResource(R.drawable.rewind);
 						}
-						if (setCodecMips() == 0)
+						if(setCodecMips() == 0)
 				        	Log.d(TAG, "setCodecMips Failed");
 						break;
 					case VideoInfo.PLAYER_SEARCHOK:
-						progressSliding = false;
+						//progressSliding = false;
 						break;
 					case VideoInfo.DIVX_AUTHOR_ERR:
 					    Log.d(TAG, "Authorize Error");
@@ -1978,19 +2062,19 @@ public class playermenu extends Activity {
 								    Intent selectFileIntent = new Intent();
 									selectFileIntent.setClass(playermenu.this, FileList.class);
 									// close sub;
-									if (subTitleView != null)
+									if(subTitleView != null)
 									    subTitleView.closeSubtitle();
-									if (!fb32) {
+									if(!fb32) {
 									    // Hide the view with key color
 										LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
-										if (layout != null) {
+										if(layout != null) {
                                             layout.setVisibility(View.INVISIBLE);
                                             layout.invalidate();
                                         }
 									}
 									// stop play
 									backToFileList = true;
-									if (m_Amplayer != null)
+									if(m_Amplayer != null)
 									    Amplayer_stop();
 									startActivity(selectFileIntent);
 									playermenu.this.finish();
@@ -2018,9 +2102,9 @@ public class playermenu extends Activity {
                                     Intent selectFileIntent = new Intent();
                                     selectFileIntent.setClass(playermenu.this, FileList.class);
                                     // close sub;
-                                    if (subTitleView != null)
+                                    if(subTitleView != null)
                                         subTitleView.closeSubtitle();
-                                    if (!fb32) {
+                                    if(!fb32) {
                                         // Hide the view with key color
                                         LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
                                         if (layout != null) {
@@ -2030,7 +2114,7 @@ public class playermenu extends Activity {
                                     }
                                     // stop play
                                     backToFileList = true;
-                                    if (m_Amplayer != null)
+                                    if(m_Amplayer != null)
                                         Amplayer_stop();
                                     startActivity(selectFileIntent);
                                     playermenu.this.finish();
@@ -2069,19 +2153,19 @@ public class playermenu extends Activity {
                                     Intent selectFileIntent = new Intent();
                                     selectFileIntent.setClass(playermenu.this, FileList.class);
                                     // close sub;
-                                    if (subTitleView != null)
+                                    if(subTitleView != null)
                                         subTitleView.closeSubtitle();
-                                    if (!fb32) {
+                                    if(!fb32) {
                                         // Hide the view with key color
                                         LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
-										if (layout != null) {
+										if(layout != null) {
                                             layout.setVisibility(View.INVISIBLE);
                                             layout.invalidate();
                                         }
                                     }
                                     // stop play
                                     backToFileList = true;
-                                    if (m_Amplayer != null)
+                                    if(m_Amplayer != null)
                                         Amplayer_stop();
                                     startActivity(selectFileIntent);
                                     playermenu.this.finish();
@@ -2120,6 +2204,8 @@ public class playermenu extends Activity {
         intent.setAction("com.android.music.musicservicecommand.pause");
         intent.putExtra("command", "stop");
         this.sendBroadcast(intent);
+        seek = false;
+        seek_cur_time = 0;
 
     	try {
     		if(morbar!=null) {	
@@ -2135,7 +2221,7 @@ public class playermenu extends Activity {
     	
 			m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);
 			//reset sub;
-			subTitleView.setText("");
+			subTitleView.clear();
 			subinit();
 			subTitleView.setTextColor(sub_para.color);
 	    	subTitleView.setTextSize(sub_para.font);
@@ -2149,12 +2235,15 @@ public class playermenu extends Activity {
     private void Amplayer_stop() {
     	try {
 			m_Amplayer.Stop();
-		} catch (RemoteException e) {
+		} 
+		catch(RemoteException e) {
 			e.printStackTrace();
 		}
+		
 		try {
 			m_Amplayer.Close();
-		} catch (RemoteException e) {
+		} 
+		catch(RemoteException e) {
 			e.printStackTrace();
 		}
 		AudioTrackOperation.AudioStreamFormat.clear();
@@ -2168,13 +2257,16 @@ public class playermenu extends Activity {
 
 			try {
 				m_Amplayer.Init();
-			} catch (RemoteException e) {
+			} 
+			catch(RemoteException e) {
 				e.printStackTrace();
 				Log.d(TAG,"init fail!");
 			}
+			
 			try {
 				m_Amplayer.RegisterClientMessager(m_PlayerMsg.getBinder());
-			} catch (RemoteException e) {
+			} 
+			catch(RemoteException e) {
 				e.printStackTrace();
 				Log.e(TAG, "set client fail!");
 			}
@@ -2197,12 +2289,15 @@ public class playermenu extends Activity {
 		public void onServiceDisconnected(ComponentName name) {
 			try {
 				m_Amplayer.Stop();
-			} catch (RemoteException e) {
+			} 
+			catch(RemoteException e) {
 				e.printStackTrace();
 			}
+			
 			try {
 				m_Amplayer.Close();
-			} catch (RemoteException e) {
+			} 
+			catch(RemoteException e) {
 				e.printStackTrace();
 			}
 			m_Amplayer = null;
@@ -2253,8 +2348,9 @@ public class playermenu extends Activity {
 		try {
 			if(subTitleView.setFile(filepath,setSublanguage())==Subtitle.SUBTYPE.SUB_INVALID)
 				return;
-		} catch (Exception e) {
-			Log.d(TAG, "open:errrrrrrrrrrrrrrr");
+		} 
+		catch(Exception e) {
+			Log.d(TAG, "open:error");
 			e.printStackTrace();
 		}
 	
@@ -2263,7 +2359,7 @@ public class playermenu extends Activity {
 	private int resumePlay() {
 		final int pos = ResumePlay.check(PlayList.getinstance().getcur());
 		Log.d(TAG, "resumePlay() pos is :"+pos);
-		if (pos > 0) {
+		if(pos > 0) {
 			confirm_dialog = new AlertDialog.Builder(this)
 				.setTitle(R.string.setting_resume)  
 				.setMessage(R.string.str_resume_play) 
@@ -2284,7 +2380,7 @@ public class playermenu extends Activity {
 			ResumeCountdown();
 			return pos;
 		}
-		if (!NOT_FIRSTTIME)
+		if(!NOT_FIRSTTIME)
 			StartPlayerService();
 		return pos;
 	}
@@ -2292,7 +2388,7 @@ public class playermenu extends Activity {
 	private class myAlertDialogDismiss implements DialogInterface.OnDismissListener {
 		public void onDismiss(DialogInterface arg0) {
 			// TODO Auto-generated method stub
-			if (!NOT_FIRSTTIME)
+			if(!NOT_FIRSTTIME)
     			StartPlayerService();
         	else
         		Amplayer_play();
@@ -2300,74 +2396,72 @@ public class playermenu extends Activity {
 		}
 		
 	}
-
-	 private final StorageEventListener mListener = new StorageEventListener() {
-	        public void onUsbMassStorageConnectionChanged(boolean connected) {
-	        	//this is the action when connect to pc
-	        	return ;
-	        }
-	        public void onStorageStateChanged(String path, String oldState, String newState) {
-	        	if (newState == null || path == null) 
-	        		return;
-	        	
-	        	if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0) {
-	        		if(PlayList.getinstance().rootPath!=null) {
-		        		if(PlayList.getinstance().rootPath.startsWith(path)) {
-
-		        			Intent selectFileIntent = new Intent();
-		    				selectFileIntent.setClass(playermenu.this, FileList.class);
-		    				//close sub;
-		    				if(subTitleView!=null)
-		    					subTitleView.closeSubtitle();		
-		    				//stop play
-		    				backToFileList = true;
-		    				if(m_Amplayer != null)
-		    					Amplayer_stop();
-		    				PlayList.getinstance().rootPath=null;
-		    				startActivity(selectFileIntent);
-		    				playermenu.this.finish();
-		        		}
-	        		}
-	        	}
-	        }
-	        
-	    };
-	    
-	    @Override
-	    public void onResume() {
-	        super.onResume();
-            closeScreenOffTimeout();
-
-	        int getRotation = mWindowManager.getDefaultDisplay().getRotation();
-	        Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
-	        if((getRotation >= 0) && (getRotation <= 3))
-	        	SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
-	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-			m_storagemgr.registerListener(mListener);
-	    }
-	    
-	    @Override
-	    public void onConfigurationChanged(Configuration config) {
-	    	try {
-	    		super.onConfigurationChanged(config);
-	    		
-	            int getRotation = mWindowManager.getDefaultDisplay().getRotation();
-	            Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
-	            if((getRotation < 0) || (getRotation > 3))
-	            	return;
-	            SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
-	            
-	    		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-	    			//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    		} 
-	    		else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-	    			//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    		}
-	    	} 
-	    	catch (Exception ex) {
-	    	
-	    	}
-	    }
+	
+	private final StorageEventListener mListener = new StorageEventListener() {
+		public void onUsbMassStorageConnectionChanged(boolean connected) {
+			//this is the action when connect to pc
+			return ;
+		}
+		
+		public void onStorageStateChanged(String path, String oldState, String newState) {
+			if(newState == null || path == null) 
+				return;
+			
+			if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0) {
+				if(PlayList.getinstance().rootPath!=null) {
+					if(PlayList.getinstance().rootPath.startsWith(path)) {
+						Intent selectFileIntent = new Intent();
+						selectFileIntent.setClass(playermenu.this, FileList.class);
+						//close sub;
+						if(subTitleView!=null)
+							subTitleView.closeSubtitle();		
+						//stop play
+						backToFileList = true;
+						if(m_Amplayer != null)
+							Amplayer_stop();
+						PlayList.getinstance().rootPath=null;
+						startActivity(selectFileIntent);
+						playermenu.this.finish();
+					}
+				}
+			}
+		}
+	};
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		int getRotation = mWindowManager.getDefaultDisplay().getRotation();
+		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
+		if((getRotation >= 0) && (getRotation <= 3))
+		    SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+        m_storagemgr.registerListener(mListener);
+    }
+	
+	@Override
+	public void onConfigurationChanged(Configuration config) {
+		try {
+			super.onConfigurationChanged(config);
+			
+			int getRotation = mWindowManager.getDefaultDisplay().getRotation();
+			//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
+			if((getRotation < 0) || (getRotation > 3))
+				return;
+			SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+			
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			} 
+			else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+				//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			}
+		} 
+		catch (Exception ex) {
+			
+		}
+	}
 }
 
 class subview_set{
