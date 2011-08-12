@@ -362,6 +362,8 @@ public class playermenu extends Activity {
 						otherbar.setVisibility(View.GONE);
 						subTitleView.setViewStatus(true);
 						morbar.setVisibility(View.VISIBLE);
+				    ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
+				    resume.requestFocus();
 					}
 				});
 				otherbar.requestFocus();
@@ -387,6 +389,8 @@ public class playermenu extends Activity {
     				    	otherbar.setVisibility(View.GONE);
     				    	subTitleView.setViewStatus(true);
     				    	morbar.setVisibility(View.VISIBLE);
+							    ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
+							    playmode.requestFocus();
     				    }
     				});
     				otherbar.requestFocus();
@@ -482,17 +486,19 @@ public class playermenu extends Activity {
                     	otherbar.setVisibility(View.GONE);
 						subTitleView.setViewStatus(true);
                     	morbar.setVisibility(View.VISIBLE);
+                    	ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+                    	play3d.requestFocus();
                     }
                 });    
                 otherbar.requestFocus();
             } 
     	});
 		}
-		ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannelBtn);
+/*
+		ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannel);
 		audiochannel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				otherbar.setVisibility(View.VISIBLE);
-				subTitleView.setViewStatus(false);
     			morbar.setVisibility(View.GONE);
     			morebar_tileText.setText(R.string.setting_audiochannel);
     			ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -509,13 +515,14 @@ public class playermenu extends Activity {
 							e.printStackTrace();
 						}
 						otherbar.setVisibility(View.GONE);
-						subTitleView.setViewStatus(true);
 				    	morbar.setVisibility(View.VISIBLE);
+				    	ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannel);
+				    	audiochannel.requestFocus();
 				    }	
 				});
 				otherbar.requestFocus();
 			}
-		});
+		}); */
     	
     	ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
     	audiotrack.setOnClickListener(new View.OnClickListener() {
@@ -547,6 +554,8 @@ public class playermenu extends Activity {
     			    	otherbar.setVisibility(View.GONE);
     			    	subTitleView.setViewStatus(true);
     			    	morbar.setVisibility(View.VISIBLE);
+						    ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
+						    audiotrack.requestFocus();
     			    }	
     			});
     			otherbar.requestFocus();
@@ -768,6 +777,8 @@ public class playermenu extends Activity {
                     	otherbar.setVisibility(View.GONE);
                     	subTitleView.setViewStatus(true);
                     	morbar.setVisibility(View.VISIBLE);
+						ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
+						display.requestFocus();
                     }
                 });    
                 otherbar.requestFocus();
@@ -846,6 +857,8 @@ public class playermenu extends Activity {
                         otherbar.setVisibility(View.GONE);
                         subTitleView.setViewStatus(true);
                         morbar.setVisibility(View.VISIBLE);
+                        ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+                        brigtness.requestFocus();
                     }
                 });
 				otherbar.requestFocus();
@@ -910,6 +923,8 @@ public class playermenu extends Activity {
                         infodialog.setVisibility(View.GONE);
                         subTitleView.setViewStatus(true);
                         morbar.setVisibility(View.VISIBLE);
+						ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
+						fileinformation.requestFocus();	
 					}
 				});
 				infodialog.requestFocus();								
@@ -957,6 +972,8 @@ public class playermenu extends Activity {
                     setContentView(R.layout.infobar);
                 }
 	        	initinfobar();
+				ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
+                morebtn.requestFocus();
 	        	return(true);
 	        }
     		else {
