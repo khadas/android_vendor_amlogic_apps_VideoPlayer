@@ -1875,6 +1875,7 @@ public class playermenu extends Activity {
             }
             finish();
         }
+        ScreenMode.setScreenMode("0");
     }
     
 	//=========================================================
