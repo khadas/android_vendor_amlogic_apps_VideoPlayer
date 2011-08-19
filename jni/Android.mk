@@ -3,8 +3,8 @@ LIBPLAYER_PATH := $(LOCAL_PATH)/../../LibPlayer
 
 include $(CLEAR_VARS)
 
-ifeq ($(BUILD_ID),MID)
-	LOCAL_CFLAGS += -DENABLE_FREE_SCALE
+ifneq ($(BOARD_VOUT_USES_FREESCALE),false)
+LOCAL_CFLAGS += -DENABLE_FREE_SCALE
 endif
 
 LOCAL_MODULE    := libamplayerjni
