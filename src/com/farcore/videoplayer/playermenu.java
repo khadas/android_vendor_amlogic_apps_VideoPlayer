@@ -609,6 +609,10 @@ public class playermenu extends Activity {
     			t_subscolor.setText(color_text[sub_color_state]);
     			
     			Button ok = (Button) findViewById(R.id.button_ok);
+    			ok.setNextFocusUpId(R.id.color_l);
+    			ok.setNextFocusDownId(R.id.button_ok);
+    			ok.setNextFocusLeftId(R.id.button_ok);
+    			ok.setNextFocusRightId(R.id.button_canncel);
     			ok.setOnClickListener(new View.OnClickListener() {	
     			    public void onClick(View v) {
     			    	sub_para.curid = sub_switch_state;
@@ -632,6 +636,10 @@ public class playermenu extends Activity {
     			    } 
     			});
     			Button cancel = (Button) findViewById(R.id.button_canncel);
+    			cancel.setNextFocusUpId(R.id.color_r);
+    			cancel.setNextFocusDownId(R.id.button_canncel);
+    			cancel.setNextFocusLeftId(R.id.button_ok);
+    			cancel.setNextFocusRightId(R.id.button_canncel);
     			cancel.setOnClickListener(new View.OnClickListener() {
   		            public void onClick(View v) {
   		            	subbar.setVisibility(View.GONE);
@@ -645,6 +653,37 @@ public class playermenu extends Activity {
     			ImageButton Bfont_r = (ImageButton) findViewById(R.id.font_r);
     			ImageButton Bcolor_l = (ImageButton) findViewById(R.id.color_l);	
     			ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
+
+    			Bswitch_l.setNextFocusUpId(R.id.switch_l);
+    			Bswitch_l.setNextFocusDownId(R.id.font_l);
+    			Bswitch_l.setNextFocusLeftId(R.id.switch_l);
+    			Bswitch_l.setNextFocusRightId(R.id.switch_r);
+    			
+    			Bswitch_r.setNextFocusUpId(R.id.switch_r);
+    			Bswitch_r.setNextFocusDownId(R.id.font_r);
+    			Bswitch_r.setNextFocusLeftId(R.id.switch_l);
+    			Bswitch_r.setNextFocusRightId(R.id.switch_r);
+
+				Bfont_l.setNextFocusUpId(R.id.switch_l);
+				Bfont_l.setNextFocusDownId(R.id.color_l);
+				Bfont_l.setNextFocusLeftId(R.id.font_l);
+				Bfont_l.setNextFocusRightId(R.id.font_r);
+
+				Bfont_r.setNextFocusUpId(R.id.switch_r);
+				Bfont_r.setNextFocusDownId(R.id.color_r);
+				Bfont_r.setNextFocusLeftId(R.id.font_l);
+				Bfont_r.setNextFocusRightId(R.id.font_r);
+
+				Bcolor_l.setNextFocusUpId(R.id.font_l);
+				Bcolor_l.setNextFocusDownId(R.id.button_ok);
+				Bcolor_l.setNextFocusLeftId(R.id.color_l);
+				Bcolor_l.setNextFocusRightId(R.id.color_r);
+
+				Bcolor_r.setNextFocusUpId(R.id.font_r);
+				Bcolor_r.setNextFocusDownId(R.id.button_canncel);
+				Bcolor_r.setNextFocusLeftId(R.id.color_l);
+				Bcolor_r.setNextFocusRightId(R.id.color_r);
+				
     			Bswitch_l.setOnClickListener(new View.OnClickListener() {
   					public void onClick(View v) {
   						if(sub_switch_state <= 0)
@@ -691,6 +730,26 @@ public class playermenu extends Activity {
   	  					Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
   	  					Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
   	  					Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+  	  					
+  	  					Bswitch_l.setNextFocusUpId(R.id.switch_l);
+  	  					Bswitch_l.setNextFocusDownId(R.id.button_ok);
+  	  					Bswitch_l.setNextFocusLeftId(R.id.switch_l);
+  	  					Bswitch_l.setNextFocusRightId(R.id.switch_r);
+  	      			
+  	  					Bswitch_r.setNextFocusUpId(R.id.switch_r);
+  	  					Bswitch_r.setNextFocusDownId(R.id.button_canncel);
+  	  					Bswitch_r.setNextFocusLeftId(R.id.switch_l);
+  	  					Bswitch_r.setNextFocusRightId(R.id.switch_r);
+  	  					
+  	  					ok.setNextFocusUpId(R.id.switch_l);
+  	  					ok.setNextFocusDownId(R.id.button_ok);
+  	  					ok.setNextFocusLeftId(R.id.button_ok);
+  	    				ok.setNextFocusRightId(R.id.button_canncel);
+
+  	    				cancel.setNextFocusUpId(R.id.switch_r);
+  	    				cancel.setNextFocusDownId(R.id.button_canncel);
+  	    				cancel.setNextFocusLeftId(R.id.button_ok);
+  	    				cancel.setNextFocusRightId(R.id.button_canncel);
   	  					return;
 	  				}
   				}
