@@ -821,7 +821,7 @@ public class playermenu extends Activity {
     	});
     	
     	/*this is setting is default*/
-    	if(SystemProperties.getBoolean("brigtness_setting.enable", true)) {
+    	if(SystemProperties.getBoolean("ro.screen.has.brightness", true)) {
     		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
     		brigtness.setOnClickListener(new View.OnClickListener() {
     			public void onClick(View v) {
