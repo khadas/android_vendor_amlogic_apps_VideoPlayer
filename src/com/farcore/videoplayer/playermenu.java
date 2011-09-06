@@ -93,6 +93,7 @@ public class playermenu extends Activity {
 	private LinearLayout infodialog = null;
 	private AlertDialog confirm_dialog = null;
 	private BroadcastReceiver mReceiver = null;
+	private int morebar_status = 0;
 
 	Timer timer = new Timer();
 	Toast toast = null;
@@ -367,6 +368,7 @@ public class playermenu extends Activity {
 					}
 				});
 				otherbar.requestFocus();
+				morebar_status = R.string.setting_resume;
 			} 
 		});
     	
@@ -394,6 +396,7 @@ public class playermenu extends Activity {
     				    }
     				});
     				otherbar.requestFocus();
+    				morebar_status = R.string.setting_playmode;
     			}
     		});
     	}
@@ -491,6 +494,7 @@ public class playermenu extends Activity {
                     }
                 });    
                 otherbar.requestFocus();
+				morebar_status = R.string.setting_3d_mode;
             } 
     	});
 		}
@@ -559,6 +563,7 @@ public class playermenu extends Activity {
     			    }	
     			});
     			otherbar.requestFocus();
+				morebar_status = R.string.setting_audiotrack;
     		} 
     	});
     	
@@ -577,6 +582,7 @@ public class playermenu extends Activity {
     			morbar.setVisibility(View.GONE);
     			subtitle_control();
     			subbar.requestFocus();
+    			morebar_status = R.string.setting_subtitle;
     		}
     		
     		String color_text[]={ 
@@ -841,6 +847,7 @@ public class playermenu extends Activity {
                     }
                 });    
                 otherbar.requestFocus();
+    			morebar_status = R.string.setting_displaymode;
             } 
     	});
     	if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
@@ -921,6 +928,7 @@ public class playermenu extends Activity {
                     }
                 });
 				otherbar.requestFocus();
+    			morebar_status = R.string.setting_brightness;
 			} 
     	}); 
     	}
@@ -986,7 +994,8 @@ public class playermenu extends Activity {
 						fileinformation.requestFocus();	
 					}
 				});
-				infodialog.requestFocus();								
+				infodialog.requestFocus();	
+    			morebar_status = R.string.str_file_name;
             } 
     	}); 
     }
@@ -1023,17 +1032,71 @@ public class playermenu extends Activity {
     	}
     	else if (keyCode == KeyEvent.KEYCODE_BACK) {
     		if (morbar!=null)  {
-	        	morbar=null;
-                if (fb32) {
-                    setContentView(R.layout.infobar32);
-                } 
-				else {
-                    setContentView(R.layout.infobar);
-                }
-	        	initinfobar();
-				ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
-                morebtn.requestFocus();
-	        	return(true);
+    			if((otherbar.getVisibility() == View.VISIBLE) 
+    					|| (infodialog.getVisibility() == View.VISIBLE)
+    					|| (subbar.getVisibility() == View.VISIBLE)) {
+	        		if((otherbar!=null) && (otherbar.getVisibility() == View.VISIBLE)){
+	        			otherbar.setVisibility(View.GONE);
+	        		}
+	        		if((infodialog!=null) && (infodialog.getVisibility() == View.VISIBLE)){
+	        			infodialog.setVisibility(View.GONE);
+	        		}
+	        		if((subbar!=null) && (subbar.getVisibility() == View.VISIBLE)){
+	        			subbar.setVisibility(View.GONE);
+	        		}
+	    	        morbar.setVisibility(View.VISIBLE);
+	    	        switch(morebar_status){
+    	        	case R.string.setting_resume:
+    	        		ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
+    				    resume.requestFocus();
+    	        		break;
+    	        	case R.string.setting_playmode:
+    	        		ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
+					    playmode.requestFocus();
+    	        		break;
+    	        	case R.string.setting_3d_mode:
+    	        		ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+                    	play3d.requestFocus();
+    	        		break;
+    	        	case R.string.setting_audiotrack:
+    	        		ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
+					    audiotrack.requestFocus();
+    	        		break;
+    	        	case R.string.setting_subtitle:
+    	        		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
+    	        		subtitle.requestFocus();
+    	        		break;
+    	        	case R.string.setting_displaymode:
+    	        		ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
+						display.requestFocus();
+    	        		break;
+    	        	case R.string.setting_brightness:
+    	        		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+                        brigtness.requestFocus();
+    	        		break;
+    	        	case R.string.str_file_name:
+    	        		ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
+						fileinformation.requestFocus();	
+    	        		break;
+	    	        default:
+	    	        	morbar.requestFocus();
+	    	        	break;
+	    	        }
+			        return(true);
+    			}
+    			else {
+		        	morbar=null;
+	                if (fb32) {
+	                    setContentView(R.layout.infobar32);
+	                } 
+					else {
+	                    setContentView(R.layout.infobar);
+	                }
+		        	initinfobar();
+					ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
+	                morebtn.requestFocus();
+		        	return(true);
+    			}
 	        }
     		else {
     			if(m_Amplayer == null)
