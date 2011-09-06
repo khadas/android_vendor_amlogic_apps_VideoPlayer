@@ -1926,6 +1926,17 @@ public class playermenu extends Activity {
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
+			}
+			
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				//timer.cancel();
+				//progressSliding = true;
+			}
+			
+			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+				// TODO Auto-generated method stub
+				timer.cancel();
 				int dest = myProgressBar.getProgress();
 				int pos = totaltime * dest / 100;
 
@@ -1943,16 +1954,6 @@ public class playermenu extends Activity {
 					e.printStackTrace();
 				}
 				waitForHide();
-			}
-			
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-				timer.cancel();
-				//progressSliding = true;
-			}
-			
-			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
-				// TODO Auto-generated method stub
 			}
 		});
         
