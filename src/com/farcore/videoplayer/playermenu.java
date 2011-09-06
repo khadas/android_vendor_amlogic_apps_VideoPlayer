@@ -68,6 +68,18 @@ public class playermenu extends Activity {
 	//private boolean progressSliding = false;
 	private boolean INITOK = false;
 	private boolean FF_FLAG = false;
+	private boolean FB_FLAG = false;
+
+    // The ffmpeg step is 2*step
+	private int FF_LEVEL = 0;
+	private int FB_LEVEL = 0;
+    private static int FF_MAX = 5;
+    private static int FB_MAX = 5;
+    private static int FF_SPEED[] = {0, 2, 4, 8, 16, 32};
+    private static int FB_SPEED[] = {0, 2, 4, 8, 16, 32};
+    private static int FF_STEP[] =  {0, 1, 2, 4, 8, 16};
+    private static int FB_STEP[] =  {0, 1, 2, 4, 8, 16};
+
 	private boolean NOT_FIRSTTIME = false;
 	private static final int MID_FREESCALE = 0x10001;
     private boolean fb32 = false;
@@ -96,6 +108,7 @@ public class playermenu extends Activity {
 	private int morebar_status = 0;
 
 	Timer timer = new Timer();
+	Toast ff_fb = null;
 	Toast toast = null;
 	public MediaInfo bMediaInfo = null;
 	private static int PRE_NEXT_FLAG = 0;
@@ -1160,10 +1173,15 @@ public class playermenu extends Activity {
 			}
 			else if (player_status == VideoInfo.PLAYER_SEARCHING) {
 				try	{
-					if (FF_FLAG)
+					ff_fb.cancel();
+					if(FF_FLAG)
 						m_Amplayer.FastForward(0);
-					else
+					if(FB_FLAG)
 						m_Amplayer.BackForward(0);
+					FF_FLAG = false;
+					FB_FLAG = false;
+					FF_LEVEL = 0;
+					FB_LEVEL = 0;
 				} 
 				catch(RemoteException e) {
 					e.printStackTrace();
@@ -1174,9 +1192,26 @@ public class playermenu extends Activity {
     	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
 			if (!INITOK)
 				return false;
-            ImageButton preItem = (ImageButton) findViewById(R.id.PreBtn);
-            preItem.requestFocus();
-
+			try
+			{
+	            if (morbar!=null)  
+	            {
+		        	morbar=null;
+	                if (fb32) {
+	                    setContentView(R.layout.infobar32);
+	                } 
+					else {
+	                    setContentView(R.layout.infobar);
+	                }
+		        	initinfobar();
+		        }
+	        	ImageButton preItem = (ImageButton) findViewById(R.id.PreBtn);
+            	preItem.requestFocus();
+            }
+            catch(Exception ex )
+            {
+            }
+            
             if (infobar.getVisibility() != View.VISIBLE) {
                 show_menu();
                 waitForHide();
@@ -1197,8 +1232,25 @@ public class playermenu extends Activity {
     	else if(keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) {
 			if (!INITOK)
 				return false;
-            ImageButton nextItem = (ImageButton) findViewById(R.id.NextBtn);
-            nextItem.requestFocus();
+			try
+			{
+	            if (morbar!=null)  
+            	{
+		        	morbar=null;
+	                if (fb32) {
+	                    setContentView(R.layout.infobar32);
+	                } 
+					else {
+	                    setContentView(R.layout.infobar);
+	                }
+		        	initinfobar();
+	        	}
+	        	ImageButton nextItem = (ImageButton) findViewById(R.id.NextBtn);
+	        	nextItem.requestFocus();
+        	}
+        	catch(Exception ex)
+        	{
+        	}
 
             if (infobar.getVisibility() != View.VISIBLE) {
                 show_menu();
@@ -1229,21 +1281,70 @@ public class playermenu extends Activity {
             }
 
 			if (player_status == VideoInfo.PLAYER_SEARCHING) {
-				try	{
-					m_Amplayer.FastForward(0);
-				} 
-				catch(RemoteException e) {
-					e.printStackTrace();
+				if(FF_FLAG) {
+					if(FF_LEVEL < FF_MAX) {
+						FF_LEVEL = FF_LEVEL + 1;
+					}
+					else {
+						FF_LEVEL = 0;
+					}
+					
+					try	{
+						m_Amplayer.FastForward(FF_STEP[FF_LEVEL]);
+					} 
+					catch(RemoteException e) {
+						e.printStackTrace();
+					}
+					
+					if(FF_LEVEL == 0) {
+						ff_fb.cancel();
+						FF_FLAG = false;
+					}
+					else {
+						ff_fb.cancel();
+						ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
+						ff_fb.show();
+					}
+				}
+				
+				if(FB_FLAG) {
+					if(FB_LEVEL > 0) {
+						FB_LEVEL = FB_LEVEL - 1;
+					}
+					else {
+						FB_LEVEL = 0;
+					}
+					
+					try	{
+						m_Amplayer.BackForward(FB_STEP[FB_LEVEL]);
+					} 
+					catch(RemoteException e) {
+						e.printStackTrace();
+					}
+					
+					if(FB_LEVEL == 0) {
+						ff_fb.cancel();
+						FB_FLAG = false;
+					}
+					else {
+						ff_fb.cancel();
+						ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
+	    				ff_fb.show();
+					}
 				}
 			}
 			else {
 				try	{
-					m_Amplayer.FastForward(2);
+					m_Amplayer.FastForward(FF_STEP[1]);
 				} 
 				catch(RemoteException e) {
 					e.printStackTrace();
 				}
 				FF_FLAG = true;
+				FF_LEVEL = 1;
+				ff_fb.cancel();
+				ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
+				ff_fb.show();
 			}		 
     	}
     	else if(keyCode == KeyEvent.KEYCODE_MEDIA_REWIND) {
@@ -1258,42 +1359,73 @@ public class playermenu extends Activity {
             }
 
             if (player_status == VideoInfo.PLAYER_SEARCHING) {
-                try {
-                    m_Amplayer.BackForward(0);
-                } 
-				catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+				if(FB_FLAG) {
+					if(FB_LEVEL < FF_MAX) {
+						FB_LEVEL = FB_LEVEL + 1;
+					}
+					else {
+						FB_LEVEL = 0;
+					}
+					
+					try	{
+						m_Amplayer.BackForward(FB_STEP[FB_LEVEL]);
+					} 
+					catch(RemoteException e) {
+						e.printStackTrace();
+					}
+					
+					if(FB_LEVEL == 0) {
+						ff_fb.cancel();
+						FB_FLAG = false;
+					}
+					else {
+						ff_fb.cancel();
+						ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
+	    				ff_fb.show();
+					}
+				}
+				
+				if(FF_FLAG) {
+					if(FF_LEVEL > 0) {
+						FF_LEVEL = FF_LEVEL - 1;
+					}
+					else {
+						FF_LEVEL = 0;
+					}
+					
+					try	{
+						m_Amplayer.FastForward(FF_STEP[FF_LEVEL]);
+					} 
+					catch(RemoteException e) {
+						e.printStackTrace();
+					}
+					
+					if(FF_LEVEL == 0) {
+						ff_fb.cancel();
+						FF_FLAG = false;
+					}
+					else {
+						ff_fb.cancel();
+						ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
+						ff_fb.show();
+					}
+				}
             } 
 			else {
                 try {
-                    m_Amplayer.BackForward(2);
+                    m_Amplayer.BackForward(FB_STEP[1]);
                 } 
 				catch (RemoteException e) {
                     e.printStackTrace();
                 }
-                FF_FLAG = false;
+				FB_FLAG = true;
+				FB_LEVEL = 1;
+				ff_fb.cancel();
+				ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
+				ff_fb.show();
             }
         } 
-    	else if (keyCode == KeyEvent.KEYCODE_MEDIA_REPEAT) {
-    		videobar();
-    		ImageButton subtitle = (ImageButton) findViewById(R.id.PlaymodeBtn);
-    		subtitle.requestFocusFromTouch();
-    		return (true);
-    	}
-      	else if (keyCode == KeyEvent.KEYCODE_MEDIA_INFO) {
-    		videobar();
-    		ImageButton subtitle = (ImageButton) findViewById(R.id.InfoBtn);
-    		subtitle.requestFocusFromTouch();
-    		return (true);
-    	}
-      	else if (keyCode == KeyEvent.KEYCODE_MEDIA_RATIO) {
-    		videobar();
-    		ImageButton subtitle = (ImageButton) findViewById(R.id.DisplayBtn);
-    		subtitle.requestFocusFromTouch();
-    		return (true);
-    	}
-      	else if (keyCode == KeyEvent.KEYCODE_MEDIA_SUB_T) {
+    	else if (keyCode == KeyEvent.KEYCODE_7) {
     		videobar();
     		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     		subtitle.requestFocusFromTouch();
@@ -1332,7 +1464,10 @@ public class playermenu extends Activity {
             setContentView(R.layout.infobar);
         }
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
-
+        ff_fb =Toast.makeText(playermenu.this, "",Toast.LENGTH_SHORT );
+        ff_fb.setGravity(Gravity.TOP | Gravity.RIGHT,10,10);
+		ff_fb.setDuration(0x00000001);
+		
         infobar = (LinearLayout) findViewById(R.id.infobarLayout);
         if(infobar != null)
             infobar.setVisibility(View.GONE);
@@ -1616,10 +1751,16 @@ public class playermenu extends Activity {
 				}
 				else if(player_status == VideoInfo.PLAYER_SEARCHING) {
 					try	{
-						if (FF_FLAG)
+						ff_fb.cancel();
+						if(FF_FLAG)
 							m_Amplayer.FastForward(0);
-						else
+						if(FB_FLAG)
 							m_Amplayer.BackForward(0);
+						FF_FLAG = false;
+						FB_FLAG = false;
+						FF_LEVEL = 0;
+						FB_LEVEL = 0;
+						
 					} catch(RemoteException e) {
 						e.printStackTrace();
 					}
@@ -1632,21 +1773,70 @@ public class playermenu extends Activity {
 				if(!INITOK)
 					return;
 				if(player_status == VideoInfo.PLAYER_SEARCHING) {
-					try	{
-						m_Amplayer.FastForward(0);
-					} 
-					catch(RemoteException e) {
-						e.printStackTrace();
+					if(FF_FLAG) {
+						if(FF_LEVEL < FF_MAX) {
+							FF_LEVEL = FF_LEVEL + 1;
+						}
+						else {
+							FF_LEVEL = 0;
+						}
+						
+						try	{
+							m_Amplayer.FastForward(FF_STEP[FF_LEVEL]);
+						} 
+						catch(RemoteException e) {
+							e.printStackTrace();
+						}
+						
+						if(FF_LEVEL == 0) {
+							ff_fb.cancel();
+							FF_FLAG = false;
+						}
+						else {
+							ff_fb.cancel();
+							ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
+		    				ff_fb.show();
+						}
+					}
+					
+					if(FB_FLAG) {
+						if(FB_LEVEL > 0) {
+							FB_LEVEL = FB_LEVEL - 1;
+						}
+						else {
+							FB_LEVEL = 0;
+						}
+						
+						try	{
+							m_Amplayer.BackForward(FB_STEP[FB_LEVEL]);
+						} 
+						catch(RemoteException e) {
+							e.printStackTrace();
+						}
+						
+						if(FB_LEVEL == 0) {
+							ff_fb.cancel();
+							FB_FLAG = false;
+						}
+						else {
+							ff_fb.cancel();
+							ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
+							ff_fb.show();
+						}
 					}
 				}
 				else {
 					try	{
-						m_Amplayer.FastForward(2);
+						m_Amplayer.FastForward(FF_STEP[1]);
 					} 
 					catch(RemoteException e) {
 						e.printStackTrace();
 					}
 					FF_FLAG = true;
+					FF_LEVEL = 1;
+					ff_fb.cancel();
+					ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
+    				ff_fb.show();
 				}
 			}
         });
@@ -1656,21 +1846,70 @@ public class playermenu extends Activity {
 				if(!INITOK)
 					return;
 				if(player_status == VideoInfo.PLAYER_SEARCHING) {
-					try	{
-						m_Amplayer.BackForward(0);
-					} 
-					catch(RemoteException e) {
-						e.printStackTrace();
+					if(FB_FLAG) {
+						if(FB_LEVEL < FB_MAX) {
+							FB_LEVEL = FB_LEVEL + 1;
+						}
+						else {
+							FB_LEVEL = 0;
+						}
+						
+						try	{
+							m_Amplayer.BackForward(FB_STEP[FB_LEVEL]);
+						} 
+						catch(RemoteException e) {
+							e.printStackTrace();
+						}
+						
+						if(FB_LEVEL == 0) {
+							ff_fb.cancel();
+							FB_FLAG = false;
+						}
+						else {
+							ff_fb.cancel();
+							ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
+		    				ff_fb.show();
+						}
+					}
+					
+					if(FF_FLAG) {
+						if(FF_LEVEL > 0) {
+							FF_LEVEL = FF_LEVEL - 1;
+						}
+						else {
+							FF_LEVEL = 0;
+						}
+						
+						try	{
+							m_Amplayer.FastForward(FF_STEP[FF_LEVEL]);
+						} 
+						catch(RemoteException e) {
+							e.printStackTrace();
+						}
+						
+						if(FF_LEVEL == 0) {
+							ff_fb.cancel();
+							FF_FLAG = false;
+						}
+						else {
+							ff_fb.cancel();
+							ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
+							ff_fb.show();
+						}
 					}
 				}
 				else {
 					try	{
-						m_Amplayer.BackForward(2);
+						m_Amplayer.BackForward(FB_STEP[1]);
 					} 
 					catch(RemoteException e) {
 						e.printStackTrace();
 					}
-					FF_FLAG = false;
+					FB_FLAG = true;
+					FB_LEVEL = 1;
+					ff_fb.cancel();
+					ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
+    				ff_fb.show();
 				}
 			}
         });
@@ -2070,7 +2309,22 @@ public class playermenu extends Activity {
 							//progressSliding = false;
     					}
 						if(subTitleView!=null)
-							subTitleView.closeSubtitle();
+						{
+							subTitleView.closeSubtitle(); //need return focus.
+							if (morbar!=null)  
+							{
+					        	morbar=null;
+				                if (fb32) {
+				                    setContentView(R.layout.infobar32);
+				                } 
+								else {
+				                    setContentView(R.layout.infobar);
+				                }
+					        	initinfobar();
+								ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
+				            	morebtn.requestFocus();
+				            }
+						}
 						sub_para.totalnum = 0;
 						cur_audio_stream = 0;
 						InternalSubtitleInfo.setInsubNum(0);
@@ -2346,7 +2600,12 @@ public class playermenu extends Activity {
         this.sendBroadcast(intent);
         seek = false;
         seek_cur_time = 0;
-
+		
+		ff_fb.cancel();
+		FF_FLAG = false;
+		FB_FLAG = false;
+		FF_LEVEL = 0;
+		FB_LEVEL = 0;
     	try {
     		if(morbar!=null) {	
     			if((otherbar!=null) && (otherbar.getVisibility() == View.VISIBLE))
