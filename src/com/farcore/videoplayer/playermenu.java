@@ -61,8 +61,6 @@ public class playermenu extends Activity {
     private final int DISPLAY = 3;
     private final int BRIGHTNESS = 4;
 	private final int PLAY3D = 5;
-	private final int PLAYCHAPTERS = 6;
-	private final int AUDIO_CHANNEL = 7;
 
 	private boolean backToFileList = false;
 	//private boolean progressSliding = false;
@@ -212,13 +210,25 @@ public class playermenu extends Activity {
 
         switch (id) {
             case PLAY_RESUME:
-            case PLAY_MODE:
                 map = new HashMap<String, Object>();
                 map.put("item_name", getResources().getString(R.string.str_on));
                 map.put("item_sel", R.drawable.item_img_unsel);
                 list.add(map);
                 map = new HashMap<String, Object>();
                 map.put("item_name", getResources().getString(R.string.str_off));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+
+                list.get(pos).put("item_sel", R.drawable.item_img_sel);
+                break;
+				
+            case PLAY_MODE:
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_playmode_repeatall));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_playmode_repeatone));
                 map.put("item_sel", R.drawable.item_img_unsel);
                 list.add(map);
 
@@ -255,11 +265,12 @@ public class playermenu extends Activity {
                 map.put("item_name", "16:9");
                 map.put("item_sel", R.drawable.item_img_unsel);
                 list.add(map);
+                /*
                 map = new HashMap<String, Object>();
                 map.put("item_name", getResources().getString(R.string.setting_displaymode_normal_noscaleup));
                 map.put("item_sel", R.drawable.item_img_unsel);
                 list.add(map);
-
+                */
                 list.get(pos).put("item_sel", R.drawable.item_img_sel);
                 break;
 
@@ -285,25 +296,7 @@ public class playermenu extends Activity {
 				
 				list.get(pos).put("item_sel", R.drawable.item_img_sel);
 			    break;
-			case PLAYCHAPTERS:
-			    break;	
-			
-            case AUDIO_CHANNEL:
-				map = new HashMap<String, Object>();
-                map.put("item_name", getResources().getString(R.string.str_stereo_auidochannel));
-                map.put("item_sel", R.drawable.item_img_unsel);
-				list.add(map);
-				map = new HashMap<String, Object>();
-                map.put("item_name", getResources().getString(R.string.str_left_auidochannel));
-                map.put("item_sel", R.drawable.item_img_unsel);
-				list.add(map);
-				map = new HashMap<String, Object>();
-				map.put("item_name", getResources().getString(R.string.str_right_auidochannel));
-                map.put("item_sel", R.drawable.item_img_unsel);
-				list.add(map);
- 
-				list.get(pos).put("item_sel", R.drawable.item_img_sel);
-	
+
             default:
                 break;
         }
@@ -313,28 +306,18 @@ public class playermenu extends Activity {
 	
     private void videobar() {
         if(fb32) {
-			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true)) {
-				setContentView(R.layout.layout_morebar32);
-			}
-			else {
-				setContentView(R.layout.layout_morebar32_mbx);
-			}
+        	setContentView(R.layout.layout_morebar32);
         } 
 		else {
-			if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true)) {
-				setContentView(R.layout.layout_morebar);
-			}
-			else {
-				setContentView(R.layout.layout_morebar_mbx);
-			}
+			setContentView(R.layout.layout_morebar);
         }
         FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
     	if (SettingsVP.display_mode.equals("480p")) {
-    		FrameLayout.LayoutParams linearParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
-    		linearParams.width = 720;
-    		linearParams.height = 480;
-    		linearParams.gravity = -1;
-    		baselayout2.setLayoutParams(linearParams);
+    		FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+    		frameParams.width = 720;
+    		frameParams.height = 480;
+    		frameParams.gravity = -1;
+    		baselayout2.setLayoutParams(frameParams);
     	}
     	
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
@@ -416,23 +399,23 @@ public class playermenu extends Activity {
     	else {
     		playmode.setImageDrawable(getResources().getDrawable(R.drawable.mode_disable));
     	}
-		if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
-        {
-    	ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
-    	play3d.setOnClickListener(new View.OnClickListener() {
-    		public void onClick(View v) {
-                otherbar.setVisibility(View.VISIBLE);
-				subTitleView.setViewStatus(false);
-                morbar.setVisibility(View.GONE);
-                	
-                morebar_tileText.setText(R.string.setting_3d_mode);
-                ListView listView = (ListView)findViewById(R.id.AudioListView);
-                listView.setAdapter(getMorebarListAdapter(PLAY3D, mode_3d));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					    mode_3d = position;
-                    	switch (position) {
-                    		case 0:
+    	
+		if(SystemProperties.getBoolean("3D_setting.enable", false)) {
+			ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+			play3d.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					otherbar.setVisibility(View.VISIBLE);
+					subTitleView.setViewStatus(false);
+					morbar.setVisibility(View.GONE);
+					
+					morebar_tileText.setText(R.string.setting_3d_mode);
+					ListView listView = (ListView)findViewById(R.id.AudioListView);
+					listView.setAdapter(getMorebarListAdapter(PLAY3D, mode_3d));
+					listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							mode_3d = position;
+							switch (position) {
+							case 0:
 							    try {
 								    m_Amplayer.Set3Dmode(Mode_3D.MODE_DISABLE.ordinal());
 								} 
@@ -498,48 +481,19 @@ public class playermenu extends Activity {
                     			break;
                     		default:
                     			break;
-                    	}
-                    	otherbar.setVisibility(View.GONE);
-						subTitleView.setViewStatus(true);
-                    	morbar.setVisibility(View.VISIBLE);
-                    	ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
-                    	play3d.requestFocus();
-                    }
-                });    
-                otherbar.requestFocus();
-				morebar_status = R.string.setting_3d_mode;
-            } 
-    	});
+                    		}
+							otherbar.setVisibility(View.GONE);
+							subTitleView.setViewStatus(true);
+							morbar.setVisibility(View.VISIBLE);
+							ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+							play3d.requestFocus();
+						}
+					});    
+					otherbar.requestFocus();
+					morebar_status = R.string.setting_3d_mode;
+				} 
+			});
 		}
-/*
-		ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannel);
-		audiochannel.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				otherbar.setVisibility(View.VISIBLE);
-    			morbar.setVisibility(View.GONE);
-    			morebar_tileText.setText(R.string.setting_audiochannel);
-    			ListView listView = (ListView)findViewById(R.id.AudioListView);
-                listView.setAdapter(getMorebarListAdapter(AUDIO_CHANNEL, cur_audio_channel));
-    			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
-				    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-						Log.d(TAG,"set audio channel "+String.valueOf(arg2));
-						cur_audio_channel = arg2;
-						try
-						{
-							m_Amplayer.SwitchAudioChannel(cur_audio_channel);
-						}
-						catch (RemoteException e) {
-							e.printStackTrace();
-						}
-						otherbar.setVisibility(View.GONE);
-				    	morbar.setVisibility(View.VISIBLE);
-				    	ImageButton audiochannel = (ImageButton) findViewById(R.id.AudioChannel);
-				    	audiochannel.requestFocus();
-				    }	
-				});
-				otherbar.requestFocus();
-			}
-		}); */
     	
     	ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
     	audiotrack.setOnClickListener(new View.OnClickListener() {
@@ -845,10 +799,12 @@ public class playermenu extends Activity {
                     			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO16_9);
                     			ScreenMode.setScreenMode("3");
                     			break;
+                    		/*	
                             case ScreenMode.NORMAL_NOSCALEUP:
                             	SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL_NOSCALEUP);
                                 ScreenMode.setScreenMode("4");
                     			break;
+                    		*/	
                     		default:
                     			break;
                     	}
@@ -863,43 +819,44 @@ public class playermenu extends Activity {
     			morebar_status = R.string.setting_displaymode;
             } 
     	});
-    	if(SystemProperties.getBoolean("mbx.3D_Bright.enable", true))
-        {
-    	ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
-    	brigtness.setOnClickListener(new View.OnClickListener() {
-    		public void onClick(View v) {
-                otherbar.setVisibility(View.VISIBLE);
-                subTitleView.setViewStatus(false);
-                morbar.setVisibility(View.GONE);
-                morebar_tileText.setText(R.string.setting_brightness);
-                ListView listView = (ListView)findViewById(R.id.AudioListView);
-				int mBrightness = 0;
-				try {
-					mBrightness = Settings.System.getInt(playermenu.this.getContentResolver(), 
+    	
+    	/*this is setting is default*/
+    	if(SystemProperties.getBoolean("brigtness_setting.enable", true)) {
+    		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+    		brigtness.setOnClickListener(new View.OnClickListener() {
+    			public void onClick(View v) {
+    				otherbar.setVisibility(View.VISIBLE);
+    				subTitleView.setViewStatus(false);
+    				morbar.setVisibility(View.GONE);
+    				morebar_tileText.setText(R.string.setting_brightness);
+    				ListView listView = (ListView)findViewById(R.id.AudioListView);
+    				int mBrightness = 0;
+    				try {
+    					mBrightness = Settings.System.getInt(playermenu.this.getContentResolver(), 
 						   Settings.System.SCREEN_BRIGHTNESS);
-				} 
-				catch (SettingNotFoundException e) {
-					e.printStackTrace();
-				}
-				int item;
-				if (mBrightness <= (android.os.Power.BRIGHTNESS_DIM + 10))
-					item = 0;
-				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.2f))
-					item = 1;
-				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.4f))
-					item = 2;
-				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.6f))
-					item = 3;
-				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.8f))
-					item = 4;
-				else
-					item = 5;
-
-                listView.setAdapter(getMorebarListAdapter(BRIGHTNESS, item));
-				listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						int brightness;
-                        switch(position) {
+    				} 
+    				catch (SettingNotFoundException e) {
+    					e.printStackTrace();
+    				}
+    				int item;
+    				if (mBrightness <= (android.os.Power.BRIGHTNESS_DIM + 10))
+    					item = 0;
+    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.2f))
+    					item = 1;
+    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.4f))
+    					item = 2;
+    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.6f))
+    					item = 3;
+    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.8f))
+    					item = 4;
+    				else
+    					item = 5;
+    				
+    				listView.setAdapter(getMorebarListAdapter(BRIGHTNESS, item));
+    				listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    						int brightness;
+    						switch(position) {
                         	case 0:
                         	 	brightness = android.os.Power.BRIGHTNESS_DIM + 10;
                         		break;
@@ -921,30 +878,31 @@ public class playermenu extends Activity {
                         	default:
 								brightness = android.os.Power.BRIGHTNESS_DIM + 30;
                         		break;
-                        }
-                        try {
-					        IPowerManager power = IPowerManager.Stub.asInterface(
-					            ServiceManager.getService("power"));
-					        if (power != null) {
-					        	power.setBacklightBrightness(brightness);
-					        	Settings.System.putInt(playermenu.this.getContentResolver(), 
+                        	}
+    						try {
+    							IPowerManager power = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
+    							if (power != null) {
+    								power.setBacklightBrightness(brightness);
+    								Settings.System.putInt(playermenu.this.getContentResolver(), 
 				                    	Settings.System.SCREEN_BRIGHTNESS, brightness);
-					        }
-					    } 
-                        catch (RemoteException doe) {
-					    }  
-                        otherbar.setVisibility(View.GONE);
-                        subTitleView.setViewStatus(true);
-                        morbar.setVisibility(View.VISIBLE);
-                        ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
-                        brigtness.requestFocus();
-                    }
-                });
-				otherbar.requestFocus();
-    			morebar_status = R.string.setting_brightness;
-			} 
-    	}); 
+    							}
+    						} 
+    						catch (RemoteException doe) {
+    							
+    						}  
+    						otherbar.setVisibility(View.GONE);
+    						subTitleView.setViewStatus(true);
+    						morbar.setVisibility(View.VISIBLE);
+    						ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+    						brigtness.requestFocus();
+    					}
+    				});
+    				otherbar.requestFocus();
+    				morebar_status = R.string.setting_brightness;
+    			} 
+    		}); 
     	}
+    	
     	ImageButton backtovidebar = (ImageButton) findViewById(R.id.BackBtn);
     	backtovidebar.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
@@ -1568,9 +1526,11 @@ public class playermenu extends Activity {
 		case ScreenMode.RATIO16_9:
 			ScreenMode.setScreenMode("3");
 			break;
+		/*
         case ScreenMode.NORMAL_NOSCALEUP:
             ScreenMode.setScreenMode("4");
 			break;
+		*/	
 		default:
 			Log.e(TAG, "load display mode para error!");
 			break;
@@ -1937,7 +1897,8 @@ public class playermenu extends Activity {
 			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
 				// TODO Auto-generated method stub
 				timer.cancel();
-				int dest = myProgressBar.getProgress();
+				//int dest = myProgressBar.getProgress();
+				int dest = progress;
 				int pos = totaltime * dest / 100;
 
 				try {
