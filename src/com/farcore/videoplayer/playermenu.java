@@ -1886,34 +1886,36 @@ public class playermenu extends Activity {
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
-				int dest = myProgressBar.getProgress();
-				int pos = totaltime * dest / 100;
-
-				try {
-					if(m_Amplayer != null) {
-				        seek = true;
-				        seek_cur_time = curtime;
-				        //Log.d(TAG, "seek curtime: " + curtime);
-						m_Amplayer.Seek(pos);
-					}
-				}
-				catch(RemoteException e) {
-			        seek = false;
-			        seek_cur_time = 0;
-					e.printStackTrace();
-				}
-				waitForHide();
 			}
 			
 			public void onStartTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
-				timer.cancel();
+				//timer.cancel();
 				//progressSliding = true;
 			}
 			
 			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
 				// TODO Auto-generated method stub
-				//timer.cancel();
+				if(fromUser == true){
+					timer.cancel();
+					int dest = myProgressBar.getProgress();
+					int pos = totaltime * dest / 100;
+	
+					try {
+						if(m_Amplayer != null) {
+					        seek = true;
+					        seek_cur_time = curtime;
+					        //Log.d(TAG, "seek curtime: " + curtime);
+							m_Amplayer.Seek(pos);
+						}
+					}
+					catch(RemoteException e) {
+				        seek = false;
+				        seek_cur_time = 0;
+						e.printStackTrace();
+					}
+					waitForHide();
+				}
 			}
 		});
         
