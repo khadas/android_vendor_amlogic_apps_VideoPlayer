@@ -303,6 +303,49 @@ public class playermenu extends Activity {
 
         return list;
     }
+
+	protected void waitForHideVideoBar(){	//videoBar auto hide
+    	final Handler handler = new Handler(){   
+            public void handleMessage(Message msg) {   
+                switch (msg.what) {       
+                case 0x40:       
+                	hideVideoBar();
+                    break;       
+                }       
+                super.handleMessage(msg);   
+            }  
+        };   
+		
+        TimerTask task = new TimerTask(){   
+            public void run() {
+				if(!touchVolFlag){
+	                Message message = new Message();       
+	                message.what = 0x40;       
+	                handler.sendMessage(message);  
+				}				
+            }     
+        };   
+        
+        timer.cancel();
+        timer = new Timer();
+    	timer.schedule(task, 3000);
+    }
+
+	private void hideVideoBar(){
+		if(null != morbar){
+			morbar.setVisibility(View.GONE);
+	    	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+	}
+
+	private void showVideoBar(){
+		if(null != morbar){
+			morbar.setVisibility(View.VISIBLE);
+	    	if(!SettingsVP.display_mode.equals("480p"))
+	    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+    }
 	
     private void videobar() {
         if(fb32) {
@@ -906,6 +949,10 @@ public class playermenu extends Activity {
     	ImageButton backtovidebar = (ImageButton) findViewById(R.id.BackBtn);
     	backtovidebar.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
+				if (null != morbar){
+	        		morbar = null;
+				}
+				
     			if(!SettingsVP.display_mode.equals("480p"))
     				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 if (fb32) {
@@ -969,6 +1016,8 @@ public class playermenu extends Activity {
     			morebar_status = R.string.str_file_name;
             } 
     	}); 
+
+		waitForHideVideoBar();
     }
     
     public boolean onKeyUp(int keyCode, KeyEvent msg) {
@@ -2097,15 +2146,24 @@ public class playermenu extends Activity {
     		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
     
-    public boolean onTouchEvent (MotionEvent event) {
+	public boolean onTouchEvent (MotionEvent event) {
     	super.onTouchEvent(event);
     	if(event.getAction() == MotionEvent.ACTION_DOWN) {
-	    	if(infobar.getVisibility() == View.VISIBLE)
-	    		hide_infobar();
-	    	else {
-		    	show_menu();
-		    	waitForHide();
-	    	}
+			if(null != morbar){
+				if(morbar.getVisibility() == View.VISIBLE)
+		    		hideVideoBar();
+		    	else {
+			    	showVideoBar();
+			    	waitForHideVideoBar();
+		    	}
+			}else{
+				if(infobar.getVisibility() == View.VISIBLE)
+		    		hide_infobar();
+		    	else {
+			    	show_menu();
+			    	waitForHide();
+		    	}
+			}
     	}
     	return true;
     }
