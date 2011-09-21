@@ -2259,6 +2259,15 @@ public class playermenu extends Activity {
         }
         ScreenMode.setScreenMode("0");
     }
+
+	public void onStop(){
+		super.onStop();
+		Log.d(TAG,"onStop");
+		if(!backToFileList){
+			PlayList.getinstance().rootPath =null;
+		}
+		finish();
+	}
     
 	//=========================================================
     private Messenger m_PlayerMsg = new Messenger(new Handler() {
