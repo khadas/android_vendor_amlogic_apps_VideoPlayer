@@ -249,13 +249,16 @@ public class playermenu extends Activity {
                 if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
                     AudioTrackOperation.setAudioStream(bMediaInfo);
                 int size_as = AudioTrackOperation.AudioStreamFormat.size();
-                for (int i = 0; i < size_as; i++) {
-                    map = new HashMap<String, Object>();
-                    map.put("item_name", AudioTrackOperation.AudioStreamFormat.get(i));
-                    map.put("item_sel", R.drawable.item_img_unsel);
-                    list.add(map);
-                }
-                list.get(pos).put("item_sel", R.drawable.item_img_sel);
+				if (size_as > 0) 
+				{
+	                for (int i = 0; i < size_as; i++) {
+	                    map = new HashMap<String, Object>();
+	                    map.put("item_name", AudioTrackOperation.AudioStreamFormat.get(i));
+	                    map.put("item_sel", R.drawable.item_img_unsel);
+	                    list.add(map);
+	                }
+	                list.get(pos).put("item_sel", R.drawable.item_img_sel);
+				}
                 break;
 
             case DISPLAY:
