@@ -165,7 +165,7 @@ public class playermenu extends Activity {
 	private boolean mSuspendFlag = false;
 	PowerManager.WakeLock mScreenLock = null;
 	private Handler mDelayHandler;
-	private final static long ScrnOff_delay = 1*1000;
+	private final static long ScrnOff_delay = 2*1000;
 
 	public void setAngleTable() {
 		String hwrotation = SystemProperties.get("ro.sf.hwrotation");
@@ -1152,6 +1152,13 @@ public class playermenu extends Activity {
 				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
+				String temp=SystemProperties.get("rw.fb.need2xscale");
+		    if(temp.equals("ok"))
+			  {
+			
+			       //ScreenOffForWhile();
+			     disable2XScale();
+			  }	
 				startActivity(selectFileIntent);
 				playermenu.this.finish();
 				return true;
@@ -1473,12 +1480,7 @@ public class playermenu extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		String temp=SystemProperties.get("rw.fb.need2xscale");
-		if(temp.equals("ok"))
-			{
-			set2XScale();
-			
-			}
-		
+
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
@@ -1503,6 +1505,7 @@ public class playermenu extends Activity {
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
         closeScreenOffTimeout();
+		
         Intent it = this.getIntent();
         playmode_switch = true;
         if(it.getData() != null) {
@@ -1564,7 +1567,6 @@ public class playermenu extends Activity {
         setAngleTable();
         seek = false;
         seek_cur_time = 0;
-        
 		if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
 			resumePlay();
 		else {
@@ -1573,7 +1575,11 @@ public class playermenu extends Activity {
         	else
         		Amplayer_play();
 		}
-
+    if(temp.equals("ok"))
+		{
+		   set2XScale();
+			
+		}        
         if(infobar != null) {
             infobar.setVisibility(View.VISIBLE);
             ImageButton browser = (ImageButton) findViewById(R.id.BrowserBtn);
@@ -1581,63 +1587,6 @@ public class playermenu extends Activity {
         }
     }
 
-	public void ScreenOffForWhile(int type)
-		{		
-		try
-			{
-			File reg=new File("/sys/class/display/wr_reg");
-			FileOutputStream fd = new FileOutputStream(reg); 
-			Log.e(TAG,"-----------------------------get FileOutputStream");
-		 	fd.write("m 0x1d26 '0x54f1'".getBytes());	
-			Log.e(TAG,"-----------------------------write fail");
-		 	fd.close();
-			}
-		catch (Exception e)
-			{   
-           // e.printStackTrace(); 
-			Log.e(TAG,"close osd register fail ");
-			}  
-		 mDelayHandler = new ScreenOnOffHandler();
-		 mDelayHandler.sendEmptyMessageDelayed(type, ScrnOff_delay);
-
-		 
-		}
-	
-    private class ScreenOnOffHandler extends Handler {
-    	 @Override
-         public void handleMessage(Message msg) 
-    	 	{
-    	 	
-			String wr=null;
-			switch (msg.what)
-				{
-				case 1:
-					wr="m 0x1d26 '0x44f1'";
-					break;
-				case 2:
-					wr="m 0x1d26 '0x10f1'";
-					break;
-				default:
-					break;	
-				}
-			super.handleMessage(msg); 
-    	 	try
-    	 		{
-				FileOutputStream fd = new FileOutputStream(new File("/sys/class/display/wr_reg"));
-				Log.e(TAG,"-----------------------------wr"+wr);
-				fd.write(wr.getBytes());	
-		 		fd.close();
-    	 		}
-			catch (Exception e)
-				{   
-	            //e.printStackTrace();   
-				Log.e(TAG,"open osd register fail ");
-				}     
-
-    	 	}
-    }
-
-		
     private void displayinit() {
     	int mode = SettingsVP.getParaInt(SettingsVP.DISPLAY_MODE);
     	switch (mode) {
@@ -2139,7 +2088,9 @@ public class playermenu extends Activity {
 		String tmp = SystemProperties.get("ubootenv.var.outputmode");
 		if(tmp.equals("1080p")==false)
 			return 0;
-		ScreenOffForWhile(SET_OSD_ON);
+//		ScreenOffForWhile(SET_OSD_ON);
+		Display display = getWindowManager().getDefaultDisplay();
+		String outputpara = "0 0 "+ (display.getWidth()/2-1)+" "+(display.getHeight()-1);
 		Log.d(TAG, "set2XScale");
     	File OutputFile = new File(ScaleaxisFile);
 		if(!OutputFile.exists()) {        	
@@ -2149,9 +2100,9 @@ public class playermenu extends Activity {
     	try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
     		try {
-				Log.d(TAG, "set2XScale  0 0 939 1059" );
+				Log.d(TAG, outputpara );
 
-    			out.write(" 0 0 939 1059 ");    
+    			out.write(outputpara);    
     		} 
 			finally {
 				out.close();
@@ -2191,7 +2142,7 @@ public class playermenu extends Activity {
 		String tmp = SystemProperties.get("ubootenv.var.outputmode");
 		if(tmp.equals("1080p")==false)
 			return 0;
-		ScreenOffForWhile(SET_OSD_OFF);
+	//	ScreenOffForWhile(SET_OSD_OFF);
 		Log.d(TAG, "disable2XScale");
 
     	File OutputFile = new File(ScaleFile);
@@ -2389,14 +2340,6 @@ public class playermenu extends Activity {
         SettingsVP.disableVideoLayout();
         SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
-
-		String temp=SystemProperties.get("rw.fb.need2xscale");
-		if(temp.equals("ok"))
-			{
-			
-			//ScreenOffForWhile();
-			disable2XScale();
-			}
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         
