@@ -42,8 +42,6 @@ public class FileList extends ListActivity {
 	
 	private TextView tileText;
 	private File file;
-    private boolean shouldBeKilled;
-
 	private static String TAG = "player_FileList";
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
@@ -95,15 +93,6 @@ public class FileList extends ListActivity {
         m_storagemgr.unregisterListener(mListener);
     }
     
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-		
-// when exit from filelist activity, kill the process at same time
-        if(shouldBeKilled)
-          android.os.Process.killProcess(android.os.Process.myPid());
-    }
-
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -112,8 +101,6 @@ public class FileList extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 	    
-        shouldBeKilled = true;
-
 	    currentlist = new ArrayList<String>();
 	    
 		if(PlayList.getinstance().rootPath==null)
@@ -330,8 +317,6 @@ public class FileList extends ListActivity {
 		//* new an Intent object and ponit a class to start
 		Intent intent = new Intent();
 		intent.setClass(FileList.this, playermenu.class);
-        // when goto playvideo, keep the process in memory without kill
-        shouldBeKilled = false;
 
 		startActivity(intent);
 		FileList.this.finish();
