@@ -2513,6 +2513,7 @@ public class playermenu extends Activity {
 								|| msg.arg2 == Errorno.DECODER_INIT_FAILED
 								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT
 								|| msg.arg2 == Errorno.PLAYER_RD_FAILED
+								|| msg.arg2 == Errorno.PLAYER_SEEK_FAILED
 								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT_VCODEC) {
 							Intent selectFileIntent = new Intent();
 							selectFileIntent.setClass(playermenu.this, FileList.class);
