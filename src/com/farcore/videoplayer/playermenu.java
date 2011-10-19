@@ -2383,6 +2383,7 @@ public class playermenu extends Activity {
     
 	//=========================================================
     private Messenger m_PlayerMsg = new Messenger(new Handler() {
+		Toast tp = null;
     	public void handleMessage(Message msg) {
     		switch(msg.what) {
     			case VideoInfo.TIME_INFO_MSG:
@@ -2429,7 +2430,7 @@ public class playermenu extends Activity {
     				
     				switch(player_status) {
 					case VideoInfo.PLAYER_RUNNING:
-						play.setImageResource(R.drawable.pause);
+						play.setImageResource(R.drawable.pause);						
 						break;
 					case VideoInfo.PLAYER_PAUSE:
 					case VideoInfo.PLAYER_SEARCHING:	
@@ -2506,32 +2507,29 @@ public class playermenu extends Activity {
 					case VideoInfo.PLAYER_ERROR:
 						String InfoStr = null;
 						InfoStr = Errorno.getErrorInfo(msg.arg2);
-						Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_LONG)
-							.show();
+						if(tp == null){
+							tp = Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_SHORT);															
+						}else{
+							tp.cancel();
+							tp.setText("Status Error:"+InfoStr);
+						}
+						tp.show();						
 						Log.d(TAG, "Player error, msg.arg2 = " + Integer.toString(msg.arg2));
-						if(msg.arg2 == Errorno.FFMPEG_OPEN_FAILED
-								|| msg.arg2 == Errorno.DECODER_INIT_FAILED
-								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT
-								|| msg.arg2 == Errorno.PLAYER_RD_FAILED
-								|| msg.arg2 == Errorno.PLAYER_SEEK_FAILED
-								|| msg.arg2 == Errorno.PLAYER_UNSUPPORT_VCODEC) {
-							Intent selectFileIntent = new Intent();
-							selectFileIntent.setClass(playermenu.this, FileList.class);
-							//close sub;
-							if(subTitleView!=null)
-								subTitleView.closeSubtitle();	
-							//stop play
-							backToFileList = true;
-							if(m_Amplayer != null) {
-								try	{
-									m_Amplayer.Close();
-								} 
-								catch(RemoteException e) {
-									e.printStackTrace();
-								}
+						if (msg.arg2 < 0) {							
+							try	{
+							m_Amplayer.Close();
+							} 
+							catch(RemoteException e) {
+								e.printStackTrace();
 							}
-							startActivity(selectFileIntent);
-							playermenu.this.finish();
+							ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
+							playPosition = 0;
+							if(m_playmode == REPEATLIST)
+								PlayList.getinstance().movenext();
+							AudioTrackOperation.AudioStreamFormat.clear();
+							AudioTrackOperation.AudioStreamInfo.clear();
+							INITOK = false;
+							PRE_NEXT_FLAG = 1;							
 						}
 						break;
 					case VideoInfo.PLAYER_INITOK:
@@ -2543,6 +2541,7 @@ public class playermenu extends Activity {
 						catch(RemoteException e) {
 							e.printStackTrace();
 						}
+						
 						if((bMediaInfo != null) && (subTitleView != null)) {
 							subTitleView.setDisplayResolution(
 									SettingsVP.panel_width, SettingsVP.panel_height);
@@ -2724,8 +2723,13 @@ public class playermenu extends Activity {
     			case VideoInfo.HAS_ERROR_MSG:
 					String errStr = null;
 					errStr = Errorno.getErrorInfo(msg.arg2);
-					Toast.makeText(playermenu.this, errStr, Toast.LENGTH_LONG)
-						.show();
+					if(tp == null){
+						tp = Toast.makeText(playermenu.this, errStr, Toast.LENGTH_SHORT);						
+					}else{
+						tp.cancel();
+						tp.setText(errStr);
+					}					
+					tp.show();
     				break;
     			default:
     				super.handleMessage(msg);
