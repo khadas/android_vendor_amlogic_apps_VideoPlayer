@@ -355,8 +355,10 @@ public class playermenu extends Activity {
 	private void showVideoBar(){
 		if(null != morbar){
 			morbar.setVisibility(View.VISIBLE);
-	    	if(!SettingsVP.display_mode.equals("480p"))
-	    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			if(AmPlayer.getProductType() == 1){
+				if(!SettingsVP.display_mode.equals("480p"))
+					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			}
 		}
     }
 	
@@ -368,14 +370,15 @@ public class playermenu extends Activity {
 			setContentView(R.layout.layout_morebar);
         }
         FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
-    	if (SettingsVP.display_mode.equals("480p")) {
-    		FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
-    		frameParams.width = 720;
-    		frameParams.height = 480;
-    		frameParams.gravity = -1;
-    		baselayout2.setLayoutParams(frameParams);
-    	}
-    	
+        if(AmPlayer.getProductType() == 1){
+	    	if (SettingsVP.display_mode.equals("480p")) {
+	    		FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+	    		frameParams.width = 720;
+	    		frameParams.height = 480;
+	    		frameParams.gravity = -1;
+	    		baselayout2.setLayoutParams(frameParams);
+	    	}
+        }
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
     	subTitleView.setGravity(Gravity.CENTER);
     	subTitleView.setTextColor(sub_para.color);
@@ -965,9 +968,10 @@ public class playermenu extends Activity {
 				if (null != morbar){
 	        		morbar = null;
 				}
-				
-    			if(!SettingsVP.display_mode.equals("480p"))
-    				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				if(AmPlayer.getProductType() == 1){
+					if(!SettingsVP.display_mode.equals("480p"))
+						getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				}
                 if (fb32) {
                     setContentView(R.layout.infobar32);
                 } else {
@@ -1541,9 +1545,11 @@ public class playermenu extends Activity {
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
         SettingsVP.enableVideoLayout();
-        if(SettingsVP.display_mode.equals("480p")) {
-        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if(AmPlayer.getProductType() == 1){
+	        if(SettingsVP.display_mode.equals("480p")) {
+	        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	        }
         }
 		subinit();
 		displayinit();
@@ -1649,23 +1655,25 @@ public class playermenu extends Activity {
     	subTitleView.setTextSize(sub_para.font);
     	subTitleView.setTextStyle(Typeface.BOLD);
 
-        if(SettingsVP.display_mode.equals("480p")) {
-        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
-        	if(SettingsVP.panel_resolution.equals("800x600")) {
-            	linearParams.width = 720;
-            	linearParams.bottomMargin = 130;
-        	}
-        	else if(SettingsVP.panel_resolution.equals("800x480")) {
-            	linearParams.width = 720;
-            	linearParams.bottomMargin = 10;
-        	}
-        	else {
-            	linearParams.width = 720;
-            	linearParams.bottomMargin = 130;
-        	}
-        	linearParams.gravity = -1;
-        	subTitleView.setLayoutParams(linearParams);
-        }
+    	if(AmPlayer.getProductType() == 1){
+	        if(SettingsVP.display_mode.equals("480p")) {
+	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
+	        	if(SettingsVP.panel_resolution.equals("800x600")) {
+	            	linearParams.width = 720;
+	            	linearParams.bottomMargin = 130;
+	        	}
+	        	else if(SettingsVP.panel_resolution.equals("800x480")) {
+	            	linearParams.width = 720;
+	            	linearParams.bottomMargin = 10;
+	        	}
+	        	else {
+	            	linearParams.width = 720;
+	            	linearParams.bottomMargin = 130;
+	        	}
+	        	linearParams.gravity = -1;
+	        	subTitleView.setLayoutParams(linearParams);
+	        }
+    	}
     	openFile(sub_para.sub_id);
 	
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
@@ -1676,22 +1684,24 @@ public class playermenu extends Activity {
         fastforword = (ImageButton)findViewById(R.id.FastForward);
         fastreverse = (ImageButton)findViewById(R.id.FastReverse);
         infobar = (LinearLayout)findViewById(R.id.infobarLayout);
-        if(SettingsVP.display_mode.equals("480p")) {
-        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
-        	if(SettingsVP.panel_resolution.equals("800x600")) {
-            	linearParams.width = 720;
-            	linearParams.bottomMargin = 130;
-        	}
-        	else if(SettingsVP.panel_resolution.equals("800x480")) {
-            	linearParams.width = 720;
-            	linearParams.bottomMargin = 10;
-        	}
-        	else {
-            	linearParams.width = 720;
-            	linearParams.bottomMargin = 130;
-        	}
-        	linearParams.gravity = -1;
-        	infobar.setLayoutParams(linearParams);
+        if(AmPlayer.getProductType() == 1){
+	        if(SettingsVP.display_mode.equals("480p")) {
+	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
+	        	if(SettingsVP.panel_resolution.equals("800x600")) {
+	            	linearParams.width = 720;
+	            	linearParams.bottomMargin = 130;
+	        	}
+	        	else if(SettingsVP.panel_resolution.equals("800x480")) {
+	            	linearParams.width = 720;
+	            	linearParams.bottomMargin = 10;
+	        	}
+	        	else {
+	            	linearParams.width = 720;
+	            	linearParams.bottomMargin = 130;
+	        	}
+	        	linearParams.gravity = -1;
+	        	infobar.setLayoutParams(linearParams);
+	        }
         }
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
@@ -2254,8 +2264,10 @@ public class playermenu extends Activity {
     
     protected void show_menu() {
     	infobar.setVisibility(View.VISIBLE);
-    	if(!SettingsVP.display_mode.equals("480p"))
-    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	if(AmPlayer.getProductType() == 1){
+	    	if(!SettingsVP.display_mode.equals("480p"))
+	    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	}
     }
     
 	public boolean onTouchEvent (MotionEvent event) {
