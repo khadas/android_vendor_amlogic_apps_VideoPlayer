@@ -31,7 +31,7 @@
 			    android:id="@+id/TextView01" 
 				android:gravity="center" 
 				android:layout_height="56dp" 
-				android:textSize="24px" 
+				android:textSize="24sp" 
 				android:layout_width="wrap_content" 
 				android:text="@string/setting_subtitle" 
 				android:textColor="@drawable/white">
@@ -52,7 +52,7 @@
 				android:gravity="left|center" 
 				android:layout_width="86dp" 
 				android:layout_height="60dp" 
-				android:textSize="24px" 
+				android:textSize="24sp" 
 				android:text="@string/sub_switch" 
 				android:layout_marginLeft="6dp" 
 				android:textColor="@drawable/black">
@@ -70,7 +70,7 @@
 		     	android:gravity="center" 
 		     	android:layout_height="60dp" 
 		     	android:id="@+id/sub_swith111" 
-		     	android:textSize="24px" 
+		     	android:textSize="24sp" 
 		     	android:textColor="@drawable/black">
 		    </TextView>
 		    
@@ -95,7 +95,7 @@
 		        android:layout_width="86dp" 
 				android:layout_height="60dp" 
 				android:gravity="left|center" 
-				android:textSize="24px" 
+				android:textSize="24sp" 
 				android:text="@string/sub_font" 
 				android:layout_marginLeft="6dp" 
 				android:textColor="@drawable/black" 
@@ -112,7 +112,7 @@
 			    android:layout_width="94dp" 
 		     	android:layout_height="60dp" 
 		     	android:gravity="center" 
-		     	android:textSize="24px" 
+		     	android:textSize="24sp" 
 		     	android:id="@+id/sub_font111" 
 		     	android:textColor="@drawable/black">
 		    </TextView>
@@ -137,7 +137,7 @@
 			    android:layout_width="86dp" 
 				android:layout_height="60dp" 
 				android:gravity="left|center" 
-				android:textSize="24px" 
+				android:textSize="24sp" 
 				android:text="@string/sub_color" 
 				android:layout_marginLeft="6dp" 
 				android:textColor="@drawable/black" 
@@ -155,7 +155,7 @@
 			    android:layout_width="94dp" 
 		     	android:layout_height="60dp" 
 		     	android:gravity="center" 
-		     	android:textSize="24px" 
+		     	android:textSize="24sp" 
 		     	android:id="@+id/sub_color111" 
 		     	android:textColor="@drawable/black">
 		    </TextView>
@@ -183,7 +183,7 @@
 			    android:layout_gravity="center" 
 			    android:layout_marginRight="20dp" 
 			    android:layout_height="wrap_content" 
-			    android:textSize="24px" 
+			    android:textSize="24sp" 
 			    android:textColor="@drawable/black">
 			</Button>
 			
@@ -193,7 +193,7 @@
 				android:layout_width="120dp" 
 				android:layout_gravity="center" 
 				android:layout_height="wrap_content" 
-				android:textSize="24px" 
+				android:textSize="24sp" 
 				android:textColor="@drawable/black">
 			</Button>
 		</LinearLayout>
@@ -214,7 +214,7 @@
 			android:layout_height="56dp" 
 			android:gravity="center" 
 			android:textColor="@drawable/white" 
-			android:textSize="24px">
+			android:textSize="24sp">
 		</TextView>
 		
 		<ListView 
@@ -248,7 +248,7 @@
 			android:layout_marginRight="60dp"
 			android:gravity="center" 
 			android:textColor="@drawable/white" 
-			android:textSize="20px">
+			android:textSize="20sp">
 		</TextView>
 		
 		<LinearLayout	
@@ -264,14 +264,14 @@
 			    android:layout_width="wrap_content" 
 			    android:layout_height="wrap_content" 
 			    android:textColor="@drawable/white" 
-			    android:textSize="18px">
+			    android:textSize="18sp">
 		    </TextView>
 		    <TextView
 			    android:id="@+id/filetype" 
 			    android:layout_width="wrap_content" 
 			    android:layout_height="wrap_content" 
 			    android:textColor="@drawable/white" 
-			    android:textSize="18px"
+			    android:textSize="18sp"
 			    android:layout_marginTop="2dp">
 		    </TextView>
 		    <TextView
@@ -279,7 +279,7 @@
 			    android:layout_width="wrap_content" 
 			    android:layout_height="wrap_content" 
 			    android:textColor="@drawable/white" 
-			    android:textSize="18px"
+			    android:textSize="18sp"
 			    android:layout_marginTop="2dp">
 		    </TextView>
 		    <TextView
@@ -287,7 +287,7 @@
 			    android:layout_width="wrap_content" 
 			    android:layout_height="wrap_content" 
 			    android:textColor="@drawable/white" 
-			    android:textSize="18px"
+			    android:textSize="18sp"
 			    android:layout_marginTop="2dp">
 		    </TextView>
 		    <TextView
@@ -295,7 +295,7 @@
 			    android:layout_width="wrap_content" 
 			    android:layout_height="wrap_content" 
 			    android:textColor="@drawable/white" 
-			    android:textSize="18px"
+			    android:textSize="18sp"
 			    android:layout_marginTop="2dp">
 		    </TextView>
 		</LinearLayout>
@@ -310,7 +310,7 @@
 			    android:layout_height="wrap_content" 
 			    android:gravity="center" 
 			    android:textColor="@drawable/black" 
-			    android:textSize="20px">
+			    android:textSize="20sp">
 		    </Button>
 		</LinearLayout>
 	</LinearLayout>
