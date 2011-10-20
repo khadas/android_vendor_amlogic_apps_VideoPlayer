@@ -2369,6 +2369,11 @@ public class playermenu extends Activity {
             }
             finish();
         }
+        String temp=SystemProperties.get("rw.fb.need2xscale");
+  	  	if(temp.equals("ok"))
+  		{
+  	    	disable2XScale();
+  		}
         ScreenMode.setScreenMode("0");
     }
 
