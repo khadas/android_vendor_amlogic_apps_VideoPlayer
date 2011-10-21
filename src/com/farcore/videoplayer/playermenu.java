@@ -1169,13 +1169,25 @@ public class playermenu extends Activity {
     		}
     	}
 		else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
-    		if (infobar.getVisibility() == View.VISIBLE)
-	    		hide_infobar();
-	    	else {
-	    		play.requestFocus();
-		    	show_menu();
-                waitForHide();
-	    	}
+			if (morbar!=null)  {
+	    		if (morbar.getVisibility() == View.VISIBLE){
+	    			morbar.setVisibility(View.GONE);
+	    		}
+		    	else {
+					morbar.setVisibility(View.VISIBLE);
+					morbar.requestFocus();
+	                waitForHide();
+		    	}
+			}
+			else{
+	    		if (infobar.getVisibility() == View.VISIBLE)
+		    		hide_infobar();
+		    	else {
+		    		play.requestFocus();
+			    	show_menu();
+	                waitForHide();
+		    	}
+			}
 			return (true);
 		}
     	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
