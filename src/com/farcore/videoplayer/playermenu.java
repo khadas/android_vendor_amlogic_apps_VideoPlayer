@@ -396,6 +396,7 @@ public class playermenu extends Activity {
 		infodialog = (LinearLayout)findViewById(R.id.dialog_layout);
 		infodialog.setVisibility(View.GONE);
     	morbar = (LinearLayout)findViewById(R.id.morebarLayout);
+    	morbar.requestFocusFromTouch();
     	morbar.requestFocus();
     	
     	ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
@@ -419,9 +420,11 @@ public class playermenu extends Activity {
 						subTitleView.setViewStatus(true);
 						morbar.setVisibility(View.VISIBLE);
 				    ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
+				    resume.requestFocusFromTouch();
 				    resume.requestFocus();
 					}
 				});
+				otherbar.requestFocusFromTouch();
 				otherbar.requestFocus();
 				morebar_status = R.string.setting_resume;
 			} 
@@ -447,9 +450,11 @@ public class playermenu extends Activity {
     				    	subTitleView.setViewStatus(true);
     				    	morbar.setVisibility(View.VISIBLE);
 							    ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
+							    playmode.requestFocusFromTouch();
 							    playmode.requestFocus();
     				    }
     				});
+    				otherbar.requestFocusFromTouch();
     				otherbar.requestFocus();
     				morebar_status = R.string.setting_playmode;
     			}
@@ -545,9 +550,11 @@ public class playermenu extends Activity {
 							subTitleView.setViewStatus(true);
 							morbar.setVisibility(View.VISIBLE);
 							ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+							play3d.requestFocusFromTouch();
 							play3d.requestFocus();
 						}
 					});    
+					otherbar.requestFocusFromTouch();
 					otherbar.requestFocus();
 					morebar_status = R.string.setting_3d_mode;
 				} 
@@ -585,9 +592,11 @@ public class playermenu extends Activity {
     			    	subTitleView.setViewStatus(true);
     			    	morbar.setVisibility(View.VISIBLE);
 						    ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
+						    audiotrack.requestFocusFromTouch();
 						    audiotrack.requestFocus();
     			    }	
     			});
+    			otherbar.requestFocusFromTouch();
     			otherbar.requestFocus();
 				morebar_status = R.string.setting_audiotrack;
     		} 
@@ -607,6 +616,7 @@ public class playermenu extends Activity {
     			subTitleView.setViewStatus(false);
     			morbar.setVisibility(View.GONE);
     			subtitle_control();
+    			subbar.requestFocusFromTouch();
     			subbar.requestFocus();
     			morebar_status = R.string.setting_subtitle;
     		}
@@ -665,6 +675,9 @@ public class playermenu extends Activity {
     			    	subbar.setVisibility(View.GONE);
     			    	subTitleView.setViewStatus(true);
     			    	videobar();
+    			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
+    			    	mSubtitle.requestFocusFromTouch();
+    			    	mSubtitle.requestFocus();
     			    } 
     			});
     			Button cancel = (Button) findViewById(R.id.button_canncel);
@@ -677,6 +690,9 @@ public class playermenu extends Activity {
   		            	subbar.setVisibility(View.GONE);
   		            	subTitleView.setViewStatus(true);
   		            	videobar();
+    			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
+    			    	mSubtitle.requestFocusFromTouch();
+    			    	mSubtitle.requestFocus();
   		            } 
   		        });
     			ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	
@@ -871,9 +887,11 @@ public class playermenu extends Activity {
                     	subTitleView.setViewStatus(true);
                     	morbar.setVisibility(View.VISIBLE);
 						ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
+						display.requestFocusFromTouch();
 						display.requestFocus();
                     }
                 });    
+                otherbar.requestFocusFromTouch();    
                 otherbar.requestFocus();
     			morebar_status = R.string.setting_displaymode;
             } 
@@ -953,9 +971,11 @@ public class playermenu extends Activity {
     						subTitleView.setViewStatus(true);
     						morbar.setVisibility(View.VISIBLE);
     						ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+    						brigtness.requestFocusFromTouch();
     						brigtness.requestFocus();
     					}
     				});
+    				otherbar.requestFocusFromTouch();
     				otherbar.requestFocus();
     				morebar_status = R.string.setting_brightness;
     			} 
@@ -979,6 +999,7 @@ public class playermenu extends Activity {
                 }
                 initinfobar();
                 ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
+                morebtn.requestFocusFromTouch();
                 morebtn.requestFocus();
     		} 
     	}); 
@@ -1026,9 +1047,11 @@ public class playermenu extends Activity {
                         subTitleView.setViewStatus(true);
                         morbar.setVisibility(View.VISIBLE);
 						ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
+						fileinformation.requestFocusFromTouch();
 						fileinformation.requestFocus();	
 					}
 				});
+				infodialog.requestFocusFromTouch();	
 				infodialog.requestFocus();	
     			morebar_status = R.string.str_file_name;
             } 
@@ -1047,8 +1070,14 @@ public class playermenu extends Activity {
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
         if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
-            if (infobar.getVisibility() == View.VISIBLE)
-                waitForHide();
+        	if (morbar!=null)  {
+        		if(morbar.getVisibility() == View.VISIBLE)
+                	waitForHideVideoBar();
+        	}
+        	else{
+        		if (infobar.getVisibility() == View.VISIBLE)
+                    waitForHide();
+        	}
         }
 
         if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
@@ -1085,40 +1114,50 @@ public class playermenu extends Activity {
 	    	        switch(morebar_status){
     	        	case R.string.setting_resume:
     	        		ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
+    	        		resume.requestFocusFromTouch();
     				    resume.requestFocus();
     	        		break;
     	        	case R.string.setting_playmode:
     	        		ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
+    	        		playmode.requestFocusFromTouch();
 					    playmode.requestFocus();
     	        		break;
     	        	case R.string.setting_3d_mode:
     	        		ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+    	        		play3d.requestFocusFromTouch();
                     	play3d.requestFocus();
     	        		break;
     	        	case R.string.setting_audiotrack:
     	        		ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
+    	        		audiotrack.requestFocusFromTouch();
 					    audiotrack.requestFocus();
     	        		break;
     	        	case R.string.setting_subtitle:
     	        		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
+    	        		subtitle.requestFocusFromTouch();
     	        		subtitle.requestFocus();
     	        		break;
     	        	case R.string.setting_displaymode:
     	        		ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
+    	        		display.requestFocusFromTouch();
 						display.requestFocus();
     	        		break;
     	        	case R.string.setting_brightness:
     	        		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+    	        		brigtness.requestFocusFromTouch();
                         brigtness.requestFocus();
     	        		break;
     	        	case R.string.str_file_name:
     	        		ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
+    	        		fileinformation.requestFocusFromTouch();
 						fileinformation.requestFocus();	
     	        		break;
 	    	        default:
+	    	        	morbar.requestFocusFromTouch();
 	    	        	morbar.requestFocus();
 	    	        	break;
 	    	        }
+	    	        waitForHideVideoBar();
 			        return(true);
     			}
     			else {
@@ -1131,6 +1170,7 @@ public class playermenu extends Activity {
 	                }
 		        	initinfobar();
 					ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
+	                morebtn.requestFocusFromTouch();
 	                morebtn.requestFocus();
 		        	return(true);
     			}
@@ -1174,15 +1214,17 @@ public class playermenu extends Activity {
 	    			morbar.setVisibility(View.GONE);
 	    		}
 		    	else {
-					morbar.setVisibility(View.VISIBLE);
+		    		morbar.requestFocusFromTouch();
 					morbar.requestFocus();
-	                waitForHide();
+					morbar.setVisibility(View.VISIBLE);
+					waitForHideVideoBar();
 		    	}
 			}
 			else{
 	    		if (infobar.getVisibility() == View.VISIBLE)
 		    		hide_infobar();
 		    	else {
+		    		play.requestFocusFromTouch();
 		    		play.requestFocus();
 			    	show_menu();
 	                waitForHide();
@@ -1823,6 +1865,7 @@ public class playermenu extends Activity {
 						e.printStackTrace();
 					}
 				}
+				play.requestFocusFromTouch();
 			}
         });
                 
@@ -1896,6 +1939,7 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
     				ff_fb.show();
 				}
+				fastforword.requestFocusFromTouch();
 			}
         });
         
@@ -1969,6 +2013,7 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
     				ff_fb.show();
 				}
+				fastreverse.requestFocusFromTouch();
 			}
         });
         
@@ -2013,10 +2058,11 @@ public class playermenu extends Activity {
 						e.printStackTrace();
 					}
 					waitForHide();
+					myProgressBar.requestFocusFromTouch();
 				}
 			}
 		});
-        
+        infobar.requestFocusFromTouch();
         waitForHide();
     }
 	
@@ -2289,13 +2335,19 @@ public class playermenu extends Activity {
 				if(morbar.getVisibility() == View.VISIBLE)
 		    		hideVideoBar();
 		    	else {
-			    	showVideoBar();
-			    	waitForHideVideoBar();
+		    		if(!(otherbar.getVisibility() == View.VISIBLE) 
+	    					&& !(infodialog.getVisibility() == View.VISIBLE)
+	    					&& !(subbar.getVisibility() == View.VISIBLE)) {
+			    		morbar.requestFocusFromTouch();
+				    	showVideoBar();
+				    	waitForHideVideoBar();
+		    		}
 		    	}
 			}else{
 				if(infobar.getVisibility() == View.VISIBLE)
 		    		hide_infobar();
 		    	else {
+		    		play.requestFocusFromTouch();
 			    	show_menu();
 			    	waitForHide();
 		    	}
