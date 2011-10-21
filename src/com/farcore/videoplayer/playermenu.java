@@ -252,10 +252,12 @@ public class playermenu extends Activity {
 				if (size_as > 0) 
 				{
 	                for (int i = 0; i < size_as; i++) {
-	                    map = new HashMap<String, Object>();
-	                    map.put("item_name", AudioTrackOperation.AudioStreamFormat.get(i));
-	                    map.put("item_sel", R.drawable.item_img_unsel);
-	                    list.add(map);
+	                	if(AudioTrackOperation.AudioStreamFormat.get(i) != "UNSUPPORT"){
+		                    map = new HashMap<String, Object>();
+		                    map.put("item_name", AudioTrackOperation.AudioStreamFormat.get(i));
+		                    map.put("item_sel", R.drawable.item_img_unsel);
+		                    list.add(map);
+	                	}
 	                }
 	                list.get(pos).put("item_sel", R.drawable.item_img_sel);
 				}
