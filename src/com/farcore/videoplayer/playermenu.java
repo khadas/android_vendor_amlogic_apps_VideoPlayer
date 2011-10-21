@@ -20,6 +20,7 @@ import com.subtitleparser.*;
 import com.subtitleview.SubtitleView;
 import android.content.Context;
 import com.farcore.playerservice.*;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -62,6 +63,7 @@ public class playermenu extends Activity {
 	private int cur_audio_stream = 0;
 	private int total_audio_num = 0;
 	private int cur_audio_channel = 0;
+	private int audio_flag = 0;
 	
     private final int PLAY_RESUME = 0;
     private final int PLAY_MODE = 1;
@@ -566,6 +568,13 @@ public class playermenu extends Activity {
     	ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
     	audiotrack.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
+    			if(audio_flag == Errorno.PLAYER_NO_AUDIO) {
+    				Toast toast =Toast.makeText(playermenu.this, R.string.file_have_no_audio,Toast.LENGTH_SHORT );
+    				toast.setGravity(Gravity.BOTTOM,110,0);
+    				toast.setDuration(0x00000001);
+    				toast.show();
+    				return;
+    			}
     			otherbar.setVisibility(View.VISIBLE);
     			subTitleView.setViewStatus(false);
     			morbar.setVisibility(View.GONE);
@@ -2806,6 +2815,7 @@ public class playermenu extends Activity {
     			case VideoInfo.HAS_ERROR_MSG:
 					String errStr = null;
 					errStr = Errorno.getErrorInfo(msg.arg2);
+    				audio_flag = msg.arg2;
 					if(tp == null){
 						tp = Toast.makeText(playermenu.this, errStr, Toast.LENGTH_SHORT);						
 					}else{

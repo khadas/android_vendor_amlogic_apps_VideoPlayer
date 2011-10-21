@@ -50,4 +50,5 @@
 	<string name="str_left_auidochannel">Left Mono</string>
 	<string name="str_right_auidochannel">Right Mono</string>
 	<string name="str_stereo_auidochannel">Stereo</string>
+	<string name="file_have_no_audio">file have no audio</string>
 </resources>

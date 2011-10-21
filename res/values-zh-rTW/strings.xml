@@ -50,4 +50,5 @@
 	<string name="str_left_auidochannel">左聲道</string>
 	<string name="str_right_auidochannel">右聲道</string>
 	<string name="str_stereo_auidochannel">立體聲</string>
+	<string name="file_have_no_audio">此文件沒有音頻</string>
 </resources>
