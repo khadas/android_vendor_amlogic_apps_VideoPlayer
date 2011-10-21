@@ -1189,6 +1189,8 @@ public class playermenu extends Activity {
     		else {
     			if(m_Amplayer == null)
 					return (true);
+    			if(bMediaInfo == null)
+					return (true);
                 // close sub
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
