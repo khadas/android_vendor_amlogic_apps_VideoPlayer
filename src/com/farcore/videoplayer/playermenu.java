@@ -1189,12 +1189,19 @@ public class playermenu extends Activity {
     			if(bMediaInfo == null)
 					return (true);
 
-                // close infobar
-				if(infobar != null) {
-					infobar.setVisibility(View.GONE);
-			    	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-			    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				}
+                // close infobar  
+          String temp_scale=SystemProperties.get("rw.fb.need2xscale");
+	  			if(temp_scale.equals("ok"))
+	  			{
+	  				String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
+						if(tmp_output.equals("1080p")){
+							if(infobar != null) {
+								infobar.setVisibility(View.GONE);
+				    		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+				    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+							}
+						}
+					}
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
 				//close sub;
@@ -1788,11 +1795,18 @@ public class playermenu extends Activity {
 			// TODO Auto-generated method stub
     			if(bMediaInfo == null)
 					return;
-				if(infobar != null) {
-					infobar.setVisibility(View.GONE);
-			    	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-			    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				}
+					String temp_scale=SystemProperties.get("rw.fb.need2xscale");
+	  			if(temp_scale.equals("ok"))
+	  			{
+	  				String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
+						if(tmp_output.equals("1080p")){
+							if(infobar != null) {
+								infobar.setVisibility(View.GONE);
+				    		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+				    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+							}
+						}
+					}
 				Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
 				//close sub;

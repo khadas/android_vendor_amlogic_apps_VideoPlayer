@@ -318,10 +318,13 @@ public class FileList extends ListActivity {
 		//* new an Intent object and ponit a class to start
 		Intent intent = new Intent();
 		intent.setClass(FileList.this, playermenu.class);
-		String temp=SystemProperties.get("rw.fb.need2xscale");
-  	  	if(temp.equals("ok")){
-  	  		this.setVisible(false);
-  	  	}
+		String temp_scale=SystemProperties.get("rw.fb.need2xscale");
+	  if(temp_scale.equals("ok")){
+	  	String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
+			if(tmp_output.equals("1080p")){
+  	  	this.setVisible(false);
+  	  }
+  	}
 		startActivity(intent);
 		FileList.this.finish();
 	}
