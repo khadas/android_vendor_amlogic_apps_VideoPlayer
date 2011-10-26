@@ -1188,12 +1188,20 @@ public class playermenu extends Activity {
 					return (true);
     			if(bMediaInfo == null)
 					return (true);
-                // close sub
+
+                // close infobar
+				if(infobar != null) {
+					infobar.setVisibility(View.GONE);
+			    	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+			    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				}
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
 				//close sub;
-				if(subTitleView!=null)
+				if(subTitleView!=null){
 					subTitleView.closeSubtitle();	
+    				subTitleView.clear();
+				}
                 if (!fb32) {
                     // Hide the view with key color
                     FrameLayout layout = (FrameLayout) findViewById(R.id.BaseLayout1);
@@ -1206,13 +1214,7 @@ public class playermenu extends Activity {
 				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
-				String temp=SystemProperties.get("rw.fb.need2xscale");
-		    if(temp.equals("ok"))
-			  {
-			
-			       //ScreenOffForWhile();
-			     disable2XScale();
-			  }	
+				//do disable2XScale in onPause()
 				startActivity(selectFileIntent);
 				playermenu.this.finish();
 				return true;
@@ -1784,11 +1786,20 @@ public class playermenu extends Activity {
         browser.setOnClickListener(new ImageButton.OnClickListener() {
 			public void onClick(View v) {
 			// TODO Auto-generated method stub
+    			if(bMediaInfo == null)
+					return;
+				if(infobar != null) {
+					infobar.setVisibility(View.GONE);
+			    	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+			    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				}
 				Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
 				//close sub;
-				if(subTitleView!=null)
+				if(subTitleView!=null){
 					subTitleView.closeSubtitle();	
+					subTitleView.clear();	
+				}
 				//stop play
 				backToFileList = true;
 				if(m_Amplayer != null)
@@ -2448,11 +2459,15 @@ public class playermenu extends Activity {
             }
             finish();
         }
+        
         String temp=SystemProperties.get("rw.fb.need2xscale");
-  	  	if(temp.equals("ok"))
-  		{
-  	    	disable2XScale();
-  		}
+	  	if(temp.equals("ok"))
+	  	{
+	  		while(!infobar.isShown()){
+	  	    	disable2XScale();
+	  	    	break;
+	  		}
+        }
         ScreenMode.setScreenMode("0");
     }
 

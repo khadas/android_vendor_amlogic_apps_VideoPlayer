@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.os.SystemProperties;
 
 public class FileList extends ListActivity {
 	private List<File> listFiles =null;
@@ -317,7 +318,10 @@ public class FileList extends ListActivity {
 		//* new an Intent object and ponit a class to start
 		Intent intent = new Intent();
 		intent.setClass(FileList.this, playermenu.class);
-
+		String temp=SystemProperties.get("rw.fb.need2xscale");
+  	  	if(temp.equals("ok")){
+  	  		this.setVisible(false);
+  	  	}
 		startActivity(intent);
 		FileList.this.finish();
 	}
