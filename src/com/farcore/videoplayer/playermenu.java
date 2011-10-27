@@ -1528,7 +1528,8 @@ public class playermenu extends Activity {
 				ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
 				ff_fb.show();
             }
-        } 
+        }
+        /*
     	else if (keyCode == KeyEvent.KEYCODE_7) {
     		videobar();
     		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
@@ -1541,6 +1542,7 @@ public class playermenu extends Activity {
     		subtitle.requestFocusFromTouch();
     		return (true);
     	}
+    	*/
         else
         	return super.onKeyDown(keyCode, msg);
     	return (true);
