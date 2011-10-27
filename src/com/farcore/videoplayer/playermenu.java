@@ -45,6 +45,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import java.io.FileOutputStream;
+import java.lang.Thread.UncaughtExceptionHandler;
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
 	private static String codec_mips = null;
@@ -1553,6 +1554,49 @@ public class playermenu extends Activity {
         }
 
         super.onCreate(savedInstanceState);
+        //uncaughtException execute
+    	Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+    		@Override
+    		public void uncaughtException(Thread thread, Throwable ex) {    
+    			Intent selectFileIntent = new Intent();
+				selectFileIntent.setClass(playermenu.this, FileList.class);
+				String temp_scale=SystemProperties.get("rw.fb.need2xscale");
+	  			if(temp_scale.equals("ok"))
+	  			{
+	  				String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
+					if(tmp_output.equals("1080p")){
+						if(infobar != null) {
+							infobar.setVisibility(View.GONE);
+							getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+									WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						}
+					}
+	  			}
+				//close sub;
+				if(subTitleView!=null){
+					subTitleView.closeSubtitle();	
+    				subTitleView.clear();
+				}
+                if (!fb32) {
+                    // Hide the view with key color
+                    FrameLayout layout = (FrameLayout) findViewById(R.id.BaseLayout1);
+                    if (layout != null) {
+                        layout.setVisibility(View.INVISIBLE);
+                        layout.invalidate();
+                    }
+                }
+				//stop play
+				backToFileList = true;
+				if(m_Amplayer != null)
+					Amplayer_stop();
+				startActivity(selectFileIntent);
+				finish();
+    		  	onPause(); //for disable 2Xscale
+    			Log.d(TAG,"----------------uncaughtException--------------------");
+    		  	android.os.Process.killProcess(android.os.Process.myPid());
+    		}
+    	});
+        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		String temp=SystemProperties.get("rw.fb.need2xscale");
