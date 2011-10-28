@@ -1558,7 +1558,6 @@ public class playermenu extends Activity {
         super.onCreate(savedInstanceState);
         //uncaughtException execute
     	Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-    		@Override
     		public void uncaughtException(Thread thread, Throwable ex) {    
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
