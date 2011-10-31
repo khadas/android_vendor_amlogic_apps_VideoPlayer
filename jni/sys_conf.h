@@ -8,16 +8,56 @@ extern "C" {
 #define PPMGR_IOC_MAGIC         'P'
 #define PPMGR_IOC_ENABLE_PP     _IOW(PPMGR_IOC_MAGIC,0X01,unsigned int)
 
+#define PPMGR_IOC_VIEW_MODE  _IOW(PPMGR_IOC_MAGIC,0X03,unsigned int)
+#define PPMGR_IOC_HOR_VER_DOUBLE  _IOW(PPMGR_IOC_MAGIC,0X04,unsigned int)
+#define PPMGR_IOC_SWITCHMODE  _IOW(PPMGR_IOC_MAGIC,0X05,unsigned int)
+
+
 #define MODE_3D_DISABLE         0x00000000
-#define MODE_3D_ENABLE          0x00000001
-#define MODE_AUTO               0x00000002
-#define MODE_2D_TO_3D           0x00000004
-#define MODE_LR                 0x00000008
-#define MODE_BT                 0x00000010
-#define MODE_LR_SWITCH          0x00000020
-#define MODE_FIELD_DEPTH        0x00000040
-#define MODE_3D_TO_2D_L         0x00000080
-#define MODE_3D_TO_2D_R         0x00000100
+#define MODE_3D_AUTO            0x00000001
+#define MODE_3D_AUTO_SWITCH     0x00000401
+#define MODE_3D_LR              0x00000101
+#define MODE_3D_LR_SWITCH       0x00000501
+#define MODE_3D_BT              0x00000201
+#define MODE_3D_BT_SWITCH      0x00000601
+
+#define MODE_3D_TO_2D_AUTO_1   0x00000002
+#define MODE_3D_TO_2D_AUTO_2    0x00000802
+#define MODE_3D_TO_2D_L         0x00000102
+#define MODE_3D_TO_2D_R         0x00000902
+#define MODE_3D_TO_2D_T         0x00000202
+#define MODE_3D_TO_2D_B         0x00000a02
+
+#define MODE_2D_TO_3D           0x00000003
+#define MODE_FIELD_DEPTH        0x00010003
+
+typedef enum _3D_MODE_SET{
+	SYS_3D_DISABLE = 0,
+	SYS_3D_AUTO,
+	SYS_3D_LR,
+	SYS_3D_BT,
+	SYS_3D_TO_2D_L,
+	SYS_3D_TO_2D_R,
+	SYS_3D_TO_2D_T,
+	SYS_3D_TO_2D_B,
+	SYS_3D_TO_2D_AUTO_1,
+	SYS_3D_TO_2D_AUTO_2,	
+	SYS_2D_TO_3D,
+	SYS_3D_FIELD_DEPTH,	
+	SYS_3D_AUTO_SWITCH,
+	SYS_3D_LR_SWITCH,
+	SYS_3D_BT_SWITCH,
+	
+}SYS_3D_MODE_SET;
+
+typedef enum _3D_VIEWMODE_SET{
+	SYS_3D_VIEW_NORMAL=0,
+	SYS_3D_VIEW_FULL,
+	SYS_3D_VIEW_4_3,
+	SYS_3D_VIEW_16_9,
+	SYS_3D_VIEW_NO_SCALEUP,
+}SYS_3D_VIEW_MODE_SET;
+
 
 /*
 Description: disable fb0 layer      
@@ -53,7 +93,19 @@ int SYS_set_global_alpha(int alpha);
 int SYS_get_osdbpp();
 
 int SYS_set_video_preview_win(int x,int y,int w,int h);
-int SYS_set_3D_mode(int mode);
+int SYS_set_3D_mode(SYS_3D_MODE_SET mode);
+
+
+int SYS_set_3D_view_mode(SYS_3D_VIEW_MODE_SET vmode);
+int SYS_set_3D_switch(int isOn);
+
+/*
+ * aspect:function disable if aspect is 0,1 means L/R,2 means T/B.
+ * 
+*/
+int SYS_set_3D_aspect_full(int aspect);
+
+
 
 /*
 Description:set fullscreen

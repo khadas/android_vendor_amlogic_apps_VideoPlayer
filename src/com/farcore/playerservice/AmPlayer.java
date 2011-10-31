@@ -33,7 +33,7 @@ public class AmPlayer extends Service {
 	private native int seek(int pid,int pos);//in second
 	private native int stop(int pid);
 	private native int close(int pid);
-	private native int set3Dmode(int pid, int mode);//0 off, 1...10 mode
+	private native int set3Dmode(int pid, int mode);//0 off, 1...14 mode
 
 	private native int fastforward(int pid,int speed);
 	private native int fastrewind(int pid,int speed);
@@ -56,6 +56,10 @@ public class AmPlayer extends Service {
     public static native int native_enablecolorkey(short key_rgb565);
     public static native int native_disablecolorkey();
     public static native int native_setglobalalpha(int alpha);
+    public native int set3Dviewmode(int vmode);
+		public native int set3Daspectfull(int aspect);
+		public native int set3Dswitch(int isOn);
+		
     public static native int native_getosdbpp();
     public static native int enable_freescale(int cfg);
     public static native int disable_freescale(int cfg);
@@ -208,6 +212,19 @@ public class AmPlayer extends Service {
 		
 		public int Set3Dmode(int mode) throws RemoteException {
 			set3Dmode(mode);
+			return 0;
+		}
+		public int Set3Dviewmode(int mode) throws RemoteException {
+			set3Dviewmode(mode);
+			return 0;
+		}
+
+		public int Set3Daspectfull(int aspect) throws RemoteException{
+			set3Daspectfull(aspect);
+			return 0;
+		}
+		public int Set3Dswitch(int isOn){
+			set3Dswitch(isOn);
 			return 0;
 		}
 

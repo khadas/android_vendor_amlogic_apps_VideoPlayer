@@ -57,7 +57,7 @@ public class playermenu extends Activity {
 	private static final int SET_OSD_ON= 1;
 	private static final int SET_OSD_OFF= 2;
 
-    /** Called when the activity is first created. */
+  /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
 	private int playPosition = 0;
@@ -66,11 +66,11 @@ public class playermenu extends Activity {
 	private int cur_audio_channel = 0;
 	private int audio_flag = 0;
 	
-    private final int PLAY_RESUME = 0;
-    private final int PLAY_MODE = 1;
-    private final int AUDIOTRACK = 2;
-    private final int DISPLAY = 3;
-    private final int BRIGHTNESS = 4;
+	private final int PLAY_RESUME = 0;
+	private final int PLAY_MODE = 1;
+	private final int AUDIOTRACK = 2;
+	private final int DISPLAY = 3;
+	private final int BRIGHTNESS = 4;
 	private final int PLAY3D = 5;
 
 	private boolean backToFileList = false;
@@ -129,6 +129,15 @@ public class playermenu extends Activity {
 	//for subtitle
 	private SubtitleUtils subtitleUtils = null;
 	private SubtitleView subTitleView = null;
+
+	//peter added it in 2011.1027,just for gadmei Glass-Less 3D pad,
+	private SubtitleView subTitleView_sm = null; 
+	private boolean is3DVideoDisplayFlag = false;
+	private int sub_sm_offset_x=0;
+	private int sub_sm_offset_y =0;
+	private int view_mode = 0;
+	private int VIEW_3D_MODE = 4;
+	
 	private subview_set sub_para = null;
 	private int sub_switch_state = 0;
 	private int sub_font_state = 0;
@@ -143,25 +152,46 @@ public class playermenu extends Activity {
 	private String[] m_brightness= {"1","2","3","4","5","6"};
 	private int mode_3d = 0;
     private enum Mode_3D {
-        MODE_DISABLE,
-        MODE_LR,
-        MODE_BT,
-        MODE_LR_SWITCH,
-        MODE_3D_TO_2D_L,
-        MODE_3D_TO_2D_R,
-        MODE_2D_TO_3D,
-        MODE_FIELD_DEPTH,
+		MODE_3D_DISABLE,
+		MODE_3D_AUTO,
+		MODE_3D_LR,
+		MODE_3D_BT,
+		MODE_3D_TO_2D_L,
+		MODE_3D_TO_2D_R,
+		MODE_3D_TO_2D_T,
+		MODE_3D_TO_2D_B,
+		MODE_3D_TO_2D_AUTO_1,
+		MODE_3D_TO_2D_AUTO_2,	
+		MODE_2D_TO_3D,
+		MODE_FIELD_DEPTH,	
+		MODE_3D_AUTO_SWITCH,
+		MODE_3D_LR_SWITCH,
+		MODE_3D_BT_SWITCH, 
+		MODE_3D_FULL_OFF,
+		MODE_3D_LR_FULL,
+		MODE_3D_BT_FULL,
+		
     }
 	
 	private int[] string_3d_id = {
-	    R.string.setting_3d_diable,
+		R.string.setting_3d_diable,
+		R.string.setting_3d_auto,	
 		R.string.setting_3d_lr,
 		R.string.setting_3d_bt,
-		R.string.setting_3d_lr_switch,
 		R.string.setting_3d_2d_l,
 		R.string.setting_3d_2d_r,
-		R.string.setting_3d_2d,
+		R.string.setting_3d_2d_t,
+		R.string.setting_3d_2d_b,
+		R.string.setting_3d_2d_auto1,
+		R.string.setting_3d_2d_auto2,	
+		R.string.setting_2d_3d,
 		R.string.setting_3d_field_depth,
+		R.string.setting_3d_auto_switch,
+		R.string.setting_3d_lr_switch,
+		R.string.setting_3d_tb_switch,
+		R.string.setting_3d_full_off,
+		R.string.setting_3d_lr_full,
+		R.string.setting_3d_tb_full,
 	};
 	
 	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
@@ -285,12 +315,14 @@ public class playermenu extends Activity {
                 map.put("item_name", "16:9");
                 map.put("item_sel", R.drawable.item_img_unsel);
                 list.add(map);
-                /*
-                map = new HashMap<String, Object>();
-                map.put("item_name", getResources().getString(R.string.setting_displaymode_normal_noscaleup));
-                map.put("item_sel", R.drawable.item_img_unsel);
-                list.add(map);
-                */
+                if(SystemProperties.getBoolean("3D_setting.enable", false)){ 
+                	if(is3DVideoDisplayFlag){//judge is 3D                		
+		                map = new HashMap<String, Object>();
+		                map.put("item_name", getResources().getString(R.string.setting_displaymode_normal_noscaleup));
+		                map.put("item_sel", R.drawable.item_img_unsel);
+		                list.add(map);
+                	}
+                }
                 list.get(pos).put("item_sel", R.drawable.item_img_sel);
                 break;
 
@@ -370,28 +402,40 @@ public class playermenu extends Activity {
     }
 	
     private void videobar() {
-        if(fb32) {
-        	setContentView(R.layout.layout_morebar32);
-        } 
+		if(fb32) {
+			setContentView(R.layout.layout_morebar32);
+		} 
 		else {
 			setContentView(R.layout.layout_morebar);
-        }
-        FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
-        if(AmPlayer.getProductType() == 1){
-	    	if (SettingsVP.display_mode.equals("480p")) {
-	    		FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
-	    		frameParams.width = 720;
-	    		frameParams.height = 480;
-	    		frameParams.gravity = -1;
-	    		baselayout2.setLayoutParams(frameParams);
-	    	}
-        }
-    	subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
-    	subTitleView.setGravity(Gravity.CENTER);
-    	subTitleView.setTextColor(sub_para.color);
-    	subTitleView.setTextSize(sub_para.font);
-    	subTitleView.setTextStyle(Typeface.BOLD);
+		}
+		FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
+		if(AmPlayer.getProductType() == 1){
+			if (SettingsVP.display_mode.equals("480p")) {
+				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+				frameParams.width = 720;
+				frameParams.height = 480;
+				frameParams.gravity = -1;
+				baselayout2.setLayoutParams(frameParams);
+			}
+		}
+		subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
+		subTitleView.setGravity(Gravity.CENTER);
+		subTitleView.setTextColor(sub_para.color);
+		subTitleView.setTextSize(sub_para.font);
+		subTitleView.setTextStyle(Typeface.BOLD);
+
+
+		if(SystemProperties.getBoolean("3D_setting.enable", false)){
+		    	subTitleView_sm = (SubtitleView) findViewById(R.id.subTitle_more_sm);
+		    	subTitleView_sm.setGravity(Gravity.CENTER);
+		    	subTitleView_sm.setTextColor(android.graphics.Color.GRAY);
+		    	subTitleView_sm.setTextSize(sub_para.font);
+		    	subTitleView_sm.setTextStyle(Typeface.BOLD);		
+		
+		}
     	openFile(sub_para.sub_id);
+
+		
 		
 		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
 		subbar.setVisibility(View.GONE);
@@ -410,6 +454,9 @@ public class playermenu extends Activity {
     		public void onClick(View v) {
 			    otherbar.setVisibility(View.VISIBLE);
 			    subTitleView.setViewStatus(false);
+				if(SystemProperties.getBoolean("3D_setting.enable", false)&&subTitleView_sm!=null){
+				     subTitleView_sm.setViewStatus(false);
+				}				
 				morbar.setVisibility(View.GONE);
 				morebar_tileText.setText(R.string.setting_resume);
 				
@@ -424,6 +471,9 @@ public class playermenu extends Activity {
 						    SettingsVP.putParaBoolean(SettingsVP.RESUME_MODE, false);
 						otherbar.setVisibility(View.GONE);
 						subTitleView.setViewStatus(true);
+						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+						     subTitleView_sm.setViewStatus(true);
+						}			
 						morbar.setVisibility(View.VISIBLE);
 				    ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
 				    resume.requestFocus();
@@ -440,6 +490,9 @@ public class playermenu extends Activity {
     			public void onClick(View v) {
     				otherbar.setVisibility(View.VISIBLE);
     				subTitleView.setViewStatus(false);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.setViewStatus(false);
+				}					
     				morbar.setVisibility(View.GONE);
     				morebar_tileText.setText(R.string.setting_playmode);
     				ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -452,6 +505,9 @@ public class playermenu extends Activity {
     				    		m_playmode = REPEATONE;
     				    	otherbar.setVisibility(View.GONE);
     				    	subTitleView.setViewStatus(true);
+					if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					     subTitleView_sm.setViewStatus(true);
+					}							
     				    	morbar.setVisibility(View.VISIBLE);
 							    ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
 							    playmode.requestFocus();
@@ -468,10 +524,14 @@ public class playermenu extends Activity {
     	
 		if(SystemProperties.getBoolean("3D_setting.enable", false)) {
 			ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+			play3d.setVisibility(View.VISIBLE);
 			play3d.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					otherbar.setVisibility(View.VISIBLE);
 					subTitleView.setViewStatus(false);
+					if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					     subTitleView_sm.setViewStatus(false);
+					}					
 					morbar.setVisibility(View.GONE);
 					
 					morebar_tileText.setText(R.string.setting_3d_mode);
@@ -483,7 +543,8 @@ public class playermenu extends Activity {
 							switch (position) {
 							case 0:
 							    try {
-								    m_Amplayer.Set3Dmode(Mode_3D.MODE_DISABLE.ordinal());
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_DISABLE.ordinal());
+								    is3DVideoDisplayFlag = false;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
@@ -491,7 +552,8 @@ public class playermenu extends Activity {
                     			break;
                     		case 1:
 							    try {
-								    m_Amplayer.Set3Dmode(Mode_3D.MODE_LR.ordinal());
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_AUTO.ordinal());
+								    is3DVideoDisplayFlag = true;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
@@ -499,7 +561,8 @@ public class playermenu extends Activity {
                     			break;
                     		case 2:
 							    try {
-								    m_Amplayer.Set3Dmode(Mode_3D.MODE_BT.ordinal());
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_LR.ordinal());
+								    is3DVideoDisplayFlag = true;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
@@ -507,7 +570,8 @@ public class playermenu extends Activity {
                     			break;
                     		case 3:
 							    try {
-								    m_Amplayer.Set3Dmode(Mode_3D.MODE_LR_SWITCH.ordinal());
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_BT.ordinal());
+								    is3DVideoDisplayFlag = true;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
@@ -516,6 +580,7 @@ public class playermenu extends Activity {
                     		case 4:
 							    try {
 								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_TO_2D_L.ordinal());
+								    is3DVideoDisplayFlag = false;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
@@ -524,6 +589,7 @@ public class playermenu extends Activity {
                     		case 5:
 							    try {
 								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_TO_2D_R.ordinal());
+								    is3DVideoDisplayFlag = false;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
@@ -531,7 +597,8 @@ public class playermenu extends Activity {
                     			break;
                     		case 6:
 							    try {
-								    m_Amplayer.Set3Dmode(Mode_3D.MODE_2D_TO_3D.ordinal());
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_TO_2D_T.ordinal());
+								    is3DVideoDisplayFlag = false;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
@@ -539,17 +606,111 @@ public class playermenu extends Activity {
                     			break;
                     		case 7:
 							    try {
-								    m_Amplayer.Set3Dmode(Mode_3D.MODE_FIELD_DEPTH.ordinal());
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_TO_2D_B.ordinal());
+								    is3DVideoDisplayFlag = false;
 								} 
 								catch(RemoteException e) {
 								    e.printStackTrace();
 								}
+                    			break;
+                    		case 8:
+							    try {
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_TO_2D_AUTO_1.ordinal());
+								    is3DVideoDisplayFlag =false;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}
+                    			break;
+                    		case 9:
+							    try {
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_TO_2D_AUTO_2.ordinal());
+								    is3DVideoDisplayFlag =false;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}
+                    			break;
+                    		case 10:
+							    try {
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_2D_TO_3D.ordinal());
+								    is3DVideoDisplayFlag =true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}
+                    			break;
+                    		case 11:
+							    try {
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_FIELD_DEPTH.ordinal());
+								    is3DVideoDisplayFlag = true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}
+                    			break;
+                    		case 12:
+							    try {
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_AUTO_SWITCH.ordinal());
+								    is3DVideoDisplayFlag = true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}
+                    			break;  
+                    		case 13:
+							    try {
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_LR_SWITCH.ordinal());
+								    is3DVideoDisplayFlag = true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}
+                    			break;
+                    		case 14:
+							    try {
+								    m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_BT_SWITCH.ordinal());
+								    is3DVideoDisplayFlag = true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}
+                    			break; 
+                    		case 15:
+							    try {
+								    m_Amplayer.Set3Daspectfull(0);
+								    is3DVideoDisplayFlag = true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}                    			
+                    			break;
+                    		case 16:
+							    try {
+								    m_Amplayer.Set3Daspectfull(1);
+								    is3DVideoDisplayFlag = true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								} 
+								break;
+                    		case 17:
+							    try {
+								    m_Amplayer.Set3Daspectfull(2);
+								    is3DVideoDisplayFlag = true;
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}                     			
                     			break;
                     		default:
                     			break;
                     		}
 							otherbar.setVisibility(View.GONE);
 							subTitleView.setViewStatus(true);
+							if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+							     subTitleView_sm.setViewStatus(true);
+							}							
 							morbar.setVisibility(View.VISIBLE);
 							ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
 							play3d.requestFocus();
@@ -573,6 +734,9 @@ public class playermenu extends Activity {
     			}
     			otherbar.setVisibility(View.VISIBLE);
     			subTitleView.setViewStatus(false);
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+			     subTitleView_sm.setViewStatus(false);
+			}				
     			morbar.setVisibility(View.GONE);
     			morebar_tileText.setText(R.string.setting_audiotrack);
     			ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -597,6 +761,9 @@ public class playermenu extends Activity {
     			    	}
     			    	otherbar.setVisibility(View.GONE);
     			    	subTitleView.setViewStatus(true);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.setViewStatus(true);
+				}						
     			    	morbar.setVisibility(View.VISIBLE);
 						    ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
 						    audiotrack.requestFocus();
@@ -619,6 +786,9 @@ public class playermenu extends Activity {
     			}
     			subbar.setVisibility(View.VISIBLE);
     			subTitleView.setViewStatus(false);
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+			     subTitleView_sm.setViewStatus(false);
+			}				
     			morbar.setVisibility(View.GONE);
     			subtitle_control();
     			subbar.requestFocus();
@@ -678,6 +848,9 @@ public class playermenu extends Activity {
     			    	
     			    	subbar.setVisibility(View.GONE);
     			    	subTitleView.setViewStatus(true);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.setViewStatus(true);
+				}						
     			    	videobar();
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
@@ -692,6 +865,9 @@ public class playermenu extends Activity {
   		            public void onClick(View v) {
   		            	subbar.setVisibility(View.GONE);
   		            	subTitleView.setViewStatus(true);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.setViewStatus(true);
+				}						
   		            	videobar();
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
@@ -850,43 +1026,122 @@ public class playermenu extends Activity {
     	ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
     	display.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
-                otherbar.setVisibility(View.VISIBLE);
-                subTitleView.setViewStatus(false);
-                morbar.setVisibility(View.GONE);
+				otherbar.setVisibility(View.VISIBLE);
+				subTitleView.setViewStatus(false);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					subTitleView_sm.setViewStatus(false);
+				}				
+	        	morbar.setVisibility(View.GONE);
                 	
                 morebar_tileText.setText(R.string.setting_displaymode);
                 ListView listView = (ListView)findViewById(R.id.AudioListView);
-                listView.setAdapter(getMorebarListAdapter(DISPLAY, ScreenMode.getScreenMode()));
+                if(is3DVideoDisplayFlag){
+                	listView.setAdapter(getMorebarListAdapter(DISPLAY, view_mode));
+                }
+                else{
+                	listView.setAdapter(getMorebarListAdapter(DISPLAY, ScreenMode.getScreenMode()));
+                }
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    	switch (position) {
-                    		case ScreenMode.NORMAL:
-                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL);
-                    			ScreenMode.setScreenMode("0");
-                    			break;
-                    		case ScreenMode.FULLSTRETCH:
-                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.FULLSTRETCH);
-                    			ScreenMode.setScreenMode("1");
-                    			break;
-                    		case ScreenMode.RATIO4_3:
-                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO4_3);
-                    			ScreenMode.setScreenMode("2");
-                    			break;
-                    		case ScreenMode.RATIO16_9:
-                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO16_9);
-                    			ScreenMode.setScreenMode("3");
-                    			break;
-                    		/*	
-                            case ScreenMode.NORMAL_NOSCALEUP:
-                            	SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL_NOSCALEUP);
-                                ScreenMode.setScreenMode("4");
-                    			break;
-                    		*/	
-                    		default:
-                    			break;
-                    	}
+                        if(SystemProperties.getBoolean("3D_setting.enable", false)){ 
+                        	if(is3DVideoDisplayFlag){//judge is 3D 
+                        		view_mode = position;
+    	                    	switch (position) { //view mode
+		                    		case 0:
+		                    			if(m_Amplayer != null){
+		                    				try{
+		                    					
+		                    					m_Amplayer.Set3Dviewmode(0);
+		                    				}
+	                    					catch(RemoteException e) {
+	        								    e.printStackTrace();
+	        								}
+		                    			}
+		                    				
+		                    			break;
+		                    		case 1:
+		                    			if(m_Amplayer != null){
+		                    				try{
+		                    					
+		                    					m_Amplayer.Set3Dviewmode(1);
+		                    				}catch(RemoteException e) {
+		    								    e.printStackTrace();
+		    								}
+		                    			}
+		                    			break;
+		                    		case 2:
+		                    			if(m_Amplayer != null){
+		                    				try{
+		                    					
+		                    					m_Amplayer.Set3Dviewmode(2);
+		                    				}
+		                    				catch(RemoteException e) {
+		    								    e.printStackTrace();
+		    								}
+		                    			}
+		                    			break;
+		                    		case 3:
+		                    			if(m_Amplayer != null){
+		                    				try{
+		                    					
+		                    					m_Amplayer.Set3Dviewmode(3);
+		                    				}
+		                    				catch(RemoteException e) {
+		    								    e.printStackTrace();
+		    								}
+		                    			}
+		                    			break;
+		                    		
+		                            case 4:
+		                    			if(m_Amplayer != null){
+		                    				try{
+		                    					
+		                    					m_Amplayer.Set3Dviewmode(4);
+		                    				}
+		                    				catch(RemoteException e) {
+		    								    e.printStackTrace();
+		    								}
+		                    			}
+		                    			break;
+		                    			
+		                    		default:
+		                    			break;
+    	                    	}                        	
+                        		
+                        	}
+                        }else{                  	
+	                    	switch (position) {
+	                    		case ScreenMode.NORMAL:
+	                            	SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL);
+	                            	ScreenMode.setScreenMode("0");                                
+	                    			break;
+	                    		case ScreenMode.FULLSTRETCH:
+	                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.FULLSTRETCH);
+	                    			ScreenMode.setScreenMode("1");
+	                    			break;
+	                    		case ScreenMode.RATIO4_3:
+	                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO4_3);
+	                    			ScreenMode.setScreenMode("2");
+	                    			break;
+	                    		case ScreenMode.RATIO16_9:
+	                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO16_9);
+	                    			ScreenMode.setScreenMode("3");
+	                    			break;
+	                    		/*	
+	                            case ScreenMode.NORMAL_NOSCALEUP:
+	                            	SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL_NOSCALEUP);
+	                                ScreenMode.setScreenMode("4");
+	                    			break;
+	                    		*/	
+	                    		default:
+	                    			break;
+	                    	}
+                        }
                     	otherbar.setVisibility(View.GONE);
                     	subTitleView.setViewStatus(true);
+						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+						     subTitleView_sm.setViewStatus(true);
+						}						
                     	morbar.setVisibility(View.VISIBLE);
 						ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
 						display.requestFocus();
@@ -904,6 +1159,9 @@ public class playermenu extends Activity {
     			public void onClick(View v) {
     				otherbar.setVisibility(View.VISIBLE);
     				subTitleView.setViewStatus(false);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.setViewStatus(false);
+				}					
     				morbar.setVisibility(View.GONE);
     				morebar_tileText.setText(R.string.setting_brightness);
     				ListView listView = (ListView)findViewById(R.id.AudioListView);
@@ -969,6 +1227,9 @@ public class playermenu extends Activity {
     						}  
     						otherbar.setVisibility(View.GONE);
     						subTitleView.setViewStatus(true);
+						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+						     subTitleView_sm.setViewStatus(true);
+						}							
     						morbar.setVisibility(View.VISIBLE);
     						ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
     						brigtness.requestFocus();
@@ -1006,6 +1267,9 @@ public class playermenu extends Activity {
     		public void onClick(View v) {
 				infodialog.setVisibility(View.VISIBLE);
 				subTitleView.setViewStatus(false);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.setViewStatus(false);
+				}				
 				morbar.setVisibility(View.GONE);
 				TextView title = (TextView)findViewById(R.id.info_title);
 				title.setText(R.string.str_file_information);
@@ -1042,6 +1306,9 @@ public class playermenu extends Activity {
 					public void onClick(View v) {
                         infodialog.setVisibility(View.GONE);
                         subTitleView.setViewStatus(true);
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+			     subTitleView_sm.setViewStatus(true);
+			}					
                         morbar.setVisibility(View.VISIBLE);
 						ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
 						fileinformation.requestFocus();	
@@ -1210,6 +1477,10 @@ public class playermenu extends Activity {
 					subTitleView.closeSubtitle();	
     				subTitleView.clear();
 				}
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.closeSubtitle();
+				     subTitleView_sm.clear();
+				}				
                 if (!fb32) {
                     // Hide the view with key color
                     FrameLayout layout = (FrameLayout) findViewById(R.id.BaseLayout1);
@@ -1528,7 +1799,7 @@ public class playermenu extends Activity {
 				ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
 				ff_fb.show();
             }
-        }
+        } 
         /*
     	else if (keyCode == KeyEvent.KEYCODE_7) {
     		videobar();
@@ -1577,6 +1848,10 @@ public class playermenu extends Activity {
 				if(subTitleView!=null){
 					subTitleView.closeSubtitle();	
     				subTitleView.clear();
+				}
+			  if(subTitleView_sm!=null){
+					subTitleView_sm.closeSubtitle();	
+    				subTitleView_sm.clear();
 				}
                 if (!fb32) {
                     // Hide the view with key color
@@ -1770,8 +2045,15 @@ public class playermenu extends Activity {
     	subTitleView.setGravity(Gravity.CENTER);
     	subTitleView.setTextColor(sub_para.color);
     	subTitleView.setTextSize(sub_para.font);
+    	
     	subTitleView.setTextStyle(Typeface.BOLD);
-
+	if(SystemProperties.getBoolean("3D_setting.enable", false)){
+	    	subTitleView_sm= (SubtitleView) findViewById(R.id.subTitle_sm);
+	    	subTitleView_sm.setGravity(Gravity.CENTER);
+	    	subTitleView_sm.setTextColor(android.graphics.Color.GRAY);
+	    	subTitleView_sm.setTextSize(sub_para.font);	    	
+	    	subTitleView_sm.setTextStyle(Typeface.BOLD);
+	}
     	if(AmPlayer.getProductType() == 1){
 	        if(SettingsVP.display_mode.equals("480p")) {
 	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
@@ -1789,6 +2071,9 @@ public class playermenu extends Activity {
 	        	}
 	        	linearParams.gravity = -1;
 	        	subTitleView.setLayoutParams(linearParams);
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				subTitleView_sm.setLayoutParams(linearParams);
+			}				
 	        }
     	}
     	openFile(sub_para.sub_id);
@@ -1859,6 +2144,10 @@ public class playermenu extends Activity {
 					subTitleView.closeSubtitle();	
 					subTitleView.clear();	
 				}
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					subTitleView_sm.closeSubtitle();
+				     	subTitleView_sm.clear();
+				}			
 				//stop play
 				backToFileList = true;
 				if(m_Amplayer != null)
@@ -2390,6 +2679,9 @@ public class playermenu extends Activity {
     	infobar.setVisibility(View.GONE);
 		if(subTitleView!=null)
 			subTitleView.redraw();
+		if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+		     subTitleView_sm.redraw();
+		}		
     	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
     			WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
@@ -2473,6 +2765,9 @@ public class playermenu extends Activity {
         //close sub;
         if(subTitleView!=null)
         	subTitleView.closeSubtitle();
+	if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+	     subTitleView_sm.closeSubtitle();
+	}		
         backToFileList = true;
         Amplayer_stop();
         if(m_Amplayer != null)
@@ -2567,6 +2862,14 @@ public class playermenu extends Activity {
     		    	if(player_status == VideoInfo.PLAYER_RUNNING) {
     		    		if(subTitleView!=null&&sub_para.sub_id!=null)
     		    			subTitleView.tick(msg.arg1);
+				if(SystemProperties.getBoolean("3D_setting.enable", false)){
+					if(subTitleView_sm!=null&View.INVISIBLE ==subTitleView_sm.getVisibility()&&is3DVideoDisplayFlag){
+						subTitleView_sm.setVisibility(View.VISIBLE);
+					}
+					if(subTitleView_sm!=null&&sub_para.sub_id!=null)
+    		    				subTitleView_sm.tick(msg.arg1);
+					
+				}
     		    	}
     		    	if(totaltime == 0)
 						myProgressBar.setProgress(0);
@@ -2612,6 +2915,11 @@ public class playermenu extends Activity {
 						if(subTitleView!=null)
 						{
 							subTitleView.closeSubtitle(); //need return focus.
+
+							if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+								subTitleView_sm.closeSubtitle(); //need return focus.	
+								
+							}
 							if (morbar!=null)  
 							{
 					        	morbar=null;
@@ -2626,6 +2934,8 @@ public class playermenu extends Activity {
 				            	morebtn.requestFocus();
 				            }
 						}
+
+						
 						sub_para.totalnum = 0;
 						cur_audio_stream = 0;
 						InternalSubtitleInfo.setInsubNum(0);
@@ -2706,6 +3016,22 @@ public class playermenu extends Activity {
 							subTitleView.setVideoResolution(
 									bMediaInfo.getWidth(), bMediaInfo.getHeight());
 						}
+						if(bMediaInfo != null&&subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+							subTitleView_sm.setDisplayResolution(
+									SettingsVP.panel_width, SettingsVP.panel_height);
+							subTitleView_sm.setVideoResolution(
+									bMediaInfo.getWidth(), bMediaInfo.getHeight());							
+						}
+						if(SystemProperties.getBoolean("3D_setting.enable", false)&&bMediaInfo.getVideoFormat().compareToIgnoreCase("H264MVC")==0){//if 264mvc,set auto mode.
+							try {
+								m_Amplayer.Set3Dmode(1);
+				    			mode_3d = 1;				
+							} 
+							catch(RemoteException e) {
+								e.printStackTrace();
+							}			    					
+						}					
+						
 						if(bMediaInfo.drm_check == 0) {
 						    try {
 							    m_Amplayer.Play();
@@ -2758,6 +3084,9 @@ public class playermenu extends Activity {
 									// close sub;
 									if(subTitleView != null)
 									    subTitleView.closeSubtitle();
+									if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+									     subTitleView_sm.closeSubtitle();
+									}									
 									if(!fb32) {
 									    // Hide the view with key color
 										LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
@@ -2798,6 +3127,10 @@ public class playermenu extends Activity {
                                     // close sub;
                                     if(subTitleView != null)
                                         subTitleView.closeSubtitle();
+                                        
+					if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					     subTitleView_sm.closeSubtitle();
+					}
                                     if(!fb32) {
                                         // Hide the view with key color
                                         LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
@@ -2849,6 +3182,9 @@ public class playermenu extends Activity {
                                     // close sub;
                                     if(subTitleView != null)
                                         subTitleView.closeSubtitle();
+					if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+						subTitleView_sm.closeSubtitle();
+					}										
                                     if(!fb32) {
                                         // Hide the view with key color
                                         LinearLayout layout = (LinearLayout) findViewById(R.id.BaseLayout1);
@@ -2924,12 +3260,49 @@ public class playermenu extends Activity {
 	            morbar.setVisibility(View.VISIBLE);
     		}
     	
-			m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);
+
 			//reset sub;
 			subTitleView.clear();
 			subinit();
 			subTitleView.setTextColor(sub_para.color);
 	    	subTitleView.setTextSize(sub_para.font);
+	    if(SystemProperties.getBoolean("3D_setting.enable", false)){
+        	try {
+    			m_Amplayer.Set3Dmode(0);
+    			mode_3d = 0;
+    			
+    			m_Amplayer.Set3Dviewmode(0);
+    			view_mode = 0;
+    		} 
+    		catch(RemoteException e) {
+    			e.printStackTrace();
+    		}
+    		
+    		if(PlayList.getinstance().getcur().indexOf("[3D]")!=-1&&PlayList.getinstance().getcur().indexOf("[HALF]")!=-1){
+    			m_Amplayer.Set3Dmode(1);
+    			mode_3d = 1;
+    		    is3DVideoDisplayFlag = true;
+    		}else if(PlayList.getinstance().getcur().indexOf("[3D]")!=-1&&PlayList.getinstance().getcur().indexOf("[FULL]")!=-1){
+    			m_Amplayer.Set3Dmode(2);
+    			mode_3d = 2;  
+    			m_Amplayer.Set3Daspectfull(1);
+    			mode_3d = 16;    	
+    		    is3DVideoDisplayFlag = true;
+    		}else if(PlayList.getinstance().getcur().indexOf("[3D]")!=-1){
+    			m_Amplayer.Set3Dmode(2);
+    			mode_3d = 2;     			
+    		    is3DVideoDisplayFlag = true;   			
+    		}
+    	}
+	    
+		if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+			subTitleView_sm.clear();			
+			subTitleView_sm.setTextColor(android.graphics.Color.GRAY);
+	    	subTitleView_sm.setTextSize(sub_para.font);	    		
+
+		}
+
+		m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);								
             // openFile(sub_para.sub_id);
 		}
 		catch(RemoteException e) {
@@ -3053,9 +3426,19 @@ public class playermenu extends Activity {
 		try {
 			if(subTitleView.setFile(filepath,setSublanguage())==Subtitle.SUBTYPE.SUB_INVALID)
 				return;
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				if(subTitleView_sm.setFile(filepath,setSublanguage())==Subtitle.SUBTYPE.SUB_INVALID){
+					return;
+				}
+			}
+			
 		} 
 		catch(Exception e) {
 			Log.d(TAG, "open:error");
+			subTitleView = null;
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+			     subTitleView_sm= null;
+			}
 			e.printStackTrace();
 		}
 	
@@ -3120,6 +3503,10 @@ public class playermenu extends Activity {
 						//close sub;
 						if(subTitleView!=null)
 							subTitleView.closeSubtitle();		
+						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+							subTitleView_sm.closeSubtitle();
+						}
+							
 						//stop play
 						backToFileList = true;
 						if(m_Amplayer != null)

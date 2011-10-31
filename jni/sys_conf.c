@@ -217,106 +217,244 @@ static int AddVfmPath(char *path)
 }
 static int RmVfmDefPath(void)
 {
-    int fd, ret;
-    char str[]="rm default";
-    
-    fd = open("/sys/class/vfm/map", O_RDWR);
+	int fd, ret;
+	char str[]="rm default";
 
-    if(fd < 0) {
-        LOGE("VideoPlayer open /sys/class/vfm/map ERROR(%s)!!\n",strerror(errno));
-            close(fd);
-            return 0;
-    } else {
-        ret = write(fd, str, sizeof(str));
-    }
-    close(fd);
-    return ret;
+	fd = open("/sys/class/vfm/map", O_RDWR);
+
+	if(fd < 0) {
+		LOGE("VideoPlayer open /sys/class/vfm/map ERROR(%s)!!\n",strerror(errno));
+		close(fd);
+		return -1;
+	} else {
+	    	ret = write(fd, str, sizeof(str));
+	}
+	close(fd);
+	return ret;
 }
 
-static int Open3DPpmgr(int commd)
+static int Open3DPpmgr(SYS_3D_MODE_SET commd)
 {
-    int ppmgrfd = open("/dev/ppmgr", O_RDWR);
+	int ppmgrfd = open("/dev/ppmgr", O_RDWR);
 
-    if(ppmgrfd < 0) {
+	if(ppmgrfd < 0) {
 
-        LOGE("VideoPlayer open ppmgr, error (%s)\n", strerror(errno));
-        return ppmgrfd;
-    }
-    int ret = -1;
-    switch((int)commd)
-    {
-        case 0:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_DISABLE);
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("VideoPlayer 3D fucntion (0: Disalbe!!)\n");
-            #endif
-            break;
-        case 1:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_LR));
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("VideoPlayer 3D fucntion (4: L/R!!)\n");
-            #endif
-            break;
-        case 2:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_BT));
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("=VDIN CPP=> 3D fucntion (5: B/T!!)\n");
-            #endif
-            break;
-        case 3:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_LR_SWITCH));
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("VideoPlayer 3D fucntion (6: LR SWITCH!!)\n");
-            #endif
-            break;
-        case 4:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_3D_TO_2D_L));
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("VideoPlayer 3D function (8: 3D_TO_2D_L!!)\n");
-            #endif
-            break;
-        case 5:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_3D_TO_2D_R));
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("VideoPlayer 3D function (9: 3D_TO_2D_R!!)\n");
-            #endif
-            break;
-        case 6:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_2D_TO_3D));
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("VideoPlayer 3D fucntion (3: 2D->3D!!)\n");
-            #endif
-            break;
-        case 7:
-            ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, (MODE_3D_ENABLE|MODE_FIELD_DEPTH));
-            #ifdef LOGD_3D_FUNCTION
-            LOGD("=VDIN CPP=> 3D function (7: FIELD_DEPTH!!)\n");
-            #endif
-            break;
-    }
+		LOGE("VideoPlayer open ppmgr, error (%s)\n", strerror(errno));
+		return ppmgrfd;
+	}
+	int ret = -1;
+	switch(commd)
+	{
+		case SYS_3D_DISABLE:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_DISABLE);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D fucntion (0: Disalbe!!)\n");
+#endif
+			break;
+		case SYS_3D_AUTO:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_AUTO);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D fucntion (1: AUTO!!)\n");
+#endif
+			break;
+		case SYS_3D_LR:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_LR);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D fucntion (2 L/R!!)\n");
+#endif
+			break;
+		case SYS_3D_BT:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_BT);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D fucntion (3: B/T!)\n");
+#endif
+			break;
+		case SYS_3D_TO_2D_L:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_TO_2D_L);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (4: 3D_TO_2D_L!!)\n");
+#endif
+			break;
+		case SYS_3D_TO_2D_R:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_TO_2D_R);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (5: 3D_TO_2D_R!!)\n");
+#endif
+			break;
+		case SYS_3D_TO_2D_T:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_TO_2D_T);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (6: 3D_TO_2D_T!!)\n");
+#endif		 	
+			break;
+		case SYS_3D_TO_2D_B:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_TO_2D_B);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (7: 3D_TO_2D_B!!)\n");
+#endif		 	
+			break;
+		case SYS_3D_TO_2D_AUTO_1:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_TO_2D_AUTO_1);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (8: 3D_TO_2D_AUTO_1!!)\n");
+#endif		 	
+			break;
+		case SYS_3D_TO_2D_AUTO_2:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_TO_2D_AUTO_2);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (9: 3D_TO_2D_AUTO_2!!)\n");
+#endif		 	
+			break;
+		case SYS_2D_TO_3D:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_2D_TO_3D);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D fucntion (10: 2D->3D!!)\n");
+#endif
+			break;
+		case SYS_3D_FIELD_DEPTH:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_FIELD_DEPTH);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (11: FIELD_DEPTH!!)\n");
+#endif
+			break;
+		case SYS_3D_AUTO_SWITCH:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_AUTO_SWITCH);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (12: 3D_AUTO_SWITCH!!)\n");
+#endif
+			break;
+		case SYS_3D_LR_SWITCH:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_LR_SWITCH);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (13: 3D_LR_SWITCH!!)\n");
+#endif
+			break;
+		case SYS_3D_BT_SWITCH:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_ENABLE_PP, MODE_3D_BT_SWITCH);
+#ifdef LOGD_3D_FUNCTION
+			LOGD("VideoPlayer 3D function (14: 3D_BT_SWITCH!!)\n");
+#endif
+			break;
+	}
 
-    if(ret < 0)
-        LOGE("VideoPlayer set 3D function error");
-    close(ppmgrfd);
-    return ret;
+	if(ret < 0)
+		LOGE("VideoPlayer set 3D function error");
+	close(ppmgrfd);
+	return ret;
 }
 
-int SYS_set_3D_mode(int mode)
+int SYS_set_3D_mode(SYS_3D_MODE_SET mode)
 {
-    RmVfmDefPath();
-    int ret = -1;
-    switch(mode) {
-        case 0:
-            ret = AddVfmPath("add default decoder amvideo");
-			usleep(100);
-            Open3DPpmgr(0);//disable
-            break;
+	int ret = -1;
+#if 0	
+	ret = RmVfmDefPath();
+	if(ret<0)	{
+		return -1;
+	}
+#endif	
+	switch(mode) {
+		case 0:
+#if 0			
+			ret = AddVfmPath("add default decoder amvideo");
+#endif	
+			Open3DPpmgr(0);//disable
+			break;
 
-        default:
-            ret = AddVfmPath("add default decoder ppmgr amvideo");
+		default:
+#if 0			
+			ret = AddVfmPath("add default decoder ppmgr amvideo");
 			usleep(100);
-            Open3DPpmgr(mode);
-            break;
-    }
-    return ret;
+#endif			
+			Open3DPpmgr(mode);
+			break;
+	}
+	return ret;
+}
+int SYS_set_3D_view_mode(SYS_3D_VIEW_MODE_SET vmode){
+	int ret = -1;
+	int ppmgrfd = open("/dev/ppmgr", O_RDWR);
+	if(ppmgrfd<0){
+		LOGE("VideoPlayer open ppmgr, error (%s)\n", strerror(errno));
+		return ppmgrfd;		
+	}	
+	switch(vmode){
+		case SYS_3D_VIEW_NORMAL:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_VIEW_MODE, SYS_3D_VIEW_NORMAL);
+			break;
+		case SYS_3D_VIEW_FULL:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_VIEW_MODE, SYS_3D_VIEW_FULL);
+			break;
+		case SYS_3D_VIEW_4_3:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_VIEW_MODE, SYS_3D_VIEW_4_3);
+			break;
+		case SYS_3D_VIEW_16_9:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_VIEW_MODE, SYS_3D_VIEW_16_9);
+			break;
+		case SYS_3D_VIEW_NO_SCALEUP:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_VIEW_MODE,SYS_3D_VIEW_NO_SCALEUP);
+			break;
+		default:
+			LOGE("invalid case,never see this line,vmode value:%d\n",vmode);
+			break;
+	}
+	if(ret < 0)
+		LOGE("VideoPlayer SYS_set_3D_view_mode function error");
+			
+	if(ppmgrfd>0){
+		close(ppmgrfd);
+	}
+	return 0;
+}
+int SYS_set_3D_switch(int isOn){
+	int ret = -1;
+	if(isOn!=0 || isOn!=1){
+		LOGE("invalid para for 3d switch\n");
+		return -1;
+	}
+	int ppmgrfd = open("/dev/ppmgr", O_RDWR);
+	if(ppmgrfd<0){
+		LOGE("VideoPlayer open ppmgr, error (%s)\n", strerror(errno));
+		return ppmgrfd;		
+	}	
+	
+	ret = ioctl(ppmgrfd, PPMGR_IOC_SWITCHMODE,isOn);
+
+	if(ret < 0)
+		LOGE("VideoPlayer SYS_set_3D_view_mode function error");
+			
+	if(ppmgrfd>0){
+		close(ppmgrfd);
+	}	
+	return 0;
+}
+
+int SYS_set_3D_aspect_full(int aspect){
+	int ret = -1;
+	int ppmgrfd = open("/dev/ppmgr", O_RDWR);
+	if(ppmgrfd<0){
+		LOGE("VideoPlayer open ppmgr, error (%s)\n", strerror(errno));
+		return ppmgrfd;		
+	}	
+	LOGI("%s,para:%d\n",__FUNCTION__,aspect);
+	switch(aspect){
+		case 0:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_HOR_VER_DOUBLE, 0);
+			break;
+		case 1:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_HOR_VER_DOUBLE, 1);
+			break;
+		case 2:
+			ret = ioctl(ppmgrfd, PPMGR_IOC_HOR_VER_DOUBLE, 2);
+			break;
+		default:
+			LOGE("invalid case,never see this line,aspect value:%d\n",aspect);
+			break;
+	}
+	if(ret < 0)
+		LOGE("VideoPlayer SYS_set_3D_view_mode function error");
+			
+	if(ppmgrfd>0){
+		close(ppmgrfd);
+	}
+	return 0;
 }

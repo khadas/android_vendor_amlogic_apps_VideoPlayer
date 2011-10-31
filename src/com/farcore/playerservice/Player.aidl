@@ -24,6 +24,10 @@ interface Player
 
 	int Seek(int time);
 	int Set3Dmode(int mode);
+	int Set3Dviewmode(int mode);
+	int Set3Daspectfull(int aspect);
+	int Set3Dswitch(int isOn);
+	
 	int FastForward(int speed);
 	int BackForward(int speed);
 	

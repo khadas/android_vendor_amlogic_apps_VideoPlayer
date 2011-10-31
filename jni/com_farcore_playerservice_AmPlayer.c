@@ -231,8 +231,10 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     if (msgt->stream_info.has_video && msgt->stream_info.total_video_num>0) { 
         (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "width", "I"), msgt->video_info[0]->width); 
         (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "height", "I"), msgt->video_info[0]->height); 
+        (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "vformat", "I"), msgt->video_info[0]->format);
+        
     }
-    
+        
     if(msgt->stream_info.has_audio>0 && msgt->stream_info.total_audio_num>0){
         jclass ainfo_cls = AudioMediaInfo_getClass(env);
         jmethodID amid = (*env)->GetMethodID(env,ainfo_cls, "<init>", "()V");
@@ -592,11 +594,31 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_seek
  */
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dmode
   (JNIEnv *env, jobject obj, jint pid, jint mode){
-	player_stop_async(pid);
-	//player_stop(pid);
+    LOGI("JNI Set 3D mode:%d,player pid:%d\n",mode,pid);
+    int ret = SYS_set_3D_mode((SYS_3D_MODE_SET)mode);
+    return ret;
+}
 
-    int ret = SYS_set_3D_mode(mode);
-    player_start_play(pid);
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dviewmode
+  (JNIEnv *env, jobject obj, jint vmode){
+    int ret = -1; 
+		ret = SYS_set_3D_view_mode((SYS_3D_VIEW_MODE_SET)vmode);
+    return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Daspectfull
+  (JNIEnv *env, jobject obj, jint aspect){
+    int ret = -1; 
+    LOGI("set 3d aspect full,value:%d\n",aspect);
+		ret = SYS_set_3D_aspect_full(aspect);
+    return ret;
+}
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dswitch
+  (JNIEnv *env, jobject obj, jint isOn){
+    int ret = -1; 
+    LOGI("set 3d switch:%d\n",isOn);
+    ret = SYS_set_3D_switch(isOn);
+		
     return ret;
 }
 
@@ -899,6 +921,9 @@ static JNINativeMethod gMethods[] = {
     {"resume",          "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_resume},
     {"seek",            "(II)I",                        (void*)Java_com_farcore_playerservice_AmPlayer_seek},
     {"set3Dmode",        "(II)I",                       (void*)Java_com_farcore_playerservice_AmPlayer_set3Dmode},
+    {"set3Dviewmode",           "(I)I",                 (void*)Java_com_farcore_playerservice_AmPlayer_set3Dviewmode},
+    {"set3Daspectfull",           "(I)I",               (void*)Java_com_farcore_playerservice_AmPlayer_set3Daspectfull},
+    {"set3Dswitch",           "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_set3Dswitch},        
     {"fastforward",             "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_fastforward},
     {"fastrewind",              "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_fastrewind},      
     {"setAudioTrack",           "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_setAudioTrack},

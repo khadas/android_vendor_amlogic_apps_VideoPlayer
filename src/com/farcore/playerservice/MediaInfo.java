@@ -22,7 +22,21 @@ public class MediaInfo {
     public void writeToParcel(Parcel reply, int parcelableWriteReturnValue) {
 		// TODO Auto-generated method stub
 	}
-
+	//just add video codec type
+	private static final int	VFORMAT_UNKNOW =-1;
+	private static final int	VFORMAT_MPEG12 = 0;
+	private static final int	VFORMAT_MPEG4 =1;
+	private static final int	VFORMAT_H264 = 2;
+	private static final int	VFORMAT_MJPEG =3;
+	private static final int	VFORMAT_REAL = 4;
+	private static final int	VFORMAT_JPEG = 5;
+	private static final int	VFORMAT_VC1 = 6;
+	private static final int	VFORMAT_AVS = 7;
+	private static final int	VFORMAT_SW = 8;
+	private static final int VFORMAT_H264MVC =9;
+	
+	
+	
 	public boolean hasAudioTrack() {
     	return (ainfo != null && ainfo.length > 0);    	
 	}
@@ -52,10 +66,51 @@ public class MediaInfo {
 	private int filetype;
 	private long filesize = 0;
 	public int duration;
-	private int width;
-	private int height;
-    public int drm_check;
+	private int width = 0;
+	private int height = 0;
+  public int drm_check;
+  private int vformat = VFORMAT_UNKNOW;  
 	
+	
+	public String getVideoFormat(){
+		String type = null;
+		switch(vformat){
+			case VFORMAT_MPEG12:
+				type = "MPEG12";
+				break;
+			case VFORMAT_MPEG4:
+				type = "MPEG4";
+				break;
+			case VFORMAT_H264:
+				type = "H264";
+				break;
+			case VFORMAT_MJPEG:
+				type = "MJPEG";
+				break;
+			case VFORMAT_REAL:
+				type = "REAL";
+				break;
+			case VFORMAT_JPEG:
+				type = "JPEG";
+				break;
+			case VFORMAT_VC1:
+				type = "VC1";
+				break;
+			case VFORMAT_AVS:
+				type = "AVS";
+				break;
+			case VFORMAT_SW:
+				type = "SW";
+				break;
+			case VFORMAT_H264MVC:
+				type = "H264MVC";
+				break;
+			default:
+				type = "UNKNOW";
+				break;
+		}
+		return type;
+	}	
 	public String getFileName(String path) {
 		File f = new File(path);
 		String filename = f.getName();

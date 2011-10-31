@@ -240,6 +240,36 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescal
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_getProductType
   (JNIEnv *, jclass);
 
+
+/*
+ * Class:     com_farcore_playerservice_MediaPlayer
+ * Method:    set3Dmode
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dmode
+  (JNIEnv *env, jobject obj, jint pid, jint mode);
+/*
+ * Class:     com_farcore_playerservice_MediaPlayer
+ * Method:    set3Dmode
+ * Signature: (I)I
+ */  
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dviewmode
+  (JNIEnv *, jobject, jint);
+/*
+ * Class:     com_farcore_playerservice_MediaPlayer
+ * Method:    set3Dmode
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Daspectfull
+  (JNIEnv *, jobject , jint );
+/*
+ * Class:     com_farcore_playerservice_MediaPlayer
+ * Method:    set3Dmode
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dswitch
+  (JNIEnv *, jobject, jint);
+
 #ifdef __cplusplus
 }
 #endif

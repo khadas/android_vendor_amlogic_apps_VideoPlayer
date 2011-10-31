@@ -5,7 +5,20 @@
     android:layout_height="fill_parent" 
     android:gravity="bottom" 
     android:background="@color/background">
-    
+    <LinearLayout
+        android:id="@+id/subtitleLayout_sm"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:paddingLeft="6dip" 
+        android:layout_gravity="bottom">
+	    <com.subtitleview.SubtitleView
+	    	android:id="@+id/subTitle_sm"
+	    	android:layout_height="wrap_content"
+	    	android:layout_width="fill_parent"
+	    	android:paddingBottom="8dip"
+	    	android:visibility="invisible">
+	    </com.subtitleview.SubtitleView>	    
+	</LinearLayout>	    
     <LinearLayout
         android:id="@+id/subtitleLayout"
         android:layout_height="wrap_content"
@@ -17,9 +30,9 @@
 	    	android:layout_height="wrap_content"
 	    	android:layout_width="fill_parent"
 	    	android:paddingBottom="10dip">
-	    </com.subtitleview.SubtitleView>
+	    </com.subtitleview.SubtitleView>    
 	</LinearLayout>
-	
+
     <LinearLayout
 	    android:orientation="vertical" 
 	    android:layout_gravity="bottom" 
