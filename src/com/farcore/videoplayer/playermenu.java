@@ -41,6 +41,7 @@ import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
@@ -125,6 +126,10 @@ public class playermenu extends Activity {
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 	
 	private boolean intouch_flag = false;
+	private int item_position_selected, item_position_first, fromtop_piexl, item_position_selected_init;
+	private boolean item_init_flag = true;
+	private ArrayList<Integer> fileDirectory_position_selected = new ArrayList<Integer>();
+	private ArrayList<Integer> fileDirectory_position_piexl = new ArrayList<Integer>();
 	
 	//for subtitle
 	private SubtitleUtils subtitleUtils = null;
@@ -1470,8 +1475,16 @@ public class playermenu extends Activity {
 							}
 						}
 					}
+	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
     			Intent selectFileIntent = new Intent();
+				Bundle bundle = new Bundle();
+				bundle.putInt("item_position_selected", item_position_selected);
+			    bundle.putInt("item_position_first", item_position_first);
+			    bundle.putInt("fromtop_piexl", fromtop_piexl);
+			    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
+			    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
 				selectFileIntent.setClass(playermenu.this, FileList.class);
+				selectFileIntent.putExtras(bundle);
 				//close sub;
 				if(subTitleView!=null){
 					subTitleView.closeSubtitle();	
@@ -1983,6 +1996,18 @@ public class playermenu extends Activity {
             ImageButton browser = (ImageButton) findViewById(R.id.BrowserBtn);
             browser.requestFocus();
         }
+        
+        Bundle bundle = new Bundle();
+        bundle = this.getIntent().getExtras();
+        item_position_selected = bundle.getInt("item_position_selected");
+        item_position_first = bundle.getInt("item_position_first");
+        fromtop_piexl = bundle.getInt("fromtop_piexl");
+        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
+        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
+        if(item_init_flag){
+        	item_position_selected_init = item_position_selected - PlayList.getinstance().getindex();
+        	item_init_flag = false;
+        }
     }
 
     private void displayinit() {
@@ -2137,8 +2162,16 @@ public class playermenu extends Activity {
 							}
 						}
 					}
+	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
 				Intent selectFileIntent = new Intent();
+				Bundle bundle = new Bundle();
+				bundle.putInt("item_position_selected", item_position_selected);
+			    bundle.putInt("item_position_first", item_position_first);
+			    bundle.putInt("fromtop_piexl", fromtop_piexl);
+			    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
+			    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
 				selectFileIntent.setClass(playermenu.this, FileList.class);
+				selectFileIntent.putExtras(bundle);
 				//close sub;
 				if(subTitleView!=null){
 					subTitleView.closeSubtitle();	

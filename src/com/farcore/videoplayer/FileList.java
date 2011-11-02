@@ -45,6 +45,11 @@ public class FileList extends ListActivity {
 	private File file;
 	private static String TAG = "player_FileList";
 	
+	private int item_position_selected, item_position_first, fromtop_piexl;
+	private ArrayList<Integer> fileDirectory_position_selected = new ArrayList<Integer>();
+	private ArrayList<Integer> fileDirectory_position_piexl = new ArrayList<Integer>();
+	private int pathLevel = 0;
+	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)
 	        {
@@ -73,7 +78,7 @@ public class FileList extends ListActivity {
 	        }
 	        
 	};
-	    
+	
     @Override
     public void onResume() {
         super.onResume();
@@ -85,6 +90,7 @@ public class FileList extends ListActivity {
         
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 		m_storagemgr.registerListener(mListener);
+        getListView().setSelectionFromTop(item_position_selected, fromtop_piexl);
     }
     
     @Override
@@ -102,6 +108,19 @@ public class FileList extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 	    
+	    try{
+	        Bundle bundle = new Bundle();
+	        bundle = this.getIntent().getExtras();
+	        item_position_selected = bundle.getInt("item_position_selected");
+	        item_position_first = bundle.getInt("item_position_first");
+	        fromtop_piexl = bundle.getInt("fromtop_piexl");
+	        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
+	        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
+	        pathLevel = fileDirectory_position_selected.size();
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    }
 	    currentlist = new ArrayList<String>();
 	    
 		if(PlayList.getinstance().rootPath==null)
@@ -141,8 +160,13 @@ public class FileList extends ListActivity {
                 	}
                 	file = new File(paths.get(0).toString());
                 	currenturl =file.getParentFile().getParent();
-                	if(file.getParent().compareToIgnoreCase(root_path)!=0)
+                	if(file.getParent().compareToIgnoreCase(root_path)!=0){
                 		BrowserFile(currenturl);
+                		pathLevel--;
+                		getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
+                		fileDirectory_position_selected.remove(pathLevel);
+                		fileDirectory_position_piexl.remove(pathLevel);
+                	}
                 	else
                 	{
             			FileList.this.finish();
@@ -265,8 +289,20 @@ public class FileList extends ListActivity {
 		currentlist.clear();
 		currentlist.addAll(paths);
 	    //currentlist =paths;
-	    if(file.isDirectory()) 
-	    	BrowserFile(paths.get(position));
+	    if(file.isDirectory()) {
+		    item_position_selected = getListView().getSelectedItemPosition();
+			item_position_first = getListView().getFirstVisiblePosition();
+			View cv = getListView().getChildAt(item_position_selected - item_position_first);
+		    if (cv != null) {
+		        fromtop_piexl = cv.getTop();
+		    }
+		    BrowserFile(paths.get(position));
+		    if(!listFiles.isEmpty()) {
+		    		fileDirectory_position_selected.add(item_position_selected);
+		    		fileDirectory_position_piexl.add(fromtop_piexl);
+		    		pathLevel++;
+	    	}
+	    }
 	    else 
 	    {
 		//stopMediaPlayer();
@@ -283,7 +319,14 @@ public class FileList extends ListActivity {
 			//else
 			//PlayList.getinstance().setlist(paths, position);
 	    	PlayList.getinstance().setlist(paths, pos);
-	    	showvideobar();
+	    	
+			item_position_selected = getListView().getSelectedItemPosition();
+			item_position_first = getListView().getFirstVisiblePosition();
+			View cv = getListView().getChildAt(item_position_selected - item_position_first);
+	        if (cv != null) {
+	        	fromtop_piexl = cv.getTop();
+	        }
+			showvideobar();
 	    }
 	}
     public boolean onKeyDown(int keyCode, KeyEvent event) { 
@@ -302,8 +345,13 @@ public class FileList extends ListActivity {
             	}
             	file = new File(paths.get(0).toString());
             	currenturl =file.getParentFile().getParent();
-            	if(file.getParent().compareToIgnoreCase(root_path)!=0)
+            	if(file.getParent().compareToIgnoreCase(root_path)!=0){
+            		pathLevel--;
             		BrowserFile(currenturl);
+                    getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
+            		fileDirectory_position_selected.remove(pathLevel);
+            		fileDirectory_position_piexl.remove(pathLevel);
+            	}
             	else
             	{
         			FileList.this.finish();
@@ -317,7 +365,15 @@ public class FileList extends ListActivity {
 	private void showvideobar() {
 		//* new an Intent object and ponit a class to start
 		Intent intent = new Intent();
+		Bundle bundle = new Bundle();
+		bundle.putInt("item_position_selected", item_position_selected);
+	    bundle.putInt("item_position_first", item_position_first);
+	    bundle.putInt("fromtop_piexl", fromtop_piexl);
+	    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
+	    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
 		intent.setClass(FileList.this, playermenu.class);
+		intent.putExtras(bundle);
+		
 		String temp_scale=SystemProperties.get("rw.fb.need2xscale");
 	  if(temp_scale.equals("ok")){
 	  	String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
