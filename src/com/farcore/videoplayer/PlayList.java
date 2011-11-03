@@ -53,10 +53,16 @@ public class PlayList{
 		pos = 0;
 		return hfilelist.get(pos);
 	}
-	
+
 	public String movelast()
 	{
 		pos = hfilelist.size()-1;
 		return hfilelist.get(pos);
+	}
+	
+	public int getindex()
+	{
+		
+		return pos;
 	}
 }
