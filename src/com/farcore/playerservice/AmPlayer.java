@@ -57,8 +57,10 @@ public class AmPlayer extends Service {
     public static native int native_disablecolorkey();
     public static native int native_setglobalalpha(int alpha);
     public native int set3Dviewmode(int vmode);
-		public native int set3Daspectfull(int aspect);
-		public native int set3Dswitch(int isOn);
+	public native int set3Daspectfull(int aspect);
+	public native int set3Dswitch(int isOn);
+	
+	public native int set3Dgrating(int isOn);
 		
     public static native int native_getosdbpp();
     public static native int enable_freescale(int cfg);
@@ -227,7 +229,10 @@ public class AmPlayer extends Service {
 			set3Dswitch(isOn);
 			return 0;
 		}
-
+		public int Set3Dgrating(int isOn){
+			set3Dgrating(isOn);
+			return 0;
+		}
 		public int RegisterClientMessager(IBinder hbinder)
 				throws RemoteException {
 			mClient = new Messenger(hbinder);

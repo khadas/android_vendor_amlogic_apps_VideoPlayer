@@ -621,7 +621,14 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dswitch
 		
     return ret;
 }
-
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dgrating
+  (JNIEnv *env, jobject obj, jint isOn){
+	int ret = -1;
+	LOGI("set 3d grating,%s\n",isOn>0?"enable":"disable");
+	ret = SYS_set_3D_grating(isOn);
+	return ret;
+  
+}
 /*
  * Class:     com_farcore_playerservice_MediaPlayer
  * Method:    stop
@@ -923,7 +930,8 @@ static JNINativeMethod gMethods[] = {
     {"set3Dmode",        "(II)I",                       (void*)Java_com_farcore_playerservice_AmPlayer_set3Dmode},
     {"set3Dviewmode",           "(I)I",                 (void*)Java_com_farcore_playerservice_AmPlayer_set3Dviewmode},
     {"set3Daspectfull",           "(I)I",               (void*)Java_com_farcore_playerservice_AmPlayer_set3Daspectfull},
-    {"set3Dswitch",           "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_set3Dswitch},        
+    {"set3Dswitch",           "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_set3Dswitch},    
+	{"set3Dgrating",           "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_set3Dgrating},
     {"fastforward",             "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_fastforward},
     {"fastrewind",              "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_fastrewind},      
     {"setAudioTrack",           "(II)I",                (void*)Java_com_farcore_playerservice_AmPlayer_setAudioTrack},

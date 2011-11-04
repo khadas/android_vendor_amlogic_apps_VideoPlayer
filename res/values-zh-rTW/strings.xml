@@ -21,6 +21,8 @@
     <string name="setting_displaymode_fullscreen">全屏</string>
     <string name="setting_brightness">亮度</string>
     <string name="setting_3d_mode">Play 3D Mode</string>
+	<string name="setting_3d_grating_open">Open Grating</string> 
+	<string name="setting_3d_grating_close">Close Grating</string> 
     <string name="setting_3d_diable">OFF</string> 
     <string name="setting_3d_auto">AUTO</string>  
     <string name="setting_3d_lr">L/R</string>

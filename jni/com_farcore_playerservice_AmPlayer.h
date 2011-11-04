@@ -270,6 +270,13 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Daspectfull
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dswitch
   (JNIEnv *, jobject, jint);
 
+/*
+ * Class:     com_farcore_playerservice_MediaPlayer
+ * Method:    set3Dgrating
+ * Signature: (I)I
+ */  
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_set3Dgrating
+  (JNIEnv *, jobject, jint);  
 #ifdef __cplusplus
 }
 #endif

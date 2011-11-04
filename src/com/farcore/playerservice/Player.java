@@ -586,6 +586,25 @@ _data.recycle();
 return _result;
 }
 
+public int Set3Dgrating(int mode) throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(mode);
+mRemote.transact(Stub.TRANSACTION_Set3Dgrating, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+}
+
 public int FastForward(int speed) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
@@ -663,6 +682,7 @@ static final int TRANSACTION_RegisterClientMessager = (android.os.IBinder.FIRST_
 static final int TRANSACTION_Set3Dviewmode = (android.os.IBinder.FIRST_CALL_TRANSACTION + 19);
 static final int TRANSACTION_Set3Daspectfull = (android.os.IBinder.FIRST_CALL_TRANSACTION + 20);
 static final int TRANSACTION_Set3Dswitch = (android.os.IBinder.FIRST_CALL_TRANSACTION + 21);
+static final int TRANSACTION_Set3Dgrating = (android.os.IBinder.FIRST_CALL_TRANSACTION + 21);
 }
 public int Init() throws android.os.RemoteException;
 public int Open(java.lang.String filepath, int position) throws android.os.RemoteException;
@@ -682,7 +702,8 @@ public int Seek(int time) throws android.os.RemoteException;
 public int Set3Dmode(int mode) throws android.os.RemoteException;
 public int Set3Dviewmode(int mode) throws android.os.RemoteException;
 public int Set3Daspectfull(int aspect) throws android.os.RemoteException;
-public int Set3Dswitch(int aspect) throws android.os.RemoteException;
+public int Set3Dswitch(int isOn) throws android.os.RemoteException;
+public int Set3Dgrating(int isOn) throws android.os.RemoteException;
 public int FastForward(int speed) throws android.os.RemoteException;
 public int BackForward(int speed) throws android.os.RemoteException;
 public int RegisterClientMessager(android.os.IBinder hbinder) throws android.os.RemoteException;

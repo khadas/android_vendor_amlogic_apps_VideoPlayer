@@ -27,6 +27,7 @@ interface Player
 	int Set3Dviewmode(int mode);
 	int Set3Daspectfull(int aspect);
 	int Set3Dswitch(int isOn);
+	int Set3Dgrating(int isOn);
 	
 	int FastForward(int speed);
 	int BackForward(int speed);

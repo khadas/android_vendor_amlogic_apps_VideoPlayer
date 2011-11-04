@@ -106,6 +106,7 @@ int SYS_set_3D_switch(int isOn);
 int SYS_set_3D_aspect_full(int aspect);
 
 
+int SYS_set_3D_grating(int isOn);
 
 /*
 Description:set fullscreen

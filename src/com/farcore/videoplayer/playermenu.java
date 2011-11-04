@@ -175,6 +175,8 @@ public class playermenu extends Activity {
 		MODE_3D_FULL_OFF,
 		MODE_3D_LR_FULL,
 		MODE_3D_BT_FULL,
+		MODE_3D_GRATING_ON,
+		MODE_3D_GRATING_OFF,
 		
     }
 	
@@ -197,6 +199,8 @@ public class playermenu extends Activity {
 		R.string.setting_3d_full_off,
 		R.string.setting_3d_lr_full,
 		R.string.setting_3d_tb_full,
+		R.string.setting_3d_grating_open,
+		R.string.setting_3d_grating_close,
 	};
 	
 	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
@@ -708,6 +712,22 @@ public class playermenu extends Activity {
 								    e.printStackTrace();
 								}                     			
                     			break;
+                    		case 18: //open
+							    try {
+								    m_Amplayer.Set3Dgrating(1);								    
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}                     			
+                    			break;
+                    		case 19: //close
+							    try {
+								    m_Amplayer.Set3Dgrating(0);								    
+								} 
+								catch(RemoteException e) {
+								    e.printStackTrace();
+								}                     			
+                    			break;								
                     		default:
                     			break;
                     		}
@@ -2805,12 +2825,18 @@ public class playermenu extends Activity {
         Amplayer_stop();
         if(m_Amplayer != null)
 			try {
-				m_Amplayer.DisableColorKey();
+				if(SystemProperties.getBoolean("3D_setting.enable", false)){
+					m_Amplayer.Set3Dgrating(0);
+				}
+				if(!fb32){
+					m_Amplayer.DisableColorKey();
+				}
 			} 
 			catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
         StopPlayerService();
         setDefCodecMips();
         openScreenOffTimeout();
@@ -3057,7 +3083,9 @@ public class playermenu extends Activity {
 						}
 						if(SystemProperties.getBoolean("3D_setting.enable", false)&&bMediaInfo.getVideoFormat().compareToIgnoreCase("H264MVC")==0){//if 264mvc,set auto mode.
 							try {
+								m_Amplayer.Set3Dgrating(1); //open grating
 								m_Amplayer.Set3Dmode(1);
+								
 				    			mode_3d = 1;				
 							} 
 							catch(RemoteException e) {
@@ -3312,16 +3340,19 @@ public class playermenu extends Activity {
     		}
     		
     		if(PlayList.getinstance().getcur().indexOf("[3D]")!=-1&&PlayList.getinstance().getcur().indexOf("[HALF]")!=-1){
-    			m_Amplayer.Set3Dmode(1);
+				m_Amplayer.Set3Dgrating(1);
+    			m_Amplayer.Set3Dmode(1);				
     			mode_3d = 1;
     		    is3DVideoDisplayFlag = true;
     		}else if(PlayList.getinstance().getcur().indexOf("[3D]")!=-1&&PlayList.getinstance().getcur().indexOf("[FULL]")!=-1){
+				m_Amplayer.Set3Dgrating(1);
     			m_Amplayer.Set3Dmode(2);
     			mode_3d = 2;  
     			m_Amplayer.Set3Daspectfull(1);
     			mode_3d = 16;    	
     		    is3DVideoDisplayFlag = true;
     		}else if(PlayList.getinstance().getcur().indexOf("[3D]")!=-1){
+				m_Amplayer.Set3Dgrating(1);
     			m_Amplayer.Set3Dmode(2);
     			mode_3d = 2;     			
     		    is3DVideoDisplayFlag = true;   			
