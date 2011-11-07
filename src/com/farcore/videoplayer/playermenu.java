@@ -2016,17 +2016,21 @@ public class playermenu extends Activity {
             ImageButton browser = (ImageButton) findViewById(R.id.BrowserBtn);
             browser.requestFocus();
         }
-        
-        Bundle bundle = new Bundle();
-        bundle = this.getIntent().getExtras();
-        item_position_selected = bundle.getInt("item_position_selected");
-        item_position_first = bundle.getInt("item_position_first");
-        fromtop_piexl = bundle.getInt("fromtop_piexl");
-        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
-        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
-        if(item_init_flag){
-        	item_position_selected_init = item_position_selected - PlayList.getinstance().getindex();
-        	item_init_flag = false;
+        try{
+	        Bundle bundle = new Bundle();
+	        bundle = this.getIntent().getExtras();
+	        item_position_selected = bundle.getInt("item_position_selected");
+	        item_position_first = bundle.getInt("item_position_first");
+	        fromtop_piexl = bundle.getInt("fromtop_piexl");
+	        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
+	        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
+	        if(item_init_flag){
+	        	item_position_selected_init = item_position_selected - PlayList.getinstance().getindex();
+	        	item_init_flag = false;
+	        }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
