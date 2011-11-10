@@ -941,7 +941,7 @@ static JNINativeMethod gMethods[] = {
     {"setRepeat",               "(II)I",                    (void*)Java_com_farcore_playerservice_AmPlayer_setRepeat},
     {"setIVolume",                  "(I)I",                         (void*)Java_com_farcore_playerservice_AmPlayer_setIVolume},
     {"getMetaInfo",                 "(I)Ljava/lang/Object;",                (void*)Java_com_farcore_playerservice_AmPlayer_getMetaInfo},
-    {"getDivxInfo",        "(I)Ljava/lang/Object",         (void*)Java_com_farcore_playerservice_AmPlayer_getDivxInfo},
+    {"getDivxInfo",        "(I)Ljava/lang/Object;",         (void*)Java_com_farcore_playerservice_AmPlayer_getDivxInfo},
     {"mute",                    "()I",                          (void*)Java_com_farcore_playerservice_AmPlayer_mute},
     {"unmute",                  "()I",                          (void*)Java_com_farcore_playerservice_AmPlayer_unmute},
     {"native_init",         "()I",                      (void*)Java_com_farcore_playerservice_AmPlayer_native_init},

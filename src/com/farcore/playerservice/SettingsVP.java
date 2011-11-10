@@ -100,34 +100,48 @@ public class SettingsVP {
 			try
 			{
 				dispMode = in.readLine();
-				Log.d(TAG, "Current display mode: "+dispMode);
-				String dispaxis = in_axis.readLine();
-				String[] axisstr = dispaxis.split(" ", 5);
 				
-				panel_resolution = axisstr[2]+"x"+axisstr[3];
-				panel_width = Integer.parseInt(axisstr[2]);
-				panel_height = Integer.parseInt(axisstr[3]);
-				Log.d(TAG, "Panel resolution: "+panel_resolution);
-				if (dispMode.equals("panel"))
-				{
-					buf = "0,0,"+axisstr[2]+","+axisstr[3];
-					Log.d(TAG, "Current display axis: "+buf);
-				}
-				else if (dispMode.equals("480p"))
-				{
-					buf = "0,0,720,480";
-				}
-				else if (dispMode.equals("720p"))
-				{
-					buf = "0,0,1280,720";
-				}
-				else if (dispMode.equals("1080p") || dispMode.equals("lvds1080p"))
-				{
-					buf = "0,0,1920,1080";
-				}
-				else
-					buf = "0,0,1280,720";
+				String dispaxis = in_axis.readLine();
+				if(dispMode== null ||dispaxis== null){//not exist,default m2,lvds1080p
+					dispMode = "lvds1080p";
+					panel_width = 1919;
+					panel_height = 1079;
+					buf = "0 0 1919 1079";
+					
+				}else{
+					String[] axisstr = dispaxis.split(" ", 5);
+					
+					panel_resolution = axisstr[2]+"x"+axisstr[3];
+					panel_width = Integer.parseInt(axisstr[2]);
+					panel_height = Integer.parseInt(axisstr[3]);
+					Log.d(TAG, "Panel resolution: "+panel_resolution);
+
+				
+					if (dispMode.equals("panel"))
+					{
+						buf = "0,0,"+axisstr[2]+","+axisstr[3];
+						Log.d(TAG, "Current display axis: "+buf);
+					}
+					else if (dispMode.equals("480p"))
+					{
+						buf = "0 0 720 480";
+					}
+					else if (dispMode.equals("720p"))
+					{
+						buf = "0 0 1280 720";
+					}
+					else if (dispMode.equals("1080p") || dispMode.equals("lvds1080p"))
+					{
+						buf = "0 0 1920 1080";
+					}
+					else{
+						buf = "0 0 1280 720";
+
+					}
+
+				}	
 				display_mode = dispMode;
+				Log.d(TAG, "Current display mode: "+display_mode);
 			} finally {
     			in.close();
     			in_axis.close();
@@ -135,6 +149,7 @@ public class SettingsVP {
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
 			Log.e(TAG, "IOException when read "+displaymode_path);
 		} 
 		
@@ -153,6 +168,7 @@ public class SettingsVP {
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
 			Log.e(TAG, "IOException when write "+video_axis_path);
 			return false;
 		}
@@ -184,6 +200,7 @@ public class SettingsVP {
     		} 
 		}
 		catch (IOException e) {
+			e.printStackTrace();
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when read "+video_layout_disable);
 		} 
@@ -228,6 +245,7 @@ public class SettingsVP {
 			 return true;
 		}
 		catch (IOException e) {
+			e.printStackTrace();
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+video_layout_disable);
 			return false;

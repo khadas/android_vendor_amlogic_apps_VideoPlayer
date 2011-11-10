@@ -1902,6 +1902,7 @@ public class playermenu extends Activity {
 				finish();
     		  	onPause(); //for disable 2Xscale
     			Log.d(TAG,"----------------uncaughtException--------------------");
+				
     		  	android.os.Process.killProcess(android.os.Process.myPid());
     		}
     	});
@@ -3106,14 +3107,19 @@ public class playermenu extends Activity {
                             }
                         }
 						sub_para.totalnum =subtitleUtils.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
-						sub_para.curid = subtitleUtils.getCurrentInSubtitleIndexByJni();
-						if(sub_para.curid == 0xff)
-						    sub_para.curid = sub_para.totalnum;
-						if(sub_para.totalnum>0)
-				    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
-						else
-						    sub_para.sub_id = null;
-						openFile(sub_para.sub_id);
+						if(sub_para.totalnum >0){
+							sub_para.curid = subtitleUtils.getCurrentInSubtitleIndexByJni();
+							if(sub_para.curid == 0xff)
+							    sub_para.curid = sub_para.totalnum;
+							if(sub_para.totalnum>0)
+					    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
+							else
+							    sub_para.sub_id = null;
+							openFile(sub_para.sub_id);
+						}else{
+							sub_para.sub_id = null;
+						}
+						
 						if(bMediaInfo.seekable == 0) {
 							myProgressBar.setEnabled(false);
 							fastforword.setEnabled(false);
@@ -3128,8 +3134,10 @@ public class playermenu extends Activity {
 							fastforword.setImageResource(R.drawable.ff);
 							fastreverse.setImageResource(R.drawable.rewind);
 						}
-						if(setCodecMips() == 0)
-				        	Log.d(TAG, "setCodecMips Failed");
+						if(setCodecMips() == 0){
+				        		Log.d(TAG, "setCodecMips Failed");
+
+						}
 						break;
 					case VideoInfo.PLAYER_SEARCHOK:
 						//progressSliding = false;
