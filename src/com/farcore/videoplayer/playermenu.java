@@ -116,6 +116,7 @@ public class playermenu extends Activity {
 	private AlertDialog confirm_dialog = null;
 	private BroadcastReceiver mReceiver = null;
 	private int morebar_status = 0;
+	private boolean backToOtherAPK = true;
 
 	Timer timer = new Timer();
 	Toast ff_fb = null;
@@ -1527,7 +1528,9 @@ public class playermenu extends Activity {
 				if(m_Amplayer != null)
 					Amplayer_stop();
 				//do disable2XScale in onPause()
-				startActivity(selectFileIntent);
+				if(!backToOtherAPK){
+					startActivity(selectFileIntent);
+				}
 				playermenu.this.finish();
 				return true;
     		}
@@ -2025,6 +2028,7 @@ public class playermenu extends Activity {
 	        fromtop_piexl = bundle.getInt("fromtop_piexl");
 	        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
 	        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
+	        backToOtherAPK = bundle.getBoolean("backToOtherAPK");
 	        if(item_init_flag){
 	        	item_position_selected_init = item_position_selected - PlayList.getinstance().getindex();
 	        	item_init_flag = false;

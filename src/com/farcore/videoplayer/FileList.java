@@ -371,6 +371,7 @@ public class FileList extends ListActivity {
 	    bundle.putInt("fromtop_piexl", fromtop_piexl);
 	    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
 	    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
+	    bundle.putBoolean("backToOtherAPK", false);
 		intent.setClass(FileList.this, playermenu.class);
 		intent.putExtras(bundle);
 		
