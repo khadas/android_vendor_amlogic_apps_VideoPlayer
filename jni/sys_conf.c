@@ -459,29 +459,22 @@ int SYS_set_3D_aspect_full(int aspect){
 	return 0;
 }
 
-int SYS_set_3D_grating(int isOn){
-    int flag = 0;
-	FILE* fp = NULL;
-    char* cmd = NULL;	
-	fp = fopen("/sys/class/i2c/cbus_reg","w");
-
-	if(fp == NULL){
-		LOGE("open file fail\n");
-		return -1;
-	}
-	if(isOn>0){
-		cmd = "wb 0x202c 16 1";
-		fwrite(cmd,strlen(cmd), 1,fp);
-		fflush(fp);
-		cmd = "wb 0x202c 19 1";
-		fwrite(cmd,strlen(cmd), 1,fp);
-	}else if(isOn == 0){
-		cmd = "wb 0x202c 16 0";
-		fwrite(cmd,strlen(cmd), 1,fp);
-		fflush(fp);
-		cmd = "wb 0x202c 19 0";
-		fwrite(cmd,strlen(cmd), 1,fp);
-	}
-	fclose(fp);
-	return 0;
+int SYS_set_3D_grating(int isOn){	
+    int fd;
+    char *path = "/sys/class/enable3d/enable-3d" ;   
+    char  bcmd[16];
+    memset(bcmd,0,16);
+    fd=open(path, O_CREAT|O_RDWR | O_TRUNC, 0644);
+    if(fd>=0){
+		if(isOn >0){
+			sprintf(bcmd,"%d",1);
+		}else{
+			sprintf(bcmd,"%d",0);
+		}
+        write(fd,bcmd,strlen(bcmd));
+        close(fd);
+        return 0;
+    }
+    return -1;   	
+	
 }
