@@ -122,21 +122,8 @@ public class SettingsVP {
 						buf = "0,0,"+axisstr[2]+","+axisstr[3];
 						Log.d(TAG, "Current display axis: "+buf);
 					}
-					else if (dispMode.equals("480p"))
-					{
-						buf = "0 0 720 480";
-					}
-					else if (dispMode.equals("720p"))
-					{
-						buf = "0 0 1280 720";
-					}
-					else if (dispMode.equals("1080p") || dispMode.equals("lvds1080p"))
-					{
-						buf = "0 0 1920 1080";
-					}
 					else{
-						buf = "0 0 1280 720";
-
+						buf = "0 0 0 0";
 					}
 
 				}	
