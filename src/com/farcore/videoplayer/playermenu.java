@@ -2177,8 +2177,9 @@ public class playermenu extends Activity {
         browser.setOnClickListener(new ImageButton.OnClickListener() {
 			public void onClick(View v) {
 			// TODO Auto-generated method stub
+				/* hui.xu remove  
     			if(bMediaInfo == null)
-					return;
+					return;*/
 					String temp_scale=SystemProperties.get("rw.fb.need2xscale");
 	  			if(temp_scale.equals("ok"))
 	  			{
@@ -2966,7 +2967,7 @@ public class playermenu extends Activity {
 						play.setImageResource(R.drawable.play);
 						break;
 					case VideoInfo.PLAYER_EXIT:						
-						if(PRE_NEXT_FLAG == 1 || (!backToFileList) ) {
+						if(PRE_NEXT_FLAG == 1 && !backToFileList) {
     						Log.d(TAG,"to play another file!");
 							//new PlayThread().start();
 							if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE)) {
