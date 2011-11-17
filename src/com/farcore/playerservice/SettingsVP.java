@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.os.SystemProperties;
 
 public class SettingsVP {
 
@@ -294,4 +295,41 @@ public class SettingsVP {
 			return false;
 		}
 	}
+
+	public static boolean chkEnableOSD2XScale() {
+		boolean enable = false;
+		String temp_scale=SystemProperties.get("rw.fb.need2xscale");
+		if(temp_scale.equals("ok")) {
+			/*
+			String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
+			if(tmp_output.equals("1080p"))
+				enable = true;
+			*/
+			String dispMode = null;
+			File file = new File(displaymode_path);
+			if (!file.exists()) {        	
+	        	return false;
+	        }
+			try
+			{
+				BufferedReader in = new BufferedReader(new FileReader(displaymode_path), 32);
+				try
+				{
+					dispMode = in.readLine();
+					if(dispMode == null)
+						enable = false;
+					else if (dispMode.equals("1080p") || dispMode.equals("lvds1080p"))
+						enable = true;
+				}finally {
+	    			in.close();
+	    		} 
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e(TAG, "IOException when read "+displaymode_path);
+			} 
+		}
+		return enable;
+	}
+
 }

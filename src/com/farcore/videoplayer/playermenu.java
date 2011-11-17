@@ -1527,18 +1527,13 @@ public class playermenu extends Activity {
 					return (true);
 
                 // close infobar  
-          String temp_scale=SystemProperties.get("rw.fb.need2xscale");
-	  			if(temp_scale.equals("ok"))
-	  			{
-	  				String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
-						if(tmp_output.equals("1080p")){
-							if(infobar != null) {
-								infobar.setVisibility(View.GONE);
-				    		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-				    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-							}
-						}
+				if(SettingsVP.chkEnableOSD2XScale() == true) {
+					if(infobar != null) {
+						infobar.setVisibility(View.GONE);
+		    		    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+		    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
 					}
+				}
 	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
     			Intent selectFileIntent = new Intent();
 				Bundle bundle = new Bundle();
@@ -1911,18 +1906,14 @@ public class playermenu extends Activity {
     		public void uncaughtException(Thread thread, Throwable ex) {    
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
-				String temp_scale=SystemProperties.get("rw.fb.need2xscale");
-	  			if(temp_scale.equals("ok"))
-	  			{
-	  				String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
-					if(tmp_output.equals("1080p")){
-						if(infobar != null) {
-							infobar.setVisibility(View.GONE);
-							getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-									WindowManager.LayoutParams.FLAG_FULLSCREEN);
-						}
+				if(SettingsVP.chkEnableOSD2XScale() == true) {
+					if(infobar != null) {
+						infobar.setVisibility(View.GONE);
+						getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+								WindowManager.LayoutParams.FLAG_FULLSCREEN);
 					}
-	  			}
+				}
+
 				//close sub;
 				if(subTitleView!=null){
 					subTitleView.closeSubtitle();	
@@ -2053,7 +2044,7 @@ public class playermenu extends Activity {
         	else
         		Amplayer_play();
 		}
-    if(temp.equals("ok"))
+        if(temp.equals("ok"))
 		{
 		   set2XScale();
 			
@@ -2224,18 +2215,14 @@ public class playermenu extends Activity {
 				/* hui.xu remove  
     			if(bMediaInfo == null)
 					return;*/
-					String temp_scale=SystemProperties.get("rw.fb.need2xscale");
-	  			if(temp_scale.equals("ok"))
-	  			{
-	  				String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
-						if(tmp_output.equals("1080p")){
-							if(infobar != null) {
-								infobar.setVisibility(View.GONE);
-				    		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-				    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-							}
-						}
+				if(SettingsVP.chkEnableOSD2XScale() == true) {
+					if(infobar != null) {
+						infobar.setVisibility(View.GONE);
+		    			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+		    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
 					}
+				}
+
 	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
 				Intent selectFileIntent = new Intent();
 				Bundle bundle = new Bundle();
@@ -2623,8 +2610,7 @@ public class playermenu extends Activity {
     }
     
 	public int set2XScale() {
-		String tmp = SystemProperties.get("ubootenv.var.outputmode");
-		if(tmp.equals("1080p")==false)
+		if(SettingsVP.chkEnableOSD2XScale() == false)
 			return 0;
 //		ScreenOffForWhile(SET_OSD_ON);
 		Display display = getWindowManager().getDefaultDisplay();
@@ -2677,8 +2663,7 @@ public class playermenu extends Activity {
     
     
     public int disable2XScale() {
-		String tmp = SystemProperties.get("ubootenv.var.outputmode");
-		if(tmp.equals("1080p")==false)
+		if(SettingsVP.chkEnableOSD2XScale() == false)
 			return 0;
 	//	ScreenOffForWhile(SET_OSD_OFF);
 		Log.d(TAG, "disable2XScale");
@@ -2905,6 +2890,7 @@ public class playermenu extends Activity {
 
 	@Override
     public void onPause() {
+		Log.d(TAG,"onPause");
         super.onPause();
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         m_storagemgr.unregisterListener(mListener);
@@ -2930,10 +2916,7 @@ public class playermenu extends Activity {
         String temp=SystemProperties.get("rw.fb.need2xscale");
 	  	if(temp.equals("ok"))
 	  	{
-	  		while(!infobar.isShown()){
-	  	    	disable2XScale();
-	  	    	break;
-	  		}
+			disable2XScale();
         }
         ScreenMode.setScreenMode("0");
     }

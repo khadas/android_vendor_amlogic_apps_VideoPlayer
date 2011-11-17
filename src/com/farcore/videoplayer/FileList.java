@@ -30,6 +30,7 @@ import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.SystemProperties;
+import com.farcore.playerservice.SettingsVP;
 
 public class FileList extends ListActivity {
 	private List<File> listFiles =null;
@@ -374,14 +375,10 @@ public class FileList extends ListActivity {
 	    bundle.putBoolean("backToOtherAPK", false);
 		intent.setClass(FileList.this, playermenu.class);
 		intent.putExtras(bundle);
-		
-		String temp_scale=SystemProperties.get("rw.fb.need2xscale");
-	  if(temp_scale.equals("ok")){
-	  	String tmp_output = SystemProperties.get("ubootenv.var.outputmode");
-			if(tmp_output.equals("1080p")){
-  	  	this.setVisible(false);
-  	  }
-  	}
+
+		if(SettingsVP.chkEnableOSD2XScale() == true)
+  	  		this.setVisible(false);
+
 		startActivity(intent);
 		FileList.this.finish();
 	}
