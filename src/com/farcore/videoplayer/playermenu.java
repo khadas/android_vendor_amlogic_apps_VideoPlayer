@@ -127,7 +127,10 @@ public class playermenu extends Activity {
 	private static int PRE_NEXT_FLAG = 0;
 	private int resumeSecond = 8;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
-	
+
+	//if already set 2xscale
+	private boolean bSet2XScale = false;
+
 	private boolean intouch_flag = false;
 	private int item_position_selected, item_position_first, fromtop_piexl, item_position_selected_init;
 	private boolean item_init_flag = true;
@@ -1946,7 +1949,6 @@ public class playermenu extends Activity {
         
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-		String temp=SystemProperties.get("rw.fb.need2xscale");
 
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
@@ -2044,11 +2046,9 @@ public class playermenu extends Activity {
         	else
         		Amplayer_play();
 		}
-        if(temp.equals("ok"))
-		{
-		   set2XScale();
-			
-		}        
+		
+		set2XScale();
+
         if(infobar != null) {
             infobar.setVisibility(View.VISIBLE);
             ImageButton browser = (ImageButton) findViewById(R.id.BrowserBtn);
@@ -2608,7 +2608,7 @@ public class playermenu extends Activity {
 			return 0;
 		}
     }
-    
+
 	public int set2XScale() {
 		if(SettingsVP.chkEnableOSD2XScale() == false)
 			return 0;
@@ -2616,6 +2616,7 @@ public class playermenu extends Activity {
 		Display display = getWindowManager().getDefaultDisplay();
 		String outputpara = "0 0 "+ (display.getWidth()/2-1)+" "+(display.getHeight()-1);
 		Log.d(TAG, "set2XScale");
+		bSet2XScale = true;
     	File OutputFile = new File(ScaleaxisFile);
 		if(!OutputFile.exists()) {        	
         	return 0;
@@ -2657,14 +2658,14 @@ public class playermenu extends Activity {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+OutputFile);
 		}
-//		SystemProperties.set("rw.fb.need2xscale", "ok");
 		return 1;
     }
     
     
     public int disable2XScale() {
-		if(SettingsVP.chkEnableOSD2XScale() == false)
+		if(bSet2XScale == false)
 			return 0;
+		bSet2XScale = false;
 	//	ScreenOffForWhile(SET_OSD_OFF);
 		Log.d(TAG, "disable2XScale");
 
@@ -2688,7 +2689,6 @@ public class playermenu extends Activity {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+OutputFile);
 		}
-//		SystemProperties.set("rw.fb.need2xscale", "");
 		return 1;
     }
     
@@ -2913,11 +2913,7 @@ public class playermenu extends Activity {
             finish();
         }
         
-        String temp=SystemProperties.get("rw.fb.need2xscale");
-	  	if(temp.equals("ok"))
-	  	{
-			disable2XScale();
-        }
+		disable2XScale();
         ScreenMode.setScreenMode("0");
     }
 
