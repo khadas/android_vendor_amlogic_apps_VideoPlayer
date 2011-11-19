@@ -40,6 +40,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import android.graphics.Canvas;
+import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -410,7 +412,47 @@ public class playermenu extends Activity {
 			}
 		}
     }
-	
+
+	SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
+		public void surfaceChanged(SurfaceHolder holder, int format,
+									int w, int h) {
+			Log.d(TAG, "surfaceChanged");
+			initSurface(holder);
+		}
+		public void surfaceCreated(SurfaceHolder holder) {
+			Log.d(TAG, "surfaceCreated");
+			initSurface(holder);
+		}
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			Log.d(TAG, "surfaceDestroyed");
+		}
+		private void initSurface(SurfaceHolder h) {
+			Canvas c = null;
+			try {
+				Log.d(TAG, "initSurface");
+				c = h.lockCanvas();
+			} finally {
+				if (c != null)
+					h.unlockCanvasAndPost(c);
+			}
+		}
+	};
+
+	private void initVideoView(int resourceId) {
+		if (fb32) {
+			Log.d(TAG, "initVideoView");
+			VideoView v = (VideoView)findViewById(resourceId);
+			if (v != null) {
+			Log.d(TAG, "initVideoView 2");
+				v.getHolder().addCallback(mSHCallback);
+				v.getHolder().setFormat(PixelFormat.VIDEO_HOLE);
+			}
+		}
+		else
+			Log.d(TAG, "!initVideoView");
+	}
+
+
     private void videobar() {
 		if(fb32) {
 			setContentView(R.layout.layout_morebar32);
@@ -418,6 +460,7 @@ public class playermenu extends Activity {
 		else {
 			setContentView(R.layout.layout_morebar);
 		}
+		initVideoView(R.id.video_view);
 		FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
 		if(AmPlayer.getProductType() == 1){
 			if (SettingsVP.display_mode.equals("480p")) {
@@ -2093,7 +2136,8 @@ public class playermenu extends Activity {
     }
     
     protected void initinfobar() {
-	    LinearLayout.LayoutParams linearParams = null;
+		initVideoView(R.id.VideoView);
+		LinearLayout.LayoutParams linearParams = null;
     	//set subtitle
     	subTitleView = (SubtitleView) findViewById(R.id.subTitle);
     	subTitleView.setGravity(Gravity.CENTER);
