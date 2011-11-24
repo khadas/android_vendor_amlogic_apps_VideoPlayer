@@ -1883,6 +1883,25 @@ public class playermenu extends Activity {
 				ff_fb.show();
             }
         } 
+    	else if (keyCode == KeyEvent.KEYCODE_MUTE) {
+    		if(null != morbar){
+				if(morbar.getVisibility() != View.VISIBLE){
+		    		if(!(otherbar.getVisibility() == View.VISIBLE) 
+	    					&& !(infodialog.getVisibility() == View.VISIBLE)
+	    					&& !(subbar.getVisibility() == View.VISIBLE)) {
+				    	showVideoBar();
+				    	waitForHideVideoBar();
+				    	morbar.requestFocus();
+		    		}
+		    	}
+			}else{
+				if(infobar.getVisibility() != View.VISIBLE){
+			    	show_menu();
+			    	waitForHide();
+				    play.requestFocus();
+		    	}
+			}
+    	}
         /*
     	else if (keyCode == KeyEvent.KEYCODE_7) {
     		videobar();
