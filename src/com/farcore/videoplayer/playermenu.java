@@ -413,6 +413,9 @@ public class playermenu extends Activity {
 				if(!SettingsVP.display_mode.equals("480p"))
 					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
+			else{
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			}
 		}
     }
 
@@ -1323,6 +1326,9 @@ public class playermenu extends Activity {
 					if(!SettingsVP.display_mode.equals("480p"))
 						getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				}
+				else{
+					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				}
                 if (fb32) {
                     setContentView(R.layout.infobar32);
                 } else {
@@ -1579,11 +1585,11 @@ public class playermenu extends Activity {
 		else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
 			if (morbar!=null)  {
 	    		if (morbar.getVisibility() == View.VISIBLE){
-	    			morbar.setVisibility(View.GONE);
+	    			hideVideoBar();
 	    		}
 		    	else {
 					morbar.requestFocus();
-					morbar.setVisibility(View.VISIBLE);
+					showVideoBar();
 					waitForHideVideoBar();
 		    	}
 			}
@@ -2783,6 +2789,9 @@ public class playermenu extends Activity {
     	if(AmPlayer.getProductType() == 1){
 	    	if(!SettingsVP.display_mode.equals("480p"))
 	    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	}
+    	else{
+    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	}
     }
     
