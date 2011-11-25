@@ -83,8 +83,17 @@ public class FileList extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if( !(new File(PlayList.getinstance().rootPath).exists()))
-		{
+		File file = new File(PlayList.getinstance().rootPath);
+        if((file != null) && file.exists()) {
+			File[] the_Files;
+			the_Files = file.listFiles(new MyFilter(extensions));
+			if(the_Files == null) {
+				PlayList.getinstance().rootPath =root_path;
+			}
+			BrowserFile(PlayList.getinstance().rootPath);
+
+		}
+		else {
 			PlayList.getinstance().rootPath =root_path;
 			BrowserFile(PlayList.getinstance().rootPath);
 		}
