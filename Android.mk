@@ -25,8 +25,8 @@ LOCAL_STATIC_JAVA_LIBRARIES := amlogic.subtitle
 
 LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
 
-#LOCAL_PROGUARD_ENABLED := disabled
-LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
+LOCAL_PROGUARD_ENABLED := disabled
+#LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
 include $(BUILD_PACKAGE)
 ##################################################
