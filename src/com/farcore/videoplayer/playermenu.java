@@ -60,6 +60,8 @@ public class playermenu extends Activity {
 	private static final int SET_OSD_ON= 1;
 	private static final int SET_OSD_OFF= 2;
 
+	private boolean mHdmiPlugged;
+
   /** Called when the activity is first created. */
 	private int totaltime = 0;
 	private int curtime = 0;
@@ -209,8 +211,8 @@ public class playermenu extends Activity {
 		R.string.setting_3d_grating_close,
 	};
 	
-	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
-		"com.amlogic.HdmiSwitch.HDMISWITCH_MODE_CHANGED";
+//	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
+//		"com.amlogic.HdmiSwitch.HDMISWITCH_MODE_CHANGED";
 	
 	private boolean mSuspendFlag = false;
 	PowerManager.WakeLock mScreenLock = null;
@@ -2044,20 +2046,29 @@ public class playermenu extends Activity {
 		subinit();
 		displayinit();
 		initinfobar();
-		IntentFilter intentFilter = new IntentFilter(ACTION_HDMISWITCH_MODE_CHANGED);
+		IntentFilter intentFilter = new IntentFilter(WindowManagerPolicy.ACTION_HDMI_PLUGGED);
 		mReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				if(ACTION_HDMISWITCH_MODE_CHANGED.equals(intent.getAction())) {			 
-					Intent selectFileIntent = new Intent();
-					selectFileIntent.setClass(playermenu.this, FileList.class);	
-					backToFileList = true;
-					startActivity(selectFileIntent);
-					playermenu.this.finish();
-				}
-			}
+	        @Override
+	        public void onReceive(Context context, Intent intent) {
+	        	boolean plugged
+	                = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
+	                
+	        	if (mHdmiPlugged != plugged) {
+	                mHdmiPlugged = plugged;
+	                Intent selectFileIntent = new Intent();
+	                selectFileIntent.setClass(playermenu.this, FileList.class);	
+	                backToFileList = true;
+	                startActivity(selectFileIntent);
+	                playermenu.this.finish();
+	        	}
+	            
+	        }
 		};
-		registerReceiver(mReceiver, intentFilter);
+		Intent intent = registerReceiver(mReceiver, intentFilter);
+		if (intent != null) {
+	        // Retrieve current sticky dock event broadcast.
+	        mHdmiPlugged = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false);
+		} 		
 		
 		mWindowManager = getWindowManager();
         setAngleTable();
