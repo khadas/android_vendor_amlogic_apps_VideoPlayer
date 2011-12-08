@@ -2650,8 +2650,8 @@ public class playermenu extends Activity {
 			return 0;
 //		ScreenOffForWhile(SET_OSD_ON);
 		Display display = getWindowManager().getDefaultDisplay();
-		String outputpara = "0 0 "+ (display.getWidth()/2-1)+" "+(display.getHeight()-1);
-		Log.d(TAG, "set2XScale");
+		String outputpara = "0 0 "+ (display.getRawWidth()/2-1)+" "+(display.getRawHeight()-1);
+		Log.d(TAG, "set2XScale"+outputpara);
 		bSet2XScale = true;
     	File OutputFile = new File(ScaleaxisFile);
 		if(!OutputFile.exists()) {        	
