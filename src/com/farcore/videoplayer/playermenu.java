@@ -425,7 +425,7 @@ public class playermenu extends Activity {
 		public void surfaceChanged(SurfaceHolder holder, int format,
 									int w, int h) {
 			Log.d(TAG, "surfaceChanged");
-			initSurface(holder);
+			//initSurface(holder);
 		}
 		public void surfaceCreated(SurfaceHolder holder) {
 			Log.d(TAG, "surfaceCreated");
