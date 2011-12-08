@@ -1928,6 +1928,8 @@ public class playermenu extends Activity {
 
         if(fb32) {
             setTheme(R.style.theme_trans);
+        } else {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
         super.onCreate(savedInstanceState);
@@ -1974,7 +1976,6 @@ public class playermenu extends Activity {
     		}
     	});
         
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 
         if(AmPlayer.getProductType() == 1)
@@ -1985,6 +1986,7 @@ public class playermenu extends Activity {
         
         if(fb32) {
             setContentView(R.layout.infobar32);
+            setTitle(null);
         } 
         else {
             setContentView(R.layout.infobar);
