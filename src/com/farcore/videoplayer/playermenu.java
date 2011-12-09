@@ -47,6 +47,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.storage.StorageVolume;
+import android.net.Uri;
 
 import java.io.FileOutputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -3673,13 +3674,12 @@ public class playermenu extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            StorageVolume storage = (StorageVolume)intent.getParcelableExtra(
-                   StorageVolume.EXTRA_STORAGE_VOLUME);                        
+            Uri uri = intent.getData();
+            String path = uri.getPath();                   
             
-            if (action == null || storage == null)
+            if (action == null || path == null)
             	return;
             
-            String path = storage.getPath();
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
 				if(PlayList.getinstance().rootPath!=null) {
 					if(PlayList.getinstance().rootPath.startsWith(path)) {
