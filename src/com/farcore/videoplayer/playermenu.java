@@ -46,6 +46,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.storage.StorageVolume;
 
 import java.io.FileOutputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -2933,8 +2934,10 @@ public class playermenu extends Activity {
     public void onPause() {
 		Log.d(TAG,"onPause");
         super.onPause();
-        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-        m_storagemgr.unregisterListener(mListener);
+//        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+//        m_storagemgr.unregisterListener(mListener);
+        unregisterReceiver(mMountReceiver);
+        
         if(mSuspendFlag){
             if(player_status == VideoInfo.PLAYER_RUNNING) {
                 try{
@@ -3630,17 +3633,53 @@ public class playermenu extends Activity {
 		
 	}
 	
-	private final StorageEventListener mListener = new StorageEventListener() {
-		public void onUsbMassStorageConnectionChanged(boolean connected) {
-			//this is the action when connect to pc
-			return ;
-		}
-		
-		public void onStorageStateChanged(String path, String oldState, String newState) {
-			if(newState == null || path == null) 
-				return;
-			
-			if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0) {
+//	private final StorageEventListener mListener = new StorageEventListener() {
+//		public void onUsbMassStorageConnectionChanged(boolean connected) {
+//			//this is the action when connect to pc
+//			return ;
+//		}
+//		
+//		public void onStorageStateChanged(String path, String oldState, String newState) {
+//			if(newState == null || path == null) 
+//				return;
+//			
+//			if(newState.compareTo("unmounted") == 0||newState.compareTo("removed") == 0) {
+//				if(PlayList.getinstance().rootPath!=null) {
+//					if(PlayList.getinstance().rootPath.startsWith(path)) {
+//						Intent selectFileIntent = new Intent();
+//						selectFileIntent.setClass(playermenu.this, FileList.class);
+//						//close sub;
+//						if(subTitleView!=null)
+//							subTitleView.closeSubtitle();		
+//						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+//							subTitleView_sm.closeSubtitle();
+//						}
+//							
+//						//stop play
+//						backToFileList = true;
+//						if(m_Amplayer != null)
+//							Amplayer_stop();
+//						PlayList.getinstance().rootPath=null;
+//						startActivity(selectFileIntent);
+//						playermenu.this.finish();
+//					}
+//				}
+//			}
+//		}
+//	};
+	
+    private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            StorageVolume storage = (StorageVolume)intent.getParcelableExtra(
+                   StorageVolume.EXTRA_STORAGE_VOLUME);                        
+            
+            if (action == null || storage == null)
+            	return;
+            
+            String path = storage.getPath();
+            if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
 				if(PlayList.getinstance().rootPath!=null) {
 					if(PlayList.getinstance().rootPath.startsWith(path)) {
 						Intent selectFileIntent = new Intent();
@@ -3660,10 +3699,15 @@ public class playermenu extends Activity {
 						startActivity(selectFileIntent);
 						playermenu.this.finish();
 					}
-				}
-			}
-		}
-	};
+				}				
+            } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
+                // Nothing				
+            } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+                // SD card unavailable
+                // handled in ACTION_MEDIA_EJECT
+            } 
+        }
+    };	
 	
 	@Override
 	public void onResume() {
@@ -3673,8 +3717,17 @@ public class playermenu extends Activity {
 		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
 		if((getRotation >= 0) && (getRotation <= 3))
 		    SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
-        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-        m_storagemgr.registerListener(mListener);
+//        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+//        m_storagemgr.registerListener(mListener);
+
+        // install an intent filter to receive SD card related events.
+        IntentFilter intentFilter =
+                new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
+        intentFilter.addAction(Intent.ACTION_MEDIA_EJECT);
+        intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+        intentFilter.addDataScheme("file");
+        registerReceiver(mMountReceiver, intentFilter);
+        
     }
 	
 	@Override
