@@ -3033,7 +3033,8 @@ public class playermenu extends Activity {
 					case VideoInfo.PLAYER_SEARCHING:	
 						play.setImageResource(R.drawable.play);
 						break;
-					case VideoInfo.PLAYER_EXIT:						
+					case VideoInfo.PLAYER_EXIT:	
+						audio_flag = 0;
 						if(PRE_NEXT_FLAG == 1 && !backToFileList) {
     						Log.d(TAG,"to play another file!");
 							//new PlayThread().start();
