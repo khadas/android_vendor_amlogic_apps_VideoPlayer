@@ -2013,6 +2013,7 @@ public class playermenu extends Activity {
         		List<String> paths = new ArrayList<String>();
                 paths.add(it.getData().getPath());
                 PlayList.getinstance().setlist(paths, 0);
+                PlayList.getinstance().rootPath = new File(it.getData().getPath()).getParent();
         	}
         	else {
                 Cursor cursor = managedQuery(it.getData(), null, null, null, null);
