@@ -2013,7 +2013,7 @@ public class playermenu extends Activity {
         		List<String> paths = new ArrayList<String>();
                 paths.add(it.getData().getPath());
                 PlayList.getinstance().setlist(paths, 0);
-                PlayList.getinstance().rootPath = new File(it.getData().getPath()).getParent();
+                PlayList.getinstance().rootPath = null;
         	}
         	else {
                 Cursor cursor = managedQuery(it.getData(), null, null, null, null);
@@ -3682,8 +3682,8 @@ public class playermenu extends Activity {
             	return;
             
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
-				if(PlayList.getinstance().rootPath!=null) {
-					if(PlayList.getinstance().rootPath.startsWith(path)) {
+				if(PlayList.getinstance().getcur()!=null) {
+					if(PlayList.getinstance().getcur().startsWith(path)) {
 						Intent selectFileIntent = new Intent();
 						selectFileIntent.setClass(playermenu.this, FileList.class);
 						//close sub;
