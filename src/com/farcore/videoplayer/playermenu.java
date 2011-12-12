@@ -804,6 +804,9 @@ public class playermenu extends Activity {
     	ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
     	audiotrack.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
+				if (player_status < VideoInfo.PLAYER_INITOK) {
+    				return;
+				}
     			if(audio_flag == Errorno.PLAYER_NO_AUDIO) {
     				Toast toast =Toast.makeText(playermenu.this, R.string.file_have_no_audio,Toast.LENGTH_SHORT );
     				toast.setGravity(Gravity.BOTTOM,110,0);
