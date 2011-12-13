@@ -83,7 +83,10 @@ public class FileList extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
-		File file = new File(PlayList.getinstance().rootPath);
+        File file = null;
+        if (PlayList.getinstance().rootPath != null)
+			file = new File(PlayList.getinstance().rootPath);
+			
         if((file != null) && file.exists()) {
 			File[] the_Files;
 			the_Files = file.listFiles(new MyFilter(extensions));
@@ -121,12 +124,14 @@ public class FileList extends ListActivity {
 	    try{
 	        Bundle bundle = new Bundle();
 	        bundle = this.getIntent().getExtras();
-	        item_position_selected = bundle.getInt("item_position_selected");
-	        item_position_first = bundle.getInt("item_position_first");
-	        fromtop_piexl = bundle.getInt("fromtop_piexl");
-	        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
-	        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
-	        pathLevel = fileDirectory_position_selected.size();
+	        if (bundle != null) {
+		        item_position_selected = bundle.getInt("item_position_selected");
+		        item_position_first = bundle.getInt("item_position_first");
+		        fromtop_piexl = bundle.getInt("fromtop_piexl");
+		        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
+		        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");	    	
+	        	pathLevel = fileDirectory_position_selected.size();
+	        }
 	    }
 	    catch (Exception e) {
 	    	e.printStackTrace();

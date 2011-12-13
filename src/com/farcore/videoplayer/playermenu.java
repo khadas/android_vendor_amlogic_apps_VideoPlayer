@@ -1972,7 +1972,8 @@ public class playermenu extends Activity {
 				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
-				startActivity(selectFileIntent);
+				if(!backToOtherAPK)
+					startActivity(selectFileIntent);
 				finish();
     		  	onPause(); //for disable 2Xscale
     			Log.d(TAG,"----------------uncaughtException--------------------");
@@ -2017,6 +2018,7 @@ public class playermenu extends Activity {
                 paths.add(it.getData().getPath());
                 PlayList.getinstance().setlist(paths, 0);
                 PlayList.getinstance().rootPath = null;
+                backToOtherAPK = true;
         	}
         	else {
                 Cursor cursor = managedQuery(it.getData(), null, null, null, null);
@@ -2066,7 +2068,8 @@ public class playermenu extends Activity {
 	                Intent selectFileIntent = new Intent();
 	                selectFileIntent.setClass(playermenu.this, FileList.class);	
 	                backToFileList = true;
-	                startActivity(selectFileIntent);
+	                if(!backToOtherAPK)
+	                	startActivity(selectFileIntent);
 	                playermenu.this.finish();
 	        	}
 	            
@@ -2101,15 +2104,18 @@ public class playermenu extends Activity {
         try{
 	        Bundle bundle = new Bundle();
 	        bundle = this.getIntent().getExtras();
-	        item_position_selected = bundle.getInt("item_position_selected");
-	        item_position_first = bundle.getInt("item_position_first");
-	        fromtop_piexl = bundle.getInt("fromtop_piexl");
-	        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
-	        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
-	        backToOtherAPK = bundle.getBoolean("backToOtherAPK");
-	        if(item_init_flag){
-	        	item_position_selected_init = item_position_selected - PlayList.getinstance().getindex();
-	        	item_init_flag = false;
+	        
+	        if (bundle != null) {
+		        item_position_selected = bundle.getInt("item_position_selected");
+		        item_position_first = bundle.getInt("item_position_first");
+		        fromtop_piexl = bundle.getInt("fromtop_piexl");
+		        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
+		        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");
+		        backToOtherAPK = bundle.getBoolean("backToOtherAPK", true);			
+		        if(item_init_flag){
+		        	item_position_selected_init = item_position_selected - PlayList.getinstance().getindex();
+		        	item_init_flag = false;
+		        }
 	        }
         }
         catch (Exception e) {
@@ -2290,7 +2296,8 @@ public class playermenu extends Activity {
 				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
-				startActivity(selectFileIntent);
+				if(!backToOtherAPK)
+					startActivity(selectFileIntent);
 				playermenu.this.finish();
 			}
 		});
@@ -3250,7 +3257,8 @@ public class playermenu extends Activity {
 									backToFileList = true;
 									if(m_Amplayer != null)
 									    Amplayer_stop();
-									startActivity(selectFileIntent);
+									if(!backToOtherAPK)
+										startActivity(selectFileIntent);
 									playermenu.this.finish();
 								}
 							}).show();
@@ -3294,7 +3302,8 @@ public class playermenu extends Activity {
                                     backToFileList = true;
                                     if(m_Amplayer != null)
                                         Amplayer_stop();
-                                    startActivity(selectFileIntent);
+                                    if(!backToOtherAPK)
+                                    	startActivity(selectFileIntent);
                                     playermenu.this.finish();
                                 }
                             }).show();
@@ -3348,7 +3357,8 @@ public class playermenu extends Activity {
                                     backToFileList = true;
                                     if(m_Amplayer != null)
                                         Amplayer_stop();
-                                    startActivity(selectFileIntent);
+                                   	if(!backToOtherAPK)
+                                    	startActivity(selectFileIntent);
                                     playermenu.this.finish();
                                 }
                             }).show();
@@ -3701,7 +3711,8 @@ public class playermenu extends Activity {
 						if(m_Amplayer != null)
 							Amplayer_stop();
 						PlayList.getinstance().rootPath=null;
-						startActivity(selectFileIntent);
+						if(!backToOtherAPK)
+							startActivity(selectFileIntent);
 						playermenu.this.finish();
 					}
 				}				
