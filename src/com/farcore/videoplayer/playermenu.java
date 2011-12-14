@@ -1972,6 +1972,7 @@ public class playermenu extends Activity {
 				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
+				PlayList.getinstance().rootPath =null;
 				if(!backToOtherAPK)
 					startActivity(selectFileIntent);
 				finish();
@@ -2068,6 +2069,7 @@ public class playermenu extends Activity {
 	                Intent selectFileIntent = new Intent();
 	                selectFileIntent.setClass(playermenu.this, FileList.class);	
 	                backToFileList = true;
+	                PlayList.getinstance().rootPath=null;
 	                if(!backToOtherAPK)
 	                	startActivity(selectFileIntent);
 	                playermenu.this.finish();
@@ -3257,6 +3259,7 @@ public class playermenu extends Activity {
 									backToFileList = true;
 									if(m_Amplayer != null)
 									    Amplayer_stop();
+									PlayList.getinstance().rootPath =null;
 									if(!backToOtherAPK)
 										startActivity(selectFileIntent);
 									playermenu.this.finish();
@@ -3302,6 +3305,7 @@ public class playermenu extends Activity {
                                     backToFileList = true;
                                     if(m_Amplayer != null)
                                         Amplayer_stop();
+                                    PlayList.getinstance().rootPath =null;
                                     if(!backToOtherAPK)
                                     	startActivity(selectFileIntent);
                                     playermenu.this.finish();
@@ -3357,6 +3361,7 @@ public class playermenu extends Activity {
                                     backToFileList = true;
                                     if(m_Amplayer != null)
                                         Amplayer_stop();
+                                   	PlayList.getinstance().rootPath =null;
                                    	if(!backToOtherAPK)
                                     	startActivity(selectFileIntent);
                                     playermenu.this.finish();
