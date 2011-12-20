@@ -100,7 +100,7 @@ public class playermenu extends Activity {
 	private static final int MID_FREESCALE = 0x10001;
     private boolean fb32 = false;
     
-    private boolean seek = false;
+    private int seek = 0;
     private int seek_cur_time = 0;
     //for repeat mode;
 	private boolean playmode_switch = true;
@@ -220,7 +220,10 @@ public class playermenu extends Activity {
 	PowerManager.WakeLock mScreenLock = null;
 	private Handler mDelayHandler;
 	private final static long ScrnOff_delay = 2*1000;
-
+    private final static int GETROTATION_TIMEOUT = 500;
+	private final static int GETROTATION = 0x0001;
+	private int mLastRotation;
+	
 	public void setAngleTable() {
 		String hwrotation = SystemProperties.get("ro.sf.hwrotation");
 		if(hwrotation == null) {
@@ -2085,7 +2088,7 @@ public class playermenu extends Activity {
 		
 		mWindowManager = getWindowManager();
         setAngleTable();
-        seek = false;
+        seek = 0;
         seek_cur_time = 0;
 		if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
 			resumePlay();
@@ -2558,14 +2561,17 @@ public class playermenu extends Activity {
 	
 					try {
 						if(m_Amplayer != null) {
-					        seek = true;
 					        seek_cur_time = curtime;
-					        //Log.d(TAG, "seek curtime: " + curtime);
+					        if(pos > curtime)
+					        	seek = 2;
+					        else
+					        	seek = 1;
+					        //Log.d(TAG, "seek curtime: " + seek_cur_time);
 							m_Amplayer.Seek(pos);
 						}
 					}
 					catch(RemoteException e) {
-				        seek = false;
+				        seek = 0;
 				        seek_cur_time = 0;
 						e.printStackTrace();
 					}
@@ -3024,13 +3030,19 @@ public class playermenu extends Activity {
     		    	if(totaltime == 0)
 						myProgressBar.setProgress(0);
 					else {
-						if(seek && (curtime <= (seek_cur_time+2))) {
+						if((seek == 1) && (curtime >= (seek_cur_time-2))) {
 							//Log.d(TAG, "count curtime: " + curtime);
+							//Log.d(TAG, "seek curtime: " + seek_cur_time);
+							return;
+						}
+						else if((seek == 2) && (curtime <= (seek_cur_time+2))) {
+							//Log.d(TAG, "count curtime: " + curtime);
+							//Log.d(TAG, "seek curtime: " + seek_cur_time);
 							return;
 						}
 						//Log.d(TAG, "curtime: " + curtime);
-	
-						seek = false;
+						
+						seek = 0;
 						seek_cur_time = 0;
 						//if(!progressSliding)
 						myProgressBar.setProgress(msg.arg1/1000*100/totaltime);
@@ -3406,7 +3418,7 @@ public class playermenu extends Activity {
         intent.setAction("com.android.music.musicservicecommand.pause");
         intent.putExtra("command", "stop");
         this.sendBroadcast(intent);
-        seek = false;
+        seek = 0;
         seek_cur_time = 0;
 		
 		ff_fb.cancel();
@@ -3473,6 +3485,7 @@ public class playermenu extends Activity {
 
 		m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);								
             // openFile(sub_para.sub_id);
+        mRotateHandler.sendEmptyMessageDelayed(GETROTATION, GETROTATION_TIMEOUT);    
 		}
 		catch(RemoteException e) {
 			e.printStackTrace();
@@ -3736,8 +3749,10 @@ public class playermenu extends Activity {
 		
 		int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
-		if((getRotation >= 0) && (getRotation <= 3))
+		if((getRotation >= 0) && (getRotation <= 3)) {
 		    SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+			mLastRotation = getRotation;
+		}
 //        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 //        m_storagemgr.registerListener(mListener);
 
@@ -3756,11 +3771,11 @@ public class playermenu extends Activity {
 		try {
 			super.onConfigurationChanged(config);
 			
-			int getRotation = mWindowManager.getDefaultDisplay().getRotation();
+			//int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 			//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
-			if((getRotation < 0) || (getRotation > 3))
-				return;
-			SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+			//if((getRotation < 0) || (getRotation > 3))
+			//	return;
+			//SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
 			
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 				//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -3773,6 +3788,24 @@ public class playermenu extends Activity {
 			
 		}
 	}
+
+Handler mRotateHandler = new Handler() {
+	public void handleMessage(Message msg) {	
+		switch (msg.what) {
+			case GETROTATION:
+				int getRotation = mWindowManager.getDefaultDisplay().getRotation();
+				Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
+				if((getRotation >= 0) && (getRotation <= 3) && (getRotation != mLastRotation)) {
+					SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+					mLastRotation = getRotation;
+				}
+				mRotateHandler.sendEmptyMessageDelayed(GETROTATION, GETROTATION_TIMEOUT);
+				break;
+		} 
+		super.handleMessage(msg); 
+	}
+};
+
 }
 
 class subview_set{
