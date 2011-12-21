@@ -2928,6 +2928,8 @@ public class playermenu extends Activity {
 			try {
 				if(SystemProperties.getBoolean("3D_setting.enable", false)){
 					m_Amplayer.Set3Dgrating(0);
+					m_Amplayer.Set3Dmode(0); //close 3D
+					
 				}
 				if(!fb32){
 					m_Amplayer.DisableColorKey();
