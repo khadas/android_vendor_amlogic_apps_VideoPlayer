@@ -1128,7 +1128,8 @@ public class playermenu extends Activity {
                 }
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if(SystemProperties.getBoolean("3D_setting.enable", false)){ 
+                        //if(SystemProperties.getBoolean("3D_setting.enable", false)){
+                        if(is3DVideoDisplayFlag){  
                         	if(is3DVideoDisplayFlag){//judge is 3D 
                         		view_mode = position;
     	                    	switch (position) { //view mode
