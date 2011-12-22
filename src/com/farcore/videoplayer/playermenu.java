@@ -417,8 +417,7 @@ public class playermenu extends Activity {
 		if(null != morbar){
 			morbar.setVisibility(View.VISIBLE);
 			if(AmPlayer.getProductType() == 1){
-				if(!SettingsVP.display_mode.equals("480p"))
-					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 			else{
 				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -476,11 +475,17 @@ public class playermenu extends Activity {
 		initVideoView(R.id.video_view);
 		FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
 		if(AmPlayer.getProductType() == 1){
-			if (SettingsVP.display_mode.equals("480p")) {
+			if (SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
 				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
 				frameParams.width = 720;
 				frameParams.height = 480;
-				frameParams.gravity = -1;
+				frameParams.gravity = Gravity.TOP;
+				baselayout2.setLayoutParams(frameParams);
+			} else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height > 720) {
+				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+				frameParams.width = 1280;
+				frameParams.height = 720;
+				frameParams.gravity = Gravity.TOP;
 				baselayout2.setLayoutParams(frameParams);
 			}
 		}
@@ -1334,8 +1339,7 @@ public class playermenu extends Activity {
 	        		morbar = null;
 				}
 				if(AmPlayer.getProductType() == 1){
-					if(!SettingsVP.display_mode.equals("480p"))
-						getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				}
 				else{
 					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -2052,12 +2056,12 @@ public class playermenu extends Activity {
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
         SettingsVP.enableVideoLayout();
-        if(AmPlayer.getProductType() == 1){
-	        if(SettingsVP.display_mode.equals("480p")) {
-	        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-	        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	        }
-        }
+//        if(AmPlayer.getProductType() == 1){
+//	        if(SettingsVP.display_mode.equals("480p")) {
+//	        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+//	        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//	        }
+//        }
 		subinit();
 		displayinit();
 		initinfobar();
@@ -2200,26 +2204,23 @@ public class playermenu extends Activity {
 	    	subTitleView_sm.setTextStyle(Typeface.BOLD);
 	}
     	if(AmPlayer.getProductType() == 1){
-	        if(SettingsVP.display_mode.equals("480p")) {
+	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
 	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
-	        	if(SettingsVP.panel_resolution.equals("800x600")) {
-	            	linearParams.width = 720;
-	            	linearParams.bottomMargin = 130;
-	        	}
-	        	else if(SettingsVP.panel_resolution.equals("800x480")) {
-	            	linearParams.width = 720;
-	            	linearParams.bottomMargin = 10;
-	        	}
-	        	else {
-	            	linearParams.width = 720;
-	            	linearParams.bottomMargin = 130;
-	        	}
-	        	linearParams.gravity = -1;
+            	linearParams.width = 720;
+            	linearParams.bottomMargin = SettingsVP.panel_height - 480 + 10;	        	
 	        	subTitleView.setLayoutParams(linearParams);
-			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
-				subTitleView_sm.setLayoutParams(linearParams);
-			}				
-	        }
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					subTitleView_sm.setLayoutParams(linearParams);
+				}				
+	        } else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height > 720) {
+	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
+            	linearParams.width = 1280;
+            	linearParams.bottomMargin = SettingsVP.panel_height - 720 + 10;	        	
+	        	subTitleView.setLayoutParams(linearParams);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					subTitleView_sm.setLayoutParams(linearParams);
+				}				
+	        } 
     	}
     	openFile(sub_para.sub_id);
 	
@@ -2231,25 +2232,19 @@ public class playermenu extends Activity {
         fastforword = (ImageButton)findViewById(R.id.FastForward);
         fastreverse = (ImageButton)findViewById(R.id.FastReverse);
         infobar = (LinearLayout)findViewById(R.id.infobarLayout);
-        if(AmPlayer.getProductType() == 1){
-	        if(SettingsVP.display_mode.equals("480p")) {
+    	if(AmPlayer.getProductType() == 1){
+	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
 	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
-	        	if(SettingsVP.panel_resolution.equals("800x600")) {
-	            	linearParams.width = 720;
-	            	linearParams.bottomMargin = 130;
-	        	}
-	        	else if(SettingsVP.panel_resolution.equals("800x480")) {
-	            	linearParams.width = 720;
-	            	linearParams.bottomMargin = 10;
-	        	}
-	        	else {
-	            	linearParams.width = 720;
-	            	linearParams.bottomMargin = 130;
-	        	}
-	        	linearParams.gravity = -1;
-	        	infobar.setLayoutParams(linearParams);
-	        }
-        }
+            	linearParams.width = 720;
+            	linearParams.bottomMargin = SettingsVP.panel_height - 480 + 10;	        	
+	        	subTitleView.setLayoutParams(linearParams);				
+	        } else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height > 720) {
+	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
+            	linearParams.width = 1280;
+            	linearParams.bottomMargin = SettingsVP.panel_height - 720 + 10;	        	
+	        	subTitleView.setLayoutParams(linearParams);			
+	        } 
+    	}        
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
     	total_time = (TextView)findViewById(R.id.TextView04);
@@ -2841,8 +2836,7 @@ public class playermenu extends Activity {
     protected void show_menu() {
     	infobar.setVisibility(View.VISIBLE);
     	if(AmPlayer.getProductType() == 1){
-	    	if(!SettingsVP.display_mode.equals("480p"))
-	    		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	    	getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	}
     	else{
     		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
