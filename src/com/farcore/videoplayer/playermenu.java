@@ -3506,6 +3506,7 @@ public class playermenu extends Activity {
 		AudioTrackOperation.AudioStreamFormat.clear();
 		AudioTrackOperation.AudioStreamInfo.clear();
 		INITOK = false;
+		mRotateHandler.removeMessages(GETROTATION);
     }
     
     ServiceConnection m_PlayerConn = new ServiceConnection() {

@@ -311,8 +311,7 @@
 
     <FrameLayout
 	    android:orientation="vertical" 
-	    android:layout_gravity="bottom" 
-	    android:layout_height="wrap_content" 
+	    android:layout_height="fill_parent" 
 	    android:layout_width="fill_parent">
 	    <com.subtitleview.SubtitleView
 	        android:id="@+id/subTitle_more_sm"
@@ -320,15 +319,16 @@
 	        android:layout_width="fill_parent"	       
 	        android:paddingBottom="8dip" 
 	        android:paddingLeft="6dip"  
+		android:layout_gravity="bottom" 
 	        android:visibility="invisible">
 	    </com.subtitleview.SubtitleView>	    
 	    <com.subtitleview.SubtitleView
 	        android:id="@+id/subTitle_more"
 	        android:layout_height="wrap_content"
 	        android:layout_width="fill_parent"
+		android:layout_gravity="bottom" 
 	        android:paddingBottom="10dip">
-	    </com.subtitleview.SubtitleView>
-    
+	    </com.subtitleview.SubtitleView>    
 	    
 	    <include layout="@layout/morebar" />
     </FrameLayout>

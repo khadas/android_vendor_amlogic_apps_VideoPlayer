@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="horizontal" 
 	android:id="@+id/morebarLayout" 
-	android:layout_gravity="center" 
+	android:layout_gravity="center|bottom" 
 	android:background="@drawable/movie_play_bk" 
 	android:layout_height="wrap_content" 
 	android:layout_width="fill_parent"
