@@ -478,13 +478,13 @@ public class playermenu extends Activity {
 			if (SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
 				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
 				frameParams.width = 720;
-				frameParams.height = 480;
+				frameParams.height = 480 - 50;
 				frameParams.gravity = Gravity.TOP;
 				baselayout2.setLayoutParams(frameParams);
 			} else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height > 720) {
 				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
 				frameParams.width = 1280;
-				frameParams.height = 720;
+				frameParams.height = 720 - 50;
 				frameParams.gravity = Gravity.TOP;
 				baselayout2.setLayoutParams(frameParams);
 			}
