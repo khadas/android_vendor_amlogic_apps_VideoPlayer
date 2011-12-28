@@ -31,6 +31,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.os.SystemProperties;
 import com.farcore.playerservice.SettingsVP;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class FileList extends ListActivity {
 	private List<File> listFiles =null;
@@ -50,6 +52,7 @@ public class FileList extends ListActivity {
 	private ArrayList<Integer> fileDirectory_position_selected = new ArrayList<Integer>();
 	private ArrayList<Integer> fileDirectory_position_piexl = new ArrayList<Integer>();
 	private int pathLevel = 0;
+	private final String iso_mount_dir = "/mnt/VIRTUAL_CDROM";
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)
@@ -201,6 +204,13 @@ public class FileList extends ListActivity {
 		listFiles = new ArrayList<File>();
 	    items=new ArrayList<String>();
 	    paths=new ArrayList<String>();
+		String[] files =file.list();      
+        for(i=0;i<files.length;i++){			
+            if(files[i].equals("VIRTUAL_CDROM")){                    
+                execCmd("vdc loop unmount");
+				break;
+            }
+		}
 	    searchFile(file);
 	    if(listFiles.isEmpty()) {
 	    	Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
@@ -264,7 +274,7 @@ public class FileList extends ListActivity {
     	//else if(path.startsWith("/mnt/sdcard"))
     		//text=path.replaceFirst("/mnt/sdcard","sdcard");
     	return text;
-    }
+    }	
     
 	public void searchFile(File file)
 	{
@@ -297,28 +307,73 @@ public class FileList extends ListActivity {
 	    	}
 	    }
 	}
-
+	
+	public boolean isISOFile(File file){		
+		String fname = file.getName();		
+		String sname = ".iso";		
+		
+		if (fname == "") {
+			Log.e(TAG, "NULL file");
+			return false;
+		}
+		if (fname.toLowerCase().endsWith(sname)) {
+			return true;
+		}		
+		return false;		
+	}	
+	
+	public void execCmd(String cmd){		
+		int ch;
+		Process p = null;
+		Log.d(TAG, "exec command: " + cmd);
+		try { 		
+			p = Runtime.getRuntime().exec(cmd); 
+			InputStream in = p.getInputStream();
+			InputStream err = p.getErrorStream(); 
+			StringBuffer sb = new StringBuffer(512);
+			while ((ch = in.read()) != -1) {
+				sb.append((char) ch);
+			}
+			if(sb.toString() != "")
+				Log.d(TAG, "exec out:"+sb.toString());	
+			while ((ch = err.read()) != -1) {
+				sb.append((char) ch);
+			}
+			if(sb.toString() != "")
+				Log.d(TAG, "exec error:"+sb.toString());				
+		} catch (IOException e) {				
+			Log.d(TAG, "IOException: " + e.toString());
+		}	
+	}
+	
 	@Override
-	protected void onListItemClick(ListView l,View v,int position,long id) {
-		File file = new File(paths.get(position));
+	protected void onListItemClick(ListView l,View v,int position,long id) {		
+		File file = new File(paths.get(position));		
 		currentlist.clear();
 		currentlist.addAll(paths);
 	    //currentlist =paths;
-	    if(file.isDirectory()) {
+	    
+	    if(file.isDirectory()) {				
 		    item_position_selected = getListView().getSelectedItemPosition();
 			item_position_first = getListView().getFirstVisiblePosition();
 			View cv = getListView().getChildAt(item_position_selected - item_position_first);
 		    if (cv != null) {
 		        fromtop_piexl = cv.getTop();
-		    }
+		    }	
 		    BrowserFile(paths.get(position));
 		    if(!listFiles.isEmpty()) {
 		    		fileDirectory_position_selected.add(item_position_selected);
 		    		fileDirectory_position_piexl.add(fromtop_piexl);
 		    		pathLevel++;
 	    	}
-	    }
-	    else 
+	    }else if(isISOFile(file)){	
+	    	execCmd("vdc loop unmount");
+	    	String fpath = file.getPath();
+	    	String cm = "vdc loop mount "+"\""+fpath+"\"";
+			Log.d(TAG, "file path:"+fpath);	 			
+			execCmd(cm);
+			BrowserFile(iso_mount_dir);
+	    }else 
 	    {
 		//stopMediaPlayer();
 	    	//file = new File(file.getParent());
