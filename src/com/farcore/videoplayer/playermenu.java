@@ -2934,6 +2934,10 @@ public class playermenu extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+        if(SystemProperties.getBoolean("vplayer.hideStatusBar.enable", false)) {
+            SystemProperties.set("vplayer.hideStatusBar.enable","off");
+        }
 			
         StopPlayerService();
         setDefCodecMips();
@@ -3234,6 +3238,15 @@ public class playermenu extends Activity {
 				        		Log.d(TAG, "setCodecMips Failed");
 
 						}
+                        if(SystemProperties.getBoolean("vplayer.hideStatusBar.enable",false) == false) {
+                            Log.d(TAG, "hideStatusBar is false");
+                            try {   
+                                SystemProperties.set("vplayer.hideStatusBar.enable","on");
+                                Log.d(TAG, "hideStatusBar is" + SystemProperties.getBoolean("vplayer.hideStatusBar.enable",false));
+                            } catch (RuntimeException e) {
+                                e.printStackTrace();
+                            }
+                        }
 						break;
 					case VideoInfo.PLAYER_SEARCHOK:
 						//progressSliding = false;
