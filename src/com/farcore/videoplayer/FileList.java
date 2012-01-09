@@ -204,12 +204,14 @@ public class FileList extends ListActivity {
 		listFiles = new ArrayList<File>();
 	    items=new ArrayList<String>();
 	    paths=new ArrayList<String>();
-		String[] files =file.list();      
-        for(i=0;i<files.length;i++){			
-            if(files[i].equals("VIRTUAL_CDROM")){                    
-                execCmd("vdc loop unmount");
-				break;
-            }
+		String[] files =file.list();  
+		if (files != null) {
+	        for(i=0;i<files.length;i++){			
+	            if(files[i].equals("VIRTUAL_CDROM")){                    
+	                execCmd("vdc loop unmount");
+					break;
+	            }
+			}
 		}
 	    searchFile(file);
 	    if(listFiles.isEmpty()) {
