@@ -1949,6 +1949,9 @@ public class playermenu extends Activity {
         //uncaughtException execute
     	Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
     		public void uncaughtException(Thread thread, Throwable ex) {    
+    			
+    			SystemProperties.set("vplayer.hideStatusBar.enable","false");
+    			  
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
 				if(SettingsVP.chkEnableOSD2XScale() == true) {
@@ -2935,9 +2938,7 @@ public class playermenu extends Activity {
 				e.printStackTrace();
 			}
 
-        if(SystemProperties.getBoolean("vplayer.hideStatusBar.enable", false)) {
-            SystemProperties.set("vplayer.hideStatusBar.enable","off");
-        }
+
 			
         StopPlayerService();
         setDefCodecMips();
@@ -2958,6 +2959,8 @@ public class playermenu extends Activity {
 //        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 //        m_storagemgr.unregisterListener(mListener);
         unregisterReceiver(mMountReceiver);
+
+        SystemProperties.set("vplayer.hideStatusBar.enable","false");      
         
         if(mSuspendFlag){
             if(player_status == VideoInfo.PLAYER_RUNNING) {
@@ -3241,7 +3244,7 @@ public class playermenu extends Activity {
                         if(SystemProperties.getBoolean("vplayer.hideStatusBar.enable",false) == false) {
                             Log.d(TAG, "hideStatusBar is false");
                             try {   
-                                SystemProperties.set("vplayer.hideStatusBar.enable","on");
+                                SystemProperties.set("vplayer.hideStatusBar.enable","true");
                                 Log.d(TAG, "hideStatusBar is" + SystemProperties.getBoolean("vplayer.hideStatusBar.enable",false));
                             } catch (RuntimeException e) {
                                 e.printStackTrace();
