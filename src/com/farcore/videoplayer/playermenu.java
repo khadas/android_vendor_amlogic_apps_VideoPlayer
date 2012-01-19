@@ -58,6 +58,8 @@ public class playermenu extends Activity {
 	private static String OutputFile = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq";
 	private static String ScaleaxisFile= "/sys/class/graphics/fb0/scale_axis";
 	private static String ScaleFile= "/sys/class/graphics/fb0/scale";
+	private static String RequestScaleFile= "/sys/class/graphics/fb0/request2XScale";
+
 
 	private static final int SET_OSD_ON= 1;
 	private static final int SET_OSD_OFF= 2;
@@ -2670,12 +2672,8 @@ public class playermenu extends Activity {
 	public int set2XScale() {
 		if(SettingsVP.chkEnableOSD2XScale() == false)
 			return 0;
-//		ScreenOffForWhile(SET_OSD_ON);
-		Display display = getWindowManager().getDefaultDisplay();
-		String outputpara = "0 0 "+ (display.getRawWidth()/2-1)+" "+(display.getRawHeight()-1);
-		Log.d(TAG, "set2XScale"+outputpara);
 		bSet2XScale = true;
-    	File OutputFile = new File(ScaleaxisFile);
+    	File OutputFile = new File(RequestScaleFile);
 		if(!OutputFile.exists()) {        	
         	return 0;
         }
@@ -2683,30 +2681,9 @@ public class playermenu extends Activity {
     	try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
     		try {
-				Log.d(TAG, outputpara );
+				Log.d(TAG, "request  2XScale" );
 
-    			out.write(outputpara);    
-    		} 
-			finally {
-				out.close();
-			}
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "IOException when write "+OutputFile);
-		}
-		
-		OutputFile = new File(ScaleFile);
-		if(!OutputFile.exists()) {        	
-        	return 0;
-        }
-
-    	try {
-			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
-    		try {
-				Log.d(TAG, "set2XScale 0x10000" );
-
-    			out.write("0x10000");    
+    			out.write(" 1 ");    
     		} 
 			finally {
 				out.close();
@@ -2725,9 +2702,9 @@ public class playermenu extends Activity {
 			return 0;
 		bSet2XScale = false;
 	//	ScreenOffForWhile(SET_OSD_OFF);
-		Log.d(TAG, "disable2XScale");
+		Log.d(TAG, "request disable2XScale");
 
-    	File OutputFile = new File(ScaleFile);
+    	File OutputFile = new File(RequestScaleFile);
 		if(!OutputFile.exists()) {        	
         	return 0;
         }
@@ -2735,9 +2712,9 @@ public class playermenu extends Activity {
     	try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
     		try {
-				Log.d(TAG, "set2XScale 0x0" );
+				Log.d(TAG, "request disable2XScale " );
 
-    			out.write(" 0x0 ");    
+    			out.write(" 2 ");    
     		} 
 			finally {
 				out.close();
