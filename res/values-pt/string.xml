@@ -31,8 +31,8 @@
     <string name="setting_3d_field_depth">Field Depth</string>
     <string name="setting_play_chapters">Play Chapters</string>
     <string name="setting_chapters">Chapters</string>
-    <string name="app_name">VideoPlayer</string>
-    <string name="main_activity">VideoPlayer</string>
+    <string name="app_name">MoviePlayer</string>
+    <string name="main_activity">MoviePlayer</string>
     <string name="str_ok">Ok</string>
     <string name="str_cancel">Cancelar</string>
     <string name="str_time_null">00:00:00</string>
