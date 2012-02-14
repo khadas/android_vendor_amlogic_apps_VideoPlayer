@@ -318,7 +318,7 @@ public class SettingsVP {
 					dispMode = in.readLine();
 					if(dispMode == null)
 						enable = false;
-					else if (dispMode.equals("1080p") || dispMode.equals("lvds1080p"))
+					else if (dispMode.equals("1080p") || dispMode.equals("lvds1080p") || dispMode.equals("lvds1080p50hz"))
 						enable = true;
 				}finally {
 	    			in.close();
