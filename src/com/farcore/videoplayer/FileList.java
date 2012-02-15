@@ -43,6 +43,7 @@ public class FileList extends ListActivity {
 	private String currenturl = null;
 	private String root_path = "/mnt";
 	private String extensions ;
+	private static String ISOpath = null;
 	
 	private TextView tileText;
 	private File file;
@@ -370,9 +371,9 @@ public class FileList extends ListActivity {
 	    	}
 	    }else if(isISOFile(file)){	
 	    	execCmd("vdc loop unmount");
-	    	String fpath = file.getPath();
-	    	String cm = "vdc loop mount "+"\""+fpath+"\"";
-			Log.d(TAG, "file path:"+fpath);	 			
+	    	ISOpath = file.getPath();
+	    	String cm = "vdc loop mount "+"\""+ISOpath+"\"";
+			Log.d(TAG, "ISO path:"+ISOpath);	 			
 			execCmd(cm);
 			BrowserFile(iso_mount_dir);
 	    }else 
@@ -416,6 +417,10 @@ public class FileList extends ListActivity {
             		PlayList.getinstance().rootPath =null;
             	}
             	file = new File(paths.get(0).toString());
+				if(file.getParent().compareTo(iso_mount_dir) == 0 && ISOpath != null) {					
+					file = new File(ISOpath);
+					ISOpath = null;
+				}
             	currenturl =file.getParentFile().getParent();
             	if(file.getParent().compareToIgnoreCase(root_path)!=0){
             		pathLevel--;
