@@ -137,6 +137,52 @@ public class playermenu extends Activity {
 	//if already set 2xscale
 	private boolean bSet2XScale = false;
 
+	// MBX freescale mode
+	private int m1080scale = 0;
+	private String outputmode = "720p";
+	private static String FreeScaleOsd0File= "/sys/class/graphics/fb0/free_scale";
+	private static String FreeScaleOsd1File= "/sys/class/graphics/fb1/free_scale";
+	private static String ScaleaxisOsd1File= "/sys/class/graphics/fb1/scale_axis";
+	private static String ScaleOsd1File= "/sys/class/graphics/fb1/scale";
+	private static String VideoAxisFile= "/sys/class/video/axis";
+	private static final String STR_OUTPUT_MODE = "ubootenv.var.outputmode";
+	private final static String sel_480ioutput_x = "ubootenv.var.480ioutputx";
+	private final static String sel_480ioutput_y = "ubootenv.var.480ioutputy";
+	private final static String sel_480ioutput_width = "ubootenv.var.480ioutputwidth";
+	private final static String sel_480ioutput_height = "ubootenv.var.480ioutputheight";
+	private final static String sel_480poutput_x = "ubootenv.var.480poutputx";
+	private final static String sel_480poutput_y = "ubootenv.var.480poutputy";
+	private final static String sel_480poutput_width = "ubootenv.var.480poutputwidth";
+	private final static String sel_480poutput_height = "ubootenv.var.480poutputheight";
+	private final static String sel_576ioutput_x = "ubootenv.var.576ioutputx";
+	private final static String sel_576ioutput_y = "ubootenv.var.576ioutputy";
+	private final static String sel_576ioutput_width = "ubootenv.var.576ioutputwidth";
+	private final static String sel_576ioutput_height = "ubootenv.var.576ioutputheight";
+	private final static String sel_576poutput_x = "ubootenv.var.576poutputx";
+	private final static String sel_576poutput_y = "ubootenv.var.576poutputy";
+	private final static String sel_576poutput_width = "ubootenv.var.576poutputwidth";
+	private final static String sel_576poutput_height = "ubootenv.var.576poutputheight";
+	private final static String sel_720poutput_x = "ubootenv.var.720poutputx";
+	private final static String sel_720poutput_y = "ubootenv.var.720poutputy";
+	private final static String sel_720poutput_width = "ubootenv.var.720poutputwidth";
+	private final static String sel_720poutput_height = "ubootenv.var.720poutputheight";
+	private final static String sel_1080ioutput_x = "ubootenv.var.1080ioutputx";
+	private final static String sel_1080ioutput_y = "ubootenv.var.1080ioutputy";
+	private final static String sel_1080ioutput_width = "ubootenv.var.1080ioutputwidth";
+	private final static String sel_1080ioutput_height = "ubootenv.var.1080ioutputheight";
+	private final static String sel_1080poutput_x = "ubootenv.var.1080poutputx";
+	private final static String sel_1080poutput_y = "ubootenv.var.1080poutputy";
+	private final static String sel_1080poutput_width = "ubootenv.var.1080poutputwidth";
+	private final static String sel_1080poutput_height = "ubootenv.var.1080poutputheight";
+	private static final int OUTPUT480_FULL_WIDTH = 720;
+	private static final int OUTPUT480_FULL_HEIGHT = 480;
+	private static final int OUTPUT576_FULL_WIDTH = 720;
+	private static final int OUTPUT576_FULL_HEIGHT = 576;
+	private static final int OUTPUT720_FULL_WIDTH = 1280;
+	private static final int OUTPUT720_FULL_HEIGHT = 720;
+	private static final int OUTPUT1080_FULL_WIDTH = 1920;
+	private static final int OUTPUT1080_FULL_HEIGHT = 1080;
+	
 	private boolean intouch_flag = false;
 	private int item_position_selected, item_position_first, fromtop_piexl, item_position_selected_init;
 	private boolean item_init_flag = true;
@@ -1998,8 +2044,19 @@ public class playermenu extends Activity {
     		}
     	});
         
-		
-
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
+        outputmode = SystemProperties.get(STR_OUTPUT_MODE);
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+        	writeFile(FreeScaleOsd0File,"0");
+        	writeFile(FreeScaleOsd1File,"0");
+        	if(!outputmode.equals("720p")){
+	        	writeFile(ScaleaxisFile,"0 0 959 539");
+	        	writeFile(ScaleFile,"0x10001");
+        	}
+        }
+        
+        
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
@@ -2929,6 +2986,12 @@ public class playermenu extends Activity {
         SettingsVP.disableVideoLayout();
         SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+        	setFreeScaleVideoAxis();
+        	writeFile(FreeScaleOsd0File,"1");
+        	writeFile(FreeScaleOsd1File,"1");
+        	writeFile(ScaleFile,"0");
+        }
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         
@@ -3803,6 +3866,191 @@ Handler mRotateHandler = new Handler() {
 	}
 };
 
+	public void setFreeScaleVideoAxis(){
+		String output_x = "";
+		String output_y = "";
+		String output_width = "";
+		String output_height = "";
+		String videoAxis = "";
+		int mode = 4;
+		int output_left;
+		int output_top;
+		int output_right;
+		int output_bottom;
+		int output_w;
+		int output_h;
+		
+		if(outputmode.equals("480i")){
+			mode = 0;
+		}
+		else if(outputmode.equals("480p")){
+			mode = 1;
+		}
+		else if(outputmode.equals("576i")){
+			mode = 2;
+		}
+		else if(outputmode.equals("576p")){
+			mode = 3;
+		}
+		else if(outputmode.equals("720p")){
+			mode = 4;
+		}
+		else if(outputmode.equals("1080i")){
+			mode = 5;
+		}
+		else if(outputmode.equals("1080p")){
+			mode = 6;
+		}
+		else{
+			mode = 4;
+		}
+		
+		switch(mode){
+		case 0:
+			output_x = SystemProperties.get(sel_480ioutput_x);
+			output_y = SystemProperties.get(sel_480ioutput_y);
+			output_width = SystemProperties.get(sel_480ioutput_width);
+			output_height = SystemProperties.get(sel_480ioutput_height);
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT480_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT480_FULL_HEIGHT);
+			break;
+		case 1:
+			output_x = SystemProperties.get(sel_480poutput_x);
+			output_y = SystemProperties.get(sel_480poutput_y);
+			output_width = SystemProperties.get(sel_480poutput_width);
+			output_height = SystemProperties.get(sel_480poutput_height);	
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT480_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT480_FULL_HEIGHT);	
+			break;
+		case 2:
+			output_x = SystemProperties.get(sel_576ioutput_x);
+			output_y = SystemProperties.get(sel_576ioutput_y);
+			output_width = SystemProperties.get(sel_576ioutput_width);
+			output_height = SystemProperties.get(sel_576ioutput_height);
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT576_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT576_FULL_HEIGHT);
+			break;
+		case 3:
+			output_x = SystemProperties.get(sel_576poutput_x);
+			output_y = SystemProperties.get(sel_576poutput_y);
+			output_width = SystemProperties.get(sel_576poutput_width);
+			output_height = SystemProperties.get(sel_576poutput_height);	
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT576_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT576_FULL_HEIGHT);	
+			break;
+		case 4:
+	    	output_x = SystemProperties.get(sel_720poutput_x);
+	    	output_y = SystemProperties.get(sel_720poutput_y);
+	    	output_width = SystemProperties.get(sel_720poutput_width);
+	    	output_height = SystemProperties.get(sel_720poutput_height);
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT720_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT720_FULL_HEIGHT);
+			break;
+		case 5:
+			output_x = SystemProperties.get(sel_1080ioutput_x);
+			output_y = SystemProperties.get(sel_1080ioutput_y);
+			output_width = SystemProperties.get(sel_1080ioutput_width);
+			output_height = SystemProperties.get(sel_1080ioutput_height);
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT1080_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT1080_FULL_HEIGHT);
+			break;
+		case 6:
+			output_x = SystemProperties.get(sel_1080poutput_x);
+			output_y = SystemProperties.get(sel_1080poutput_y);
+			output_width = SystemProperties.get(sel_1080poutput_width);
+			output_height = SystemProperties.get(sel_1080poutput_height);	
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT1080_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT1080_FULL_HEIGHT);	
+			break;
+		default:
+	    	output_x = SystemProperties.get(sel_720poutput_x);
+	    	output_y = SystemProperties.get(sel_720poutput_y);
+	    	output_width = SystemProperties.get(sel_720poutput_width);
+	    	output_height = SystemProperties.get(sel_720poutput_height);
+			if(output_x.equals(""))
+				output_x = "0";
+			if(output_y.equals(""))
+				output_y = "0";
+			if(output_width.equals(""))
+				output_width = String.valueOf(OUTPUT720_FULL_WIDTH);
+			if(output_height.equals(""))
+				output_height = String.valueOf(OUTPUT720_FULL_HEIGHT);
+			break;
+		}
+		output_left = Integer.valueOf(output_x).intValue();
+		output_top = Integer.valueOf(output_y).intValue();
+		output_w = Integer.valueOf(output_width).intValue();
+		output_h = Integer.valueOf(output_height).intValue();
+		
+		output_right = output_left + output_w;
+		output_bottom = output_top + output_h;
+		videoAxis = String.valueOf(output_left) + " " + String.valueOf(output_top) + " " + String.valueOf(output_right) + " " + String.valueOf(output_bottom);
+		writeFile(VideoAxisFile, videoAxis);
+	}
+
+	public void writeFile(String file, String value){
+		File OutputFile = new File(file);
+		if(!OutputFile.exists()) {        	
+        	return;
+        }
+
+    	try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
+    		try {
+				Log.d(TAG, "---------------------------------------set" + file + ": " + value);
+    			out.write(value);    
+    		} 
+			finally {
+				out.close();
+			}
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException when write "+OutputFile);
+		}
+	}
 }
 
 class subview_set{
