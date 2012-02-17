@@ -145,6 +145,7 @@ public class playermenu extends Activity {
 	private static String ScaleaxisOsd1File= "/sys/class/graphics/fb1/scale_axis";
 	private static String ScaleOsd1File= "/sys/class/graphics/fb1/scale";
 	private static String VideoAxisFile= "/sys/class/video/axis";
+	private static String PpscalerFile= "/sys/class/ppmgr/ppscaler";
 	private static final String STR_OUTPUT_MODE = "ubootenv.var.outputmode";
 	private final static String sel_480ioutput_x = "ubootenv.var.480ioutputx";
 	private final static String sel_480ioutput_y = "ubootenv.var.480ioutputy";
@@ -2048,6 +2049,7 @@ public class playermenu extends Activity {
         m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
         outputmode = SystemProperties.get(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+        	writeFile(PpscalerFile,"0");
         	writeFile(FreeScaleOsd0File,"0");
         	writeFile(FreeScaleOsd1File,"0");
         	if(!outputmode.equals("720p")){
@@ -2988,6 +2990,7 @@ public class playermenu extends Activity {
         unregisterReceiver(mReceiver);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
         	setFreeScaleVideoAxis();
+        	writeFile(PpscalerFile,"1");
         	writeFile(FreeScaleOsd0File,"1");
         	writeFile(FreeScaleOsd1File,"1");
         	writeFile(ScaleFile,"0");
