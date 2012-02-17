@@ -2054,7 +2054,9 @@ public class playermenu extends Activity {
         	writeFile(FreeScaleOsd1File,"0");
         	if(!outputmode.equals("720p")){
 	        	writeFile(ScaleaxisFile,"0 0 959 539");
+	        	writeFile(ScaleaxisOsd1File,"1280 720 1920 1080");
 	        	writeFile(ScaleFile,"0x10001");
+	        	writeFile(ScaleOsd1File,"0x10001");
         	}
         }
         
@@ -2994,6 +2996,7 @@ public class playermenu extends Activity {
         	writeFile(FreeScaleOsd0File,"1");
         	writeFile(FreeScaleOsd1File,"1");
         	writeFile(ScaleFile,"0");
+        	writeFile(ScaleOsd1File,"0");
         }
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
