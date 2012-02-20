@@ -2392,6 +2392,7 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
+				waitForHide();
 			}
         });
         
@@ -2411,6 +2412,7 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
+				waitForHide();
 			}
         });
         
@@ -2451,6 +2453,7 @@ public class playermenu extends Activity {
 						e.printStackTrace();
 					}
 				}
+				waitForHide();
 			}
         });
                 
@@ -2524,6 +2527,7 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
     				ff_fb.show();
 				}
+				waitForHide();
 			}
         });
         
@@ -2597,6 +2601,7 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
     				ff_fb.show();
 				}
+				waitForHide();
 			}
         });
         
