@@ -2140,16 +2140,18 @@ public class playermenu extends Activity {
 	        	boolean plugged
 	                = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
 	                
-	        	if (mHdmiPlugged != plugged) {
-	                mHdmiPlugged = plugged;
-	                Intent selectFileIntent = new Intent();
-	                selectFileIntent.setClass(playermenu.this, FileList.class);	
-	                backToFileList = true;
-	                PlayList.getinstance().rootPath=null;
-	                if(!backToOtherAPK)
-	                	startActivity(selectFileIntent);
-	                playermenu.this.finish();
-	        	}
+                if (!SystemProperties.getBoolean("ro.vout.dualdisplay", false)) {    
+    	        	if (mHdmiPlugged != plugged) {
+    	                mHdmiPlugged = plugged;
+    	                Intent selectFileIntent = new Intent();
+    	                selectFileIntent.setClass(playermenu.this, FileList.class);	
+    	                backToFileList = true;
+    	                PlayList.getinstance().rootPath=null;
+    	                if(!backToOtherAPK)
+    	                	startActivity(selectFileIntent);
+    	                playermenu.this.finish();
+    	        	}
+                }
 	            
 	        }
 		};
