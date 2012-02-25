@@ -146,6 +146,7 @@ public class playermenu extends Activity {
 	private static String ScaleOsd1File= "/sys/class/graphics/fb1/scale";
 	private static String VideoAxisFile= "/sys/class/video/axis";
 	private static String PpscalerFile= "/sys/class/ppmgr/ppscaler";
+	private static String RegFile= "/sys/class/display/wr_reg";
 	private static final String STR_OUTPUT_MODE = "ubootenv.var.outputmode";
 	private final static String sel_480ioutput_x = "ubootenv.var.480ioutputx";
 	private final static String sel_480ioutput_y = "ubootenv.var.480ioutputy";
@@ -2045,21 +2046,19 @@ public class playermenu extends Activity {
     		}
     	});
         
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
         outputmode = SystemProperties.get(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
         	writeFile(PpscalerFile,"0");
-        	writeFile(FreeScaleOsd0File,"0");
-        	writeFile(FreeScaleOsd1File,"0");
         	if(!outputmode.equals("720p")){
 	        	writeFile(ScaleaxisFile,"0 0 959 539");
 	        	writeFile(ScaleaxisOsd1File,"1280 720 1920 1080");
 	        	writeFile(ScaleFile,"0x10001");
 	        	writeFile(ScaleOsd1File,"0x10001");
         	}
+        	writeFile(FreeScaleOsd0File,"0");
+        	writeFile(FreeScaleOsd1File,"0");
         }
-        
         
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
@@ -2997,14 +2996,6 @@ public class playermenu extends Activity {
         SettingsVP.disableVideoLayout();
         SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-        	setFreeScaleVideoAxis();
-        	writeFile(PpscalerFile,"1");
-        	writeFile(FreeScaleOsd0File,"1");
-        	writeFile(FreeScaleOsd1File,"1");
-        	writeFile(ScaleFile,"0");
-        	writeFile(ScaleOsd1File,"0");
-        }
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         
@@ -3039,7 +3030,15 @@ public class playermenu extends Activity {
             }
             finish();
         }
-        
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+        	writeFile(RegFile,"m 0x1d26 0x00b1");
+        	setFreeScaleVideoAxis();
+        	writeFile(PpscalerFile,"1");
+        	writeFile(ScaleFile,"0");
+        	writeFile(ScaleOsd1File,"0");
+        	writeFile(FreeScaleOsd0File,"1");
+        	writeFile(FreeScaleOsd1File,"1");
+        }
 		disable2XScale();
         ScreenMode.setScreenMode("0");
     }
