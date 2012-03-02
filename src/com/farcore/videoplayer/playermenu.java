@@ -1487,18 +1487,20 @@ public class playermenu extends Activity {
                     waitForHide();
         		}
         	}
-        	if(intouch_flag){
-        		if (morbar!=null)  {
-            		if(morbar.getVisibility() == View.VISIBLE){
-            			morbar.requestFocusFromTouch();
-            		}
-            	}
-            	else{
-            		if (infobar.getVisibility() == View.VISIBLE){
-            			infobar.requestFocusFromTouch();
-            		}
-            	}
-        		intouch_flag = false;
+        	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+	        	if(intouch_flag){
+	        		if (morbar!=null)  {
+	            		if(morbar.getVisibility() == View.VISIBLE){
+	            			morbar.requestFocusFromTouch();
+	            		}
+	            	}
+	            	else{
+	            		if (infobar.getVisibility() == View.VISIBLE){
+	            			infobar.requestFocusFromTouch();
+	            		}
+	            	}
+	        		intouch_flag = false;
+	        	}
         	}
         }
 
@@ -1533,51 +1535,54 @@ public class playermenu extends Activity {
 	        			subbar.setVisibility(View.GONE);
 	        		}
 	    	        morbar.setVisibility(View.VISIBLE);
-	    	        switch(morebar_status){
-    	        	case R.string.setting_resume:
-    	        		ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
-    	        		resume.requestFocusFromTouch();
-    				    resume.requestFocus();
-    	        		break;
-    	        	case R.string.setting_playmode:
-    	        		ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
-    	        		playmode.requestFocusFromTouch();
-					    playmode.requestFocus();
-    	        		break;
-    	        	case R.string.setting_3d_mode:
-    	        		ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
-    	        		play3d.requestFocusFromTouch();
-                    	play3d.requestFocus();
-    	        		break;
-    	        	case R.string.setting_audiotrack:
-    	        		ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
-    	        		audiotrack.requestFocusFromTouch();
-					    audiotrack.requestFocus();
-    	        		break;
-    	        	case R.string.setting_subtitle:
-    	        		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
-    	        		subtitle.requestFocusFromTouch();
-    	        		subtitle.requestFocus();
-    	        		break;
-    	        	case R.string.setting_displaymode:
-    	        		ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
-    	        		display.requestFocusFromTouch();
-						display.requestFocus();
-    	        		break;
-    	        	case R.string.setting_brightness:
-    	        		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
-    	        		brigtness.requestFocusFromTouch();
-                        brigtness.requestFocus();
-    	        		break;
-    	        	case R.string.str_file_name:
-    	        		ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
-    	        		fileinformation.requestFocusFromTouch();
-						fileinformation.requestFocus();	
-    	        		break;
-	    	        default:
-	    	        	morbar.requestFocus();
-	    	        	break;
-	    	        }
+
+	            	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+		    	        switch(morebar_status){
+	    	        	case R.string.setting_resume:
+	    	        		ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
+	    	        		resume.requestFocusFromTouch();
+	    				    resume.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_playmode:
+	    	        		ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
+	    	        		playmode.requestFocusFromTouch();
+						    playmode.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_3d_mode:
+	    	        		ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+	    	        		play3d.requestFocusFromTouch();
+	                    	play3d.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_audiotrack:
+	    	        		ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
+	    	        		audiotrack.requestFocusFromTouch();
+						    audiotrack.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_subtitle:
+	    	        		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
+	    	        		subtitle.requestFocusFromTouch();
+	    	        		subtitle.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_displaymode:
+	    	        		ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
+	    	        		display.requestFocusFromTouch();
+							display.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_brightness:
+	    	        		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+	    	        		brigtness.requestFocusFromTouch();
+	                        brigtness.requestFocus();
+	    	        		break;
+	    	        	case R.string.str_file_name:
+	    	        		ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
+	    	        		fileinformation.requestFocusFromTouch();
+							fileinformation.requestFocus();	
+	    	        		break;
+		    	        default:
+		    	        	morbar.requestFocus();
+		    	        	break;
+		    	        }
+	            	}
 	    	        waitForHideVideoBar();
 			        return(true);
     			}
@@ -1591,8 +1596,11 @@ public class playermenu extends Activity {
 	                }
 		        	initinfobar();
 					ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
-	                morebtn.requestFocusFromTouch();
-	                morebtn.requestFocus();
+
+		        	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+		                morebtn.requestFocusFromTouch();
+		                morebtn.requestFocus();
+		        	}
 		        	return(true);
     			}
 	        }
@@ -1664,8 +1672,10 @@ public class playermenu extends Activity {
 	    		if (infobar.getVisibility() == View.VISIBLE)
 		    		hide_infobar();
 		    	else {
-		    		play.requestFocusFromTouch();
-		    		play.requestFocus();
+		        	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+			    		play.requestFocusFromTouch();
+			    		play.requestFocus();
+		        	}
 			    	show_menu();
 	                waitForHide();
 		    	}
