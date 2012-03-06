@@ -2050,6 +2050,7 @@ public class playermenu extends Activity {
 					startActivity(selectFileIntent);
 				finish();
     		  	onPause(); //for disable 2Xscale
+    		  	onDestroy(); //set freescale when exception
     			Log.d(TAG,"----------------uncaughtException--------------------");
 				
     		  	android.os.Process.killProcess(android.os.Process.myPid());
