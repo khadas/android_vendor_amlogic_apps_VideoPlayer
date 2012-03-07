@@ -67,6 +67,12 @@ public class AmPlayer extends Service {
     public static native int enable_freescale(int cfg);
     public static native int disable_freescale(int cfg);
     public static native int getProductType();
+    public static native int disableFreescaleMBX();
+    public static native int enable2XScale();
+    public static native int enable2XYScale();
+    public static native int enableFreescaleMBX();
+    public static native int disable2X2XYScale();
+    public static native int GL2XScale(int mSwitch);
 
     public int start() { return start(mPid);}
 	public int pause() { return pause(mPid);}

@@ -923,6 +923,48 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_getProductType(JN
     return ret;
 }
 
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disableFreescaleMBX(JNIEnv *env, jclass class){
+    jint ret = -1;
+    ret = disable_freescale_MBX();
+    LOGI("disable freeacale:%d\n", ret);
+    return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable2XScale(JNIEnv *env, jclass class){
+    jint ret = -1;
+    ret = enable_2Xscale();
+    LOGI("enable2XScale:%d\n", ret);
+    return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable2XYScale(JNIEnv *env, jclass class){
+    jint ret = -1;
+    ret = enable_2XYscale();
+    LOGI("enable2XYScale:%d\n", ret);
+    return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enableFreescaleMBX(JNIEnv *env, jclass class){
+    jint ret = -1;
+    ret = enable_freescale_MBX();
+    LOGI("enableFreescaleMBX:%d\n", ret);
+    return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable2X2XYScale(JNIEnv *env, jclass class){
+    jint ret = -1;
+    ret = disable_2X_2XYscale();
+    LOGI("disable2X2XYScale:%d\n", ret);
+    return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_GL2XScale(JNIEnv *env, jclass class, jint mSwitch){
+    jint ret = -1;
+    ret = GL_2X_scale(mSwitch);
+    LOGI("GL2XScale:%d\n", ret);
+    return ret;
+}
+
 //
 static JNINativeMethod gMethods[] = {
     {"setMedia",            "(Ljava/lang/String;III)I",         (void*)Java_com_farcore_playerservice_AmPlayer_setMedia},   

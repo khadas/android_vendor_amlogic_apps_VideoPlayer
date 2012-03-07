@@ -239,6 +239,54 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable_1freescal
  */
 JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_getProductType
   (JNIEnv *, jclass);
+  
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    disableFreescaleMBX
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disableFreescaleMBX
+  (JNIEnv *, jclass);  
+  
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    enable2XScale
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable2XScale
+  (JNIEnv *, jclass);  
+  
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    enable2XYScale
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enable2XYScale
+  (JNIEnv *, jclass);  
+  
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    enableFreescaleMBX
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_enableFreescaleMBX
+  (JNIEnv *, jclass);  
+  
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    disable2X2XYScale
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_disable2X2XYScale
+  (JNIEnv *, jclass);
+  
+/*
+ * Class:     com_farcore_playerservice_AmPlayer
+ * Method:    GL2XScale
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_GL2XScale
+  (JNIEnv *env, jclass class, jint);
 
 
 /*
