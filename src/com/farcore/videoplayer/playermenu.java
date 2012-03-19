@@ -2016,14 +2016,6 @@ public class playermenu extends Activity {
     		}
     	});
         
-        m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
-        outputmode = SystemProperties.get(STR_OUTPUT_MODE);
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-	       	//AmPlayer.enable2XYScale();
-	 			 	AmPlayer.GL2XScale(1);
-				  AmPlayer.disableFreescaleMBX();			
-        }
-        
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
@@ -2163,6 +2155,22 @@ public class playermenu extends Activity {
         }
         catch (Exception e) {
             e.printStackTrace();
+        }
+                
+        m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
+        outputmode = SystemProperties.get(STR_OUTPUT_MODE);
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+	 			 	writeFile(RegFile,"m 0x1d26 0x00b1");
+	 			 	AmPlayer.GL2XScale(1);	
+					Timer timer1 = new Timer();
+	 			 	TimerTask task = new TimerTask(){   
+            public void run() {   
+				  		AmPlayer.disableFreescaleMBX();
+            }
+	        };
+	        timer1.cancel();
+	        timer1 = new Timer();
+	    		timer1.schedule(task, 1000);	
         }
     }
 
@@ -2960,14 +2968,12 @@ public class playermenu extends Activity {
         SettingsVP.disableVideoLayout();
         SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-        	writeFile(RegFile,"m 0x1d26 0x00b1");
-		AmPlayer.GL2XScale(0);
-		AmPlayer.enableFreescaleMBX();	
-        }
+
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
-        
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+			    AmPlayer.enableFreescaleMBX();
+        }
         super.onDestroy();
     }
 
@@ -2998,6 +3004,10 @@ public class playermenu extends Activity {
 			    PlayList.getinstance().rootPath =null;
             }
             finish();
+        }
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+        	writeFile(RegFile,"m 0x1d26 0x00b1");
+		AmPlayer.GL2XScale(0);
         }
 		disable2XScale();
         ScreenMode.setScreenMode("0");
