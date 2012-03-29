@@ -826,7 +826,8 @@ public class playermenu extends Activity {
 				if (player_status < VideoInfo.PLAYER_INITOK) {
     				return;
 				}
-    			if(audio_flag == Errorno.PLAYER_NO_AUDIO) {
+                SimpleAdapter audioarray = getMorebarListAdapter(AUDIOTRACK, cur_audio_stream);
+                if((audio_flag == Errorno.PLAYER_NO_AUDIO) || (audioarray.getCount() <= 0) ) {
     				Toast toast =Toast.makeText(playermenu.this, R.string.file_have_no_audio,Toast.LENGTH_SHORT );
     				toast.setGravity(Gravity.BOTTOM,110,0);
     				toast.setDuration(0x00000001);
@@ -841,7 +842,7 @@ public class playermenu extends Activity {
     			morbar.setVisibility(View.GONE);
     			morebar_tileText.setText(R.string.setting_audiotrack);
     			ListView listView = (ListView)findViewById(R.id.AudioListView);
-                listView.setAdapter(getMorebarListAdapter(AUDIOTRACK, cur_audio_stream));
+                listView.setAdapter(audioarray);
     			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
     			    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
     			    	if (bMediaInfo.getAudioTrackCount()>1) {
