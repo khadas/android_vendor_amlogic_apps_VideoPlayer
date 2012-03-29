@@ -3836,7 +3836,7 @@ Handler mRotateHandler = new Handler() {
 		switch (msg.what) {
 			case GETROTATION:
 				int getRotation = mWindowManager.getDefaultDisplay().getRotation();
-				Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
+			//	Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
 				if((getRotation >= 0) && (getRotation <= 3) && (getRotation != mLastRotation)) {
 					SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
 					mLastRotation = getRotation;
