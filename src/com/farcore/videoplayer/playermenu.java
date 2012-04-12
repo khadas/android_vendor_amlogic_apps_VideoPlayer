@@ -48,6 +48,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.storage.StorageVolume;
 import android.net.Uri;
+import android.content.SharedPreferences;  
 
 import java.io.FileOutputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -59,6 +60,7 @@ public class playermenu extends Activity {
 	private static String ScaleaxisFile= "/sys/class/graphics/fb0/scale_axis";
 	private static String ScaleFile= "/sys/class/graphics/fb0/scale";
 	private static String RequestScaleFile= "/sys/class/graphics/fb0/request2XScale";
+	public static final String PREFS_NAME = "subtitlesetting"; 
 
 
 	private static final int SET_OSD_ON= 1;
@@ -918,8 +920,13 @@ public class playermenu extends Activity {
     			else
     				sub_color_state =2;
     			
-    			if(sub_para.curid==sub_para.totalnum)
+    			
+    			//modify by jeff.yang
+    			if(sub_para.curid==sub_para.totalnum||sub_para.enable==false)
+    			{
+    				sub_para.curid=sub_para.totalnum;
     				t_subswitch.setText(R.string.str_off);
+    			}
     			else
     				t_subswitch.setText(String.valueOf(sub_para.curid+1)+"/"+String.valueOf(sub_para.totalnum));
     			
@@ -937,10 +944,15 @@ public class playermenu extends Activity {
     			    	sub_para.font = sub_font_state;
     			    	
     			    	if(sub_para.curid==sub_para.totalnum )
+    			    	{
     			    		sub_para.sub_id =null;
+    			    		sub_para.enable = false;
+    			    	}
     			    	else
+    			    	{
+    			    		sub_para.enable = true;
     			    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
-    			    	
+    			    	}
     			    	if(sub_color_state==0)
     			    		sub_para.color =android.graphics.Color.WHITE;
     			    	else if(sub_color_state==1) 
@@ -948,11 +960,21 @@ public class playermenu extends Activity {
     			    	else
     			    		sub_para.color =android.graphics.Color.BLUE;
     			    	
+    			    	//add by jeff.yang
+    			    	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0); 
+    			    	SharedPreferences.Editor editor = settings.edit(); 
+    			    	editor.putBoolean("enable", sub_para.enable); 
+						editor.putInt("color", sub_para.color); 
+    			    	editor.putInt("font", sub_para.font); 
+    			    	// Don't forget to commit your edits!!! 
+    			    	editor.commit();  
+    			    	
+    			    	
     			    	subbar.setVisibility(View.GONE);
     			    	subTitleView.setViewStatus(true);
-				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
-				     subTitleView_sm.setViewStatus(true);
-				}						
+						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+						     subTitleView_sm.setViewStatus(true);
+						}						
     			    	videobar();
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
@@ -2200,15 +2222,19 @@ public class playermenu extends Activity {
 			break;
 		}
     }
-    
+	
     protected void subinit() {
         subtitleUtils = new SubtitleUtils(PlayList.getinstance().getcur());
         sub_para = new subview_set();
          
         sub_para.totalnum = 0;
         sub_para.curid = 0;
-        sub_para.color = android.graphics.Color.WHITE;
-    	sub_para.font=20;
+        //add by jeff.yang
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);  
+        sub_para.enable = settings.getBoolean("enable", true);  
+        sub_para.color = settings.getInt("color", android.graphics.Color.WHITE);  //android.graphics.Color.WHITE;
+    	sub_para.font=settings.getInt("font", 20);//20;
+    	
         sub_para.sub_id = null;
     }
     
@@ -3240,8 +3266,10 @@ public class playermenu extends Activity {
                         }
 						sub_para.totalnum =subtitleUtils.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
 						if(sub_para.totalnum >0){
+        						
 							sub_para.curid = subtitleUtils.getCurrentInSubtitleIndexByJni();
-							if(sub_para.curid == 0xff)
+							//change by jeff.yang	
+							if(sub_para.curid == 0xff||sub_para.enable==false)
 							    sub_para.curid = sub_para.totalnum;
 							if(sub_para.totalnum>0)
 					    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
@@ -3878,4 +3906,5 @@ class subview_set{
 	public int color;
 	public int font; 
 	public SubID sub_id;
+	public boolean enable;
 }
