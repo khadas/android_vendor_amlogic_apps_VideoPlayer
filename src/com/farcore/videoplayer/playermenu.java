@@ -438,7 +438,7 @@ public class playermenu extends Activity {
 		}
     }
 
-	SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
+	private static SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
 		public void surfaceChanged(SurfaceHolder holder, int format,
 									int w, int h) {
 			Log.d(TAG, "surfaceChanged");
