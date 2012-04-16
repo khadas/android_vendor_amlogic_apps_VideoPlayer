@@ -144,6 +144,8 @@ public class playermenu extends Activity {
 	private String outputmode = "720p";
 	private static String VideoAxisFile= "/sys/class/video/axis";
 	private static String RegFile= "/sys/class/display/wr_reg";
+	private static String Fb0Blank= "/sys/class/graphics/fb0/blank";
+	private static String Fb1Blank= "/sys/class/graphics/fb1/blank";
 	private static final String STR_OUTPUT_MODE = "ubootenv.var.outputmode";
 	
 	private boolean intouch_flag = false;
@@ -2038,7 +2040,26 @@ public class playermenu extends Activity {
     		  	android.os.Process.killProcess(android.os.Process.myPid());
     		}
     	});
-        
+
+        m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
+        outputmode = SystemProperties.get(STR_OUTPUT_MODE);
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+	 			 	writeFile(Fb0Blank,"1");
+					writeFile(Fb1Blank,"1");
+	 			 	AmPlayer.GL2XScale(1);	
+				  	AmPlayer.disableFreescaleMBX();
+				/*	Timer timer1 = new Timer();
+	 			 	TimerTask task = new TimerTask(){   
+            public void run() {   
+				  		AmPlayer.disableFreescaleMBX();
+            }
+	        };
+	        timer1.cancel();
+	        timer1 = new Timer();
+	    		timer1.schedule(task, 1000);	*/
+        }
+
+		
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
@@ -2178,22 +2199,6 @@ public class playermenu extends Activity {
         }
         catch (Exception e) {
             e.printStackTrace();
-        }
-                
-        m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
-        outputmode = SystemProperties.get(STR_OUTPUT_MODE);
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-	 			 	writeFile(RegFile,"m 0x1d26 0x00b1");
-	 			 	AmPlayer.GL2XScale(1);	
-					Timer timer1 = new Timer();
-	 			 	TimerTask task = new TimerTask(){   
-            public void run() {   
-				  		AmPlayer.disableFreescaleMBX();
-            }
-	        };
-	        timer1.cancel();
-	        timer1 = new Timer();
-	    		timer1.schedule(task, 1000);	
         }
     }
 
@@ -2999,7 +3004,10 @@ public class playermenu extends Activity {
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-			    AmPlayer.enableFreescaleMBX();
+			writeFile(Fb0Blank,"1");
+			writeFile(Fb1Blank,"1");
+			AmPlayer.GL2XScale(0);
+			AmPlayer.enableFreescaleMBX();
         }
         super.onDestroy();
     }
@@ -3033,8 +3041,8 @@ public class playermenu extends Activity {
             finish();
         }
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-        	writeFile(RegFile,"m 0x1d26 0x00b1");
-		AmPlayer.GL2XScale(0);
+        	writeFile(Fb0Blank,"1");
+			writeFile(Fb1Blank,"1");
         }
 		disable2XScale();
         ScreenMode.setScreenMode("0");
