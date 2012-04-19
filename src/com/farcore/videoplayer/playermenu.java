@@ -67,6 +67,7 @@ public class playermenu extends Activity {
 	private static final int SET_OSD_OFF= 2;
 
 	private boolean mHdmiPlugged;
+	private boolean mPaused;
 
   /** Called when the activity is first created. */
 	private int totaltime = 0;
@@ -418,6 +419,64 @@ public class playermenu extends Activity {
     	timer.schedule(task, 3000);
     }
 
+/// patch for hide OSD
+    private static final String OSD_BLANK_PATH = "/sys/class/graphics/fb0/blank";
+    private static final String OSD_BLOCK_MODE_PATH = "/sys/class/graphics/fb0/block_mode";
+    
+    private static int writeSysfs(String path, String val) {
+        if (!new File(path).exists()) {
+            Log.e(TAG, "File not found: " + path);
+            return 1; 
+        }
+        
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path), 64);
+            try {
+                writer.write(val);
+            } finally {
+                writer.close();
+            }    		
+            return 0;
+        		
+        } catch (IOException e) { 
+            Log.e(TAG, "IO Exception when write: " + path, e);
+            return 1;
+        }                 
+    }
+    private boolean isSubtitleOn() {
+        if (sub_para != null && sub_para.totalnum > 0 && sub_para.sub_id != null)
+            return true;
+                        
+        return false;
+    }
+    private int getOSDRotation() {
+        Display display = getWindowManager().getDefaultDisplay();
+        int orientation = display.getOrientation();
+        int hw_rotation = SystemProperties.getInt("ro.sf.hwrotation", 0);
+        return (orientation * 90 + hw_rotation) % 360;
+    }
+    void setOSDOnOff(boolean on) {
+        if (!on && !mPaused) {
+            if (isSubtitleOn()) {
+                int ori = getOSDRotation();
+                if (ori == 90)
+                    writeSysfs(OSD_BLOCK_MODE_PATH, "0x20001"); //OSD ver blk0 enable
+                else if (ori == 180)
+                    writeSysfs(OSD_BLOCK_MODE_PATH, "0x10001"); //OSD hor blk0 enable
+                else if (ori == 270)
+                    writeSysfs(OSD_BLOCK_MODE_PATH, "0x20008"); //OSD ver blk3 enable
+                else                
+                    writeSysfs(OSD_BLOCK_MODE_PATH, "0x10008"); //OSD hor blk3 enable
+                    
+            } else {
+                writeSysfs(OSD_BLANK_PATH, "1"); 
+            }
+        } else {
+            writeSysfs(OSD_BLANK_PATH, "0");
+            writeSysfs(OSD_BLOCK_MODE_PATH, "0");
+        }
+    }    
+/// patch for hide OSD
 	private void hideVideoBar(){
 		if(null != morbar){
 			morbar.setVisibility(View.GONE);
@@ -1460,6 +1519,8 @@ public class playermenu extends Activity {
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
+        
+        setOSDOnOff(true);
         if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
         	if (morbar!=null)  {
         		if(morbar.getVisibility() == View.VISIBLE){
@@ -2888,6 +2949,7 @@ public class playermenu extends Activity {
 		}		
     	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
     			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	setOSDOnOff(false);		
     }
     
     protected void show_menu() {
@@ -2898,6 +2960,7 @@ public class playermenu extends Activity {
     	else{
     		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	}
+    	setOSDOnOff(true);
     }
     
 	public boolean onTouchEvent (MotionEvent event) {
@@ -3016,6 +3079,8 @@ public class playermenu extends Activity {
     public void onPause() {
 		Log.d(TAG,"onPause");
         super.onPause();
+        mPaused = true;
+        setOSDOnOff(true);
 //        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 //        m_storagemgr.unregisterListener(mListener);
         unregisterReceiver(mMountReceiver);
@@ -3825,6 +3890,7 @@ public class playermenu extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
+		mPaused = false;
 		
 		int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
