@@ -456,6 +456,8 @@ public class playermenu extends Activity {
         return (orientation * 90 + hw_rotation) % 360;
     }
     void setOSDOnOff(boolean on) {
+        if(confirm_dialog != null && confirm_dialog.isShowing())
+            on = true;
         if (!on && !mPaused) {
             if (isSubtitleOn()) {
                 int ori = getOSDRotation();
@@ -3960,7 +3962,7 @@ Handler mRotateHandler = new Handler() {
     	try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
     		try {
-				Log.d(TAG, "---------------------------------------set" + file + ": " + value);
+				Log.d(TAG, "set" + file + ": " + value);
     			out.write(value);    
     		} 
 			finally {
