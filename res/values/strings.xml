@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="sub_font">font:</string>
+    <string name="sub_position_v">position:</string>
     <string name="sub_color">color:</string>
     <string name="color_white">White</string>
     <string name="color_yellow">Yellow</string>

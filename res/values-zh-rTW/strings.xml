@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="sub_font">字體:</string>
+    <string name="sub_position_v">垂直位置:</string>
     <string name="sub_color">顏色:</string>
     <string name="color_white">白</string>
     <string name="color_yellow">黃</string>

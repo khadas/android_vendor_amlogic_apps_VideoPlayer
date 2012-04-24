@@ -171,9 +171,11 @@ public class playermenu extends Activity {
 	private int sub_switch_state = 0;
 	private int sub_font_state = 0;
 	private int sub_color_state = 0;
+	private int sub_position_v_state = 0;
 	private TextView t_subswitch =null ;
 	private TextView t_subsfont=null ;
 	private TextView t_subscolor=null ;
+	private TextView t_subsposition_v=null ;
 	private TextView morebar_tileText =null;
     private boolean touchVolFlag = false;
 	private WindowManager mWindowManager;
@@ -570,7 +572,11 @@ public class playermenu extends Activity {
 		subTitleView.setTextColor(sub_para.color);
 		subTitleView.setTextSize(sub_para.font);
 		subTitleView.setTextStyle(Typeface.BOLD);
-
+		subTitleView.setPadding(
+			subTitleView.getPaddingLeft(),
+			subTitleView.getPaddingTop(),
+			subTitleView.getPaddingRight(),
+			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20);
 
 		if(SystemProperties.getBoolean("3D_setting.enable", false)){
 		    	subTitleView_sm = (SubtitleView) findViewById(R.id.subTitle_more_sm);
@@ -972,9 +978,11 @@ public class playermenu extends Activity {
     			t_subswitch =(TextView)findViewById(R.id.sub_swith111);
     			t_subsfont =(TextView)findViewById(R.id.sub_font111);
     			t_subscolor =(TextView)findViewById(R.id.sub_color111);
+    			t_subsposition_v =(TextView)findViewById(R.id.sub_position_v111);
     			
     			sub_switch_state = sub_para.curid;
     			sub_font_state = sub_para.font;
+				sub_position_v_state = sub_para.position_v;
     			
     			if(sub_para.color==android.graphics.Color.WHITE)
     				sub_color_state =0;
@@ -995,9 +1003,10 @@ public class playermenu extends Activity {
     			
     			t_subsfont.setText(String.valueOf(sub_font_state));
     			t_subscolor.setText(color_text[sub_color_state]);
+    			t_subsposition_v.setText(String.valueOf(sub_position_v_state));
     			
     			Button ok = (Button) findViewById(R.id.button_ok);
-    			ok.setNextFocusUpId(R.id.color_l);
+    			ok.setNextFocusUpId(R.id.position_v_l);
     			ok.setNextFocusDownId(R.id.button_ok);
     			ok.setNextFocusLeftId(R.id.button_ok);
     			ok.setNextFocusRightId(R.id.button_canncel);
@@ -1005,6 +1014,7 @@ public class playermenu extends Activity {
     			    public void onClick(View v) {
     			    	sub_para.curid = sub_switch_state;
     			    	sub_para.font = sub_font_state;
+						sub_para.position_v = sub_position_v_state;
     			    	
     			    	if(sub_para.curid==sub_para.totalnum )
     			    	{
@@ -1029,6 +1039,7 @@ public class playermenu extends Activity {
     			    	editor.putBoolean("enable", sub_para.enable); 
 						editor.putInt("color", sub_para.color); 
     			    	editor.putInt("font", sub_para.font); 
+    			    	editor.putInt("position_v", sub_para.position_v); 
     			    	// Don't forget to commit your edits!!! 
     			    	editor.commit();  
     			    	
@@ -1044,7 +1055,7 @@ public class playermenu extends Activity {
     			    } 
     			});
     			Button cancel = (Button) findViewById(R.id.button_canncel);
-    			cancel.setNextFocusUpId(R.id.color_r);
+    			cancel.setNextFocusUpId(R.id.position_v_r);
     			cancel.setNextFocusDownId(R.id.button_canncel);
     			cancel.setNextFocusLeftId(R.id.button_ok);
     			cancel.setNextFocusRightId(R.id.button_canncel);
@@ -1066,6 +1077,8 @@ public class playermenu extends Activity {
     			ImageButton Bfont_r = (ImageButton) findViewById(R.id.font_r);
     			ImageButton Bcolor_l = (ImageButton) findViewById(R.id.color_l);	
     			ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
+    			ImageButton Bposition_v_l = (ImageButton) findViewById(R.id.position_v_l);	
+    			ImageButton Bposition_v_r = (ImageButton) findViewById(R.id.position_v_r);
 
     			Bswitch_l.setNextFocusUpId(R.id.switch_l);
     			Bswitch_l.setNextFocusDownId(R.id.font_l);
@@ -1088,14 +1101,25 @@ public class playermenu extends Activity {
 				Bfont_r.setNextFocusRightId(R.id.font_r);
 
 				Bcolor_l.setNextFocusUpId(R.id.font_l);
-				Bcolor_l.setNextFocusDownId(R.id.button_ok);
+				Bcolor_l.setNextFocusDownId(R.id.position_v_l);
 				Bcolor_l.setNextFocusLeftId(R.id.color_l);
 				Bcolor_l.setNextFocusRightId(R.id.color_r);
 
 				Bcolor_r.setNextFocusUpId(R.id.font_r);
-				Bcolor_r.setNextFocusDownId(R.id.button_canncel);
+				Bcolor_r.setNextFocusDownId(R.id.position_v_r);
 				Bcolor_r.setNextFocusLeftId(R.id.color_l);
 				Bcolor_r.setNextFocusRightId(R.id.color_r);
+				
+				Bposition_v_l.setNextFocusUpId(R.id.color_l);
+				Bposition_v_l.setNextFocusDownId(R.id.button_ok);
+				Bposition_v_l.setNextFocusLeftId(R.id.position_v_l);
+				Bposition_v_l.setNextFocusRightId(R.id.position_v_r);
+
+				Bposition_v_r.setNextFocusUpId(R.id.color_r);
+				Bposition_v_r.setNextFocusDownId(R.id.button_canncel);
+				Bposition_v_r.setNextFocusLeftId(R.id.position_v_l);
+				Bposition_v_r.setNextFocusRightId(R.id.position_v_r);
+
 				
     			Bswitch_l.setOnClickListener(new View.OnClickListener() {
   					public void onClick(View v) {
@@ -1128,21 +1152,28 @@ public class playermenu extends Activity {
 	  				if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx")) {
   						TextView font =(TextView)findViewById(R.id.font_title);
 						TextView color =(TextView)findViewById(R.id.color_title);
+						TextView position_v =(TextView)findViewById(R.id.position_v_title);
 							
 						font.setTextColor(android.graphics.Color.LTGRAY);
 						color.setTextColor(android.graphics.Color.LTGRAY);
+						position_v.setTextColor(android.graphics.Color.LTGRAY);
 							
   						t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
-  						t_subscolor.setTextColor(android.graphics.Color.LTGRAY);	
+  						t_subscolor.setTextColor(android.graphics.Color.LTGRAY);
+  						t_subsposition_v.setTextColor(android.graphics.Color.LTGRAY);	
   							
   					    Bfont_l.setEnabled(false);
   	  					Bfont_r.setEnabled(false);
   	  					Bcolor_l.setEnabled(false);
   	  					Bcolor_r.setEnabled(false);
+  	  					Bposition_v_l.setEnabled(false);
+  	  					Bposition_v_r.setEnabled(false);
   	  					Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
   	  					Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
   	  					Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
   	  					Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+  	  					Bposition_v_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+  	  					Bposition_v_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
   	  					
   	  					Bswitch_l.setNextFocusUpId(R.id.switch_l);
   	  					Bswitch_l.setNextFocusDownId(R.id.button_ok);
@@ -1205,6 +1236,27 @@ public class playermenu extends Activity {
     						sub_color_state++ ;
     							 
   						t_subscolor.setText(color_text[sub_color_state]);
+   		            } 
+  				});
+  					
+  				Bposition_v_l.setOnClickListener(new View.OnClickListener() {
+  					public void onClick(View v) {
+  						if(sub_position_v_state<= 0)
+  							sub_position_v_state=15;
+   						else 
+   							sub_position_v_state-- ;
+   							 
+   						t_subsposition_v.setText(String.valueOf(sub_position_v_state));
+   		            } 
+  				});
+  				Bposition_v_r.setOnClickListener(new View.OnClickListener() {
+  					public void onClick(View v) {
+  						if(sub_position_v_state>=15)
+   							sub_position_v_state=0;
+    					else 
+    						sub_position_v_state++ ;
+    							 
+  						t_subsposition_v.setText(String.valueOf(sub_position_v_state));
    		            } 
   				});
 			} 
@@ -2302,6 +2354,7 @@ public class playermenu extends Activity {
         sub_para.enable = settings.getBoolean("enable", true);  
         sub_para.color = settings.getInt("color", android.graphics.Color.WHITE);  //android.graphics.Color.WHITE;
     	sub_para.font=settings.getInt("font", 20);//20;
+    	sub_para.position_v=settings.getInt("position_v", 0);//0;
     	
         sub_para.sub_id = null;
     }
@@ -2330,6 +2383,11 @@ public class playermenu extends Activity {
     	subTitleView.setGravity(Gravity.CENTER);
     	subTitleView.setTextColor(sub_para.color);
     	subTitleView.setTextSize(sub_para.font);
+		subTitleView.setPadding(
+			subTitleView.getPaddingLeft(),
+			subTitleView.getPaddingTop(),
+			subTitleView.getPaddingRight(),
+			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20);
     	
     	subTitleView.setTextStyle(Typeface.BOLD);
 	if(SystemProperties.getBoolean("3D_setting.enable", false)){
@@ -3589,6 +3647,11 @@ public class playermenu extends Activity {
 			subinit();
 			subTitleView.setTextColor(sub_para.color);
 	    	subTitleView.setTextSize(sub_para.font);
+			subTitleView.setPadding(
+				subTitleView.getPaddingLeft(),
+				subTitleView.getPaddingTop(),
+				subTitleView.getPaddingRight(),
+				getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20);
 	    if(SystemProperties.getBoolean("3D_setting.enable", false)){
         	try {
     			m_Amplayer.Set3Dmode(0);
@@ -3983,4 +4046,5 @@ class subview_set{
 	public int font; 
 	public SubID sub_id;
 	public boolean enable;
+	public int position_v;
 }
