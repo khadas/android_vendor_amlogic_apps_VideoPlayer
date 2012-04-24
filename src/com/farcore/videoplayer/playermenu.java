@@ -2160,7 +2160,7 @@ public class playermenu extends Activity {
         outputmode = SystemProperties.get(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
 	 			 	writeFile(Fb0Blank,"1");
-					writeFile(Fb1Blank,"1");
+					//writeFile(Fb1Blank,"1");
 	 			 	AmPlayer.GL2XScale(1);	
 				  	AmPlayer.disableFreescaleMBX();
 				/*	Timer timer1 = new Timer();
@@ -3128,7 +3128,7 @@ public class playermenu extends Activity {
         	AmPlayer.enable_freescale(MID_FREESCALE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
 			writeFile(Fb0Blank,"1");
-			writeFile(Fb1Blank,"1");
+			//writeFile(Fb1Blank,"1");
 			AmPlayer.GL2XScale(0);
 			AmPlayer.enableFreescaleMBX();
         }
@@ -3167,7 +3167,7 @@ public class playermenu extends Activity {
         }
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
         	writeFile(Fb0Blank,"1");
-			writeFile(Fb1Blank,"1");
+			//writeFile(Fb1Blank,"1");
         }
 		disable2XScale();
         ScreenMode.setScreenMode("0");
