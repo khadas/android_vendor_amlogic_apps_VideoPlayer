@@ -460,6 +460,8 @@ public class playermenu extends Activity {
     void setOSDOnOff(boolean on) {
         if(confirm_dialog != null && confirm_dialog.isShowing())
             on = true;
+		if(isSubtitleOn())
+			on = true;
         if (!on && !mPaused) {
             if (isSubtitleOn()) {
                 int ori = getOSDRotation();
@@ -576,7 +578,7 @@ public class playermenu extends Activity {
 			subTitleView.getPaddingLeft(),
 			subTitleView.getPaddingTop(),
 			subTitleView.getPaddingRight(),
-			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20);
+			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
 
 		if(SystemProperties.getBoolean("3D_setting.enable", false)){
 		    	subTitleView_sm = (SubtitleView) findViewById(R.id.subTitle_more_sm);
@@ -2387,7 +2389,7 @@ public class playermenu extends Activity {
 			subTitleView.getPaddingLeft(),
 			subTitleView.getPaddingTop(),
 			subTitleView.getPaddingRight(),
-			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20);
+			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
     	
     	subTitleView.setTextStyle(Typeface.BOLD);
 	if(SystemProperties.getBoolean("3D_setting.enable", false)){
@@ -3651,7 +3653,7 @@ public class playermenu extends Activity {
 				subTitleView.getPaddingLeft(),
 				subTitleView.getPaddingTop(),
 				subTitleView.getPaddingRight(),
-				getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20);
+				getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
 	    if(SystemProperties.getBoolean("3D_setting.enable", false)){
         	try {
     			m_Amplayer.Set3Dmode(0);
