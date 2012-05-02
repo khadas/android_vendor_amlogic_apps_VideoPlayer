@@ -61,7 +61,10 @@ public class playermenu extends Activity {
 	private static String ScaleFile= "/sys/class/graphics/fb0/scale";
 	private static String RequestScaleFile= "/sys/class/graphics/fb0/request2XScale";
 	public static final String PREFS_NAME = "subtitlesetting"; 
+	private static String FormatMVC= "/sys/class/amhdmitx/amhdmitx0/config";
 
+	private static String FormatMVC_3dtb= "3dtb";
+	private static String FormatMVC_3doff= "3doff";
 
 	private static final int SET_OSD_ON= 1;
 	private static final int SET_OSD_OFF= 2;
@@ -3171,6 +3174,7 @@ public class playermenu extends Activity {
         	writeFile(Fb0Blank,"1");
 			//writeFile(Fb1Blank,"1");
         }
+		writeFile(FormatMVC,FormatMVC_3doff);
 		disable2XScale();
         ScreenMode.setScreenMode("0");
     }
@@ -3248,6 +3252,13 @@ public class playermenu extends Activity {
     				switch(player_status) {
 					case VideoInfo.PLAYER_RUNNING:
 						play.setImageResource(R.drawable.pause);						
+						String videoFotmat = bMediaInfo.getFullFileName(PlayList.getinstance().getcur());
+						if(videoFotmat.endsWith(".mvc")){
+							writeFile(FormatMVC,FormatMVC_3dtb);
+						}
+						else{
+							writeFile(FormatMVC,FormatMVC_3doff);
+						}
 						break;
 					case VideoInfo.PLAYER_PAUSE:
 					case VideoInfo.PLAYER_SEARCHING:	

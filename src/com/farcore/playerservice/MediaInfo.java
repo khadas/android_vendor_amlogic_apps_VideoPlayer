@@ -116,6 +116,11 @@ public class MediaInfo {
 		String filename = f.getName();
 		filename = filename.substring(0, filename.lastIndexOf("."));
 		return filename;
+	}	
+	public String getFullFileName(String path) {
+		File f = new File(path);
+		String filename = f.getName();
+		return filename;
 	}
 	
 	public String getResolution() {
