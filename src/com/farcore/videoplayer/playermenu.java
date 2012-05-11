@@ -3061,10 +3061,7 @@ public class playermenu extends Activity {
 		int minute = 0;
 		int second = 0;
 		if(i <= 0) {
-			if(isTotalTime && i<0)
-				return "99:59:59";
-			else
-				return "00:00:00";
+            return "00:00:00";
 		}
 		else {
 			minute = i/60;
@@ -3194,7 +3191,8 @@ public class playermenu extends Activity {
     	public void handleMessage(Message msg) {
     		switch(msg.what) {
     			case VideoInfo.TIME_INFO_MSG:
-    				//Log.i(TAG,"get time "+secToTime((msg.arg1)/1000));
+    				//Log.d(TAG,"get time "+secToTime((msg.arg1)/1000,false));
+                    //Log.d(TAG,"total time "+secToTime(msg.arg2,false));
     		    	cur_time.setText(secToTime((msg.arg1)/1000, false));
     		    	total_time.setText(secToTime(msg.arg2, true));
     		    	curtime = msg.arg1/1000;
