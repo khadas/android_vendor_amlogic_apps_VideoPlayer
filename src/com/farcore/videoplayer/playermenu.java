@@ -572,6 +572,16 @@ public class playermenu extends Activity {
 				baselayout2.setLayoutParams(frameParams);
 			}
 		}
+		
+		if(m1080scale == 2)
+		{
+			FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+			frameParams.leftMargin = 30;
+			frameParams.width = 1220;
+			frameParams.height = 680;
+			frameParams.gravity = Gravity.TOP;
+			baselayout2.setLayoutParams(frameParams);							
+		}
 		subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
 		subTitleView.setGravity(Gravity.CENTER);
 		subTitleView.setTextColor(sub_para.color);
@@ -2165,21 +2175,9 @@ public class playermenu extends Activity {
         outputmode = SystemProperties.get(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
 	 			 	writeFile(Fb0Blank,"1");
-					//writeFile(Fb1Blank,"1");
 	 			 	AmPlayer.GL2XScale(1);	
 				  	AmPlayer.disableFreescaleMBX();
-				/*	Timer timer1 = new Timer();
-	 			 	TimerTask task = new TimerTask(){   
-            public void run() {   
-				  		AmPlayer.disableFreescaleMBX();
-            }
-	        };
-	        timer1.cancel();
-	        timer1 = new Timer();
-	    		timer1.schedule(task, 1000);	*/
         }
-
-		
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
         //fixed bug for green line
@@ -2423,6 +2421,18 @@ public class playermenu extends Activity {
 				}				
 	        } 
     	}
+
+		if(m1080scale == 2)
+		{
+			linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
+			linearParams.leftMargin = 30;
+           	linearParams.width = 1220;
+           	linearParams.bottomMargin = 20;	        	
+	        subTitleView.setLayoutParams(linearParams);
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				subTitleView_sm.setLayoutParams(linearParams);
+			}							
+		}
     	openFile(sub_para.sub_id);
 	
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
@@ -2448,6 +2458,18 @@ public class playermenu extends Activity {
 	        	subTitleView.setLayoutParams(linearParams);			
 	        } 
     	}        
+		
+		if(m1080scale == 2)
+		{
+			linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
+			linearParams.leftMargin = 30;
+           	linearParams.width = 1220;
+           	linearParams.bottomMargin = 20;	        	
+	        subTitleView.setLayoutParams(linearParams);
+			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				subTitleView_sm.setLayoutParams(linearParams);
+			}							
+		}
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
     	total_time = (TextView)findViewById(R.id.TextView04);
