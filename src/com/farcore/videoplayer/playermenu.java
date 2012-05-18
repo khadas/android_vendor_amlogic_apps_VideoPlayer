@@ -2177,6 +2177,7 @@ public class playermenu extends Activity {
 	 			 	writeFile(Fb0Blank,"1");
 	 			 	AmPlayer.GL2XScale(1);	
 				  	AmPlayer.disableFreescaleMBX();
+					SystemProperties.set("vplayer.hideStatusBar.enable","true");
         }
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
