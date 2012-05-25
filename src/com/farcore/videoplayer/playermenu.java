@@ -62,6 +62,8 @@ public class playermenu extends Activity {
 	private static String RequestScaleFile= "/sys/class/graphics/fb0/request2XScale";
 	public static final String PREFS_NAME = "subtitlesetting"; 
 	private static String FormatMVC= "/sys/class/amhdmitx/amhdmitx0/config";
+	private final String ACTION_REALVIDEO_ON = "android.intent.action.REALVIDEO_ON";
+	private final String ACTION_REALVIDEO_OFF = "android.intent.action.REALVIDEO_OFF";
 
 	private static String FormatMVC_3dtb= "3dtb";
 	private static String FormatMVC_3doff= "3doff";
@@ -2182,9 +2184,8 @@ public class playermenu extends Activity {
         m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
         outputmode = SystemProperties.get(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-	 			 	writeFile(Fb0Blank,"1");
-	 			 	AmPlayer.GL2XScale(1);	
-				  	AmPlayer.disableFreescaleMBX();
+				  	Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
+					playermenu.this.sendBroadcast(intent_video_on);
 					SystemProperties.set("vplayer.hideStatusBar.enable","true");
         }
         if(AmPlayer.getProductType() == 1)
@@ -3169,10 +3170,8 @@ public class playermenu extends Activity {
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-			writeFile(Fb0Blank,"1");
-			//writeFile(Fb1Blank,"1");
-			AmPlayer.GL2XScale(0);
-			AmPlayer.enableFreescaleMBX();
+		  	Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
+			playermenu.this.sendBroadcast(intent_video_off);
         }
         super.onDestroy();
     }
@@ -3209,7 +3208,6 @@ public class playermenu extends Activity {
         }
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
         	writeFile(Fb0Blank,"1");
-			//writeFile(Fb1Blank,"1");
         }
 		writeFile(FormatMVC,FormatMVC_3doff);
 		disable2XScale();
