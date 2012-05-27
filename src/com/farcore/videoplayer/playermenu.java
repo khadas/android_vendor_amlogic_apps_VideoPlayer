@@ -452,15 +452,9 @@ public class playermenu extends Activity {
     }
     private boolean isSubtitleOn() {
         if (sub_para != null && sub_para.totalnum > 0 && sub_para.sub_id != null)
-        {
-			AmPlayer.setSubOnFlag(true);//tony.wang
             return true;
-        }
-		else
-		{
-            AmPlayer.setSubOnFlag(false);//tony.wang    
-       		return false;
-		}
+                        
+        return false;
     }
     private int getOSDRotation() {
         Display display = getWindowManager().getDefaultDisplay();
@@ -486,13 +480,11 @@ public class playermenu extends Activity {
                     writeSysfs(OSD_BLOCK_MODE_PATH, "0x10008"); //OSD hor blk3 enable
                     
             } else {
-                writeSysfs(OSD_BLANK_PATH, "1");
-				AmPlayer.setOSDOnFlag(false);//tony.wang
+                writeSysfs(OSD_BLANK_PATH, "1"); 
             }
         } else {
             writeSysfs(OSD_BLANK_PATH, "0");
             writeSysfs(OSD_BLOCK_MODE_PATH, "0");
-			AmPlayer.setOSDOnFlag(true);//tony.wang
         }
     }    
 /// patch for hide OSD
@@ -3079,15 +3071,6 @@ public class playermenu extends Activity {
 				if(infobar.getVisibility() == View.VISIBLE)
 		    		hide_infobar();
 		    	else {
-					//tony.wang
-					AmPlayer.setOSDOnFlag(true);
-					curtime=AmPlayer.getBackupCurrentTime()/1000;
-					totaltime = AmPlayer.getBackupTotalTime();
-					//Log.i("wxl","curtime:"+curtime+";totaltime:"+totaltime);
-					cur_time.setText(secToTime(curtime, false));
-			    	total_time.setText(secToTime(totaltime, true));
-			    	myProgressBar.setProgress(curtime*100/totaltime);
-					
 			    	show_menu();
 			    	waitForHide();
 		    	}

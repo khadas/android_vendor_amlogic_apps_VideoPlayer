@@ -263,27 +263,6 @@ public class AmPlayer extends Service {
     	mhandler.removeCallbacks(mGetState);
     }
 
-	//tony.wang
-	private static boolean isOSDOn = true;
-	private static boolean isSubOn = false;
-	private static int current_time_bac = 0;
-	private static int full_time_bac = 0;
-	public static void setOSDOnFlag(boolean flag)
-	{
-		isOSDOn = flag;
-	}
-	public static void setSubOnFlag(boolean flag)
-	{
-		isSubOn = flag;
-	}
-	public static int getBackupCurrentTime()
-	{
-		return current_time_bac;
-	}
-	public static int getBackupTotalTime()
-	{
-		return full_time_bac;
-	}
 	public static void onUpdateState(int pid, int status, int full_time,
 			int current_time, int last_time, int error_no, int param)
 	{
@@ -298,30 +277,12 @@ public class AmPlayer extends Service {
 			message.what = VideoInfo.TIME_INFO_MSG;
 			message.arg1 = current_time;
 			message.arg2 = full_time;
-
-			current_time_bac = current_time;//tony.wang
-			full_time_bac = full_time;
-
-			if((isOSDOn)||(!isOSDOn&&isSubOn))
-			{
-				try {
-					mClient.send(message);
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
+			try {
+				mClient.send(message);
+			} catch (RemoteException e) {
+				e.printStackTrace();
 			}
 			last_cur_time = current_time;
-		}
-		
-		//tony.wang
-		if(current_time==0)
-		{
-			current_time_bac = 0;
-		}
-		if(full_time==0)
-		{
-			current_time_bac = 0;
-			full_time_bac = 0;
 		}
 		
 		//send message for status changed
