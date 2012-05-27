@@ -3062,6 +3062,7 @@ public class playermenu extends Activity {
     
 	public boolean onTouchEvent (MotionEvent event) {
     	super.onTouchEvent(event);
+    	setOSDOnOff(true);
     	if(event.getAction() == MotionEvent.ACTION_DOWN) {
 			if(null != morbar){
 				if(morbar.getVisibility() == View.VISIBLE)
