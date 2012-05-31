@@ -64,6 +64,7 @@ public class playermenu extends Activity {
 	private static String FormatMVC= "/sys/class/amhdmitx/amhdmitx0/config";
 	private final String ACTION_REALVIDEO_ON = "android.intent.action.REALVIDEO_ON";
 	private final String ACTION_REALVIDEO_OFF = "android.intent.action.REALVIDEO_OFF";
+	private final String ACTION_VIDEOPOSITION_CHANGE = "android.intent.action.VIDEOPOSITION_CHANGE";
 
 	private static String FormatMVC_3dtb= "3dtb";
 	private static String FormatMVC_3doff= "3doff";
@@ -2250,6 +2251,10 @@ public class playermenu extends Activity {
 		mode_3d = 0;
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
+		if(m1080scale == 2){		//set video position for MBX 
+			Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
+			playermenu.this.sendBroadcast(intent_videoposition_change);
+		}
         SettingsVP.enableVideoLayout();
 //        if(AmPlayer.getProductType() == 1){
 //	        if(SettingsVP.display_mode.equals("480p")) {
