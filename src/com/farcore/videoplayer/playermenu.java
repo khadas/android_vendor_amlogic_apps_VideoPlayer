@@ -64,7 +64,7 @@ public class playermenu extends Activity {
 	private static String FormatMVC= "/sys/class/amhdmitx/amhdmitx0/config";
 	private final String ACTION_REALVIDEO_ON = "android.intent.action.REALVIDEO_ON";
 	private final String ACTION_REALVIDEO_OFF = "android.intent.action.REALVIDEO_OFF";
-	private final String ACTION_VIDEOPOSITION_CHANGE = "android.intent.action.VIDEOPOSITION_CHANGE";
+	private final String ACTION_VIDEOPOSITION_CHANGE = "android.intent.action.VIDEOPOSITION_CHANGE"; 
 
 	private static String FormatMVC_3dtb= "3dtb";
 	private static String FormatMVC_3doff= "3doff";
@@ -556,15 +556,7 @@ public class playermenu extends Activity {
 			Log.d(TAG, "!initVideoView");
 	}
 
-
     private void videobar() {
-		if(fb32) {
-			setContentView(R.layout.layout_morebar32);
-		} 
-		else {
-			setContentView(R.layout.layout_morebar);
-		}
-		initVideoView(R.id.video_view);
 		FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
 		if(AmPlayer.getProductType() == 1){
 			if (SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
@@ -593,16 +585,8 @@ public class playermenu extends Activity {
 			frameParams.gravity = Gravity.TOP;
 			baselayout2.setLayoutParams(frameParams);							
 		}
-		subTitleView = (SubtitleView) findViewById(R.id.subTitle_more);
-		subTitleView.setGravity(Gravity.CENTER);
-		subTitleView.setTextColor(sub_para.color);
-		subTitleView.setTextSize(sub_para.font);
-		subTitleView.setTextStyle(Typeface.BOLD);
-		subTitleView.setPadding(
-			subTitleView.getPaddingLeft(),
-			subTitleView.getPaddingTop(),
-			subTitleView.getPaddingRight(),
-			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
+		
+		//setSubtitleView();//tony.wang 20120525
 
 		if(SystemProperties.getBoolean("3D_setting.enable", false)){
 		    	subTitleView_sm = (SubtitleView) findViewById(R.id.subTitle_more_sm);
@@ -612,9 +596,7 @@ public class playermenu extends Activity {
 		    	subTitleView_sm.setTextStyle(Typeface.BOLD);		
 		
 		}
-    	openFile(sub_para.sub_id);
-
-		
+    	//openFile(sub_para.sub_id);//tony.wang 20120525
 		
 		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
 		subbar.setVisibility(View.GONE);
@@ -626,7 +608,7 @@ public class playermenu extends Activity {
 		infodialog = (LinearLayout)findViewById(R.id.dialog_layout);
 		infodialog.setVisibility(View.GONE);
     	morbar = (LinearLayout)findViewById(R.id.morebarLayout);
-    	morbar.requestFocus();
+    	morbar.setVisibility(View.GONE);
     	
     	ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
     	resume.setOnClickListener(new View.OnClickListener() {
@@ -656,10 +638,14 @@ public class playermenu extends Activity {
 						morbar.setVisibility(View.VISIBLE);
 				    ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
 				    resume.requestFocus();
+
+					waitForHideOsd();//tony.wang 20120525
 					}
 				});
 				otherbar.requestFocus();
 				morebar_status = R.string.setting_resume;
+
+				timer.cancel();//tony.wang 20120525
 			} 
 		});
     	
@@ -690,10 +676,14 @@ public class playermenu extends Activity {
     				    	morbar.setVisibility(View.VISIBLE);
 							    ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
 							    playmode.requestFocus();
+
+							waitForHideOsd();//tony.wang 20120525
     				    }
     				});
     				otherbar.requestFocus();
     				morebar_status = R.string.setting_playmode;
+
+					timer.cancel();//tony.wang 20120525
     			}
     		});
     	}
@@ -909,10 +899,14 @@ public class playermenu extends Activity {
 							morbar.setVisibility(View.VISIBLE);
 							ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
 							play3d.requestFocus();
+
+							waitForHideOsd();//tony.wang 20120525
 						}
 					});    
 					otherbar.requestFocus();
 					morebar_status = R.string.setting_3d_mode;
+
+					timer.cancel();//tony.wang 20120525
 				} 
 			});
 		}
@@ -929,6 +923,7 @@ public class playermenu extends Activity {
     				toast.setGravity(Gravity.BOTTOM,110,0);
     				toast.setDuration(0x00000001);
     				toast.show();
+					waitForHideOsd();//tony.wang 20120525
     				return;
     			}
     			otherbar.setVisibility(View.VISIBLE);
@@ -966,10 +961,14 @@ public class playermenu extends Activity {
     			    	morbar.setVisibility(View.VISIBLE);
 						    ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
 						    audiotrack.requestFocus();
+
+						waitForHideOsd();//tony.wang 20120525
     			    }	
     			});
     			otherbar.requestFocus();
 				morebar_status = R.string.setting_audiotrack;
+
+				timer.cancel();//tony.wang 20120525
     		} 
     	});
     	
@@ -981,6 +980,7 @@ public class playermenu extends Activity {
     				toast.setGravity(Gravity.BOTTOM,110,0);
     				toast.setDuration(0x00000001);
     				toast.show();
+					waitForHideOsd();//tony.wang 20120525
     				return;
     			}
     			subbar.setVisibility(View.VISIBLE);
@@ -992,6 +992,8 @@ public class playermenu extends Activity {
     			subtitle_control();
     			subbar.requestFocus();
     			morebar_status = R.string.setting_subtitle;
+
+				timer.cancel();//tony.wang 20120525
     		}
     		
     		String color_text[]={ 
@@ -1074,10 +1076,26 @@ public class playermenu extends Activity {
     			    	subTitleView.setViewStatus(true);
 						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 						     subTitleView_sm.setViewStatus(true);
-						}						
-    			    	videobar();
+						}
+						//tony.wang 20120525
+    			    	//videobar();
+    			    	showOsdView();
+						if (sub_para.sub_id != null) {
+	  						if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
+	  						{
+								//do nothing
+							}
+							else
+							{
+								setSubtitleView();
+							}
+						}
+						openFile(sub_para.sub_id);
+						
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
+
+						waitForHideOsd();//tony.wang 20120525
     			    } 
     			});
     			Button cancel = (Button) findViewById(R.id.button_canncel);
@@ -1092,9 +1110,25 @@ public class playermenu extends Activity {
 				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 				     subTitleView_sm.setViewStatus(true);
 				}						
-  		            	videobar();
+  		            	//tony.wang 20120525
+    			    	//videobar();
+						showOsdView();
+						if (sub_para.sub_id != null) {
+	  						if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
+	  						{
+								//do nothing
+							}
+							else
+							{
+								setSubtitleView();
+							}
+						}
+						openFile(sub_para.sub_id);
+						
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
+
+						waitForHideOsd();//tony.wang 20120525
   		            } 
   		        });
     			ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	
@@ -1411,10 +1445,14 @@ public class playermenu extends Activity {
                     	morbar.setVisibility(View.VISIBLE);
 						ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
 						display.requestFocus();
+
+						waitForHideOsd();//tony.wang 20120525
                     }
                 });      
                 otherbar.requestFocus();
     			morebar_status = R.string.setting_displaymode;
+
+				timer.cancel();//tony.wang 20120525
             } 
     	});
     	
@@ -1499,10 +1537,14 @@ public class playermenu extends Activity {
     						morbar.setVisibility(View.VISIBLE);
     						ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
     						brigtness.requestFocus();
+
+							waitForHideOsd();//tony.wang 20120525
     					}
     				});
     				otherbar.requestFocus();
     				morebar_status = R.string.setting_brightness;
+
+					timer.cancel();//tony.wang 20120525
     			} 
     		}); 
     	}
@@ -1510,7 +1552,8 @@ public class playermenu extends Activity {
     	ImageButton backtovidebar = (ImageButton) findViewById(R.id.BackBtn);
     	backtovidebar.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
-				if (null != morbar){
+				//tony.wang 20120525
+				/*if (null != morbar){
 	        		morbar = null;
 				}
 				if(AmPlayer.getProductType() == 1){
@@ -1524,7 +1567,9 @@ public class playermenu extends Activity {
                 } else {
                     setContentView(R.layout.infobar);
                 }
-                initinfobar();
+                initinfobar();*/
+				switchOsdView();
+                
                 ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
                 morebtn.requestFocus();
     		} 
@@ -1579,30 +1624,38 @@ public class playermenu extends Activity {
 			}					
                         morbar.setVisibility(View.VISIBLE);
 						ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
-						fileinformation.requestFocus();	
+						fileinformation.requestFocus();
+
+						waitForHideOsd();//tony.wang 20120525
 					}
 				});
 				infodialog.requestFocus();	
     			morebar_status = R.string.str_file_name;
+
+				timer.cancel();//tony.wang 20120525
             } 
     	}); 
 
-		waitForHideVideoBar();
+		//tony.wang 20120525
+		//waitForHideVideoBar();
     }
     
     public boolean onKeyUp(int keyCode, KeyEvent msg) {
         if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
             touchVolFlag = false;
-            waitForHide();
+            //waitForHide();//tony.wang 20120525
+            waitForHideOsd();
         }
+		
         return true;
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
-        
-        setOSDOnOff(true);
+		//tony.wang 20120525
+		setOSDOnOff(true);
         if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
-        	if (morbar!=null)  {
+			//tony.wang 20120525
+        	/*if (morbar!=null)  {
         		if(morbar.getVisibility() == View.VISIBLE){
                 	waitForHideVideoBar();
         		}
@@ -1611,10 +1664,16 @@ public class playermenu extends Activity {
         		if (infobar.getVisibility() == View.VISIBLE){
                     waitForHide();
         		}
-        	}
+        	}*/
+        	if((morbar.getVisibility() == View.VISIBLE)||(infobar.getVisibility() == View.VISIBLE))
+			waitForHideOsd();
+			
         	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
 	        	if(intouch_flag){
-	        		if (morbar!=null)  {
+	        		//if (morbar!=null)//tony.wang 20120525 
+	        		int flag = getCurOsdViewFlag();
+					if(OSD_MORE_BAR==flag)
+					{
 	            		if(morbar.getVisibility() == View.VISIBLE){
 	            			morbar.requestFocusFromTouch();
 	            		}
@@ -1646,6 +1705,134 @@ public class playermenu extends Activity {
     		return true;
     	}
     	else if (keyCode == KeyEvent.KEYCODE_BACK) {
+			int flag = getCurOsdViewFlag();
+			if(OSD_MORE_BAR==flag)
+			{
+				if((otherbar.getVisibility() == View.VISIBLE) 
+				|| (infodialog.getVisibility() == View.VISIBLE)
+				|| (subbar.getVisibility() == View.VISIBLE))
+				{
+					switchOsdView();
+
+					if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+		    	        switch(morebar_status){
+	    	        	case R.string.setting_resume:
+	    	        		ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
+	    	        		resume.requestFocusFromTouch();
+	    				    resume.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_playmode:
+	    	        		ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
+	    	        		playmode.requestFocusFromTouch();
+						    playmode.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_3d_mode:
+	    	        		ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+	    	        		play3d.requestFocusFromTouch();
+	                    	play3d.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_audiotrack:
+	    	        		ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
+	    	        		audiotrack.requestFocusFromTouch();
+						    audiotrack.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_subtitle:
+	    	        		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
+	    	        		subtitle.requestFocusFromTouch();
+	    	        		subtitle.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_displaymode:
+	    	        		ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
+	    	        		display.requestFocusFromTouch();
+							display.requestFocus();
+	    	        		break;
+	    	        	case R.string.setting_brightness:
+	    	        		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
+	    	        		brigtness.requestFocusFromTouch();
+	                        brigtness.requestFocus();
+	    	        		break;
+	    	        	case R.string.str_file_name:
+	    	        		ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
+	    	        		fileinformation.requestFocusFromTouch();
+							fileinformation.requestFocus();	
+	    	        		break;
+		    	        default:
+		    	        	morbar.requestFocus();
+		    	        	break;
+		    	        }
+	            	}
+					return(true);
+				}
+				else
+				{
+					switchOsdView();//tony.wang 20120525
+					
+					ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
+
+		        	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+		                morebtn.requestFocusFromTouch();
+		                morebtn.requestFocus();
+		        	}
+					return(true);
+				}
+			}
+			else if(OSD_INFO_BAR==flag)
+			{
+    			if(m_Amplayer == null)
+					return (true);
+    			if(bMediaInfo == null)
+					return (true);
+
+                // close infobar  
+				if(SettingsVP.chkEnableOSD2XScale() == true) {
+					//tony.wang 20120525
+					/*if(infobar != null) {
+						infobar.setVisibility(View.GONE);
+		    		    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+		    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					}*/
+					showNoOsdView();
+				}
+	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
+    			Intent selectFileIntent = new Intent();
+				Bundle bundle = new Bundle();
+				bundle.putInt("item_position_selected", item_position_selected);
+			    bundle.putInt("item_position_first", item_position_first);
+			    bundle.putInt("fromtop_piexl", fromtop_piexl);
+			    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
+			    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
+				selectFileIntent.setClass(playermenu.this, FileList.class);
+				selectFileIntent.putExtras(bundle);
+				//close sub;
+				if(subTitleView!=null){
+					subTitleView.closeSubtitle();	
+    				subTitleView.clear();
+				}
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+				     subTitleView_sm.closeSubtitle();
+				     subTitleView_sm.clear();
+				}				
+                if (!fb32) {
+                    // Hide the view with key color
+                    FrameLayout layout = (FrameLayout) findViewById(R.id.BaseLayout1);
+                    if (layout != null) {
+                        layout.setVisibility(View.INVISIBLE);
+                        layout.invalidate();
+                    }
+                }
+
+				//stop play
+				backToFileList = true;
+				if(m_Amplayer != null)
+					Amplayer_stop();
+				//do disable2XScale in onPause()
+				if(!backToOtherAPK){
+					startActivity(selectFileIntent);
+				}
+				playermenu.this.finish();
+				return true;
+    		}
+			/*
     		if (morbar!=null)  {
     			if((otherbar.getVisibility() == View.VISIBLE) 
     					|| (infodialog.getVisibility() == View.VISIBLE)
@@ -1708,10 +1895,14 @@ public class playermenu extends Activity {
 		    	        	break;
 		    	        }
 	            	}
-	    	        waitForHideVideoBar();
+					//tony.wang 20120525
+	    	        //waitForHideVideoBar();
+	    	        waitForHideOsd();
 			        return(true);
     			}
     			else {
+					//tony.wang 20120525
+					/*
 		        	morbar=null;
 	                if (fb32) {
 	                    setContentView(R.layout.infobar32);
@@ -1719,7 +1910,9 @@ public class playermenu extends Activity {
 					else {
 	                    setContentView(R.layout.infobar);
 	                }
-		        	initinfobar();
+		        	initinfobar();*//*
+		        	switchOsdView();
+					
 					ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
 
 		        	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
@@ -1737,11 +1930,13 @@ public class playermenu extends Activity {
 
                 // close infobar  
 				if(SettingsVP.chkEnableOSD2XScale() == true) {
-					if(infobar != null) {
+					//tony.wang 20120525
+					/*if(infobar != null) {
 						infobar.setVisibility(View.GONE);
 		    		    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
 		    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-					}
+					}*//*
+					showNoOsdView();
 				}
 	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
     			Intent selectFileIntent = new Intent();
@@ -1780,9 +1975,11 @@ public class playermenu extends Activity {
 				}
 				playermenu.this.finish();
 				return true;
-    		}
+    		}*/
     	}
 		else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
+			//tony.wang 20120525
+			/*
 			if (morbar!=null)  {
 	    		if (morbar.getVisibility() == View.VISIBLE){
 	    			hideVideoBar();
@@ -1804,16 +2001,45 @@ public class playermenu extends Activity {
 			    	show_menu();
 	                waitForHide();
 		    	}
+			}*/
+
+			if((morbar.getVisibility() == View.VISIBLE)||(infobar.getVisibility() == View.VISIBLE))
+			{
+				showNoOsdView();
+			}
+			else
+			{
+				showOsdView();
+				
+				int flag = getCurOsdViewFlag();
+				if(OSD_INFO_BAR==flag)
+				{
+					if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+			    		play.requestFocusFromTouch();
+			    		play.requestFocus();
+		        	}
+				}
 			}
 			return (true);
 		}
     	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
             play.requestFocus();
 
+			//tony.wang 20120525
+			/*
             if (infobar.getVisibility() != View.VISIBLE) {
                 show_menu();
                 waitForHide();
-            }
+            }*/
+			int flag = getCurOsdViewFlag();
+			if(OSD_INFO_BAR==flag)
+			{
+				showOsdView();
+			}
+			else if(OSD_MORE_BAR==flag)
+			{
+				switchOsdView();
+			}
 
 			if (player_status == VideoInfo.PLAYER_RUNNING) {
 				try	{
@@ -1854,6 +2080,8 @@ public class playermenu extends Activity {
 				return false;
 			try
 			{
+				//tony.wang 20120525
+				/*
 	            if (morbar!=null)  
 	            {
 		        	morbar=null;
@@ -1864,18 +2092,30 @@ public class playermenu extends Activity {
 	                    setContentView(R.layout.infobar);
 	                }
 		        	initinfobar();
-		        }
+		        }*/
+		        int flag = getCurOsdViewFlag();
+				if(OSD_INFO_BAR==flag)
+				{
+					showOsdView();
+				}
+				else if(OSD_MORE_BAR==flag)
+				{
+					switchOsdView();
+				}
+				
 	        	ImageButton preItem = (ImageButton) findViewById(R.id.PreBtn);
             	preItem.requestFocus();
             }
             catch(Exception ex )
             {
             }
-            
+
+			//tony.wang 20120525
+			/*
             if (infobar.getVisibility() != View.VISIBLE) {
                 show_menu();
                 waitForHide();
-            }
+            }*/
 
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().moveprev();
@@ -1894,6 +2134,8 @@ public class playermenu extends Activity {
 				return false;
 			try
 			{
+				//tony.wang 20120525
+				/*
 	            if (morbar!=null)  
             	{
 		        	morbar=null;
@@ -1904,7 +2146,17 @@ public class playermenu extends Activity {
 	                    setContentView(R.layout.infobar);
 	                }
 		        	initinfobar();
-	        	}
+	        	}*/
+	        	int flag = getCurOsdViewFlag();
+				if(OSD_INFO_BAR==flag)
+				{
+					showOsdView();
+				}
+				else if(OSD_MORE_BAR==flag)
+				{
+					switchOsdView();
+				}
+				
 	        	ImageButton nextItem = (ImageButton) findViewById(R.id.NextBtn);
 	        	nextItem.requestFocus();
         	}
@@ -1912,10 +2164,12 @@ public class playermenu extends Activity {
         	{
         	}
 
+			//tony.wang 20120525
+			/*
             if (infobar.getVisibility() != View.VISIBLE) {
                 show_menu();
                 waitForHide();
-            }
+            }*/
 
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().movenext();
@@ -1935,10 +2189,20 @@ public class playermenu extends Activity {
 
             fastforword.requestFocus();
 
-            if (infobar.getVisibility() != View.VISIBLE) {
+			//tony.wang 20120525
+            /*if (infobar.getVisibility() != View.VISIBLE) {
                 show_menu();
                 waitForHide();
-            }
+            }*/
+            int flag = getCurOsdViewFlag();
+			if(OSD_INFO_BAR==flag)
+			{
+				showOsdView();
+			}
+			else if(OSD_MORE_BAR==flag)
+			{
+				switchOsdView();
+			}
 
 			if (player_status == VideoInfo.PLAYER_SEARCHING) {
 				if(FF_FLAG) {
@@ -2013,10 +2277,20 @@ public class playermenu extends Activity {
 
             fastreverse.requestFocus();
 
-            if (infobar.getVisibility() != View.VISIBLE) {
+			//tony.wang 20120525
+            /*if (infobar.getVisibility() != View.VISIBLE) {
                 show_menu();
                 waitForHide();
-            }
+            }*/
+            int flag = getCurOsdViewFlag();
+			if(OSD_INFO_BAR==flag)
+			{
+				showOsdView();
+			}
+			else if(OSD_MORE_BAR==flag)
+			{
+				switchOsdView();
+			}
 
             if (player_status == VideoInfo.PLAYER_SEARCHING) {
 				if(FB_FLAG) {
@@ -2086,7 +2360,8 @@ public class playermenu extends Activity {
             }
         } 
     	else if (keyCode == KeyEvent.KEYCODE_MUTE) {
-    		if(null != morbar){
+			//tony.wang 20120525
+			/*if(null != morbar){
 				if(morbar.getVisibility() != View.VISIBLE){
 		    		if(!(otherbar.getVisibility() == View.VISIBLE) 
 	    					&& !(infodialog.getVisibility() == View.VISIBLE)
@@ -2102,6 +2377,21 @@ public class playermenu extends Activity {
 			    	waitForHide();
 				    play.requestFocus();
 		    	}
+			}*/
+			int flag = getCurOsdViewFlag();
+			if(OSD_INFO_BAR==flag)
+			{
+				showOsdView();
+				play.requestFocus();
+			}
+			else if(OSD_MORE_BAR==flag)
+			{
+				if(!(otherbar.getVisibility() == View.VISIBLE) 
+				&& !(infodialog.getVisibility() == View.VISIBLE)
+				&& !(subbar.getVisibility() == View.VISIBLE))
+				{
+					showOsdView();
+				}
 			}
     	}
         /*
@@ -2185,7 +2475,7 @@ public class playermenu extends Activity {
         m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
         outputmode = SystemProperties.get(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-				  	Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
+	 			 	Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
 					playermenu.this.sendBroadcast(intent_video_on);
 					SystemProperties.set("vplayer.hideStatusBar.enable","true");
         }
@@ -2194,7 +2484,7 @@ public class playermenu extends Activity {
         //fixed bug for green line
         FrameLayout foreground = (FrameLayout)findViewById(android.R.id.content);
         foreground.setForeground(null);
-        
+		
         if(fb32) {
             setContentView(R.layout.infobar32);
             setTitle(null);
@@ -2202,15 +2492,16 @@ public class playermenu extends Activity {
         else {
             setContentView(R.layout.infobar);
         }
+
         toast = Toast.makeText(playermenu.this, "", Toast.LENGTH_SHORT);
         ff_fb =Toast.makeText(playermenu.this, "",Toast.LENGTH_SHORT );
         ff_fb.setGravity(Gravity.TOP | Gravity.RIGHT,10,10);
 		ff_fb.setDuration(0x00000001);
-		
-        infobar = (LinearLayout) findViewById(R.id.infobarLayout);
-        if(infobar != null)
-            infobar.setVisibility(View.GONE);
 
+		//tony.wang 20120525
+       /* infobar = (LinearLayout) findViewById(R.id.infobarLayout);
+        if(infobar != null)
+            infobar.setVisibility(View.GONE);*/
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
         closeScreenOffTimeout();
@@ -2251,9 +2542,9 @@ public class playermenu extends Activity {
 		mode_3d = 0;
         SettingsVP.init(this);
         SettingsVP.setVideoLayoutMode();
-		if(m1080scale == 2){		//set video position for MBX 
-			Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
-			playermenu.this.sendBroadcast(intent_videoposition_change);
+		if(m1080scale == 2){            //set video position for MBX 
+		Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
+		playermenu.this.sendBroadcast(intent_videoposition_change);
 		}
         SettingsVP.enableVideoLayout();
 //        if(AmPlayer.getProductType() == 1){
@@ -2264,7 +2555,11 @@ public class playermenu extends Activity {
 //        }
 		subinit();
 		displayinit();
-		initinfobar();
+		
+		//tony.wang 20120525
+		//initinfobar();
+		initOsdBar();
+		
 		IntentFilter intentFilter = new IntentFilter(WindowManagerPolicy.ACTION_HDMI_PLUGGED);
 		mReceiver = new BroadcastReceiver() {
 	        @Override
@@ -2397,17 +2692,8 @@ public class playermenu extends Activity {
 		initVideoView(R.id.VideoView);
 		LinearLayout.LayoutParams linearParams = null;
     	//set subtitle
-    	subTitleView = (SubtitleView) findViewById(R.id.subTitle);
-    	subTitleView.setGravity(Gravity.CENTER);
-    	subTitleView.setTextColor(sub_para.color);
-    	subTitleView.setTextSize(sub_para.font);
-		subTitleView.setPadding(
-			subTitleView.getPaddingLeft(),
-			subTitleView.getPaddingTop(),
-			subTitleView.getPaddingRight(),
-			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
-    	
-    	subTitleView.setTextStyle(Typeface.BOLD);
+		setSubtitleView();//tony.wang 20120525
+		
 	if(SystemProperties.getBoolean("3D_setting.enable", false)){
 	    	subTitleView_sm= (SubtitleView) findViewById(R.id.subTitle_sm);
 	    	subTitleView_sm.setGravity(Gravity.CENTER);
@@ -2415,6 +2701,7 @@ public class playermenu extends Activity {
 	    	subTitleView_sm.setTextSize(sub_para.font);	    	
 	    	subTitleView_sm.setTextStyle(Typeface.BOLD);
 	}
+
     	if(AmPlayer.getProductType() == 1){
 	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
 	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
@@ -2436,7 +2723,6 @@ public class playermenu extends Activity {
 				}				
 	        } 
     	}
-
 		if(m1080scale == 2)
 		{
 			linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
@@ -2458,6 +2744,11 @@ public class playermenu extends Activity {
         fastforword = (ImageButton)findViewById(R.id.FastForward);
         fastreverse = (ImageButton)findViewById(R.id.FastReverse);
         infobar = (LinearLayout)findViewById(R.id.infobarLayout);
+
+		//tony.wang 20120525
+		if(null!=infobar)
+			infobar.setVisibility(View.GONE);
+		
     	if(AmPlayer.getProductType() == 1){
 	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
 	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
@@ -2485,6 +2776,7 @@ public class playermenu extends Activity {
 				subTitleView_sm.setLayoutParams(linearParams);
 			}							
 		}
+
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
     	total_time = (TextView)findViewById(R.id.TextView04);
@@ -2499,7 +2791,6 @@ public class playermenu extends Activity {
 				fastreverse.setImageResource(R.drawable.rewind_disable);
 			}
     	}
-    	
         browser.setOnClickListener(new ImageButton.OnClickListener() {
 			public void onClick(View v) {
 			// TODO Auto-generated method stub
@@ -2560,7 +2851,8 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
-				waitForHide();
+				//waitForHide();//tony.wang 20120525
+				waitForHideOsd();
 			}
         });
         
@@ -2580,7 +2872,8 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
-				waitForHide();
+				//waitForHide();//tony.wang 20120525
+				waitForHideOsd();
 			}
         });
         
@@ -2621,7 +2914,8 @@ public class playermenu extends Activity {
 						e.printStackTrace();
 					}
 				}
-				waitForHide();
+				//waitForHide();//tony.wang 20120525
+				waitForHideOsd();
 			}
         });
                 
@@ -2695,7 +2989,8 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
     				ff_fb.show();
 				}
-				waitForHide();
+				//waitForHide();//tony.wang 20120525
+				waitForHideOsd();
 			}
         });
         
@@ -2769,17 +3064,21 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
     				ff_fb.show();
 				}
-				waitForHide();
+				//waitForHide();//tony.wang 20120525
+				waitForHideOsd();
 			}
         });
-        
+
+
         more.setOnClickListener(new ImageButton.OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				videobar();
+
+				//tony.wang 20120525
+				//videobar();
+				switchOsdView();
 			}
 		});
-        
         if(curtime != 0)
         	myProgressBar.setProgress(curtime*100/totaltime);
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -2816,11 +3115,12 @@ public class playermenu extends Activity {
 				        seek_cur_time = 0;
 						e.printStackTrace();
 					}
-					waitForHide();
+					//waitForHide();//tony.wang 20120525
+					waitForHideOsd();
 				}
 			}
 		});
-        waitForHide();
+        //waitForHide();//tony.wang 20120525
     }
 	
     private String catShowFilePath(String path) {
@@ -3067,9 +3367,9 @@ public class playermenu extends Activity {
     
 	public boolean onTouchEvent (MotionEvent event) {
     	super.onTouchEvent(event);
-    	setOSDOnOff(true);
     	if(event.getAction() == MotionEvent.ACTION_DOWN) {
-			if(null != morbar){
+			//tony.wang 20120525
+			/*if(null != morbar){
 				if(morbar.getVisibility() == View.VISIBLE)
 		    		hideVideoBar();
 		    	else {
@@ -3096,7 +3396,35 @@ public class playermenu extends Activity {
 			    	show_menu();
 			    	waitForHide();
 		    	}
+			}*/
+			if((morbar.getVisibility() == View.VISIBLE)||(infobar.getVisibility() == View.VISIBLE))
+			{
+				showNoOsdView();
 			}
+			else if((View.VISIBLE==otherbar.getVisibility())
+				||(View.VISIBLE==infodialog.getVisibility())
+				||(View.VISIBLE==subbar.getVisibility()))
+			{
+				// do nothing
+			}
+			else
+			{
+				showOsdView();
+			}
+
+			int flag = getCurOsdViewFlag();
+			if(OSD_INFO_BAR==flag)
+			{
+				//tony.wang
+				AmPlayer.setOSDOnFlag(true);
+				curtime=AmPlayer.getBackupCurrentTime()/1000;
+				totaltime = AmPlayer.getBackupTotalTime();
+				//Log.i("wxl","curtime:"+curtime+";totaltime:"+totaltime);
+				cur_time.setText(secToTime(curtime, false));
+		    	total_time.setText(secToTime(totaltime, true));
+		    	myProgressBar.setProgress(curtime*100/totaltime);
+			}
+			
 			intouch_flag = true;
     	}
     	return true;
@@ -3176,7 +3504,7 @@ public class playermenu extends Activity {
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-		  	Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
+			Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
 			playermenu.this.sendBroadcast(intent_video_off);
         }
         super.onDestroy();
@@ -3330,6 +3658,9 @@ public class playermenu extends Activity {
 								subTitleView_sm.closeSubtitle(); //need return focus.	
 								
 							}
+
+							//tony.wang 20120525
+							/*
 							if (morbar!=null)  
 							{
 					        	morbar=null;
@@ -3342,9 +3673,15 @@ public class playermenu extends Activity {
 					        	initinfobar();
 								ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
 				            	morebtn.requestFocus();
-				            }
+				            }*/
+				            int flag = getCurOsdViewFlag();
+							if(OSD_MORE_BAR==flag)
+				            {
+				            	switchOsdView();
+								ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
+				            	morebtn.requestFocus();
+							}
 						}
-
 						
 						sub_para.totalnum = 0;
 						cur_audio_stream = 0;
@@ -3524,6 +3861,13 @@ public class playermenu extends Activity {
                                             layout.setVisibility(View.INVISIBLE);
                                             layout.invalidate();
                                         }
+
+										//tony.wang 20120525
+										LinearLayout layout2 = (LinearLayout) findViewById(R.id.BaseLayout2);
+										if(layout2 != null) {
+                                            layout.setVisibility(View.INVISIBLE);
+                                            layout2.invalidate();
+                                        }
 									}
 									// stop play
 									backToFileList = true;
@@ -3569,6 +3913,13 @@ public class playermenu extends Activity {
                                         if (layout != null) {
                                             layout.setVisibility(View.INVISIBLE);
                                             layout.invalidate();
+                                        }
+
+										//tony.wang 20120525
+										LinearLayout layout2 = (LinearLayout) findViewById(R.id.BaseLayout2);
+										if(layout2 != null) {
+                                            layout.setVisibility(View.INVISIBLE);
+                                            layout2.invalidate();
                                         }
                                     }
                                     // stop play
@@ -3625,6 +3976,13 @@ public class playermenu extends Activity {
 										if(layout != null) {
                                             layout.setVisibility(View.INVISIBLE);
                                             layout.invalidate();
+                                        }
+
+										//tony.wang 20120525
+										LinearLayout layout2 = (LinearLayout) findViewById(R.id.BaseLayout2);
+										if(layout2 != null) {
+                                            layout.setVisibility(View.INVISIBLE);
+                                            layout2.invalidate();
                                         }
                                     }
                                     // stop play
@@ -3685,7 +4043,9 @@ public class playermenu extends Activity {
 		FF_LEVEL = 0;
 		FB_LEVEL = 0;
     	try {
-    		if(morbar!=null) {	
+    		
+			//if(morbar!=null) //tony.wang 20120525
+			/*{	
     			if((otherbar!=null) && (otherbar.getVisibility() == View.VISIBLE))
     				otherbar.setVisibility(View.GONE);
     			if((infodialog!=null) && (infodialog.getVisibility() == View.VISIBLE))
@@ -3693,20 +4053,19 @@ public class playermenu extends Activity {
     			if((subbar!=null) && (subbar.getVisibility() == View.VISIBLE))
     				subbar.setVisibility(View.GONE);
     			
-	            morbar.setVisibility(View.VISIBLE);
-    		}
-    	
+	            morbar.setVisibility(View.VISIBLE)
+    		}*/
+			int flag = getCurOsdViewFlag();
+			if(OSD_MORE_BAR==flag)
+			{
+				showOsdView();
+			}
 
 			//reset sub;
 			subTitleView.clear();
 			subinit();
-			subTitleView.setTextColor(sub_para.color);
-	    	subTitleView.setTextSize(sub_para.font);
-			subTitleView.setPadding(
-				subTitleView.getPaddingLeft(),
-				subTitleView.getPaddingTop(),
-				subTitleView.getPaddingRight(),
-				getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
+			setSubtitleView();//tony.wang 20120525
+			
 	    if(SystemProperties.getBoolean("3D_setting.enable", false)){
         	try {
     			m_Amplayer.Set3Dmode(0);
@@ -4091,6 +4450,222 @@ Handler mRotateHandler = new Handler() {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+OutputFile);
 		}
+	}
+
+	//tony.wang 20120525 add for flash while osd switching
+	private static final int OSD_INFO_BAR=0;
+	private static final int OSD_MORE_BAR=1;
+	private int curOsdViewFlag=-1;
+
+	protected void waitForHideOsd() {
+    	final Handler handler = new Handler(){   
+    		  
+            public void handleMessage(Message msg) {   
+                switch (msg.what) {       
+                case 0x4c: 
+                	showNoOsdView();
+                    break;       
+                }       
+                super.handleMessage(msg);   
+            }
+               
+        };   
+        TimerTask task = new TimerTask(){   
+      
+            public void run() {   
+                if(!touchVolFlag) {
+                    Message message = Message.obtain();
+                    message.what = 0x4c;       
+                    handler.sendMessage(message);     
+                }   
+            }
+        };   
+        
+        timer.cancel();
+        timer = new Timer();
+    	timer.schedule(task, 3000);
+    }
+
+	private void initOsdBar()
+	{
+		/*
+		if(fb32) 
+		{
+            setContentView(R.layout.infobar32);
+			initinfobar();
+			setContentView(R.layout.layout_morebar32);
+			videobar();
+        } 
+        else 
+		{
+            setContentView(R.layout.infobar);
+			initinfobar();
+			setContentView(R.layout.layout_morebar);
+			videobar();
+        }*/
+
+		initinfobar();
+		videobar();
+		showInfoBar();
+	}
+
+	private int getCurOsdViewFlag()
+	{
+		return curOsdViewFlag;
+	}
+
+	private void setCurOsdViewFlag(int osdView)
+	{
+		curOsdViewFlag = osdView;
+	}
+
+	private void showInfoBar()
+	{
+		if ((null!=infobar)&&(View.GONE==infobar.getVisibility()))
+		{
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+			if ((null!=morbar)&&(View.VISIBLE==morbar.getVisibility()))
+				morbar.setVisibility(View.GONE);
+			if ((null!=subbar)&&(View.VISIBLE==subbar.getVisibility()))
+				subbar.setVisibility(View.GONE);
+			if ((null!=otherbar)&&(View.VISIBLE==otherbar.getVisibility()))
+				otherbar.setVisibility(View.GONE);
+			if ((null!=infodialog)&&(View.VISIBLE==infodialog.getVisibility()))
+				infodialog.setVisibility(View.GONE);
+			
+			infobar.setVisibility(View.VISIBLE);
+			infobar.requestFocus();
+			setCurOsdViewFlag(OSD_INFO_BAR);
+			setOSDOnOff(true);
+			//waitForHide();
+			waitForHideOsd();
+        }
+	}
+
+	private void showMorBar()
+	{
+		if ((null!=morbar)&&(View.GONE==morbar.getVisibility()))
+		{
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			
+			if ((null!=infobar)&&(View.VISIBLE==infobar.getVisibility()))
+				infobar.setVisibility(View.GONE);
+			if ((null!=subbar)&&(View.VISIBLE==subbar.getVisibility()))
+				subbar.setVisibility(View.GONE);
+			if ((null!=otherbar)&&(View.VISIBLE==otherbar.getVisibility()))
+				otherbar.setVisibility(View.GONE);
+			if ((null!=infodialog)&&(View.VISIBLE==infodialog.getVisibility()))
+				infodialog.setVisibility(View.GONE);
+			
+			morbar.setVisibility(View.VISIBLE);
+	        morbar.requestFocus();
+			setCurOsdViewFlag(OSD_MORE_BAR);
+			setOSDOnOff(true);
+			//waitForHideVideoBar();
+			waitForHideOsd();
+        }
+	}
+
+	private void showNoOsdView()
+	{
+		if(subTitleView!=null)
+			subTitleView.redraw();
+		if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+		     subTitleView_sm.redraw();
+		}	
+
+		if ((null!=infobar)&&(View.VISIBLE==infobar.getVisibility()))
+			infobar.setVisibility(View.GONE);
+		if ((null!=morbar)&&(View.VISIBLE==morbar.getVisibility()))
+			morbar.setVisibility(View.GONE);
+		if ((null!=subbar)&&(View.VISIBLE==subbar.getVisibility()))
+			subbar.setVisibility(View.GONE);
+		if ((null!=otherbar)&&(View.VISIBLE==otherbar.getVisibility()))
+			otherbar.setVisibility(View.GONE);
+		if ((null!=infodialog)&&(View.VISIBLE==infodialog.getVisibility()))
+			infodialog.setVisibility(View.GONE);
+
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		setOSDOnOff(false);
+	}
+
+	private void showOsdView()
+	{
+		if(null==infobar)
+			return;
+		if(null==morbar)
+			return;
+
+		int flag = getCurOsdViewFlag();
+		switch(flag)
+		{
+			case OSD_INFO_BAR:
+			{
+				showInfoBar();
+			}
+			break;
+
+			case OSD_MORE_BAR:
+			{
+				showMorBar();
+			}
+			break;
+
+			default:
+			{
+				Log.e(TAG,"[showOsdView]getCurOsdView error flag:"+flag+",set CurOsdView default");
+				showInfoBar();
+			}
+			break;
+		}
+	}
+
+	private void switchOsdView()
+	{
+		if(null==infobar)
+			return;
+		if(null==morbar)
+			return;
+		
+		int flag = getCurOsdViewFlag();
+		switch(flag)
+		{
+			case OSD_INFO_BAR:
+			{
+				showMorBar();
+			}
+			break;
+
+			case OSD_MORE_BAR:
+			{
+				showInfoBar();
+			}
+			break;
+
+			default:
+			{
+				Log.e(TAG,"[switchOsdView]getCurOsdView error flag:"+flag+",set CurOsdView default");
+				showInfoBar();
+			}
+			break;
+		}
+	}
+
+	private void setSubtitleView()
+	{
+		subTitleView = (SubtitleView) findViewById(R.id.subTitle);
+		subTitleView.setGravity(Gravity.CENTER);
+		subTitleView.setTextColor(sub_para.color);
+		subTitleView.setTextSize(sub_para.font);
+		subTitleView.setTextStyle(Typeface.BOLD);
+		subTitleView.setPadding(
+			subTitleView.getPaddingLeft(),
+			subTitleView.getPaddingTop(),
+			subTitleView.getPaddingRight(),
+			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
+		subTitleView.clear();
 	}
 }
 
