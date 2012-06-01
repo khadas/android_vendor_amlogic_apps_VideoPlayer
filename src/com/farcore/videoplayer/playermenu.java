@@ -2451,6 +2451,7 @@ public class playermenu extends Activity {
 		
 		//tony.wang 20120525
 		//initinfobar();
+		firstInvokFlag=1;//tony.wang 20120601
 		initOsdBar();
 		
 		IntentFilter intentFilter = new IntentFilter(WindowManagerPolicy.ACTION_HDMI_PLUGGED);
@@ -4351,6 +4352,7 @@ Handler mRotateHandler = new Handler() {
 	private static final int OSD_INFO_BAR=0;
 	private static final int OSD_MORE_BAR=1;
 	private int curOsdViewFlag=-1;
+	private int firstInvokFlag=1;//tony.wang 20120601 add for box shield scale interface on start of playing
 
 	protected void waitForHideOsd() {
     	final Handler handler = new Handler(){   
@@ -4432,7 +4434,15 @@ Handler mRotateHandler = new Handler() {
 			infobar.setVisibility(View.VISIBLE);
 			infobar.requestFocus();
 			setCurOsdViewFlag(OSD_INFO_BAR);
-			setOSDOnOff(true);
+			Log.i("wxl","firstInvokFlag:"+firstInvokFlag);
+			if(1==firstInvokFlag)
+			{
+				firstInvokFlag--;
+			}
+			else
+			{
+				setOSDOnOff(true);
+			}
 			//waitForHide();
 			waitForHideOsd();
         }
