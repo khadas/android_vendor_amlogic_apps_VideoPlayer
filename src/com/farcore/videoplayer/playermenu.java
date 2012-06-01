@@ -995,49 +995,30 @@ public class playermenu extends Activity {
 
 				timer.cancel();//tony.wang 20120525
     		}
-    		
-    		String color_text[]={ 
-    				playermenu.this.getResources().getString(R.string.color_white),
-    				playermenu.this.getResources().getString(R.string.color_yellow),
-        			playermenu.this.getResources().getString(R.string.color_blue)
-        	};
 
+			String color_text[]={ 
+				playermenu.this.getResources().getString(R.string.color_white),
+				playermenu.this.getResources().getString(R.string.color_yellow),
+				playermenu.this.getResources().getString(R.string.color_blue)
+			};
+    		
     		private void subtitle_control() {
-    			t_subswitch =(TextView)findViewById(R.id.sub_swith111);
-    			t_subsfont =(TextView)findViewById(R.id.sub_font111);
-    			t_subscolor =(TextView)findViewById(R.id.sub_color111);
-    			t_subsposition_v =(TextView)findViewById(R.id.sub_position_v111);
-    			
-    			sub_switch_state = sub_para.curid;
-    			sub_font_state = sub_para.font;
-				sub_position_v_state = sub_para.position_v;
-    			
-    			if(sub_para.color==android.graphics.Color.WHITE)
-    				sub_color_state =0;
-    			else if(sub_para.color==android.graphics.Color.YELLOW)
-    				sub_color_state =1;
-    			else
-    				sub_color_state =2;
-    			
-    			
-    			//modify by jeff.yang
-    			if(sub_para.curid==sub_para.totalnum||sub_para.enable==false)
-    			{
-    				sub_para.curid=sub_para.totalnum;
-    				t_subswitch.setText(R.string.str_off);
-    			}
-    			else
-    				t_subswitch.setText(String.valueOf(sub_para.curid+1)+"/"+String.valueOf(sub_para.totalnum));
-    			
-    			t_subsfont.setText(String.valueOf(sub_font_state));
-    			t_subscolor.setText(color_text[sub_color_state]);
-    			t_subsposition_v.setText(String.valueOf(sub_position_v_state));
-    			
-    			Button ok = (Button) findViewById(R.id.button_ok);
-    			ok.setNextFocusUpId(R.id.position_v_l);
-    			ok.setNextFocusDownId(R.id.button_ok);
-    			ok.setNextFocusLeftId(R.id.button_ok);
-    			ok.setNextFocusRightId(R.id.button_canncel);
+				Button ok = (Button) findViewById(R.id.button_ok);
+				Button cancel = (Button) findViewById(R.id.button_canncel);
+				ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	
+				ImageButton Bswitch_r = (ImageButton) findViewById(R.id.switch_r);
+				ImageButton Bfont_l = (ImageButton) findViewById(R.id.font_l);	
+				ImageButton Bfont_r = (ImageButton) findViewById(R.id.font_r);
+				ImageButton Bcolor_l = (ImageButton) findViewById(R.id.color_l);	
+				ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
+				ImageButton Bposition_v_l = (ImageButton) findViewById(R.id.position_v_l);	
+				ImageButton Bposition_v_r = (ImageButton) findViewById(R.id.position_v_r);
+				TextView font =(TextView)findViewById(R.id.font_title);
+				TextView color =(TextView)findViewById(R.id.color_title);
+				TextView position_v =(TextView)findViewById(R.id.position_v_title);
+				
+				initSubSetOptions(color_text);
+		
     			ok.setOnClickListener(new View.OnClickListener() {	
     			    public void onClick(View v) {
     			    	sub_para.curid = sub_switch_state;
@@ -1080,17 +1061,21 @@ public class playermenu extends Activity {
 						//tony.wang 20120525
     			    	//videobar();
     			    	showOsdView();
+						setSubtitleView();
+						openFile(sub_para.sub_id);
 						if (sub_para.sub_id != null) {
-	  						if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
-	  						{
-								//do nothing
-							}
+			  				if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx")) {
+								disableSubSetOptions();
+			  				}
 							else
 							{
-								setSubtitleView();
+								initSubSetOptions(color_text);
 							}
+		  				}
+						else
+						{
+							initSubSetOptions(color_text);
 						}
-						openFile(sub_para.sub_id);
 						
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
@@ -1098,11 +1083,7 @@ public class playermenu extends Activity {
 						waitForHideOsd();//tony.wang 20120525
     			    } 
     			});
-    			Button cancel = (Button) findViewById(R.id.button_canncel);
-    			cancel.setNextFocusUpId(R.id.position_v_r);
-    			cancel.setNextFocusDownId(R.id.button_canncel);
-    			cancel.setNextFocusLeftId(R.id.button_ok);
-    			cancel.setNextFocusRightId(R.id.button_canncel);
+				
     			cancel.setOnClickListener(new View.OnClickListener() {
   		            public void onClick(View v) {
   		            	subbar.setVisibility(View.GONE);
@@ -1113,17 +1094,21 @@ public class playermenu extends Activity {
   		            	//tony.wang 20120525
     			    	//videobar();
 						showOsdView();
+						setSubtitleView();
+						openFile(sub_para.sub_id);
 						if (sub_para.sub_id != null) {
-	  						if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx"))
-	  						{
-								//do nothing
-							}
+			  				if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx")) {
+								disableSubSetOptions();
+			  				}
 							else
 							{
-								setSubtitleView();
+								initSubSetOptions(color_text);
 							}
+		  				}
+						else
+						{
+							initSubSetOptions(color_text);
 						}
-						openFile(sub_para.sub_id);
 						
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
@@ -1131,55 +1116,6 @@ public class playermenu extends Activity {
 						waitForHideOsd();//tony.wang 20120525
   		            } 
   		        });
-    			ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	
-    			ImageButton Bswitch_r = (ImageButton) findViewById(R.id.switch_r);
-    			ImageButton Bfont_l = (ImageButton) findViewById(R.id.font_l);	
-    			ImageButton Bfont_r = (ImageButton) findViewById(R.id.font_r);
-    			ImageButton Bcolor_l = (ImageButton) findViewById(R.id.color_l);	
-    			ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
-    			ImageButton Bposition_v_l = (ImageButton) findViewById(R.id.position_v_l);	
-    			ImageButton Bposition_v_r = (ImageButton) findViewById(R.id.position_v_r);
-
-    			Bswitch_l.setNextFocusUpId(R.id.switch_l);
-    			Bswitch_l.setNextFocusDownId(R.id.font_l);
-    			Bswitch_l.setNextFocusLeftId(R.id.switch_l);
-    			Bswitch_l.setNextFocusRightId(R.id.switch_r);
-    			
-    			Bswitch_r.setNextFocusUpId(R.id.switch_r);
-    			Bswitch_r.setNextFocusDownId(R.id.font_r);
-    			Bswitch_r.setNextFocusLeftId(R.id.switch_l);
-    			Bswitch_r.setNextFocusRightId(R.id.switch_r);
-
-				Bfont_l.setNextFocusUpId(R.id.switch_l);
-				Bfont_l.setNextFocusDownId(R.id.color_l);
-				Bfont_l.setNextFocusLeftId(R.id.font_l);
-				Bfont_l.setNextFocusRightId(R.id.font_r);
-
-				Bfont_r.setNextFocusUpId(R.id.switch_r);
-				Bfont_r.setNextFocusDownId(R.id.color_r);
-				Bfont_r.setNextFocusLeftId(R.id.font_l);
-				Bfont_r.setNextFocusRightId(R.id.font_r);
-
-				Bcolor_l.setNextFocusUpId(R.id.font_l);
-				Bcolor_l.setNextFocusDownId(R.id.position_v_l);
-				Bcolor_l.setNextFocusLeftId(R.id.color_l);
-				Bcolor_l.setNextFocusRightId(R.id.color_r);
-
-				Bcolor_r.setNextFocusUpId(R.id.font_r);
-				Bcolor_r.setNextFocusDownId(R.id.position_v_r);
-				Bcolor_r.setNextFocusLeftId(R.id.color_l);
-				Bcolor_r.setNextFocusRightId(R.id.color_r);
-				
-				Bposition_v_l.setNextFocusUpId(R.id.color_l);
-				Bposition_v_l.setNextFocusDownId(R.id.button_ok);
-				Bposition_v_l.setNextFocusLeftId(R.id.position_v_l);
-				Bposition_v_l.setNextFocusRightId(R.id.position_v_r);
-
-				Bposition_v_r.setNextFocusUpId(R.id.color_r);
-				Bposition_v_r.setNextFocusDownId(R.id.button_canncel);
-				Bposition_v_r.setNextFocusLeftId(R.id.position_v_l);
-				Bposition_v_r.setNextFocusRightId(R.id.position_v_r);
-
 				
     			Bswitch_l.setOnClickListener(new View.OnClickListener() {
   					public void onClick(View v) {
@@ -1207,56 +1143,7 @@ public class playermenu extends Activity {
   							t_subswitch.setText(String.valueOf(sub_switch_state+1)+"/"+String.valueOf(sub_para.totalnum));;
    		            } 
   				});
-  				
-  				if (sub_para.sub_id != null) {
-	  				if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx")) {
-  						TextView font =(TextView)findViewById(R.id.font_title);
-						TextView color =(TextView)findViewById(R.id.color_title);
-						TextView position_v =(TextView)findViewById(R.id.position_v_title);
-							
-						font.setTextColor(android.graphics.Color.LTGRAY);
-						color.setTextColor(android.graphics.Color.LTGRAY);
-						position_v.setTextColor(android.graphics.Color.LTGRAY);
-							
-  						t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
-  						t_subscolor.setTextColor(android.graphics.Color.LTGRAY);
-  						t_subsposition_v.setTextColor(android.graphics.Color.LTGRAY);	
-  							
-  					    Bfont_l.setEnabled(false);
-  	  					Bfont_r.setEnabled(false);
-  	  					Bcolor_l.setEnabled(false);
-  	  					Bcolor_r.setEnabled(false);
-  	  					Bposition_v_l.setEnabled(false);
-  	  					Bposition_v_r.setEnabled(false);
-  	  					Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
-  	  					Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
-  	  					Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
-  	  					Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
-  	  					Bposition_v_l.setImageResource(R.drawable.fondsetup_larrow_disable);
-  	  					Bposition_v_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
-  	  					
-  	  					Bswitch_l.setNextFocusUpId(R.id.switch_l);
-  	  					Bswitch_l.setNextFocusDownId(R.id.button_ok);
-  	  					Bswitch_l.setNextFocusLeftId(R.id.switch_l);
-  	  					Bswitch_l.setNextFocusRightId(R.id.switch_r);
-  	      			
-  	  					Bswitch_r.setNextFocusUpId(R.id.switch_r);
-  	  					Bswitch_r.setNextFocusDownId(R.id.button_canncel);
-  	  					Bswitch_r.setNextFocusLeftId(R.id.switch_l);
-  	  					Bswitch_r.setNextFocusRightId(R.id.switch_r);
-  	  					
-  	  					ok.setNextFocusUpId(R.id.switch_l);
-  	  					ok.setNextFocusDownId(R.id.button_ok);
-  	  					ok.setNextFocusLeftId(R.id.button_ok);
-  	    				ok.setNextFocusRightId(R.id.button_canncel);
 
-  	    				cancel.setNextFocusUpId(R.id.switch_r);
-  	    				cancel.setNextFocusDownId(R.id.button_canncel);
-  	    				cancel.setNextFocusLeftId(R.id.button_ok);
-  	    				cancel.setNextFocusRightId(R.id.button_canncel);
-  	  					return;
-	  				}
-  				}
   				Bfont_l.setOnClickListener(new View.OnClickListener() {
   					public void onClick(View v) {
   						if(sub_font_state > 12)
@@ -1319,6 +1206,12 @@ public class playermenu extends Activity {
   						t_subsposition_v.setText(String.valueOf(sub_position_v_state));
    		            } 
   				});
+
+				if (sub_para.sub_id != null) {
+	  				if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx")) {
+						disableSubSetOptions();
+	  				}
+  				}
 			} 
     	});
     	
@@ -1712,7 +1605,7 @@ public class playermenu extends Activity {
 				|| (infodialog.getVisibility() == View.VISIBLE)
 				|| (subbar.getVisibility() == View.VISIBLE))
 				{
-					switchOsdView();
+					showOsdView();
 
 					if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
 		    	        switch(morebar_status){
@@ -3800,6 +3693,8 @@ public class playermenu extends Activity {
 					    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
 							else
 							    sub_para.sub_id = null;
+
+							setSubtitleView();//tony.wang 20120525
 							openFile(sub_para.sub_id);
 						}else{
 							sub_para.sub_id = null;
@@ -4656,6 +4551,7 @@ Handler mRotateHandler = new Handler() {
 	private void setSubtitleView()
 	{
 		subTitleView = (SubtitleView) findViewById(R.id.subTitle);
+		subTitleView.clear();
 		subTitleView.setGravity(Gravity.CENTER);
 		subTitleView.setTextColor(sub_para.color);
 		subTitleView.setTextSize(sub_para.font);
@@ -4665,7 +4561,183 @@ Handler mRotateHandler = new Handler() {
 			subTitleView.getPaddingTop(),
 			subTitleView.getPaddingRight(),
 			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
-		subTitleView.clear();
+	}
+
+	private void initSubSetOptions(String color_text[])
+	{
+		t_subswitch =(TextView)findViewById(R.id.sub_swith111);
+		t_subsfont =(TextView)findViewById(R.id.sub_font111);
+		t_subscolor =(TextView)findViewById(R.id.sub_color111);
+		t_subsposition_v =(TextView)findViewById(R.id.sub_position_v111);
+		
+		sub_switch_state = sub_para.curid;
+		sub_font_state = sub_para.font;
+		sub_position_v_state = sub_para.position_v;
+		
+		if(sub_para.color==android.graphics.Color.WHITE)
+			sub_color_state =0;
+		else if(sub_para.color==android.graphics.Color.YELLOW)
+			sub_color_state =1;
+		else
+			sub_color_state =2;
+		
+		
+		//modify by jeff.yang
+		if(sub_para.curid==sub_para.totalnum||sub_para.enable==false)
+		{
+			sub_para.curid=sub_para.totalnum;
+			t_subswitch.setText(R.string.str_off);
+		}
+		else
+			t_subswitch.setText(String.valueOf(sub_para.curid+1)+"/"+String.valueOf(sub_para.totalnum));
+		
+		t_subsfont.setText(String.valueOf(sub_font_state));
+		t_subscolor.setText(color_text[sub_color_state]);
+		t_subsposition_v.setText(String.valueOf(sub_position_v_state));
+		
+	
+		Button ok = (Button) findViewById(R.id.button_ok);
+		Button cancel = (Button) findViewById(R.id.button_canncel);
+		ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	
+		ImageButton Bswitch_r = (ImageButton) findViewById(R.id.switch_r);
+		ImageButton Bfont_l = (ImageButton) findViewById(R.id.font_l);	
+		ImageButton Bfont_r = (ImageButton) findViewById(R.id.font_r);
+		ImageButton Bcolor_l = (ImageButton) findViewById(R.id.color_l);	
+		ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
+		ImageButton Bposition_v_l = (ImageButton) findViewById(R.id.position_v_l);	
+		ImageButton Bposition_v_r = (ImageButton) findViewById(R.id.position_v_r);
+		TextView font =(TextView)findViewById(R.id.font_title);
+		TextView color =(TextView)findViewById(R.id.color_title);
+		TextView position_v =(TextView)findViewById(R.id.position_v_title);
+
+		font.setTextColor(android.graphics.Color.BLACK);
+		color.setTextColor(android.graphics.Color.BLACK);
+		position_v.setTextColor(android.graphics.Color.BLACK);
+		
+		t_subsfont.setTextColor(android.graphics.Color.BLACK);
+		t_subscolor.setTextColor(android.graphics.Color.BLACK);
+		t_subsposition_v.setTextColor(android.graphics.Color.BLACK);	
+			
+	    Bfont_l.setEnabled(true);
+		Bfont_r.setEnabled(true);
+		Bcolor_l.setEnabled(true);
+		Bcolor_r.setEnabled(true);
+		Bposition_v_l.setEnabled(true);
+		Bposition_v_r.setEnabled(true);
+		Bfont_l.setImageResource(R.drawable.fondsetup_larrow_unfocus);
+		Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_unfocus);
+		Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_unfocus);
+		Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_unfocus);
+		Bposition_v_l.setImageResource(R.drawable.fondsetup_larrow_unfocus);
+		Bposition_v_r.setImageResource(R.drawable.fondsetup_rarrow_unfocus);
+
+		Bswitch_l.setNextFocusUpId(R.id.switch_l);
+		Bswitch_l.setNextFocusDownId(R.id.font_l);
+		Bswitch_l.setNextFocusLeftId(R.id.switch_l);
+		Bswitch_l.setNextFocusRightId(R.id.switch_r);
+		
+		Bswitch_r.setNextFocusUpId(R.id.switch_r);
+		Bswitch_r.setNextFocusDownId(R.id.font_r);
+		Bswitch_r.setNextFocusLeftId(R.id.switch_l);
+		Bswitch_r.setNextFocusRightId(R.id.switch_r);
+
+		Bfont_l.setNextFocusUpId(R.id.switch_l);
+		Bfont_l.setNextFocusDownId(R.id.color_l);
+		Bfont_l.setNextFocusLeftId(R.id.font_l);
+		Bfont_l.setNextFocusRightId(R.id.font_r);
+
+		Bfont_r.setNextFocusUpId(R.id.switch_r);
+		Bfont_r.setNextFocusDownId(R.id.color_r);
+		Bfont_r.setNextFocusLeftId(R.id.font_l);
+		Bfont_r.setNextFocusRightId(R.id.font_r);
+
+		Bcolor_l.setNextFocusUpId(R.id.font_l);
+		Bcolor_l.setNextFocusDownId(R.id.position_v_l);
+		Bcolor_l.setNextFocusLeftId(R.id.color_l);
+		Bcolor_l.setNextFocusRightId(R.id.color_r);
+
+		Bcolor_r.setNextFocusUpId(R.id.font_r);
+		Bcolor_r.setNextFocusDownId(R.id.position_v_r);
+		Bcolor_r.setNextFocusLeftId(R.id.color_l);
+		Bcolor_r.setNextFocusRightId(R.id.color_r);
+		
+		Bposition_v_l.setNextFocusUpId(R.id.color_l);
+		Bposition_v_l.setNextFocusDownId(R.id.button_ok);
+		Bposition_v_l.setNextFocusLeftId(R.id.position_v_l);
+		Bposition_v_l.setNextFocusRightId(R.id.position_v_r);
+
+		Bposition_v_r.setNextFocusUpId(R.id.color_r);
+		Bposition_v_r.setNextFocusDownId(R.id.button_canncel);
+		Bposition_v_r.setNextFocusLeftId(R.id.position_v_l);
+		Bposition_v_r.setNextFocusRightId(R.id.position_v_r);
+
+		cancel.setNextFocusUpId(R.id.position_v_r);
+		cancel.setNextFocusDownId(R.id.button_canncel);
+		cancel.setNextFocusLeftId(R.id.button_ok);
+		cancel.setNextFocusRightId(R.id.button_canncel);
+
+		ok.setNextFocusUpId(R.id.position_v_l);
+		ok.setNextFocusDownId(R.id.button_ok);
+		ok.setNextFocusLeftId(R.id.button_ok);
+		ok.setNextFocusRightId(R.id.button_canncel);
+	}
+
+	private void disableSubSetOptions()
+	{
+		Button ok = (Button) findViewById(R.id.button_ok);
+		Button cancel = (Button) findViewById(R.id.button_canncel);
+		ImageButton Bswitch_l = (ImageButton) findViewById(R.id.switch_l);	
+		ImageButton Bswitch_r = (ImageButton) findViewById(R.id.switch_r);
+		ImageButton Bfont_l = (ImageButton) findViewById(R.id.font_l);	
+		ImageButton Bfont_r = (ImageButton) findViewById(R.id.font_r);
+		ImageButton Bcolor_l = (ImageButton) findViewById(R.id.color_l);	
+		ImageButton Bcolor_r = (ImageButton) findViewById(R.id.color_r);
+		ImageButton Bposition_v_l = (ImageButton) findViewById(R.id.position_v_l);	
+		ImageButton Bposition_v_r = (ImageButton) findViewById(R.id.position_v_r);
+		TextView font =(TextView)findViewById(R.id.font_title);
+		TextView color =(TextView)findViewById(R.id.color_title);
+		TextView position_v =(TextView)findViewById(R.id.position_v_title);
+			
+		font.setTextColor(android.graphics.Color.LTGRAY);
+		color.setTextColor(android.graphics.Color.LTGRAY);
+		position_v.setTextColor(android.graphics.Color.LTGRAY);
+		
+		t_subsfont.setTextColor(android.graphics.Color.LTGRAY);
+		t_subscolor.setTextColor(android.graphics.Color.LTGRAY);
+		t_subsposition_v.setTextColor(android.graphics.Color.LTGRAY);	
+			
+	    Bfont_l.setEnabled(false);
+		Bfont_r.setEnabled(false);
+		Bcolor_l.setEnabled(false);
+		Bcolor_r.setEnabled(false);
+		Bposition_v_l.setEnabled(false);
+		Bposition_v_r.setEnabled(false);
+		Bfont_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+		Bfont_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+		Bcolor_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+		Bcolor_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+		Bposition_v_l.setImageResource(R.drawable.fondsetup_larrow_disable);
+		Bposition_v_r.setImageResource(R.drawable.fondsetup_rarrow_disable);
+		
+		Bswitch_l.setNextFocusUpId(R.id.switch_l);
+		Bswitch_l.setNextFocusDownId(R.id.button_ok);
+		Bswitch_l.setNextFocusLeftId(R.id.switch_l);
+		Bswitch_l.setNextFocusRightId(R.id.switch_r);
+	
+		Bswitch_r.setNextFocusUpId(R.id.switch_r);
+		Bswitch_r.setNextFocusDownId(R.id.button_canncel);
+		Bswitch_r.setNextFocusLeftId(R.id.switch_l);
+		Bswitch_r.setNextFocusRightId(R.id.switch_r);
+		
+		ok.setNextFocusUpId(R.id.switch_l);
+		ok.setNextFocusDownId(R.id.button_ok);
+		ok.setNextFocusLeftId(R.id.button_ok);
+		ok.setNextFocusRightId(R.id.button_canncel);
+
+		cancel.setNextFocusUpId(R.id.switch_r);
+		cancel.setNextFocusDownId(R.id.button_canncel);
+		cancel.setNextFocusLeftId(R.id.button_ok);
+		cancel.setNextFocusRightId(R.id.button_canncel);
 	}
 }
 
