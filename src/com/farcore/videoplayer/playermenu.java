@@ -586,8 +586,6 @@ public class playermenu extends Activity {
 			baselayout2.setLayoutParams(frameParams);							
 		}
 		
-		//setSubtitleView();//tony.wang 20120525
-
 		if(SystemProperties.getBoolean("3D_setting.enable", false)){
 		    	subTitleView_sm = (SubtitleView) findViewById(R.id.subTitle_more_sm);
 		    	subTitleView_sm.setGravity(Gravity.CENTER);
@@ -596,7 +594,6 @@ public class playermenu extends Activity {
 		    	subTitleView_sm.setTextStyle(Typeface.BOLD);		
 		
 		}
-    	//openFile(sub_para.sub_id);//tony.wang 20120525
 		
 		subbar = (LinearLayout)findViewById(R.id.LinearLayout_sub);
 		subbar.setVisibility(View.GONE);
@@ -639,13 +636,13 @@ public class playermenu extends Activity {
 				    ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
 				    resume.requestFocus();
 
-					waitForHideOsd();//tony.wang 20120525
+					waitForHideOsd();
 					}
 				});
 				otherbar.requestFocus();
 				morebar_status = R.string.setting_resume;
 
-				timer.cancel();//tony.wang 20120525
+				timer.cancel();
 			} 
 		});
     	
@@ -677,13 +674,13 @@ public class playermenu extends Activity {
 							    ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
 							    playmode.requestFocus();
 
-							waitForHideOsd();//tony.wang 20120525
+							waitForHideOsd();
     				    }
     				});
     				otherbar.requestFocus();
     				morebar_status = R.string.setting_playmode;
 
-					timer.cancel();//tony.wang 20120525
+					timer.cancel();
     			}
     		});
     	}
@@ -900,13 +897,13 @@ public class playermenu extends Activity {
 							ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
 							play3d.requestFocus();
 
-							waitForHideOsd();//tony.wang 20120525
+							waitForHideOsd();
 						}
 					});    
 					otherbar.requestFocus();
 					morebar_status = R.string.setting_3d_mode;
 
-					timer.cancel();//tony.wang 20120525
+					timer.cancel();
 				} 
 			});
 		}
@@ -923,7 +920,7 @@ public class playermenu extends Activity {
     				toast.setGravity(Gravity.BOTTOM,110,0);
     				toast.setDuration(0x00000001);
     				toast.show();
-					waitForHideOsd();//tony.wang 20120525
+					waitForHideOsd();
     				return;
     			}
     			otherbar.setVisibility(View.VISIBLE);
@@ -962,13 +959,13 @@ public class playermenu extends Activity {
 						    ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
 						    audiotrack.requestFocus();
 
-						waitForHideOsd();//tony.wang 20120525
+						waitForHideOsd();
     			    }	
     			});
     			otherbar.requestFocus();
 				morebar_status = R.string.setting_audiotrack;
 
-				timer.cancel();//tony.wang 20120525
+				timer.cancel();
     		} 
     	});
     	
@@ -980,7 +977,7 @@ public class playermenu extends Activity {
     				toast.setGravity(Gravity.BOTTOM,110,0);
     				toast.setDuration(0x00000001);
     				toast.show();
-					waitForHideOsd();//tony.wang 20120525
+					waitForHideOsd();
     				return;
     			}
     			subbar.setVisibility(View.VISIBLE);
@@ -993,7 +990,7 @@ public class playermenu extends Activity {
     			subbar.requestFocus();
     			morebar_status = R.string.setting_subtitle;
 
-				timer.cancel();//tony.wang 20120525
+				timer.cancel();
     		}
 
 			String color_text[]={ 
@@ -1058,8 +1055,6 @@ public class playermenu extends Activity {
 						if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 						     subTitleView_sm.setViewStatus(true);
 						}
-						//tony.wang 20120525
-    			    	//videobar();
     			    	showOsdView();
 						setSubtitleView();
 						openFile(sub_para.sub_id);
@@ -1080,7 +1075,7 @@ public class playermenu extends Activity {
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
 
-						waitForHideOsd();//tony.wang 20120525
+						waitForHideOsd();
     			    } 
     			});
 				
@@ -1091,8 +1086,6 @@ public class playermenu extends Activity {
 				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 				     subTitleView_sm.setViewStatus(true);
 				}						
-  		            	//tony.wang 20120525
-    			    	//videobar();
 						showOsdView();
 						setSubtitleView();
 						openFile(sub_para.sub_id);
@@ -1113,7 +1106,7 @@ public class playermenu extends Activity {
     			    	ImageButton mSubtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
     			    	mSubtitle.requestFocus();
 
-						waitForHideOsd();//tony.wang 20120525
+						waitForHideOsd();
   		            } 
   		        });
 				
@@ -1185,8 +1178,8 @@ public class playermenu extends Activity {
   						t_subscolor.setText(color_text[sub_color_state]);
    		            } 
   				});
-  					
-  				Bposition_v_l.setOnClickListener(new View.OnClickListener() {
+
+				Bposition_v_l.setOnClickListener(new View.OnClickListener() {
   					public void onClick(View v) {
   						if(sub_position_v_state<= 0)
   							sub_position_v_state=15;
@@ -1339,13 +1332,13 @@ public class playermenu extends Activity {
 						ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
 						display.requestFocus();
 
-						waitForHideOsd();//tony.wang 20120525
+						waitForHideOsd();
                     }
                 });      
                 otherbar.requestFocus();
     			morebar_status = R.string.setting_displaymode;
 
-				timer.cancel();//tony.wang 20120525
+				timer.cancel();
             } 
     	});
     	
@@ -1431,13 +1424,13 @@ public class playermenu extends Activity {
     						ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
     						brigtness.requestFocus();
 
-							waitForHideOsd();//tony.wang 20120525
+							waitForHideOsd();
     					}
     				});
     				otherbar.requestFocus();
     				morebar_status = R.string.setting_brightness;
 
-					timer.cancel();//tony.wang 20120525
+					timer.cancel();
     			} 
     		}); 
     	}
@@ -1445,22 +1438,6 @@ public class playermenu extends Activity {
     	ImageButton backtovidebar = (ImageButton) findViewById(R.id.BackBtn);
     	backtovidebar.setOnClickListener(new View.OnClickListener() {
     		public void onClick(View v) {
-				//tony.wang 20120525
-				/*if (null != morbar){
-	        		morbar = null;
-				}
-				if(AmPlayer.getProductType() == 1){
-					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				}
-				else{
-					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				}
-                if (fb32) {
-                    setContentView(R.layout.infobar32);
-                } else {
-                    setContentView(R.layout.infobar);
-                }
-                initinfobar();*/
 				switchOsdView();
                 
                 ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
@@ -1519,24 +1496,20 @@ public class playermenu extends Activity {
 						ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
 						fileinformation.requestFocus();
 
-						waitForHideOsd();//tony.wang 20120525
+						waitForHideOsd();
 					}
 				});
 				infodialog.requestFocus();	
     			morebar_status = R.string.str_file_name;
 
-				timer.cancel();//tony.wang 20120525
+				timer.cancel();
             } 
     	}); 
-
-		//tony.wang 20120525
-		//waitForHideVideoBar();
     }
     
     public boolean onKeyUp(int keyCode, KeyEvent msg) {
         if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
             touchVolFlag = false;
-            //waitForHide();//tony.wang 20120525
             waitForHideOsd();
         }
 		
@@ -1544,26 +1517,13 @@ public class playermenu extends Activity {
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
-		//tony.wang 20120525
 		setOSDOnOff(true);
         if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
-			//tony.wang 20120525
-        	/*if (morbar!=null)  {
-        		if(morbar.getVisibility() == View.VISIBLE){
-                	waitForHideVideoBar();
-        		}
-        	}
-        	else{
-        		if (infobar.getVisibility() == View.VISIBLE){
-                    waitForHide();
-        		}
-        	}*/
         	if((morbar.getVisibility() == View.VISIBLE)||(infobar.getVisibility() == View.VISIBLE))
 			waitForHideOsd();
 			
         	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
 	        	if(intouch_flag){
-	        		//if (morbar!=null)//tony.wang 20120525 
 	        		int flag = getCurOsdViewFlag();
 					if(OSD_MORE_BAR==flag)
 					{
@@ -1658,7 +1618,7 @@ public class playermenu extends Activity {
 				}
 				else
 				{
-					switchOsdView();//tony.wang 20120525
+					switchOsdView();
 					
 					ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
 
@@ -1678,12 +1638,6 @@ public class playermenu extends Activity {
 
                 // close infobar  
 				if(SettingsVP.chkEnableOSD2XScale() == true) {
-					//tony.wang 20120525
-					/*if(infobar != null) {
-						infobar.setVisibility(View.GONE);
-		    		    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-		    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-					}*/
 					showNoOsdView();
 				}
 	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
@@ -1725,177 +1679,8 @@ public class playermenu extends Activity {
 				playermenu.this.finish();
 				return true;
     		}
-			/*
-    		if (morbar!=null)  {
-    			if((otherbar.getVisibility() == View.VISIBLE) 
-    					|| (infodialog.getVisibility() == View.VISIBLE)
-    					|| (subbar.getVisibility() == View.VISIBLE)) {
-	        		if((otherbar!=null) && (otherbar.getVisibility() == View.VISIBLE)){
-	        			otherbar.setVisibility(View.GONE);
-	        		}
-	        		if((infodialog!=null) && (infodialog.getVisibility() == View.VISIBLE)){
-	        			infodialog.setVisibility(View.GONE);
-	        		}
-	        		if((subbar!=null) && (subbar.getVisibility() == View.VISIBLE)){
-	        			subbar.setVisibility(View.GONE);
-	        		}
-	    	        morbar.setVisibility(View.VISIBLE);
-
-	            	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
-		    	        switch(morebar_status){
-	    	        	case R.string.setting_resume:
-	    	        		ImageButton resume = (ImageButton) findViewById(R.id.ResumeBtn);
-	    	        		resume.requestFocusFromTouch();
-	    				    resume.requestFocus();
-	    	        		break;
-	    	        	case R.string.setting_playmode:
-	    	        		ImageButton playmode = (ImageButton) findViewById(R.id.PlaymodeBtn);
-	    	        		playmode.requestFocusFromTouch();
-						    playmode.requestFocus();
-	    	        		break;
-	    	        	case R.string.setting_3d_mode:
-	    	        		ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
-	    	        		play3d.requestFocusFromTouch();
-	                    	play3d.requestFocus();
-	    	        		break;
-	    	        	case R.string.setting_audiotrack:
-	    	        		ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
-	    	        		audiotrack.requestFocusFromTouch();
-						    audiotrack.requestFocus();
-	    	        		break;
-	    	        	case R.string.setting_subtitle:
-	    	        		ImageButton subtitle = (ImageButton) findViewById(R.id.SubtitleBtn);
-	    	        		subtitle.requestFocusFromTouch();
-	    	        		subtitle.requestFocus();
-	    	        		break;
-	    	        	case R.string.setting_displaymode:
-	    	        		ImageButton display = (ImageButton) findViewById(R.id.DisplayBtn);
-	    	        		display.requestFocusFromTouch();
-							display.requestFocus();
-	    	        		break;
-	    	        	case R.string.setting_brightness:
-	    	        		ImageButton brigtness = (ImageButton) findViewById(R.id.BrightnessBtn);
-	    	        		brigtness.requestFocusFromTouch();
-	                        brigtness.requestFocus();
-	    	        		break;
-	    	        	case R.string.str_file_name:
-	    	        		ImageButton fileinformation = (ImageButton) findViewById(R.id.InfoBtn);
-	    	        		fileinformation.requestFocusFromTouch();
-							fileinformation.requestFocus();	
-	    	        		break;
-		    	        default:
-		    	        	morbar.requestFocus();
-		    	        	break;
-		    	        }
-	            	}
-					//tony.wang 20120525
-	    	        //waitForHideVideoBar();
-	    	        waitForHideOsd();
-			        return(true);
-    			}
-    			else {
-					//tony.wang 20120525
-					/*
-		        	morbar=null;
-	                if (fb32) {
-	                    setContentView(R.layout.infobar32);
-	                } 
-					else {
-	                    setContentView(R.layout.infobar);
-	                }
-		        	initinfobar();*//*
-		        	switchOsdView();
-					
-					ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
-
-		        	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
-		                morebtn.requestFocusFromTouch();
-		                morebtn.requestFocus();
-		        	}
-		        	return(true);
-    			}
-	        }
-    		else {
-    			if(m_Amplayer == null)
-					return (true);
-    			if(bMediaInfo == null)
-					return (true);
-
-                // close infobar  
-				if(SettingsVP.chkEnableOSD2XScale() == true) {
-					//tony.wang 20120525
-					/*if(infobar != null) {
-						infobar.setVisibility(View.GONE);
-		    		    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-		    			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-					}*//*
-					showNoOsdView();
-				}
-	  			item_position_selected = item_position_selected_init + PlayList.getinstance().getindex();
-    			Intent selectFileIntent = new Intent();
-				Bundle bundle = new Bundle();
-				bundle.putInt("item_position_selected", item_position_selected);
-			    bundle.putInt("item_position_first", item_position_first);
-			    bundle.putInt("fromtop_piexl", fromtop_piexl);
-			    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
-			    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
-				selectFileIntent.setClass(playermenu.this, FileList.class);
-				selectFileIntent.putExtras(bundle);
-				//close sub;
-				if(subTitleView!=null){
-					subTitleView.closeSubtitle();	
-    				subTitleView.clear();
-				}
-				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
-				     subTitleView_sm.closeSubtitle();
-				     subTitleView_sm.clear();
-				}				
-                if (!fb32) {
-                    // Hide the view with key color
-                    FrameLayout layout = (FrameLayout) findViewById(R.id.BaseLayout1);
-                    if (layout != null) {
-                        layout.setVisibility(View.INVISIBLE);
-                        layout.invalidate();
-                    }
-                }
-				//stop play
-				backToFileList = true;
-				if(m_Amplayer != null)
-					Amplayer_stop();
-				//do disable2XScale in onPause()
-				if(!backToOtherAPK){
-					startActivity(selectFileIntent);
-				}
-				playermenu.this.finish();
-				return true;
-    		}*/
     	}
 		else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
-			//tony.wang 20120525
-			/*
-			if (morbar!=null)  {
-	    		if (morbar.getVisibility() == View.VISIBLE){
-	    			hideVideoBar();
-	    		}
-		    	else {
-					morbar.requestFocus();
-					showVideoBar();
-					waitForHideVideoBar();
-		    	}
-			}
-			else{
-	    		if (infobar.getVisibility() == View.VISIBLE)
-		    		hide_infobar();
-		    	else {
-		        	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
-			    		play.requestFocusFromTouch();
-			    		play.requestFocus();
-		        	}
-			    	show_menu();
-	                waitForHide();
-		    	}
-			}*/
-
 			if((morbar.getVisibility() == View.VISIBLE)||(infobar.getVisibility() == View.VISIBLE))
 			{
 				showNoOsdView();
@@ -1918,12 +1703,6 @@ public class playermenu extends Activity {
     	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
             play.requestFocus();
 
-			//tony.wang 20120525
-			/*
-            if (infobar.getVisibility() != View.VISIBLE) {
-                show_menu();
-                waitForHide();
-            }*/
 			int flag = getCurOsdViewFlag();
 			if(OSD_INFO_BAR==flag)
 			{
@@ -1973,19 +1752,6 @@ public class playermenu extends Activity {
 				return false;
 			try
 			{
-				//tony.wang 20120525
-				/*
-	            if (morbar!=null)  
-	            {
-		        	morbar=null;
-	                if (fb32) {
-	                    setContentView(R.layout.infobar32);
-	                } 
-					else {
-	                    setContentView(R.layout.infobar);
-	                }
-		        	initinfobar();
-		        }*/
 		        int flag = getCurOsdViewFlag();
 				if(OSD_INFO_BAR==flag)
 				{
@@ -2002,13 +1768,6 @@ public class playermenu extends Activity {
             catch(Exception ex )
             {
             }
-
-			//tony.wang 20120525
-			/*
-            if (infobar.getVisibility() != View.VISIBLE) {
-                show_menu();
-                waitForHide();
-            }*/
 
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().moveprev();
@@ -2027,19 +1786,6 @@ public class playermenu extends Activity {
 				return false;
 			try
 			{
-				//tony.wang 20120525
-				/*
-	            if (morbar!=null)  
-            	{
-		        	morbar=null;
-	                if (fb32) {
-	                    setContentView(R.layout.infobar32);
-	                } 
-					else {
-	                    setContentView(R.layout.infobar);
-	                }
-		        	initinfobar();
-	        	}*/
 	        	int flag = getCurOsdViewFlag();
 				if(OSD_INFO_BAR==flag)
 				{
@@ -2056,13 +1802,6 @@ public class playermenu extends Activity {
         	catch(Exception ex)
         	{
         	}
-
-			//tony.wang 20120525
-			/*
-            if (infobar.getVisibility() != View.VISIBLE) {
-                show_menu();
-                waitForHide();
-            }*/
 
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().movenext();
@@ -2081,12 +1820,6 @@ public class playermenu extends Activity {
 				return false;
 
             fastforword.requestFocus();
-
-			//tony.wang 20120525
-            /*if (infobar.getVisibility() != View.VISIBLE) {
-                show_menu();
-                waitForHide();
-            }*/
             int flag = getCurOsdViewFlag();
 			if(OSD_INFO_BAR==flag)
 			{
@@ -2169,12 +1902,6 @@ public class playermenu extends Activity {
 				return false;
 
             fastreverse.requestFocus();
-
-			//tony.wang 20120525
-            /*if (infobar.getVisibility() != View.VISIBLE) {
-                show_menu();
-                waitForHide();
-            }*/
             int flag = getCurOsdViewFlag();
 			if(OSD_INFO_BAR==flag)
 			{
@@ -2253,24 +1980,6 @@ public class playermenu extends Activity {
             }
         } 
     	else if (keyCode == KeyEvent.KEYCODE_MUTE) {
-			//tony.wang 20120525
-			/*if(null != morbar){
-				if(morbar.getVisibility() != View.VISIBLE){
-		    		if(!(otherbar.getVisibility() == View.VISIBLE) 
-	    					&& !(infodialog.getVisibility() == View.VISIBLE)
-	    					&& !(subbar.getVisibility() == View.VISIBLE)) {
-				    	showVideoBar();
-				    	waitForHideVideoBar();
-				    	morbar.requestFocus();
-		    		}
-		    	}
-			}else{
-				if(infobar.getVisibility() != View.VISIBLE){
-			    	show_menu();
-			    	waitForHide();
-				    play.requestFocus();
-		    	}
-			}*/
 			int flag = getCurOsdViewFlag();
 			if(OSD_INFO_BAR==flag)
 			{
@@ -2391,10 +2100,6 @@ public class playermenu extends Activity {
         ff_fb.setGravity(Gravity.TOP | Gravity.RIGHT,10,10);
 		ff_fb.setDuration(0x00000001);
 
-		//tony.wang 20120525
-       /* infobar = (LinearLayout) findViewById(R.id.infobarLayout);
-        if(infobar != null)
-            infobar.setVisibility(View.GONE);*/
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
         closeScreenOffTimeout();
@@ -2448,9 +2153,6 @@ public class playermenu extends Activity {
 //        }
 		subinit();
 		displayinit();
-		
-		//tony.wang 20120525
-		//initinfobar();
 		firstInvokFlag=1;//tony.wang 20120601
 		initOsdBar();
 		
@@ -2586,7 +2288,7 @@ public class playermenu extends Activity {
 		initVideoView(R.id.VideoView);
 		LinearLayout.LayoutParams linearParams = null;
     	//set subtitle
-		setSubtitleView();//tony.wang 20120525
+		setSubtitleView();
 		
 	if(SystemProperties.getBoolean("3D_setting.enable", false)){
 	    	subTitleView_sm= (SubtitleView) findViewById(R.id.subTitle_sm);
@@ -2745,7 +2447,6 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
-				//waitForHide();//tony.wang 20120525
 				waitForHideOsd();
 			}
         });
@@ -2766,7 +2467,6 @@ public class playermenu extends Activity {
 				else
 					Amplayer_stop();
 				PRE_NEXT_FLAG = 1;
-				//waitForHide();//tony.wang 20120525
 				waitForHideOsd();
 			}
         });
@@ -2808,7 +2508,6 @@ public class playermenu extends Activity {
 						e.printStackTrace();
 					}
 				}
-				//waitForHide();//tony.wang 20120525
 				waitForHideOsd();
 			}
         });
@@ -2883,7 +2582,6 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
     				ff_fb.show();
 				}
-				//waitForHide();//tony.wang 20120525
 				waitForHideOsd();
 			}
         });
@@ -2958,7 +2656,6 @@ public class playermenu extends Activity {
 					ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
     				ff_fb.show();
 				}
-				//waitForHide();//tony.wang 20120525
 				waitForHideOsd();
 			}
         });
@@ -2967,9 +2664,6 @@ public class playermenu extends Activity {
         more.setOnClickListener(new ImageButton.OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-
-				//tony.wang 20120525
-				//videobar();
 				switchOsdView();
 			}
 		});
@@ -3009,12 +2703,10 @@ public class playermenu extends Activity {
 				        seek_cur_time = 0;
 						e.printStackTrace();
 					}
-					//waitForHide();//tony.wang 20120525
 					waitForHideOsd();
 				}
 			}
 		});
-        //waitForHide();//tony.wang 20120525
     }
 	
     private String catShowFilePath(String path) {
@@ -3262,35 +2954,6 @@ public class playermenu extends Activity {
 	public boolean onTouchEvent (MotionEvent event) {
     	super.onTouchEvent(event);
     	if(event.getAction() == MotionEvent.ACTION_DOWN) {
-			//tony.wang 20120525
-			/*if(null != morbar){
-				if(morbar.getVisibility() == View.VISIBLE)
-		    		hideVideoBar();
-		    	else {
-		    		if(!(otherbar.getVisibility() == View.VISIBLE) 
-	    					&& !(infodialog.getVisibility() == View.VISIBLE)
-	    					&& !(subbar.getVisibility() == View.VISIBLE)) {
-				    	showVideoBar();
-				    	waitForHideVideoBar();
-		    		}
-		    	}
-			}else{
-				if(infobar.getVisibility() == View.VISIBLE)
-		    		hide_infobar();
-		    	else {
-					//tony.wang
-					AmPlayer.setOSDOnFlag(true);
-					curtime=AmPlayer.getBackupCurrentTime()/1000;
-					totaltime = AmPlayer.getBackupTotalTime();
-					//Log.i("wxl","curtime:"+curtime+";totaltime:"+totaltime);
-					cur_time.setText(secToTime(curtime, false));
-			    	total_time.setText(secToTime(totaltime, true));
-			    	myProgressBar.setProgress(curtime*100/totaltime);
-					
-			    	show_menu();
-			    	waitForHide();
-		    	}
-			}*/
 			if((morbar.getVisibility() == View.VISIBLE)||(infobar.getVisibility() == View.VISIBLE))
 			{
 				showNoOsdView();
@@ -3552,22 +3215,7 @@ public class playermenu extends Activity {
 								subTitleView_sm.closeSubtitle(); //need return focus.	
 								
 							}
-
-							//tony.wang 20120525
-							/*
-							if (morbar!=null)  
-							{
-					        	morbar=null;
-				                if (fb32) {
-				                    setContentView(R.layout.infobar32);
-				                } 
-								else {
-				                    setContentView(R.layout.infobar);
-				                }
-					        	initinfobar();
-								ImageButton morebtn = (ImageButton) findViewById(R.id.moreBtn);
-				            	morebtn.requestFocus();
-				            }*/
+							
 				            int flag = getCurOsdViewFlag();
 							if(OSD_MORE_BAR==flag)
 				            {
@@ -3695,7 +3343,7 @@ public class playermenu extends Activity {
 							else
 							    sub_para.sub_id = null;
 
-							setSubtitleView();//tony.wang 20120525
+							setSubtitleView();
 							openFile(sub_para.sub_id);
 						}else{
 							sub_para.sub_id = null;
@@ -3939,18 +3587,6 @@ public class playermenu extends Activity {
 		FF_LEVEL = 0;
 		FB_LEVEL = 0;
     	try {
-    		
-			//if(morbar!=null) //tony.wang 20120525
-			/*{	
-    			if((otherbar!=null) && (otherbar.getVisibility() == View.VISIBLE))
-    				otherbar.setVisibility(View.GONE);
-    			if((infodialog!=null) && (infodialog.getVisibility() == View.VISIBLE))
-    				infodialog.setVisibility(View.GONE);
-    			if((subbar!=null) && (subbar.getVisibility() == View.VISIBLE))
-    				subbar.setVisibility(View.GONE);
-    			
-	            morbar.setVisibility(View.VISIBLE)
-    		}*/
 			int flag = getCurOsdViewFlag();
 			if(OSD_MORE_BAR==flag)
 			{
@@ -3960,7 +3596,7 @@ public class playermenu extends Activity {
 			//reset sub;
 			subTitleView.clear();
 			subinit();
-			setSubtitleView();//tony.wang 20120525
+			setSubtitleView();
 			
 	    if(SystemProperties.getBoolean("3D_setting.enable", false)){
         	try {
@@ -4353,7 +3989,7 @@ Handler mRotateHandler = new Handler() {
 	private static final int OSD_MORE_BAR=1;
 	private int curOsdViewFlag=-1;
 	private int firstInvokFlag=1;//tony.wang 20120601 add for box shield scale interface on start of playing
-
+	
 	protected void waitForHideOsd() {
     	final Handler handler = new Handler(){   
     		  
@@ -4385,22 +4021,6 @@ Handler mRotateHandler = new Handler() {
 
 	private void initOsdBar()
 	{
-		/*
-		if(fb32) 
-		{
-            setContentView(R.layout.infobar32);
-			initinfobar();
-			setContentView(R.layout.layout_morebar32);
-			videobar();
-        } 
-        else 
-		{
-            setContentView(R.layout.infobar);
-			initinfobar();
-			setContentView(R.layout.layout_morebar);
-			videobar();
-        }*/
-
 		initinfobar();
 		videobar();
 		showInfoBar();
