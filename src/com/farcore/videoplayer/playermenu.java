@@ -62,6 +62,9 @@ public class playermenu extends Activity {
 	private static String RequestScaleFile= "/sys/class/graphics/fb0/request2XScale";
 	public static final String PREFS_NAME = "subtitlesetting"; 
 	private static String FormatMVC= "/sys/class/amhdmitx/amhdmitx0/config";
+	private static String Filemap= "/sys/class/vfm/map";
+	private static String File_amvdec_mpeg12 = "/sys/module/amvdec_mpeg12/parameters/dec_control";
+	private static String File_amvdec_h264 = "/sys/module/amvdec_h264/parameters/dec_control";
 	private final String ACTION_REALVIDEO_ON = "android.intent.action.REALVIDEO_ON";
 	private final String ACTION_REALVIDEO_OFF = "android.intent.action.REALVIDEO_OFF";
 	private final String ACTION_VIDEOPOSITION_CHANGE = "android.intent.action.VIDEOPOSITION_CHANGE"; 
@@ -3246,6 +3249,16 @@ public class playermenu extends Activity {
 					case VideoInfo.PLAYER_STOPED:
 						break;
 					case VideoInfo.PLAYER_PLAYEND:
+						if(SystemProperties.getBoolean("ro.video.deinterlace.enable", false)){
+							if(bMediaInfo != null&&bMediaInfo.getWidth()*bMediaInfo.getHeight()<1280*720){
+								writeFile(Filemap,"rm default decoder deinterlace amvideo");
+								writeFile(Filemap,"add default decoder ppmgr amvideo");
+								writeFile(Filemap,"add default_osd osd amvideo");
+								writeFile(Filemap,"add default_ext vdin amvideo2");
+								writeFile(File_amvdec_h264,"0");
+								writeFile(File_amvdec_mpeg12,"0");	
+							}
+						}
 						try	{
 							m_Amplayer.Close();
 						} 
@@ -3294,6 +3307,16 @@ public class playermenu extends Activity {
 						NOT_FIRSTTIME = true;
 						try {
 							bMediaInfo = m_Amplayer.GetMediaInfo();
+							if(SystemProperties.getBoolean("ro.video.deinterlace.enable", false)){
+								if(bMediaInfo!=null&&bMediaInfo.getWidth()*bMediaInfo.getHeight()<1280*720){
+									writeFile(Filemap,"rm default decoder ppmgr amvideo");
+									writeFile(Filemap,"rm default_osd osd amvideo");
+									writeFile(Filemap,"rm default_ext vdin amvideo2");
+									writeFile(Filemap,"add default decoder deinterlace amvideo");
+									writeFile(File_amvdec_h264,"3");
+									writeFile(File_amvdec_mpeg12,"14");			
+								}
+							}
 						} 
 						catch(RemoteException e) {
 							e.printStackTrace();
@@ -3664,6 +3687,16 @@ public class playermenu extends Activity {
 		AudioTrackOperation.AudioStreamInfo.clear();
 		INITOK = false;
 		mRotateHandler.removeMessages(GETROTATION);
+		if(SystemProperties.getBoolean("ro.video.deinterlace.enable", false)){
+			if(bMediaInfo != null&&bMediaInfo.getWidth()*bMediaInfo.getHeight()<1280*720){
+				writeFile(Filemap,"rm default decoder deinterlace amvideo");
+				writeFile(Filemap,"add default decoder ppmgr amvideo");
+				writeFile(Filemap,"add default_osd osd amvideo");
+				writeFile(Filemap,"add default_ext vdin amvideo2");
+				writeFile(File_amvdec_h264,"0");
+				writeFile(File_amvdec_mpeg12,"0");	
+			}
+		}
     }
     
     ServiceConnection m_PlayerConn = new ServiceConnection() {
