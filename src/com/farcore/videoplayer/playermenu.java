@@ -3051,8 +3051,6 @@ public class playermenu extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-
 			
         StopPlayerService();
         setDefCodecMips();
@@ -3063,10 +3061,6 @@ public class playermenu extends Activity {
 
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-			Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
-			playermenu.this.sendBroadcast(intent_video_off);
-        }
         super.onDestroy();
     }
 
@@ -3102,7 +3096,10 @@ public class playermenu extends Activity {
         }
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
         	writeFile(Fb0Blank,"1");
+			Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
+			playermenu.this.sendBroadcast(intent_video_off);
         }
+        
 		writeFile(FormatMVC,FormatMVC_3doff);
 		disable2XScale();
         ScreenMode.setScreenMode("0");
