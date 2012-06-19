@@ -582,9 +582,9 @@ public class playermenu extends Activity {
 		if(m1080scale == 2)
 		{
 			FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
-			frameParams.leftMargin = 30;
-			frameParams.width = 1220;
-			frameParams.height = 680;
+			frameParams.leftMargin = 50;
+			frameParams.width = 1180;
+			frameParams.height = 660;
 			frameParams.gravity = Gravity.TOP;
 			baselayout2.setLayoutParams(frameParams);							
 		}
@@ -2325,9 +2325,9 @@ public class playermenu extends Activity {
 		if(m1080scale == 2)
 		{
 			linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
-			linearParams.leftMargin = 30;
-           	linearParams.width = 1220;
-           	linearParams.bottomMargin = 20;	        	
+			linearParams.leftMargin = 50;
+           	linearParams.width = 1180;
+           	linearParams.bottomMargin = 40;	        	
 	        subTitleView.setLayoutParams(linearParams);
 			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 				subTitleView_sm.setLayoutParams(linearParams);
@@ -2367,9 +2367,9 @@ public class playermenu extends Activity {
 		if(m1080scale == 2)
 		{
 			linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
-			linearParams.leftMargin = 30;
-           	linearParams.width = 1220;
-           	linearParams.bottomMargin = 20;	        	
+			linearParams.leftMargin = 50;
+           	linearParams.width = 1180;
+           	linearParams.bottomMargin = 40;	        	
 	        subTitleView.setLayoutParams(linearParams);
 			if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 				subTitleView_sm.setLayoutParams(linearParams);
