@@ -114,6 +114,7 @@ public class playermenu extends Activity {
 	private static final int MID_FREESCALE = 0x10001;
     private boolean fb32 = false;
     
+    private int destPos = 0;
     private int seek = 0;
     private int seek_cur_time = 0;
     //for repeat mode;
@@ -2689,7 +2690,7 @@ public class playermenu extends Activity {
 					timer.cancel();
 					int dest = myProgressBar.getProgress();
 					int pos = totaltime * dest / 100;
-	
+					destPos = dest;
 					try {
 						if(m_Amplayer != null) {
 					        seek_cur_time = curtime;
@@ -3116,6 +3117,7 @@ public class playermenu extends Activity {
 	}
     
 	//=========================================================
+	private final int maxOffsetPos=1;
     private Messenger m_PlayerMsg = new Messenger(new Handler() {
 		Toast tp = null;
     	public void handleMessage(Message msg) {
@@ -3171,7 +3173,16 @@ public class playermenu extends Activity {
 						seek = 0;
 						seek_cur_time = 0;
 						//if(!progressSliding)
-						myProgressBar.setProgress(msg.arg1/1000*100/totaltime);
+						int curPos=msg.arg1/1000*100/totaltime;
+							if((curPos<destPos)||((curPos-destPos)>maxOffsetPos))
+							{
+								myProgressBar.setProgress(destPos);
+							}
+							else 
+							{
+								destPos=curPos;
+								myProgressBar.setProgress(msg.arg1/1000*100/totaltime);
+							}
 					}
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
@@ -3194,6 +3205,7 @@ public class playermenu extends Activity {
 						break;
 					case VideoInfo.PLAYER_EXIT:	
 						audio_flag = 0;
+						destPos=0;
 						if(PRE_NEXT_FLAG == 1 && !backToFileList) {
     						Log.d(TAG,"to play another file!");
 							//new PlayThread().start();
@@ -3601,7 +3613,7 @@ public class playermenu extends Activity {
         this.sendBroadcast(intent);
         seek = 0;
         seek_cur_time = 0;
-		
+	destPos=0;	
 		ff_fb.cancel();
 		FF_FLAG = false;
 		FB_FLAG = false;
