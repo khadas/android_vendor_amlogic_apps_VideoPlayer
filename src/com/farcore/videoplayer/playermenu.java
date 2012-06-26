@@ -2672,10 +2672,7 @@ public class playermenu extends Activity {
 			}
 		});
         if(curtime != 0)
-    	{
-    		destPos=curtime*100/totaltime;
         	myProgressBar.setProgress(curtime*100/totaltime);
-    	}
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
@@ -2987,7 +2984,6 @@ public class playermenu extends Activity {
 				//Log.i("wxl","curtime:"+curtime+";totaltime:"+totaltime);
 				cur_time.setText(secToTime(curtime, false));
 		    	total_time.setText(secToTime(totaltime, true));
-				destPos=curtime*100/totaltime;
 		    	myProgressBar.setProgress(curtime*100/totaltime);
 			}
 			
@@ -3180,11 +3176,6 @@ public class playermenu extends Activity {
 						int curPos=msg.arg1/1000*100/totaltime;
 							if((curPos<destPos)||((curPos-destPos)>maxOffsetPos))
 							{
-								if(true==resumePlayFlag)
-								{
-									resumePlayFlag=false;
-									destPos=curPos;
-								}
 								myProgressBar.setProgress(destPos);
 							}
 							else 
@@ -3833,13 +3824,7 @@ public class playermenu extends Activity {
 	
 	}
 	
-	boolean resumePlayFlag=false;
 	private int resumePlay() {
-		if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
-		{
-			resumePlayFlag=true;
-		}
-		
 		final int pos = ResumePlay.check(PlayList.getinstance().getcur());
 		Log.d(TAG, "resumePlay() pos is :"+pos);
 		if(pos > 0) {
@@ -3850,7 +3835,6 @@ public class playermenu extends Activity {
 					new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialog, int whichButton) {  
 			                playPosition = pos;
-							destPos=playPosition;
 			            }  
 			        })  
 			    .setNegativeButton(playermenu.this.getResources().getString(R.string.str_cancel) + " ( "+resumeSecond+" )",  
