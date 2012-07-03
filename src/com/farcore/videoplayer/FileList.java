@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -54,6 +55,9 @@ public class FileList extends ListActivity {
 	private ArrayList<Integer> fileDirectory_position_piexl = new ArrayList<Integer>();
 	private int pathLevel = 0;
 	private final String iso_mount_dir = "/mnt/VIRTUAL_CDROM";
+	
+	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
+    private boolean isRealSD=false;
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)
@@ -142,6 +146,9 @@ public class FileList extends ListActivity {
 	    }
 	    currentlist = new ArrayList<String>();
 	    
+	    /* check whether use real sdcard*/
+		isRealSD=Environment.isExternalStorageBeSdcard();
+	    
 		if(PlayList.getinstance().rootPath==null)
 			PlayList.getinstance().rootPath =root_path;
 	    	
@@ -179,7 +186,17 @@ public class FileList extends ListActivity {
                 	}
                 	file = new File(paths.get(0).toString());
                 	currenturl =file.getParentFile().getParent();
-                	if(file.getParent().compareToIgnoreCase(root_path)!=0){
+                	if((file.getParent().compareToIgnoreCase(root_path)!=0)&&(pathLevel>0)){
+						if(false==isRealSD)
+						{
+							String path = file.getParent();
+							if(path.equals(EXT_SD))
+							{
+								currenturl=root_path;
+								//pathLevel--;
+							}
+						}
+						
                 		BrowserFile(currenturl);
                 		pathLevel--;
                 		getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
@@ -249,7 +266,16 @@ public class FileList extends ListActivity {
 	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure"))&&
 	    			(!tpath.equals("/mnt/obb")))
 	    		{
-	    			items.add(tmppath);
+	    			if(false==isRealSD)
+    				{
+		    			String path=changeDevName(tpath);
+		    			items.add(path);
+    				}
+					else
+					{
+						items.add(tmppath);
+					}
+					
 	    	    	paths.add(tempF.getPath());
 	    		}
 	    	}
@@ -263,6 +289,37 @@ public class FileList extends ListActivity {
 	    tileText =(TextView) findViewById(R.id.TextView_path);
 	    tileText.setText(catShowFilePath(filePath));
 	    setListAdapter(new MyAdapter(this,items,paths));
+	}
+
+	private String changeDevName(String tpath)
+	{
+		String path="";
+		String internal = getString(R.string.memory_device_str);
+		String sdcard = getString(R.string.sdcard_device_str);
+		String usb = getString(R.string.usb_device_str);
+		String sdcardExt = getString(R.string.ext_sdcard_device_str);
+
+		//Log.i("wxl","[changeDevName]tpath:"+tpath);
+
+		if(tpath.equals("/mnt/flash"))
+		{
+			path=internal;
+		}
+		else if(tpath.equals("/mnt/sdcard"))
+		{
+			path=sdcard;
+		}
+		else if(tpath.equals("/mnt/usb"))
+		{
+			path=usb;
+		}
+		else if(tpath.equals(EXT_SD))
+		{
+			path=sdcardExt;
+		}
+
+		//Log.i("wxl","[changeDevName]path:"+path);
+		return path;
 	}
 
     private String catShowFilePath(String path) {
@@ -289,6 +346,8 @@ public class FileList extends ListActivity {
 		  Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
 		  return;
 		 }
+	    
+	    String curPath=file.getPath();
 
 	    for(int i=0;i<the_Files.length;i++) 
 	    {
@@ -297,7 +356,38 @@ public class FileList extends ListActivity {
 	    	if (tempF.isDirectory())
 	    	{
 	    		if(!tempF.isHidden())
-	    		    listFiles.add(tempF);   	
+	    			listFiles.add(tempF);
+				
+				if(false==isRealSD)
+				{
+		    		if(curPath.equals(root_path))
+		    		{
+		    			if((tempF.toString()).equals("/mnt/sdcard"))
+						{
+			    			File[] tempFSub = tempF.listFiles();
+			    			if(tempFSub.length>0)
+			    			{
+				    			for(int n=0;n<tempFSub.length;n++)
+				    			{
+				    				if(tempFSub[n].isDirectory() && tempFSub[n].exists())
+				    				{
+				    					String path=tempFSub[n].getAbsolutePath();
+				    					if(path.equals(EXT_SD))
+				    					{
+				    						if(!tempF.isHidden())
+				    							listFiles.add(tempFSub[n]);  
+				    					}
+				    				}
+				    			}
+			    			}
+						}
+		    		}
+		    		else if((tempF.toString()).equals(EXT_SD))
+		    		{
+		    			listFiles.remove(tempF);
+		    			continue;
+		    		}
+				}
 	    	} 
 	    	else
 	    	{
@@ -422,8 +512,17 @@ public class FileList extends ListActivity {
 					ISOpath = null;
 				}
             	currenturl =file.getParentFile().getParent();
-            	if(file.getParent().compareToIgnoreCase(root_path)!=0){
+            	if((file.getParent().compareToIgnoreCase(root_path)!=0)&&(pathLevel>0)){
             		pathLevel--;
+
+					if(false==isRealSD)
+					{
+						String path = file.getParent();
+						if(path.equals(EXT_SD))
+						{
+							currenturl=root_path;
+						}
+					}
             		BrowserFile(currenturl);
                     getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
             		fileDirectory_position_selected.remove(pathLevel);

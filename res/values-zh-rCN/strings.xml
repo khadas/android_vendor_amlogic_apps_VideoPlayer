@@ -65,4 +65,10 @@
 	<string name="str_right_auidochannel">右声道</string>
 	<string name="str_stereo_auidochannel">立体声</string>
 	<string name="file_have_no_audio">此文件没有音频</string>
+	
+	<string name="memory_device_str">内部存储器 </string>
+	<string name="sdcard_device_str">本机磁盘</string>
+	<string name="ext_sdcard_device_str">外接TF卡</string>
+	<string name="sata_device_str">SATA</string>
+	<string name="usb_device_str">USB设备</string>
 </resources>

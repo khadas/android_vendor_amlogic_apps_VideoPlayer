@@ -65,4 +65,10 @@
 	<string name="str_right_auidochannel">Right Mono</string>
 	<string name="str_stereo_auidochannel">Stereo</string>
 	<string name="file_have_no_audio">file have no audio</string>
+	
+	<string name="memory_device_str">Internal Memory </string>
+	<string name="sdcard_device_str">Local Disk</string>
+	<string name="ext_sdcard_device_str">External TF Card</string>
+	<string name="sata_device_str">SATA</string>
+	<string name="usb_device_str">USB</string>
 </resources>

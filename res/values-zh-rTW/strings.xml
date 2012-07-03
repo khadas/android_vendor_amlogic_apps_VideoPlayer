@@ -65,4 +65,10 @@
 	<string name="str_right_auidochannel">右聲道</string>
 	<string name="str_stereo_auidochannel">立體聲</string>
 	<string name="file_have_no_audio">此文件沒有音頻</string>
+	
+	<string name="memory_device_str">內部存儲器 </string>
+	<string name="sdcard_device_str">本機磁盤</string>
+	<string name="ext_sdcard_device_str">外接TF卡</string>
+	<string name="sata_device_str">SATA</string>
+	<string name="usb_device_str">USB設備</string>
 </resources>
