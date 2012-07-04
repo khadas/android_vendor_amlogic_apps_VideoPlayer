@@ -256,10 +256,12 @@ public class FileList extends ListActivity {
 		    //change device name;	
 	    	if(filePath.equals("/mnt"))
 	    	{
-	    		String tpath = tempF.getAbsolutePath();  
+	    		String tpath = tempF.getAbsolutePath();
 	    	
 	    		if (tpath.equals("/mnt/flash"))
 	    			 tmppath = "nand";
+				else if (tpath.equals(EXT_SD))
+	    			 tmppath = "external_sdcard";
 	    		else if((!tpath.equals("/mnt/sdcard"))&&tpath.startsWith("/mnt/sd"))
 	    			 tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
 	    		//delete used folder
@@ -268,7 +270,7 @@ public class FileList extends ListActivity {
 	    		{
 	    			if(false==isRealSD)
     				{
-		    			String path=changeDevName(tpath);
+		    			String path=changeDevName(tmppath);
 		    			items.add(path);
     				}
 					else
@@ -291,7 +293,7 @@ public class FileList extends ListActivity {
 	    setListAdapter(new MyAdapter(this,items,paths));
 	}
 
-	private String changeDevName(String tpath)
+	private String changeDevName(String tmppath)
 	{
 		String path="";
 		String internal = getString(R.string.memory_device_str);
@@ -299,23 +301,30 @@ public class FileList extends ListActivity {
 		String usb = getString(R.string.usb_device_str);
 		String sdcardExt = getString(R.string.ext_sdcard_device_str);
 
-		//Log.i("wxl","[changeDevName]tpath:"+tpath);
+		//Log.i("wxl","[changeDevName]tmppath:"+tmppath);
 
-		if(tpath.equals("/mnt/flash"))
+		if(tmppath.equals("flash"))
 		{
 			path=internal;
 		}
-		else if(tpath.equals("/mnt/sdcard"))
+		else if(tmppath.equals("sdcard"))
 		{
-			path=sdcard;
+			if(true==isRealSD)
+				path=sdcardExt;
+			else
+				path=sdcard;
 		}
-		else if(tpath.equals("/mnt/usb"))
+		else if(tmppath.equals("usb"))
 		{
 			path=usb;
 		}
-		else if(tpath.equals(EXT_SD))
+		else if(tmppath.equals("external_sdcard"))
 		{
 			path=sdcardExt;
+		}
+		else
+		{
+			path=tmppath;
 		}
 
 		//Log.i("wxl","[changeDevName]path:"+path);
