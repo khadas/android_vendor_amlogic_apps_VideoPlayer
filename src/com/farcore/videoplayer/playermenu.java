@@ -2166,6 +2166,10 @@ public class playermenu extends Activity {
 	        	boolean plugged
 	                = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
 	                
+	            if(mHdmiPlugged != plugged && confirm_dialog != null && confirm_dialog.isShowing()) {
+	                confirm_dialog.dismiss();
+	            } 	                
+	                
                 if (!SystemProperties.getBoolean("ro.vout.dualdisplay", false)) {    
     	        	if (mHdmiPlugged != plugged) {
     	                mHdmiPlugged = plugged;
