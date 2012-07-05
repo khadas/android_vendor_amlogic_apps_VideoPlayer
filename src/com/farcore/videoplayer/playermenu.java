@@ -3614,6 +3614,8 @@ public class playermenu extends Activity {
 				showOsdView();
 			}
 
+			setOSDOnOff(true);//make sure subtitle show ok
+
 			//reset sub;
 			subTitleView.clear();
 			subinit();
