@@ -3074,6 +3074,11 @@ public class playermenu extends Activity {
 		Log.d(TAG,"onPause");
         super.onPause();
         mPaused = true;
+        
+        if(confirm_dialog != null && confirm_dialog.isShowing()) {
+            confirm_dialog.dismiss();
+        }        
+        
         setOSDOnOff(true);
 //        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 //        m_storagemgr.unregisterListener(mListener);
