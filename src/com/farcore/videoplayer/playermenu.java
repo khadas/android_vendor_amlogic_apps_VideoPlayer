@@ -2692,8 +2692,8 @@ public class playermenu extends Activity {
 				if(fromUser == true){
 					timer.cancel();
 					int dest = myProgressBar.getProgress();
-					int pos = totaltime * dest / 100;
-	
+					int pos = totaltime * (dest+1) / 100;
+					
 					try {
 						if(m_Amplayer != null) {
 					        seek_cur_time = curtime;

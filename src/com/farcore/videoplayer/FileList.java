@@ -246,7 +246,15 @@ public class FileList extends ListActivity {
 	    for(i=0;i<listFiles.size();i++) {
 	    	fs[i] = listFiles.get(i);
 	    }
-	    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));   
+	    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
+
+		if(false==isRealSD)
+		{
+			if(filePath.equals("/mnt"))
+			{
+				Arrays.sort(fs, new MyComparator(MyComparator.NAME_DESCEND)); 
+			}
+		}
 	    
 	    for(i=0;i<fs.length;i++)
 	    {
@@ -268,15 +276,15 @@ public class FileList extends ListActivity {
 	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure"))&&
 	    			(!tpath.equals("/mnt/obb")))
 	    		{
-	    			if(false==isRealSD)
-    				{
+	    			//if(false==isRealSD)
+    				//{
 		    			String path=changeDevName(tmppath);
 		    			items.add(path);
-    				}
+    				/*}
 					else
 					{
 						items.add(tmppath);
-					}
+					}*/
 					
 	    	    	paths.add(tempF.getPath());
 	    		}
