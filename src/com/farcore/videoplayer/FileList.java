@@ -382,7 +382,7 @@ public class FileList extends ListActivity {
 		    			if((tempF.toString()).equals("/mnt/sdcard"))
 						{
 			    			File[] tempFSub = tempF.listFiles();
-			    			if(tempFSub.length>0)
+			    			if((tempFSub != null) && (tempFSub.length>0))
 			    			{
 				    			for(int n=0;n<tempFSub.length;n++)
 				    			{
