@@ -1367,15 +1367,15 @@ public class playermenu extends Activity {
     					e.printStackTrace();
     				}
     				int item;
-    				if (mBrightness <= (android.os.Power.BRIGHTNESS_DIM + 10))
+    				if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_DIM + 10))
     					item = 0;
-    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.2f))
+    				else if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_ON * 0.2f))
     					item = 1;
-    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.4f))
+    				else if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_ON * 0.4f))
     					item = 2;
-    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.6f))
+    				else if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_ON * 0.6f))
     					item = 3;
-    				else if (mBrightness <= (android.os.Power.BRIGHTNESS_ON * 0.8f))
+    				else if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_ON * 0.8f))
     					item = 4;
     				else
     					item = 5;
@@ -1386,25 +1386,25 @@ public class playermenu extends Activity {
     						int brightness;
     						switch(position) {
                         	case 0:
-                        	 	brightness = android.os.Power.BRIGHTNESS_DIM + 10;
+                        	 	brightness = android.os.PowerManager.BRIGHTNESS_DIM + 10;
                         		break;
                         	case 1:
-                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.2f);
+                        		brightness = (int)(android.os.PowerManager.BRIGHTNESS_ON * 0.2f);
                         		break;
                         	case 2:
-                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.4f);
+                        		brightness = (int)(android.os.PowerManager.BRIGHTNESS_ON * 0.4f);
                         	 	break;
                         	case 3:
-                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.6f);
+                        		brightness = (int)(android.os.PowerManager.BRIGHTNESS_ON * 0.6f);
                         	 	break;	 
 							case 4:
-                        		brightness = (int)(android.os.Power.BRIGHTNESS_ON * 0.8f);
+                        		brightness = (int)(android.os.PowerManager.BRIGHTNESS_ON * 0.8f);
                         	 	break;
 							case 5:
-                        		brightness = android.os.Power.BRIGHTNESS_ON;
+                        		brightness = android.os.PowerManager.BRIGHTNESS_ON;
                         	 	break;
                         	default:
-								brightness = android.os.Power.BRIGHTNESS_DIM + 30;
+								brightness = android.os.PowerManager.BRIGHTNESS_DIM + 30;
                         		break;
                         	}
     						try {
