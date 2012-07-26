@@ -52,6 +52,11 @@ import android.content.SharedPreferences;
 
 import java.io.FileOutputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+
+import android.content.ContentResolver;
+import android.content.res.AssetFileDescriptor;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
 	private static String codec_mips = null;
@@ -2109,6 +2114,8 @@ public class playermenu extends Activity {
 		
         Intent it = this.getIntent();
         playmode_switch = true;
+		
+		mUri = it.getData();
         if(it.getData() != null) {
         	if(it.getData().getScheme().equals("file")) {
         		List<String> paths = new ArrayList<String>();
@@ -2133,10 +2140,10 @@ public class playermenu extends Activity {
                     PlayList.getinstance().setlist(paths, 0);
                     
                     playmode_switch = false;
-                    Log.d(TAG, "index = " + index);
-                    Log.d(TAG, "From content providor DATA:" + cursor.getString(index));
-                    Log.d(TAG, " -- MIME_TYPE :" + 
-                    		cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)));
+                    //Log.d(TAG, "index = " + index);
+                    //Log.d(TAG, "From content providor DATA:" + cursor.getString(index));
+                    //Log.d(TAG, " -- MIME_TYPE :" + 
+                    		//cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)));
                 }
         	}
         }
@@ -3600,7 +3607,8 @@ public class playermenu extends Activity {
     		}
     	}
     });   
-	
+
+	private Uri mUri=null;
     public Player m_Amplayer = null;
     private void Amplayer_play() {
         // stop music player
@@ -3669,7 +3677,34 @@ public class playermenu extends Activity {
 
 		}
 
-		m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);								
+		if(null!=mUri)
+		{
+			if(mUri.getScheme().equals("content")) 
+			{		
+				AssetFileDescriptor fd = null;
+		        try {
+		            ContentResolver resolver = this.getContentResolver();
+		            fd = resolver.openAssetFileDescriptor(mUri, "r");
+		            if (fd == null) {
+		                return;
+		            }
+		            m_Amplayer.Open(fd.getFileDescriptor(), playPosition);
+		        }catch(FileNotFoundException nf){
+				}/*finally {
+		            if (fd != null) {
+		                fd.close();
+		            }
+		        }*/
+			}
+			else
+			{
+				m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);
+			}
+		}
+		else
+		{
+			m_Amplayer.Open(PlayList.getinstance().getcur(), playPosition);
+		}
             // openFile(sub_para.sub_id);
         mRotateHandler.sendEmptyMessageDelayed(GETROTATION, GETROTATION_TIMEOUT);    
 		}

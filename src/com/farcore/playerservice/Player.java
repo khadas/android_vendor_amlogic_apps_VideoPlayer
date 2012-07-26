@@ -3,6 +3,7 @@
  * Original file: Player.aidl
  */
 package com.farcore.playerservice;
+import android.util.Log;
 public interface Player extends android.os.IInterface
 {
 /** Local-side IPC implementation stub class. */
@@ -55,6 +56,20 @@ case TRANSACTION_Open:
 data.enforceInterface(DESCRIPTOR);
 java.lang.String _arg0;
 _arg0 = data.readString();
+int _arg1;
+_arg1 = data.readInt();
+int _result = this.Open(_arg0, _arg1);
+reply.writeNoException();
+reply.writeInt(_result);
+return true;
+}
+case TRANSACTION_OpenFd:
+{
+data.enforceInterface(DESCRIPTOR);
+android.os.ParcelFileDescriptor pfd;
+java.io.FileDescriptor _arg0;
+pfd = data.readFileDescriptor();
+_arg0 = pfd.getFileDescriptor();
 int _arg1;
 _arg1 = data.readInt();
 int _result = this.Open(_arg0, _arg1);
@@ -270,6 +285,25 @@ _data.writeInterfaceToken(DESCRIPTOR);
 _data.writeString(filepath);
 _data.writeInt(position);
 mRemote.transact(Stub.TRANSACTION_Open, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+}
+
+public int Open(java.io.FileDescriptor fd, int position) throws /*java.io.IOException, java.lang.IllegalArgumentException, java.lang.IllegalStateException,*/android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeFileDescriptor(fd);
+mRemote.transact(Stub.TRANSACTION_OpenFd, _data, _reply, 0);
 _reply.readException();
 _result = _reply.readInt();
 }
@@ -683,9 +717,11 @@ static final int TRANSACTION_Set3Dviewmode = (android.os.IBinder.FIRST_CALL_TRAN
 static final int TRANSACTION_Set3Daspectfull = (android.os.IBinder.FIRST_CALL_TRANSACTION + 20);
 static final int TRANSACTION_Set3Dswitch = (android.os.IBinder.FIRST_CALL_TRANSACTION + 21);
 static final int TRANSACTION_Set3Dgrating = (android.os.IBinder.FIRST_CALL_TRANSACTION + 21);
+static final int TRANSACTION_OpenFd = (android.os.IBinder.FIRST_CALL_TRANSACTION + 23);
 }
 public int Init() throws android.os.RemoteException;
 public int Open(java.lang.String filepath, int position) throws android.os.RemoteException;
+public int Open(java.io.FileDescriptor fd, int position) throws /*java.io.IOException, java.lang.IllegalArgumentException, java.lang.IllegalStateException,*/ android.os.RemoteException;
 public int Play() throws android.os.RemoteException;
 public int Pause() throws android.os.RemoteException;
 public int Resume() throws android.os.RemoteException;

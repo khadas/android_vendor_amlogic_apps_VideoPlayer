@@ -18,7 +18,7 @@ LOCAL_C_INCLUDES := $(LIBPLAYER_PATH)/amplayer/player/include \
     $(JNI_H_INCLUDE) 
 
 LOCAL_STATIC_LIBRARIES := libamplayer libamcodec libavformat librtmp libavcodec libavutil libamadec  
-LOCAL_SHARED_LIBRARIES += libutils libmedia libz libbinder libdl libcutils libc libamavutils libssl libcrypto
+LOCAL_SHARED_LIBRARIES += libutils libmedia libz libbinder libdl libcutils libc libamavutils libssl libcrypto libnativehelper
 
 LOCAL_PROGUARD_ENABLED := disabled
 

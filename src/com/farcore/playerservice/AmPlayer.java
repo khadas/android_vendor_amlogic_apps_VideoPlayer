@@ -10,6 +10,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import java.lang.*;
+import java.io.FileDescriptor;
+import java.io.IOException;
 
 public class AmPlayer extends Service {
     static 
@@ -25,6 +27,7 @@ public class AmPlayer extends Service {
     
   //TODO need api
 	private native int setMedia(String url,int loop,int playMode,int pos);//playMode:0,all,just default;
+	private native int setMedia(FileDescriptor fd,int loop,int playMode,int pos,long offset, long length);//playMode:0,all,just default;
 	//play
 	private native int playMedia(String url,int loop,int playMode,int pos);// pos refer to "start position"
 
@@ -137,6 +140,14 @@ public class AmPlayer extends Service {
 			return 0;
 		}
 
+		public int Open(FileDescriptor fd, int position) throws /*IOException, IllegalArgumentException, IllegalStateException,*/ RemoteException{			
+			mPid = setMedia( fd, 0, 0, position, 0, 0x7ffffffffffffffL);
+			if (mPid < 0)
+				Log.e(TAG, "get pid failed after setMedia");
+			//else
+				//start();
+			return 0;
+		}
 		public int Play() throws RemoteException {
 			//startGetStates();
 			start();

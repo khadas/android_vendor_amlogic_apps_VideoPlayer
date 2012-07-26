@@ -112,9 +112,19 @@ public class MediaInfo {
 		return type;
 	}	
 	public String getFileName(String path) {
-		File f = new File(path);
-		String filename = f.getName();
-		filename = filename.substring(0, filename.lastIndexOf("."));
+		String filename=null;
+		//check file start with "content"
+		if(path!=null&&path.startsWith("content"))
+		{
+			// do nothing
+			filename="null";
+		}
+		else
+		{
+			File f = new File(path);
+			filename = f.getName();
+			filename = filename.substring(0, filename.lastIndexOf("."));
+		}
 		return filename;
 	}	
 	public String getFullFileName(String path) {
