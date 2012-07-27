@@ -2038,6 +2038,7 @@ public class playermenu extends Activity {
     		public void uncaughtException(Thread thread, Throwable ex) {    
     			
     			SystemProperties.set("vplayer.hideStatusBar.enable","false");
+    			SystemProperties.set("vplayer.playing","false");
     			  
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
@@ -2172,6 +2173,10 @@ public class playermenu extends Activity {
 	        public void onReceive(Context context, Intent intent) {
 	        	boolean plugged
 	                = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
+	            
+	            if (!SystemProperties.getBoolean("ro.vout.player.exit", true)) {
+	                return;
+	            }
 	                
 	            if(mHdmiPlugged != plugged && confirm_dialog != null && confirm_dialog.isShowing()) {
 	                confirm_dialog.dismiss();
@@ -3081,7 +3086,7 @@ public class playermenu extends Activity {
 		Log.d(TAG,"onPause");
         super.onPause();
         mPaused = true;
-        
+        SystemProperties.set("vplayer.playing","false");
         if(confirm_dialog != null && confirm_dialog.isShowing()) {
             confirm_dialog.dismiss();
         }        
@@ -3996,6 +4001,8 @@ public class playermenu extends Activity {
         intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
+        
+        SystemProperties.set("vplayer.playing","true");  
         
     }
 	
