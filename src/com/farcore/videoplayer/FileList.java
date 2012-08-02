@@ -147,7 +147,7 @@ public class FileList extends ListActivity {
 	    currentlist = new ArrayList<String>();
 	    
 	    /* check whether use real sdcard*/
-		isRealSD = true; //TODO add API.  //Environment.isExternalStorageBeSdcard();
+		isRealSD = Environment.isExternalStorageBeSdcard();
 	    
 		if(PlayList.getinstance().rootPath==null)
 			PlayList.getinstance().rootPath =root_path;
