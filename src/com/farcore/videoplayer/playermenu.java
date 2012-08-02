@@ -2175,6 +2175,10 @@ public class playermenu extends Activity {
 	                = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
 	            
 	            if (!SystemProperties.getBoolean("ro.vout.player.exit", true)) {
+	                SettingsVP.setVideoLayoutMode();
+	                infobar = null;
+	                morbar = null;
+	                initOsdBar();
 	                return;
 	            }
 	                
