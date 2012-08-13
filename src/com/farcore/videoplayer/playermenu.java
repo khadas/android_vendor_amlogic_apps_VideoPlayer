@@ -157,6 +157,7 @@ public class playermenu extends Activity {
 	// MBX freescale mode
 	private int m1080scale = 0;
 	private String outputmode = "720p";
+	private static String VideoDisableFile= "/sys/class/video/disable_video";
 	private static String VideoAxisFile= "/sys/class/video/axis";
 	private static String RegFile= "/sys/class/display/wr_reg";
 	private static String Fb0Blank= "/sys/class/graphics/fb0/blank";
@@ -3121,7 +3122,8 @@ public class playermenu extends Activity {
             finish();
         }
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-        	writeFile(Fb0Blank,"1");
+			writeFile(VideoDisableFile,"1");
+			writeFile(Fb0Blank,"1");
 			Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
 			playermenu.this.sendBroadcast(intent_video_off);
         }
