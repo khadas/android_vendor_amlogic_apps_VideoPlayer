@@ -2039,6 +2039,7 @@ public class playermenu extends Activity {
     		public void uncaughtException(Thread thread, Throwable ex) {    
     			
     			SystemProperties.set("vplayer.hideStatusBar.enable","false");
+    			SystemProperties.set("mbx.hideStatusBar.enable","false");
     			SystemProperties.set("vplayer.playing","false");
     			  
     			Intent selectFileIntent = new Intent();
@@ -2089,7 +2090,7 @@ public class playermenu extends Activity {
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
 	 			 	Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
 					playermenu.this.sendBroadcast(intent_video_on);
-					SystemProperties.set("vplayer.hideStatusBar.enable","true");
+					SystemProperties.set("mbx.hideStatusBar.enable","true");
         }
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
@@ -3122,6 +3123,7 @@ public class playermenu extends Activity {
             finish();
         }
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+			SystemProperties.set("mbx.hideStatusBar.enable","false");
 			writeFile(VideoDisableFile,"1");
 			writeFile(Fb0Blank,"1");
 			Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
