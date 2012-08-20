@@ -69,6 +69,8 @@ public class FileList extends ListActivity {
 	        {
 	        	if (newState == null || path == null) 
 	        		return;
+
+				path = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
 	        	
 	        	if(newState.compareTo("mounted") == 0)
 	        	{

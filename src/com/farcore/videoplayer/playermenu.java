@@ -3956,6 +3956,8 @@ public class playermenu extends Activity {
             
             if (action == null || path == null)
             	return;
+
+			path = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
             
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
 				if(PlayList.getinstance().getcur()!=null) {
