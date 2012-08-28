@@ -2028,7 +2028,8 @@ public class playermenu extends Activity {
         fb32 = SystemProperties.get("sys.fb.bits", "16").equals("32");
 
         if(fb32) {
-            setTheme(R.style.theme_trans);
+            //setTheme(R.style.theme_trans);
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
         } else {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
@@ -2122,10 +2123,15 @@ public class playermenu extends Activity {
         if(it.getData() != null) {
         	if(it.getData().getScheme().equals("file")) {
         		List<String> paths = new ArrayList<String>();
-                paths.add(it.getData().getPath());
-                PlayList.getinstance().setlist(paths, 0);
-                PlayList.getinstance().rootPath = null;
-                backToOtherAPK = true;
+				int pos = getCurDirFile(mUri, paths);
+                //paths.add(it.getData().getPath());
+                if(pos != -1){
+	                PlayList.getinstance().setlist(paths, pos);
+	                PlayList.getinstance().rootPath = null;
+	                backToOtherAPK = true;
+	            }
+				else
+					return;
         	}
         	else {
                 Cursor cursor = managedQuery(it.getData(), null, null, null, null);
@@ -2250,6 +2256,53 @@ public class playermenu extends Activity {
             e.printStackTrace();
         }
     }
+
+	private int getCurDirFile(Uri uri, List<String> list){
+		String path = uri.getPath(); 
+		String name = (new File(path)).getName();
+		int pos=-1;
+		
+		if(null!=path)
+		{
+			String dir=null;
+			int index=-1;
+			index=path.lastIndexOf("/");
+			if(index>=0)
+			{
+				dir=path.substring(0,index);
+			}
+
+			File dirFile = new File(dir);
+
+			if (dirFile.exists() && dirFile.isDirectory() && dirFile.listFiles() != null && dirFile.listFiles().length > 0) {
+				for (File file : dirFile.listFiles()){
+					String pathFull = file.getAbsolutePath();
+					String ext = name.substring(name.lastIndexOf(".")+1,name.length()).toLowerCase();
+
+					if(ext.equals("rm") || ext.equals("rmvb") || ext.equals("avi")|| ext.equals("mkv") || 
+					ext.equals("mp4")|| ext.equals("wmv") || ext.equals("mov")|| ext.equals("flv") ||
+					ext.equals("asf")|| ext.equals("3gp")|| ext.equals("mpg") ||
+					ext.equals("m2ts")|| ext.equals("ts")|| ext.equals("swf") ||
+					ext.equals("divx")|| ext.equals("3gp2")|| ext.equals("3gpp") ||
+					ext.equals("m4v")|| ext.equals("mts")|| ext.equals("tp") ||
+					ext.equals("webm")|| ext.equals("3g2")|| ext.equals("f4v") ||
+					ext.equals("mpeg") || ext.equals("vob") || ext.equals("dat"))
+					{
+						list.add(pathFull); 
+					}
+				}
+			} 
+
+			for(int i=0;i<list.size();i++) {
+		    	String tempP = list.get(i);
+		    	if(tempP.equals(path)) {
+		    		pos = i;
+		    	}
+		    }
+		}
+		return pos;
+	}
+		
 
     private void displayinit() {
     	int mode = SettingsVP.getParaInt(SettingsVP.DISPLAY_MODE);

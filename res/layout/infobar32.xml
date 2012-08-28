@@ -6,8 +6,8 @@
     android:background="@color/transparent_background">
     
     <VideoView
-        android:layout_height="fill_parent"
-        android:layout_width="fill_parent"
+        android:layout_height="1080dip"
+        android:layout_width="1920dip"
         android:id="@+id/VideoView">
     </VideoView>
     
