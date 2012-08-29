@@ -148,6 +148,7 @@ public class playermenu extends Activity {
 	Toast toast = null;
 	public MediaInfo bMediaInfo = null;
 	private static int PRE_NEXT_FLAG = 0;
+	private static boolean isBackWard = false; //tony.wang add for played fail 
 	private int resumeSecond = 8;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 
@@ -2259,7 +2260,6 @@ public class playermenu extends Activity {
 
 	private int getCurDirFile(Uri uri, List<String> list){
 		String path = uri.getPath(); 
-		String name = (new File(path)).getName();
 		int pos=-1;
 		
 		if(null!=path)
@@ -2277,6 +2277,7 @@ public class playermenu extends Activity {
 			if (dirFile.exists() && dirFile.isDirectory() && dirFile.listFiles() != null && dirFile.listFiles().length > 0) {
 				for (File file : dirFile.listFiles()){
 					String pathFull = file.getAbsolutePath();
+					String name = (new File(pathFull)).getName();
 					String ext = name.substring(name.lastIndexOf(".")+1,name.length()).toLowerCase();
 
 					if(ext.equals("rm") || ext.equals("rmvb") || ext.equals("avi")|| ext.equals("mkv") || 
@@ -2513,6 +2514,7 @@ public class playermenu extends Activity {
 				// TODO Auto-generated method stub
 				if(!INITOK)
 					return;
+				isBackWard = true;
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().moveprev();
 				toast.cancel();
@@ -2534,6 +2536,7 @@ public class playermenu extends Activity {
 				// TODO Auto-generated method stub
 				if(!INITOK)
 					return;
+				isBackWard = false;
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().movenext();
 				toast.cancel();
@@ -3375,7 +3378,13 @@ public class playermenu extends Activity {
 							ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
 							playPosition = 0;
 							if(m_playmode == REPEATLIST)
-								PlayList.getinstance().movenext();
+								if(isBackWard)
+									{
+										isBackWard = false;
+										PlayList.getinstance().moveprev();
+									}
+								else
+									PlayList.getinstance().movenext();
 							AudioTrackOperation.AudioStreamFormat.clear();
 							AudioTrackOperation.AudioStreamInfo.clear();
 							INITOK = false;
@@ -4047,6 +4056,7 @@ public class playermenu extends Activity {
 	public void onResume() {
 		super.onResume();
 		mPaused = false;
+		isBackWard = false;
 		
 		int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
