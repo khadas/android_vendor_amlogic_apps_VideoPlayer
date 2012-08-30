@@ -1523,7 +1523,7 @@ public class playermenu extends Activity {
             waitForHideOsd();
         }
 		
-        return true;
+        return false;
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
