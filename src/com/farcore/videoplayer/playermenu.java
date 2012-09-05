@@ -120,6 +120,7 @@ public class playermenu extends Activity {
     private boolean fb32 = false;
     
     private int seek = 0;
+    private int ignoreupdatetimecnt=0;
     private int seek_cur_time = 0;
     //for repeat mode;
 	private boolean playmode_switch = true;
@@ -2776,6 +2777,7 @@ public class playermenu extends Activity {
 					        else
 					        	seek = 1;
 					        //Log.d(TAG, "seek curtime: " + seek_cur_time);
+					        	ignoreupdatetimecnt=4;
 							m_Amplayer.Seek(pos);
 						}
 					}
@@ -3210,7 +3212,10 @@ public class playermenu extends Activity {
                     //Log.d(TAG,"total time "+secToTime(msg.arg2,false));
     		    	cur_time.setText(secToTime((msg.arg1)/1000, false));
     		    	total_time.setText(secToTime(msg.arg2, true));
-    		    	curtime = msg.arg1/1000;
+			if(ignoreupdatetimecnt<=0)/*don't update the time if just update the seek.*/		
+    		    		curtime = msg.arg1/1000;
+			else
+				ignoreupdatetimecnt--;
     		    	totaltime = msg.arg2;
     		    	
                     boolean mVfdDisplay = SystemProperties.getBoolean("hw.vfd", false);
