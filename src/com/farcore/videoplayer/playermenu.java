@@ -2777,8 +2777,9 @@ public class playermenu extends Activity {
 					        else
 					        	seek = 1;
 					        //Log.d(TAG, "seek curtime: " + seek_cur_time);
-					        	ignoreupdatetimecnt=4;
+					        	ignoreupdatetimecnt=3;
 							m_Amplayer.Seek(pos);
+							curtime=pos;
 						}
 					}
 					catch(RemoteException e) {
@@ -3212,10 +3213,7 @@ public class playermenu extends Activity {
                     //Log.d(TAG,"total time "+secToTime(msg.arg2,false));
     		    	cur_time.setText(secToTime((msg.arg1)/1000, false));
     		    	total_time.setText(secToTime(msg.arg2, true));
-			if(ignoreupdatetimecnt<=0)/*don't update the time if just update the seek.*/		
-    		    		curtime = msg.arg1/1000;
-			else
-				ignoreupdatetimecnt--;
+			
     		    	totaltime = msg.arg2;
     		    	
                     boolean mVfdDisplay = SystemProperties.getBoolean("hw.vfd", false);
@@ -3243,7 +3241,13 @@ public class playermenu extends Activity {
 					
 				}
     		    	}
-    		    	if(totaltime == 0)
+			if(ignoreupdatetimecnt<=0)/*don't update the time if just update the seek.*/		
+    		    		curtime = msg.arg1/1000;
+			else{
+				ignoreupdatetimecnt--;
+				return;
+			}		
+    		    			if(totaltime == 0)
 						myProgressBar.setProgress(0);
 					else {
 						if((seek == 1) && (curtime >= (seek_cur_time-2))) {
@@ -3261,7 +3265,7 @@ public class playermenu extends Activity {
 						seek = 0;
 						seek_cur_time = 0;
 						//if(!progressSliding)
-						myProgressBar.setProgress(msg.arg1/1000*100/totaltime);
+						myProgressBar.setProgress(curtime*100/totaltime);
 					}
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
