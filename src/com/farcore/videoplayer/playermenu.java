@@ -100,7 +100,7 @@ public class playermenu extends Activity {
 	private final int PLAY3D = 5;
 
 	private boolean backToFileList = false;
-	//private boolean progressSliding = false;
+	private boolean progressSliding = false;
 	private boolean INITOK = false;
 	private boolean FF_FLAG = false;
 	private boolean FB_FLAG = false;
@@ -121,6 +121,7 @@ public class playermenu extends Activity {
     
     private int seek = 0;
     private int ignoreupdatetimecnt=0;
+	private int ignoreupdateiconcnt=0;
     private int seek_cur_time = 0;
     //for repeat mode;
 	private boolean playmode_switch = true;
@@ -2754,17 +2755,18 @@ public class playermenu extends Activity {
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
+				progressSliding = false;
 			}
 			
 			public void onStartTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
 				//timer.cancel();
-				//progressSliding = true;
 			}
 			
 			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
 				// TODO Auto-generated method stub
 				if(fromUser == true){
+					progressSliding = true;
 					timer.cancel();
 					int dest = myProgressBar.getProgress();
 					int pos = totaltime * (dest+1) / 100;
@@ -2778,6 +2780,7 @@ public class playermenu extends Activity {
 					        	seek = 1;
 					        //Log.d(TAG, "seek curtime: " + seek_cur_time);
 					        	ignoreupdatetimecnt=3;
+							ignoreupdateiconcnt=4;
 							m_Amplayer.Seek(pos);
 							curtime=pos;
 						}
@@ -3273,7 +3276,8 @@ public class playermenu extends Activity {
     				
     				switch(player_status) {
 					case VideoInfo.PLAYER_RUNNING:
-						play.setImageResource(R.drawable.pause);						
+						if(!progressSliding)
+							play.setImageResource(R.drawable.pause);						
 						String videoFotmat = bMediaInfo.getFullFileName(PlayList.getinstance().getcur());
 						if(videoFotmat.endsWith(".mvc")){
 							writeFile(FormatMVC,FormatMVC_3dtb);
@@ -3283,8 +3287,18 @@ public class playermenu extends Activity {
 						}
 						break;
 					case VideoInfo.PLAYER_PAUSE:
-					case VideoInfo.PLAYER_SEARCHING:	
+						ignoreupdateiconcnt=0;
 						play.setImageResource(R.drawable.play);
+						break;
+					case VideoInfo.PLAYER_SEARCHING:
+						if(!progressSliding) {
+							if(ignoreupdateiconcnt<=0) {
+								play.setImageResource(R.drawable.play);
+							}
+							else {
+								ignoreupdateiconcnt--;
+							}
+						}
 						break;
 					case VideoInfo.PLAYER_EXIT:	
 						audio_flag = 0;
@@ -3300,7 +3314,7 @@ public class playermenu extends Activity {
 								Amplayer_play();
 							}
     						PRE_NEXT_FLAG = 0;
-							//progressSliding = false;
+							progressSliding = false;
     					}
 						if(subTitleView!=null)
 						{
