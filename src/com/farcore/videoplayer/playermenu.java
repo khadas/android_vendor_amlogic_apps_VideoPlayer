@@ -585,6 +585,13 @@ public class playermenu extends Activity {
 				frameParams.height = 720 - 50;
 				frameParams.gravity = Gravity.TOP;
 				baselayout2.setLayoutParams(frameParams);
+			} else if (!SystemProperties.getBoolean("ro.vout.player.exit", true)
+	                   && SettingsVP.display_mode.equals("panel")) {
+                FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+                frameParams.width = -1;
+                frameParams.height = -1;
+                baselayout2.setLayoutParams(frameParams);
+                baselayout2.requestLayout();	                    
 			}
 		}
 		
@@ -2398,6 +2405,17 @@ public class playermenu extends Activity {
 				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 					subTitleView_sm.setLayoutParams(linearParams);
 				}				
+	        } else if (!SystemProperties.getBoolean("ro.vout.player.exit", true)
+	                   && SettingsVP.display_mode.equals("panel")) {
+                linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
+                linearParams.width = -1;
+                linearParams.bottomMargin = 0;	        	
+                subTitleView.setLayoutParams(linearParams);
+                subTitleView.requestLayout();
+                if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+                    subTitleView_sm.setLayoutParams(linearParams);
+                    subTitleView_sm.requestLayout();
+                }				
 	        } 
     	}
 		if(m1080scale == 2)
