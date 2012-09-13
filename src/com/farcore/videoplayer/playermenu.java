@@ -3451,6 +3451,10 @@ public class playermenu extends Activity {
 						catch(RemoteException e) {
 							e.printStackTrace();
 						}
+
+						if(bMediaInfo != null) {
+							cur_audio_stream = bMediaInfo.cur_audio_index-1;
+						}
 						
 						if((bMediaInfo != null) && (subTitleView != null)) {
 							subTitleView.setDisplayResolution(
@@ -4252,7 +4256,7 @@ Handler mRotateHandler = new Handler() {
 			infobar.setVisibility(View.VISIBLE);
 			infobar.requestFocus();
 			setCurOsdViewFlag(OSD_INFO_BAR);
-			Log.i("wxl","firstInvokFlag:"+firstInvokFlag);
+			Log.i(TAG,"firstInvokFlag:"+firstInvokFlag);
 			if(1==firstInvokFlag)
 			{
 				firstInvokFlag--;

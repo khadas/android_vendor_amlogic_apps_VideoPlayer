@@ -68,6 +68,7 @@ public class MediaInfo {
 	public int duration;
 	private int width = 0;
 	private int height = 0;
+	public int cur_audio_index=0;
   public int drm_check;
   private int vformat = VFORMAT_UNKNOW;  
 	

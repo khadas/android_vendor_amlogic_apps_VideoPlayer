@@ -346,6 +346,7 @@ jobject MediaInfoContext_create(JNIEnv *env,media_info_t *msgt){
     jfieldID id_filetype = (*env)->GetFieldID(env, meta_cls, "filetype", "I");
     (*env)->SetIntField(env, meta_obj, id_filetype, (int)(msgt->stream_info.type));
 
+		(*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "cur_audio_index", "I"), msgt->stream_info.cur_audio_index); 
     (*env)->SetLongField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "filesize", "J"), msgt->stream_info.file_size); 
     (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "duration", "I"), msgt->stream_info.duration); 
     (*env)->SetIntField(env,meta_obj, (*env)->GetFieldID(env, meta_cls, "drm_check", "I"), msgt->stream_info.drm_check); 
