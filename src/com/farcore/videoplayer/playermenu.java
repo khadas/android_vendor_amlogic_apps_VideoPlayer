@@ -4301,6 +4301,11 @@ Handler mRotateHandler = new Handler() {
 		if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 		     subTitleView_sm.redraw();
 		}	
+		
+		if(isSubtitleOn()) {
+			subbar.setVisibility(View.GONE);
+			subTitleView.setViewStatus(true);
+		}
 
 		if ((null!=infobar)&&(View.VISIBLE==infobar.getVisibility()))
 			infobar.setVisibility(View.GONE);
