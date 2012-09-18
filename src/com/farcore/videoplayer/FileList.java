@@ -58,6 +58,21 @@ public class FileList extends ListActivity {
 	
 	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
     private boolean isRealSD=false;
+
+	private String pathTransferForJB(String path) {
+		String pathout = path;
+
+		if (path.startsWith("/storage/sd")) {
+			if(path.contains("/storage/sdcard0")) {
+				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
+			}
+			else {
+				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
+			}
+		}
+
+		return pathout;
+	}
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)
@@ -70,7 +85,7 @@ public class FileList extends ListActivity {
 	        	if (newState == null || path == null) 
 	        		return;
 
-				path = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
+				path = pathTransferForJB(path);
 	        	
 	        	if(newState.compareTo("mounted") == 0)
 	        	{
