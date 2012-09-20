@@ -1652,9 +1652,10 @@ public class playermenu extends Activity {
 			{
     			if(m_Amplayer == null)
 					return (true);
-    			if(bMediaInfo == null)
-					return (true);
-
+				if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+	    			if(bMediaInfo == null)
+						return (true);
+				}
                 // close infobar  
 				if(SettingsVP.chkEnableOSD2XScale() == true) {
 					showNoOsdView();
