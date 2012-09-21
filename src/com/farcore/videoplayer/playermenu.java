@@ -3455,6 +3455,9 @@ public class playermenu extends Activity {
 
 						if(bMediaInfo != null) {
 							cur_audio_stream = bMediaInfo.cur_audio_index-1;
+							if(cur_audio_stream <= 0) {
+								cur_audio_stream = 0;
+							}
 						}
 						
 						if((bMediaInfo != null) && (subTitleView != null)) {
