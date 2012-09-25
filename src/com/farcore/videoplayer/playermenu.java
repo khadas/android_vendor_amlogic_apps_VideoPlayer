@@ -2082,12 +2082,13 @@ public class playermenu extends Activity {
                     }
                 }
 				//stop play
-				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
 				PlayList.getinstance().rootPath =null;
-				if(!backToOtherAPK)
+				//if backToFileList==true ,it means startActivity:FileList has been called.
+				if((!backToOtherAPK)&&(!backToFileList))
 					startActivity(selectFileIntent);
+				backToFileList = true;
 				finish();
     		  	onPause(); //for disable 2Xscale
     		  	onDestroy(); //set freescale when exception
