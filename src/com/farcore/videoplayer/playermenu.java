@@ -2175,7 +2175,7 @@ public class playermenu extends Activity {
 		Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
 		playermenu.this.sendBroadcast(intent_videoposition_change);
 		}
-        SettingsVP.enableVideoLayout();
+        ///SettingsVP.enableVideoLayout();
 //        if(AmPlayer.getProductType() == 1){
 //	        if(SettingsVP.display_mode.equals("480p")) {
 //	        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
@@ -2231,14 +2231,14 @@ public class playermenu extends Activity {
         setAngleTable();
         seek = 0;
         seek_cur_time = 0;
-		if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
+		/*if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
 			resumePlay();
 		else {
 			if(!NOT_FIRSTTIME)
     			StartPlayerService();
         	else
         		Amplayer_play();
-		}
+		}*/
 		
 		set2XScale();
 
@@ -3166,6 +3166,10 @@ public class playermenu extends Activity {
 
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
+		if(!backToFileList){
+		    PlayList.getinstance().rootPath =null;
+        }
+        finish();
         super.onDestroy();
     }
 
@@ -3186,7 +3190,7 @@ public class playermenu extends Activity {
 
         SystemProperties.set("vplayer.hideStatusBar.enable","false");      
         
-        if(mSuspendFlag){
+        /*if(mSuspendFlag){
             if(player_status == VideoInfo.PLAYER_RUNNING) {
                 try{
                     m_Amplayer.Pause();
@@ -3203,7 +3207,11 @@ public class playermenu extends Activity {
 			    PlayList.getinstance().rootPath =null;
             }
             finish();
-        }
+        }*/
+		
+		Amplayer_stop();
+		closeScreenOffTimeout();
+		mSuspendFlag = true;
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
 			SystemProperties.set("mbx.hideStatusBar.enable","false");
 			writeFile(VideoDisableFile,"1");
@@ -3215,15 +3223,17 @@ public class playermenu extends Activity {
 		writeFile(FormatMVC,FormatMVC_3doff);
 		disable2XScale();
         ScreenMode.setScreenMode("0");
+
+		ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
     }
 
 	public void onStop(){
 		super.onStop();
 		Log.d(TAG,"onStop");
-		if(!backToFileList){
+		/*if(!backToFileList){
 			PlayList.getinstance().rootPath =null;
 		}
-		finish();
+		finish();*/
 	}
     
 	//=========================================================
@@ -4122,6 +4132,27 @@ public class playermenu extends Activity {
 		super.onResume();
 		mPaused = false;
 		isBackWard = false;
+
+		SettingsVP.enableVideoLayout();
+		if(mSuspendFlag) {
+			mSuspendFlag = false;
+			playPosition = ResumePlay.check(PlayList.getinstance().getcur());
+
+			if(!NOT_FIRSTTIME)
+    			StartPlayerService();
+        	else
+        		Amplayer_play();
+		}
+		else {
+			if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
+				resumePlay();
+			else {
+				if(!NOT_FIRSTTIME)
+	    			StartPlayerService();
+	        	else
+	        		Amplayer_play();
+			}
+		}
 		
 		int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
