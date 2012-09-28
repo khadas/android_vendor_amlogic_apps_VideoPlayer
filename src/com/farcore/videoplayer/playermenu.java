@@ -3214,10 +3214,19 @@ public class playermenu extends Activity {
             }
             finish();
         }*/
+		if(mHdmiPlugged) {
+			if(!backToFileList){
+			    PlayList.getinstance().rootPath =null;
+            }
+            finish();
+		}
+		else {
+			Amplayer_stop();
+			closeScreenOffTimeout();
+			mSuspendFlag = true;
+			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+		}
 		
-		Amplayer_stop();
-		closeScreenOffTimeout();
-		mSuspendFlag = true;
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
 			SystemProperties.set("mbx.hideStatusBar.enable","false");
 			writeFile(VideoDisableFile,"1");
@@ -3229,8 +3238,6 @@ public class playermenu extends Activity {
 		writeFile(FormatMVC,FormatMVC_3doff);
 		disable2XScale();
         ScreenMode.setScreenMode("0");
-
-		ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
     }
 
 	public void onStop(){
