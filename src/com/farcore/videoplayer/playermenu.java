@@ -2790,6 +2790,12 @@ public class playermenu extends Activity {
 					timer.cancel();
 					int dest = myProgressBar.getProgress();
 					int pos = totaltime * (dest+1) / 100;
+
+					//check for small stream while seeking
+					int pos_check = totaltime * (dest+1) - pos * 100;
+					if(pos_check>0) 
+						pos += 1;
+					
 					
 					try {
 						if(m_Amplayer != null) {
