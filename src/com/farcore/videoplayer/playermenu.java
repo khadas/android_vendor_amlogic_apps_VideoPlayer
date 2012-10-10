@@ -3182,8 +3182,18 @@ public class playermenu extends Activity {
 	@Override
     public void onPause() {
 		Log.d(TAG,"onPause");
-        super.onPause();
+        super.onPause();		
         mPaused = true;
+
+		if(player_status == VideoInfo.PLAYER_RUNNING) {
+			try	{
+				m_Amplayer.Pause();
+			} 
+			catch(RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		
         SystemProperties.set("vplayer.playing","false");
         if(confirm_dialog != null && confirm_dialog.isShowing()) {
             confirm_dialog.dismiss();
@@ -4145,6 +4155,15 @@ public class playermenu extends Activity {
 		super.onResume();
 		mPaused = false;
 		isBackWard = false;
+
+		if(player_status == VideoInfo.PLAYER_PAUSE) {
+			try	{
+				m_Amplayer.Resume();
+			} 
+			catch(RemoteException e)	{
+				e.printStackTrace();
+			}
+		}
 
 		SettingsVP.enableVideoLayout();
 		if(mSuspendFlag) {
