@@ -3179,13 +3179,19 @@ public class playermenu extends Activity {
         super.onDestroy();
     }
 
+	private int lastPlayerStatus = VideoInfo.PLAYER_UNKNOWN;
+
 	@Override
     public void onPause() {
 		Log.d(TAG,"onPause");
         super.onPause();		
         mPaused = true;
 
-		if(player_status == VideoInfo.PLAYER_RUNNING) {
+		if(player_status == VideoInfo.PLAYER_PAUSE) {
+			lastPlayerStatus = VideoInfo.PLAYER_PAUSE;
+		}
+		else if(player_status == VideoInfo.PLAYER_RUNNING) {
+			lastPlayerStatus = VideoInfo.PLAYER_RUNNING;
 			try	{
 				m_Amplayer.Pause();
 			} 
@@ -4155,16 +4161,6 @@ public class playermenu extends Activity {
 		super.onResume();
 		mPaused = false;
 		isBackWard = false;
-
-		if(player_status == VideoInfo.PLAYER_PAUSE) {
-			try	{
-				m_Amplayer.Resume();
-			} 
-			catch(RemoteException e)	{
-				e.printStackTrace();
-			}
-		}
-
 		SettingsVP.enableVideoLayout();
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
@@ -4183,6 +4179,17 @@ public class playermenu extends Activity {
 	    			StartPlayerService();
 	        	else
 	        		Amplayer_play();
+			}
+		}
+
+		if(lastPlayerStatus == VideoInfo.PLAYER_PAUSE)
+		{
+			lastPlayerStatus = VideoInfo.PLAYER_UNKNOWN;
+			try	{
+				m_Amplayer.Pause();
+			} 
+			catch(RemoteException e) {
+				e.printStackTrace();
 			}
 		}
 		
