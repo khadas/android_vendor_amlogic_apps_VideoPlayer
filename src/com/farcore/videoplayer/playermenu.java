@@ -75,6 +75,7 @@ public class playermenu extends Activity {
 	private final String ACTION_VIDEOPOSITION_CHANGE = "android.intent.action.VIDEOPOSITION_CHANGE"; 
 
 	private static String FormatMVC_3dtb= "3dtb";
+	private static String FormatMVC_3dlr= "3dlr";
 	private static String FormatMVC_3doff= "3doff";
 
 	private static final int SET_OSD_ON= 1;
@@ -394,19 +395,29 @@ public class playermenu extends Activity {
                 list.get(pos).put("item_sel", R.drawable.item_img_sel);
                 break;
 			case PLAY3D:
-			    int size_3d =  string_3d_id.length;
-				for (int i = 0; i < size_3d; i++) {
-                  map = new HashMap<String, Object>();
-                    map.put("item_name", getResources().getString(string_3d_id[i]));
-                    map.put("item_sel", R.drawable.item_img_unsel);
-                    list.add(map);
+				if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+					int size_3d = 4;
+					for (int i = 0; i < size_3d; i++) {
+					  map = new HashMap<String, Object>();
+						map.put("item_name", getResources().getString(string_3d_id[i]));
+						map.put("item_sel", R.drawable.item_img_unsel);
+						list.add(map);
+					}
+					list.get(pos).put("item_sel", R.drawable.item_img_sel);                    					
+				}else{
+					int size_3d =  string_3d_id.length;
+					for (int i = 0; i < size_3d; i++) {
+					  map = new HashMap<String, Object>();
+						map.put("item_name", getResources().getString(string_3d_id[i]));
+						map.put("item_sel", R.drawable.item_img_unsel);
+						list.add(map);
+					}
+					
+					list.get(pos).put("item_sel", R.drawable.item_img_sel);
 				}
-				
-				list.get(pos).put("item_sel", R.drawable.item_img_sel);
-			    break;
-
-            default:
-                break;
+				break;
+			default:
+				break;
         }
 
         return list;
@@ -922,6 +933,67 @@ public class playermenu extends Activity {
 					otherbar.requestFocus();
 					morebar_status = R.string.setting_3d_mode;
 
+					timer.cancel();
+				} 
+			});
+		}
+		//----------------------------mbox---------------
+    	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)) {
+			ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+			play3d.setVisibility(View.VISIBLE);
+			play3d.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					otherbar.setVisibility(View.VISIBLE);
+					subTitleView.setViewStatus(false);
+					if(subTitleView_sm!=null&&SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+					     subTitleView_sm.setViewStatus(false);
+					}					
+					morbar.setVisibility(View.GONE);
+					
+					morebar_tileText.setText(R.string.setting_3d_mode);
+					ListView listView = (ListView)findViewById(R.id.AudioListView);
+					listView.setAdapter(getMorebarListAdapter(PLAY3D, mode_3d));
+					listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							mode_3d = position;
+							switch (position) {
+							case 0:
+								    //m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_DISABLE.ordinal());
+								    //is3DVideoDisplayFlag = false;
+								    writeFile(FormatMVC,FormatMVC_3doff);
+								break;
+							case 1:
+							   
+								break;
+							case 2:
+								    //m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_LR.ordinal());
+								    //is3DVideoDisplayFlag = true;
+								    writeFile(FormatMVC,FormatMVC_3dlr);
+								break;
+							case 3:
+								    //m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_BT.ordinal());
+								    //is3DVideoDisplayFlag = true;
+								    writeFile(FormatMVC,FormatMVC_3dtb);
+								break;
+                    							
+							default:
+									writeFile(FormatMVC,FormatMVC_3doff);
+								break;
+                    		}
+							otherbar.setVisibility(View.GONE);
+							subTitleView.setViewStatus(true);
+							if(subTitleView_sm!=null&&SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+							     subTitleView_sm.setViewStatus(true);
+							}							
+							morbar.setVisibility(View.VISIBLE);
+							ImageButton play3d = (ImageButton) findViewById(R.id.Play3DBtn);
+							play3d.requestFocus();
+
+							waitForHideOsd();
+						}
+					});    
+					otherbar.requestFocus();
+					morebar_status = R.string.setting_3d_mode;
 					timer.cancel();
 				} 
 			});
@@ -3338,12 +3410,12 @@ public class playermenu extends Activity {
 						if(!progressSliding)
 							play.setImageResource(R.drawable.pause);						
 						String videoFotmat = bMediaInfo.getFullFileName(PlayList.getinstance().getcur());
-						if(videoFotmat.endsWith(".mvc")){
+						/*if(videoFotmat.endsWith(".mvc")){
 							writeFile(FormatMVC,FormatMVC_3dtb);
 						}
 						else{
 							writeFile(FormatMVC,FormatMVC_3doff);
-						}
+						}*/
 						break;
 					case VideoInfo.PLAYER_PAUSE:
 						ignoreupdateiconcnt=0;
