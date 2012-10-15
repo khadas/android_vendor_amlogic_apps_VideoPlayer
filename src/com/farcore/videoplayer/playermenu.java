@@ -77,6 +77,8 @@ public class playermenu extends Activity {
 	private static String FormatMVC_3dtb= "3dtb";
 	private static String FormatMVC_3dlr= "3dlr";
 	private static String FormatMVC_3doff= "3doff";
+	private int MBX_3D_status = 0;		//0:3doff,1:auto,2:3dlr,3:3dtb
+	Toast mbx_3d = null;
 
 	private static final int SET_OSD_ON= 1;
 	private static final int SET_OSD_OFF= 2;
@@ -403,7 +405,7 @@ public class playermenu extends Activity {
 						map.put("item_sel", R.drawable.item_img_unsel);
 						list.add(map);
 					}
-					list.get(pos).put("item_sel", R.drawable.item_img_sel);                    					
+					list.get(MBX_3D_status).put("item_sel", R.drawable.item_img_sel);                    					
 				}else{
 					int size_3d =  string_3d_id.length;
 					for (int i = 0; i < size_3d; i++) {
@@ -953,31 +955,30 @@ public class playermenu extends Activity {
 					morebar_tileText.setText(R.string.setting_3d_mode);
 					ListView listView = (ListView)findViewById(R.id.AudioListView);
 					listView.setAdapter(getMorebarListAdapter(PLAY3D, mode_3d));
+					listView.setSelection(MBX_3D_status);
 					listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 							mode_3d = position;
 							switch (position) {
 							case 0:
-								    //m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_DISABLE.ordinal());
-								    //is3DVideoDisplayFlag = false;
 								    writeFile(FormatMVC,FormatMVC_3doff);
+									MBX_3D_status = 0;
 								break;
 							case 1:
-							   
+									MBX_3D_status = 1;
 								break;
 							case 2:
-								    //m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_LR.ordinal());
-								    //is3DVideoDisplayFlag = true;
 								    writeFile(FormatMVC,FormatMVC_3dlr);
+									MBX_3D_status = 2;
 								break;
 							case 3:
-								    //m_Amplayer.Set3Dmode(Mode_3D.MODE_3D_BT.ordinal());
-								    //is3DVideoDisplayFlag = true;
 								    writeFile(FormatMVC,FormatMVC_3dtb);
+									MBX_3D_status = 3;
 								break;
                     							
 							default:
 									writeFile(FormatMVC,FormatMVC_3doff);
+									MBX_3D_status = 0;
 								break;
                     		}
 							otherbar.setVisibility(View.GONE);
@@ -2088,6 +2089,36 @@ public class playermenu extends Activity {
 				}
 			}
     	}
+		else if (keyCode == KeyEvent.KEYCODE_F10){      //3D switch
+			MBX_3D_status++;
+			if(MBX_3D_status > 3)
+				MBX_3D_status = 0;
+
+			if(MBX_3D_status == 1)		//NO auto setting
+				MBX_3D_status++;
+
+			switch(MBX_3D_status){
+				case 0:
+					writeFile(FormatMVC,FormatMVC_3doff);
+					mbx_3d.setText(new String("3D OFF"));
+					mbx_3d.show();
+					break;
+				case 1:
+					mbx_3d.setText(new String("3D AUTO"));
+					mbx_3d.show();
+					break;
+				case 2:
+					writeFile(FormatMVC,FormatMVC_3dlr);
+					mbx_3d.setText(new String("3D L/R"));
+					mbx_3d.show();
+					break;
+				case 3:
+					writeFile(FormatMVC,FormatMVC_3dtb);
+					mbx_3d.setText(new String("3D T/B"));
+					mbx_3d.show();
+					break;
+			}
+		}
         /*
     	else if (keyCode == KeyEvent.KEYCODE_7) {
     		videobar();
@@ -2195,6 +2226,9 @@ public class playermenu extends Activity {
         ff_fb =Toast.makeText(playermenu.this, "",Toast.LENGTH_SHORT );
         ff_fb.setGravity(Gravity.TOP | Gravity.RIGHT,10,10);
 		ff_fb.setDuration(0x00000001);
+		mbx_3d = Toast.makeText(playermenu.this, "",Toast.LENGTH_SHORT );
+		mbx_3d.setGravity(Gravity.TOP,10,10);
+		mbx_3d.setDuration(0x00000001);
 
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
@@ -3324,6 +3358,7 @@ public class playermenu extends Activity {
         }
         
 		writeFile(FormatMVC,FormatMVC_3doff);
+		MBX_3D_status = 0;
 		disable2XScale();
         ScreenMode.setScreenMode("0");
     }
