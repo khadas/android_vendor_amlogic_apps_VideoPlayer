@@ -1944,7 +1944,7 @@ public class playermenu extends Activity {
 						FF_FLAG = false;
 					}
 					else {
-						ff_fb.cancel();
+						//ff_fb.cancel();
 						ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
 						ff_fb.show();
 					}
@@ -1970,7 +1970,7 @@ public class playermenu extends Activity {
 						FB_FLAG = false;
 					}
 					else {
-						ff_fb.cancel();
+						//ff_fb.cancel();
 						ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
 	    				ff_fb.show();
 					}
@@ -1985,7 +1985,7 @@ public class playermenu extends Activity {
 				}
 				FF_FLAG = true;
 				FF_LEVEL = 1;
-				ff_fb.cancel();
+				//ff_fb.cancel();
 				ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
 				ff_fb.show();
 			}		 
@@ -2026,7 +2026,7 @@ public class playermenu extends Activity {
 						FB_FLAG = false;
 					}
 					else {
-						ff_fb.cancel();
+						//ff_fb.cancel();
 						ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
 	    				ff_fb.show();
 					}
@@ -2052,7 +2052,7 @@ public class playermenu extends Activity {
 						FF_FLAG = false;
 					}
 					else {
-						ff_fb.cancel();
+						//ff_fb.cancel();
 						ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
 						ff_fb.show();
 					}
@@ -2067,7 +2067,7 @@ public class playermenu extends Activity {
                 }
 				FB_FLAG = true;
 				FB_LEVEL = 1;
-				ff_fb.cancel();
+				//ff_fb.cancel();
 				ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
 				ff_fb.show();
             }
@@ -2746,7 +2746,7 @@ public class playermenu extends Activity {
 							FF_FLAG = false;
 						}
 						else {
-							ff_fb.cancel();
+							//ff_fb.cancel();
 							ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
 		    				ff_fb.show();
 						}
@@ -2772,7 +2772,7 @@ public class playermenu extends Activity {
 							FB_FLAG = false;
 						}
 						else {
-							ff_fb.cancel();
+							//ff_fb.cancel();
 							ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
 							ff_fb.show();
 						}
@@ -2787,7 +2787,7 @@ public class playermenu extends Activity {
 					}
 					FF_FLAG = true;
 					FF_LEVEL = 1;
-					ff_fb.cancel();
+					//ff_fb.cancel();
 					ff_fb.setText(new String("FF x"+FF_SPEED[FF_LEVEL]));
     				ff_fb.show();
 				}
@@ -2820,7 +2820,7 @@ public class playermenu extends Activity {
 							FB_FLAG = false;
 						}
 						else {
-							ff_fb.cancel();
+							//ff_fb.cancel();
 							ff_fb.setText(new String("FB x" + Integer.toString(FB_SPEED[FB_LEVEL])));
 		    				ff_fb.show();
 						}
@@ -2846,7 +2846,7 @@ public class playermenu extends Activity {
 							FF_FLAG = false;
 						}
 						else {
-							ff_fb.cancel();
+							//ff_fb.cancel();
 							ff_fb.setText(new String("FF x" + Integer.toString(FF_SPEED[FF_LEVEL])));
 							ff_fb.show();
 						}
@@ -2861,7 +2861,7 @@ public class playermenu extends Activity {
 					}
 					FB_FLAG = true;
 					FB_LEVEL = 1;
-					ff_fb.cancel();
+					//ff_fb.cancel();
 					ff_fb.setText(new String("FB x"+FB_SPEED[FB_LEVEL]));
     				ff_fb.show();
 				}
