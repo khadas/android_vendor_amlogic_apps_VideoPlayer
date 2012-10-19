@@ -2305,6 +2305,7 @@ public class playermenu extends Activity {
 	                infobar = null;
 	                morbar = null;
 	                initOsdBar();
+					mHdmiPlugged = plugged;
 	                return;
 	            }
 	                
