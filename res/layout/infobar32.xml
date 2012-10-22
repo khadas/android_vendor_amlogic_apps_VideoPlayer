@@ -52,7 +52,9 @@
 	    android:id="@+id/infobarLayout" 
 	    android:gravity="bottom|center"
 	    android:layout_height="wrap_content" 
-	    android:layout_gravity="bottom" >
+	    android:layout_gravity="bottom" 
+	    android:paddingLeft="10dp"
+	    android:paddingRight="10dp">
 			
 		<LinearLayout
 		    android:id="@+id/LinearLayout02"

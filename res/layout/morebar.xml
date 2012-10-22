@@ -6,7 +6,9 @@
 	android:background="@drawable/movie_play_bk" 
 	android:layout_height="wrap_content" 
 	android:layout_width="fill_parent"
-	android:gravity="center">
+	android:gravity="center"
+	android:paddingLeft="10dp"
+	android:paddingRight="10dp">
 	        
 	<ImageButton 
 		android:id="@+id/BackBtn" 
