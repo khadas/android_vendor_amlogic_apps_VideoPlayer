@@ -3190,8 +3190,8 @@ public class playermenu extends Activity {
 				showOsdView();
 			}
 
-			int flag = getCurOsdViewFlag();
-			if(OSD_INFO_BAR==flag)
+			int flag = getCurOsdViewFlag(); 
+			if((OSD_INFO_BAR==flag)&&((player_status == VideoInfo.PLAYER_RUNNING)||(player_status == VideoInfo.PLAYER_SEARCHING)))
 			{
 				//tony.wang
 				AmPlayer.setOSDOnFlag(true);
