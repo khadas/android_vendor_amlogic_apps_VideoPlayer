@@ -57,6 +57,10 @@ import android.content.ContentResolver;
 import android.content.res.AssetFileDescriptor;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.os.Process;
+
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
 	private static String codec_mips = null;
@@ -260,6 +264,7 @@ public class playermenu extends Activity {
     private final static int GETROTATION_TIMEOUT = 500;
 	private final static int GETROTATION = 0x0001;
 	private int mLastRotation;
+	private int mLastRotationFlag = 0;
 	
 	public void setAngleTable() {
 		String hwrotation = SystemProperties.get("ro.sf.hwrotation");
@@ -2194,6 +2199,11 @@ public class playermenu extends Activity {
 				if((!backToOtherAPK)&&(!backToFileList))
 					startActivity(selectFileIntent);
 				backToFileList = true;
+				
+				if(backToOtherAPK) {
+					Process.killProcess(Process.myPid());
+				}
+					
 				finish();
     		  	onPause(); //for disable 2Xscale
     		  	onDestroy(); //set freescale when exception
@@ -2235,6 +2245,7 @@ public class playermenu extends Activity {
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
         closeScreenOffTimeout();
+
 		
         Intent it = this.getIntent();
         playmode_switch = true;
@@ -3244,7 +3255,7 @@ public class playermenu extends Activity {
 			retStr = Integer.toString(i);
 		return retStr;
     }
-	
+
 	@Override
     public void onDestroy() {
         ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
@@ -3286,6 +3297,18 @@ public class playermenu extends Activity {
         }
         finish();
         super.onDestroy();
+
+		if(backToOtherAPK) {
+			ActivityManager am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+			List<RunningTaskInfo> list = am.getRunningTasks(100);
+			String MY_PKG_NAME = "com.farcore.videoplayer";
+			for (RunningTaskInfo info : list) {
+				if (info.topActivity.getPackageName().equals(MY_PKG_NAME) || info.baseActivity.getPackageName().equals(MY_PKG_NAME)) {
+					Process.killProcess(Process.myPid());
+					break;
+				}
+			}
+		}
     }
 
 	private int lastPlayerStatus = VideoInfo.PLAYER_UNKNOWN;
@@ -3295,7 +3318,6 @@ public class playermenu extends Activity {
 		Log.d(TAG,"onPause");
         super.onPause();		
         mPaused = true;
-
 		if(player_status == VideoInfo.PLAYER_PAUSE) {
 			lastPlayerStatus = VideoInfo.PLAYER_PAUSE;
 		}
@@ -4328,6 +4350,13 @@ public class playermenu extends Activity {
 	public void onConfigurationChanged(Configuration config) {
 		try {
 			super.onConfigurationChanged(config);
+
+			int getRotation = mWindowManager.getDefaultDisplay().getRotation();
+			if(getRotation != mLastRotationFlag) {			 	 
+				//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
+				mLastRotationFlag = getRotation;				 
+				setOSDOnOff(false);				 
+			}
 			
 			//int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 			//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
