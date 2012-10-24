@@ -34,6 +34,7 @@ import android.os.SystemProperties;
 import com.farcore.playerservice.SettingsVP;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System;
 
 public class FileList extends ListActivity {
 	private List<File> listFiles =null;
@@ -164,7 +165,19 @@ public class FileList extends ListActivity {
 	    currentlist = new ArrayList<String>();
 	    
 	    /* check whether use real sdcard*/
-		isRealSD = Environment.isExternalStorageBeSdcard();
+		//isRealSD = Environment.isExternalStorageBeSdcard();
+		String path = System.getenv("INTERNAL_STORAGE");
+		if(path!=null) {
+			if(path.equals("/storage/sdcard0")) {
+				isRealSD = false;
+			}
+			else {
+				isRealSD = true;
+			}
+		}
+		else {
+			isRealSD = false;
+		}
 	    
 		if(PlayList.getinstance().rootPath==null)
 			PlayList.getinstance().rootPath =root_path;
