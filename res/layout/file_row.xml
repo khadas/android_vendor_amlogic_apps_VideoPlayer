@@ -11,8 +11,8 @@
     android:layout_weight="1.0"
     android:textColor="@drawable/black"
     android:textSize="20px"
-    android:ellipsize="marquee" 
-    android:marqueeRepeatLimit="marquee_forever" 
+	android:ellipsize="middle"
+    android:singleLine="true"
     android:focusableInTouchMode="true" 
     android:scrollHorizontally="true"
   android:layout_height="56dp" android:fadeScrollbars="true" android:fadingEdge="vertical" android:isScrollContainer="false" android:layout_gravity="center_horizontal" android:gravity="left|center">
