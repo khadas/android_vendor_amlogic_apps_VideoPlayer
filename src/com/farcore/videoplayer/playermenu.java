@@ -1011,8 +1011,8 @@ public class playermenu extends Activity {
 				if (player_status < VideoInfo.PLAYER_INITOK) {
     				return;
 				}
-				if(bMediaInfo.getAudioTrackCount()==1)
-					cur_audio_stream = 0;
+				if(cur_audio_stream>=bMediaInfo.getAudioTrackCount())
+					cur_audio_stream = bMediaInfo.getAudioTrackCount()-1;
                 SimpleAdapter audioarray = getMorebarListAdapter(AUDIOTRACK, cur_audio_stream);
                 if((audio_flag == Errorno.PLAYER_NO_AUDIO) || (audioarray.getCount() <= 0) ) {
     				Toast toast =Toast.makeText(playermenu.this, R.string.file_have_no_audio,Toast.LENGTH_SHORT );
