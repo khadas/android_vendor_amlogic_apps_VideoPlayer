@@ -88,6 +88,7 @@ public class playermenu extends Activity {
 	private static final int SET_OSD_OFF= 2;
 
 	private boolean mHdmiPlugged;
+	private boolean mHdmiPluggedBac;
 	private boolean mPaused;
 
   /** Called when the activity is first created. */
@@ -4302,6 +4303,16 @@ public class playermenu extends Activity {
     			StartPlayerService();
         	else
         		Amplayer_play();
+
+			
+			if ((mHdmiPlugged != mHdmiPluggedBac) && (mHdmiPlugged == true)){
+				PlayList.getinstance().rootPath =null;
+				Intent selectFileIntent = new Intent();
+                selectFileIntent.setClass(playermenu.this, FileList.class);
+               	if(!backToOtherAPK)
+                	startActivity(selectFileIntent);
+                playermenu.this.finish();
+			}
 		}
 		else {
 			if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
@@ -4313,6 +4324,7 @@ public class playermenu extends Activity {
 	        		Amplayer_play();
 			}
 		}
+		mHdmiPluggedBac = mHdmiPlugged;
 
 		if(lastPlayerStatus == VideoInfo.PLAYER_PAUSE)
 		{
