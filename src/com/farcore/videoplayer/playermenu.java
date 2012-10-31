@@ -60,6 +60,8 @@ import java.io.FileNotFoundException;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.os.Process;
+import android.view.IWindowManager;
+import android.os.RemoteException;
 
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
@@ -3387,6 +3389,13 @@ public class playermenu extends Activity {
 		MBX_3D_status = 0;
 		disable2XScale();
         ScreenMode.setScreenMode("0");
+
+		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
+		try {			
+			iWindowManager.setAnimationScale(1, mTransitionAnimationScale);	
+		}		
+		catch (RemoteException e) {
+		}   
     }
 
 	public void onStop(){
@@ -4288,6 +4297,8 @@ public class playermenu extends Activity {
             } 
         }
     };	
+
+	float mTransitionAnimationScale = 1.0f;
 	
 	@Override
 	public void onResume() {
@@ -4354,21 +4365,28 @@ public class playermenu extends Activity {
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
         
-        SystemProperties.set("vplayer.playing","true");  
-        
+        SystemProperties.set("vplayer.playing","true");
+
+		mTransitionAnimationScale = Settings.System.getFloat(playermenu.this.getContentResolver(), Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
+		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
+		try {			
+			iWindowManager.setAnimationScale(1, 0.0f);
+		}		
+		catch (RemoteException e) { 
+		}
     }
 	
 	@Override
 	public void onConfigurationChanged(Configuration config) {
 		try {
 			super.onConfigurationChanged(config);
-
+/*
 			int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 			if(getRotation != mLastRotationFlag) {			 	 
 				//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
 				mLastRotationFlag = getRotation;				 
 				setOSDOnOff(false);				 
-			}
+			}*/
 			
 			//int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 			//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
