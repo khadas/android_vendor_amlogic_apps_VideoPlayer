@@ -60,8 +60,12 @@ import java.io.FileNotFoundException;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.os.Process;
+import android.view.KeyEvent;
 import android.view.IWindowManager;
 import android.os.RemoteException;
+import android.os.ServiceManager;
+import android.os.SystemClock;
+import android.hardware.input.IInputManager;
 
 public class playermenu extends Activity {
 	private static String TAG = "playermenu";
@@ -4300,6 +4304,13 @@ public class playermenu extends Activity {
 
 	float mTransitionAnimationScale = 1.0f;
 	
+    private void sendKeyEvent(int keyCode) {
+        int eventCode = keyCode;
+        long now = SystemClock.uptimeMillis();
+        KeyEvent down = new KeyEvent(now, now, KeyEvent.ACTION_DOWN, eventCode, 0);
+        onKeyDown(KeyEvent.KEYCODE_BACK, down);
+    }
+	
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -4314,16 +4325,20 @@ public class playermenu extends Activity {
     			StartPlayerService();
         	else
         		Amplayer_play();
-
+				
+        	if ((mHdmiPlugged != mHdmiPluggedBac) && (mHdmiPlugged == true)){
+        	    mHdmiPluggedBac = mHdmiPlugged;
+        	    sendKeyEvent(KeyEvent.KEYCODE_BACK); 
+        	}
 			
-			if ((mHdmiPlugged != mHdmiPluggedBac) && (mHdmiPlugged == true)){
-				PlayList.getinstance().rootPath =null;
-				Intent selectFileIntent = new Intent();
-                selectFileIntent.setClass(playermenu.this, FileList.class);
-               	if(!backToOtherAPK)
-                	startActivity(selectFileIntent);
-                playermenu.this.finish();
-			}
+//			if ((mHdmiPlugged != mHdmiPluggedBac) && (mHdmiPlugged == true)){
+//				PlayList.getinstance().rootPath =null;
+//				Intent selectFileIntent = new Intent();
+//                selectFileIntent.setClass(playermenu.this, FileList.class);
+//               	if(!backToOtherAPK)
+//                	startActivity(selectFileIntent);
+//                playermenu.this.finish();
+//			}
 		}
 		else {
 			if(SettingsVP.getParaBoolean(SettingsVP.RESUME_MODE))
@@ -4335,7 +4350,7 @@ public class playermenu extends Activity {
 	        		Amplayer_play();
 			}
 		}
-		mHdmiPluggedBac = mHdmiPlugged;
+
 
 		if(lastPlayerStatus == VideoInfo.PLAYER_PAUSE)
 		{
