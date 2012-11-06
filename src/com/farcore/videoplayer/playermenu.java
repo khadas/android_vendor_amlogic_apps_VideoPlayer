@@ -610,6 +610,13 @@ public class playermenu extends Activity {
 				frameParams.height = 720 - 50;
 				frameParams.gravity = Gravity.TOP;
 				baselayout2.setLayoutParams(frameParams);
+			} else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height > 1080) {
+				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+				if (SettingsVP.panel_width > 1920)
+				    frameParams.width = 1920;
+				frameParams.height = 1080 - 50;
+				frameParams.gravity = Gravity.TOP;
+				baselayout2.setLayoutParams(frameParams);
 			} else if (!SystemProperties.getBoolean("ro.vout.player.exit", true)
 	                   && SettingsVP.display_mode.equals("panel")) {
                 FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
@@ -2534,6 +2541,15 @@ public class playermenu extends Activity {
 				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
 					subTitleView_sm.setLayoutParams(linearParams);
 				}				
+	        } else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height > 1080) {
+	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
+	        	if (SettingsVP.panel_width > 1920)
+            	    linearParams.width = 1920;
+            	linearParams.bottomMargin = SettingsVP.panel_height - 1080 + 10;
+	        	subTitleView.setLayoutParams(linearParams);
+				if(subTitleView_sm!=null&&SystemProperties.getBoolean("3D_setting.enable", false)){
+					subTitleView_sm.setLayoutParams(linearParams);
+				}				
 	        } else if (!SystemProperties.getBoolean("ro.vout.player.exit", true)
 	                   && SettingsVP.display_mode.equals("panel")) {
                 linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
@@ -2584,7 +2600,13 @@ public class playermenu extends Activity {
 	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
 	        	if (SettingsVP.panel_width > 1280)
             	    linearParams.width = 1280;
-            	linearParams.bottomMargin = SettingsVP.panel_height - 720 + 10;	        	
+            	linearParams.bottomMargin = SettingsVP.panel_height - 720 + 10;
+				subTitleView.setLayoutParams(linearParams);			
+	        } else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height > 1080) {
+	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
+	        	if (SettingsVP.panel_width > 1920)
+            	    linearParams.width = 1920;
+            	linearParams.bottomMargin = SettingsVP.panel_height - 1080 + 10;	
 	        	subTitleView.setLayoutParams(linearParams);			
 	        } 
     	}        
@@ -3368,7 +3390,7 @@ public class playermenu extends Activity {
             }
             finish();
         }*/
-		if(mHdmiPlugged) {
+		if(mHdmiPlugged || SystemProperties.getBoolean("ro.panel.with.freescale", false)) {
 			if(!backToFileList){
 			    PlayList.getinstance().rootPath =null;
             }
