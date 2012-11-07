@@ -989,10 +989,22 @@ public class playermenu extends Activity {
 							case 2:
 								    writeFile(FormatMVC,FormatMVC_3dlr);
 									MBX_3D_status = 2;
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")){
+										writeFile(RequestScaleFile,"17");
+										}
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")){
+										writeFile(RequestScaleFile,"8 1");
+										}
 								break;
 							case 3:
 								    writeFile(FormatMVC,FormatMVC_3dtb);
 									MBX_3D_status = 3;
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")){
+										writeFile(RequestScaleFile,"18");
+										}
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")){
+										writeFile(RequestScaleFile,"8 2");
+										}
 								break;
                     							
 							default:
