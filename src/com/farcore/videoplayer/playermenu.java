@@ -3718,7 +3718,7 @@ public class playermenu extends Activity {
 							subTitleView_sm.setVideoResolution(
 									bMediaInfo.getWidth(), bMediaInfo.getHeight());							
 						}
-						if(SystemProperties.getBoolean("3D_setting.enable", false)&&bMediaInfo.getVideoFormat().compareToIgnoreCase("H264MVC")==0){//if 264mvc,set auto mode.
+						if(bMediaInfo != null && SystemProperties.getBoolean("3D_setting.enable", false)&&bMediaInfo.getVideoFormat().compareToIgnoreCase("H264MVC")==0){//if 264mvc,set auto mode.
 							try {
 								m_Amplayer.Set3Dgrating(1); //open grating
 								m_Amplayer.Set3Dmode(1);
@@ -3730,7 +3730,7 @@ public class playermenu extends Activity {
 							}			    					
 						}					
 						
-						if(bMediaInfo.drm_check == 0) {
+						if(bMediaInfo != null && bMediaInfo.drm_check == 0) { //test
 						    try {
 							    m_Amplayer.Play();
                             } 
@@ -3756,7 +3756,7 @@ public class playermenu extends Activity {
 							sub_para.sub_id = null;
 						}
 						
-						if(bMediaInfo.seekable == 0) {
+						if(bMediaInfo != null&&bMediaInfo.seekable == 0) {
 							myProgressBar.setEnabled(false);
 							fastforword.setEnabled(false);
 							fastreverse.setEnabled(false);
