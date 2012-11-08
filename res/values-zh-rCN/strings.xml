@@ -71,4 +71,7 @@
 	<string name="ext_sdcard_device_str">外部存储卡</string>
 	<string name="sata_device_str">SATA</string>
 	<string name="usb_device_str">USB设备</string>
+	<string name="no_file">没有视频文件！</string>
+	<string name="searching">搜索中...</string>
+	<string name="all_file">视频列表</string>
 </resources>

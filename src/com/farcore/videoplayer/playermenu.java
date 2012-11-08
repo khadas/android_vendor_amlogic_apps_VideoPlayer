@@ -105,6 +105,8 @@ public class playermenu extends Activity {
 	private int total_audio_num = 0;
 	private int cur_audio_channel = 0;
 	private int audio_flag = 0;
+	private int aidResume = -1;//audio id add for resume from suspend
+	private int smResume = -1;//screen mode
 	
 	private final int PLAY_RESUME = 0;
 	private final int PLAY_MODE = 1;
@@ -1064,6 +1066,7 @@ public class playermenu extends Activity {
     			    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
     			    			Log.d("audiostream","change audio stream to: " + arg2);
     			    			cur_audio_stream = arg2;
+								aidResume = arg2;
     			    		}
     			    		catch (RemoteException e) {
     			    			e.printStackTrace();
@@ -1424,19 +1427,23 @@ public class playermenu extends Activity {
 	                    	switch (position) {
 	                    		case ScreenMode.NORMAL:
 	                            	SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL);
-	                            	ScreenMode.setScreenMode("0");                                
+	                            	ScreenMode.setScreenMode("0"); 
+									smResume = 0;
 	                    			break;
 	                    		case ScreenMode.FULLSTRETCH:
 	                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.FULLSTRETCH);
 	                    			ScreenMode.setScreenMode("1");
+									smResume = 1;
 	                    			break;
 	                    		case ScreenMode.RATIO4_3:
 	                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO4_3);
 	                    			ScreenMode.setScreenMode("2");
+									smResume = 2;
 	                    			break;
 	                    		case ScreenMode.RATIO16_9:
 	                    			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO16_9);
 	                    			ScreenMode.setScreenMode("3");
+									smResume = 3;
 	                    			break;
 	                    		/*	
 	                            case ScreenMode.NORMAL_NOSCALEUP:
@@ -1897,6 +1904,8 @@ public class playermenu extends Activity {
 
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().moveprev();
+			smResume = -1;
+			aidResume = -1;
 			toast.cancel();
 			toast.setText(filename);
 			toast.show();
@@ -1931,6 +1940,8 @@ public class playermenu extends Activity {
 
 			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			String filename = PlayList.getinstance().movenext();
+			smResume = -1;
+			aidResume = -1;
 			toast.cancel();
 			toast.setText(filename); 
 			toast.show();
@@ -2418,6 +2429,7 @@ public class playermenu extends Activity {
 	private int getCurDirFile(Uri uri, List<String> list){
 		String path = uri.getPath(); 
 		int pos=-1;
+		list.clear();
 		
 		if(null!=path)
 		{
@@ -2700,6 +2712,8 @@ public class playermenu extends Activity {
 				isBackWard = true;
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().moveprev();
+				smResume = -1;
+				aidResume = -1;
 				toast.cancel();
 				toast.setText(catShowFilePath(filename));
 				toast.show();
@@ -2722,6 +2736,8 @@ public class playermenu extends Activity {
 				isBackWard = false;
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 				String filename = PlayList.getinstance().movenext();
+				smResume = -1;
+				aidResume = -1;
 				toast.cancel();
 				toast.setText(catShowFilePath(filename)); 
 				toast.show();
@@ -3307,6 +3323,9 @@ public class playermenu extends Activity {
 	     subTitleView_sm.closeSubtitle();
 	}		
         backToFileList = true;
+		mSuspendFlag = false;
+		smResume = -1;
+		aidResume = -1;
         Amplayer_stop();
         if(m_Amplayer != null)
 			try {
@@ -3359,6 +3378,14 @@ public class playermenu extends Activity {
 		Log.d(TAG,"onPause");
         super.onPause();		
         mPaused = true;
+
+		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
+		try {			
+			iWindowManager.setAnimationScale(1, mTransitionAnimationScale);	
+		}		
+		catch (RemoteException e) {
+		}  
+		
 		if(player_status == VideoInfo.PLAYER_PAUSE) {
 			lastPlayerStatus = VideoInfo.PLAYER_PAUSE;
 		}
@@ -3427,13 +3454,6 @@ public class playermenu extends Activity {
 		MBX_3D_status = 0;
 		disable2XScale();
         ScreenMode.setScreenMode("0");
-
-		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
-		try {			
-			iWindowManager.setAnimationScale(1, mTransitionAnimationScale);	
-		}		
-		catch (RemoteException e) {
-		}   
     }
 
 	public void onStop(){
@@ -3612,8 +3632,11 @@ public class playermenu extends Activity {
 						}
 						ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
 						playPosition = 0;
-						if(m_playmode == REPEATLIST)
+						if(m_playmode == REPEATLIST) {
+							smResume = -1;
+							aidResume = -1;
 							PlayList.getinstance().movenext();
+						}
 						AudioTrackOperation.AudioStreamFormat.clear();
 						AudioTrackOperation.AudioStreamInfo.clear();
 						INITOK = false;
@@ -3639,7 +3662,9 @@ public class playermenu extends Activity {
 							}
 							ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
 							playPosition = 0;
-							if(m_playmode == REPEATLIST)
+							if(m_playmode == REPEATLIST) {
+								smResume = -1;
+								aidResume = -1;
 								if(isBackWard)
 									{
 										isBackWard = false;
@@ -3647,6 +3672,7 @@ public class playermenu extends Activity {
 									}
 								else
 									PlayList.getinstance().movenext();
+							}
 							AudioTrackOperation.AudioStreamFormat.clear();
 							AudioTrackOperation.AudioStreamInfo.clear();
 							INITOK = false;
@@ -3757,6 +3783,44 @@ public class playermenu extends Activity {
                                 e.printStackTrace();
                             }
                         }
+
+						if(aidResume != -1) {
+							if (bMediaInfo.getAudioTrackCount()>1) {
+					    		try {
+									getMorebarListAdapter(AUDIOTRACK, aidResume);
+					    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(aidResume).audio_id);
+									cur_audio_stream = aidResume;
+					    		}
+					    		catch (RemoteException e) {
+					    			e.printStackTrace();
+					    		}
+					    	}
+						}
+
+						if(smResume != -1) {
+							if(!is3DVideoDisplayFlag) {
+								switch (smResume) {
+					        		case ScreenMode.NORMAL:
+					                	SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.NORMAL);
+					                	ScreenMode.setScreenMode("0"); 
+					        			break;
+					        		case ScreenMode.FULLSTRETCH:
+					        			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.FULLSTRETCH);
+					        			ScreenMode.setScreenMode("1");
+					        			break;
+					        		case ScreenMode.RATIO4_3:
+					        			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO4_3);
+					        			ScreenMode.setScreenMode("2");
+					        			break;
+					        		case ScreenMode.RATIO16_9:
+					        			SettingsVP.putParaInt(SettingsVP.DISPLAY_MODE, ScreenMode.RATIO16_9);
+					        			ScreenMode.setScreenMode("3");
+					        			break;
+					        		default:
+					        			break;
+					        	}
+							}
+						}
 						break;
 					case VideoInfo.PLAYER_SEARCHOK:
 						//progressSliding = false;
@@ -4350,6 +4414,15 @@ public class playermenu extends Activity {
 		super.onResume();
 		mPaused = false;
 		isBackWard = false;
+
+		mTransitionAnimationScale = Settings.System.getFloat(playermenu.this.getContentResolver(), Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
+		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
+		try {			
+			iWindowManager.setAnimationScale(1, 0.0f);
+		}		
+		catch (RemoteException e) { 
+		}
+		
 		SettingsVP.enableVideoLayout();
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
@@ -4415,14 +4488,6 @@ public class playermenu extends Activity {
         registerReceiver(mMountReceiver, intentFilter);
         
         SystemProperties.set("vplayer.playing","true");
-
-		mTransitionAnimationScale = Settings.System.getFloat(playermenu.this.getContentResolver(), Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
-		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
-		try {			
-			iWindowManager.setAnimationScale(1, 0.0f);
-		}		
-		catch (RemoteException e) { 
-		}
     }
 	
 	@Override

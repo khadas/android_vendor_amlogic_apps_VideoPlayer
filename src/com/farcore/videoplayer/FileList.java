@@ -35,8 +35,18 @@ import com.farcore.playerservice.SettingsVP;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.System;
+import android.database.Cursor;
+import android.provider.MediaStore;
+import android.widget.ProgressBar;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.os.Handler;
+import java.util.Timer;
+import java.util.TimerTask;
+import android.os.Message;
 
 public class FileList extends ListActivity {
+	private boolean listAllFiles = true;
 	private List<File> listFiles =null;
 	private List<File> listVideos =null;
 	private List<String> items=null;
@@ -48,8 +58,16 @@ public class FileList extends ListActivity {
 	private static String ISOpath = null;
 	
 	private TextView tileText;
+	private TextView nofileText;
+	private TextView searchText;
+	private ProgressBar sp;
+	private boolean isScanning=false;
+	private boolean isQuerying=false;
+	private int scanCnt=0;
 	private File file;
 	private static String TAG = "player_FileList";
+	Timer timer = new Timer();
+	Timer timerScan = new Timer();
 	
 	private int item_position_selected, item_position_first, fromtop_piexl;
 	private ArrayList<Integer> fileDirectory_position_selected = new ArrayList<Integer>();
@@ -59,6 +77,7 @@ public class FileList extends ListActivity {
 	
 	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
     private boolean isRealSD=false;
+	private Uri uri;
 
 	private String pathTransferForJB(String path) {
 		String pathout = path;
@@ -90,14 +109,14 @@ public class FileList extends ListActivity {
 	        	
 	        	if(newState.compareTo("mounted") == 0)
 	        	{
-	        		if(PlayList.getinstance().rootPath==null 
+					if(PlayList.getinstance().rootPath==null 
 	        		|| PlayList.getinstance().rootPath.equals(root_path))
 	        			BrowserFile(root_path); 
 	        	}
 	        	else if(newState.compareTo("unmounted") == 0
 	        			|| newState.compareTo("removed") == 0)
 	        	{
-	        		if(PlayList.getinstance().rootPath.startsWith(path)
+					if(PlayList.getinstance().rootPath.startsWith(path)
 	        		|| PlayList.getinstance().rootPath.equals(root_path))
 	        			BrowserFile(root_path);
 	        	}
@@ -105,38 +124,145 @@ public class FileList extends ListActivity {
 	        }
 	        
 	};
+
+	 private void waitForRescan() {
+    	final Handler handler = new Handler(){   
+            public void handleMessage(Message msg) {   
+                switch (msg.what) {       
+                case 0x5c: 
+                	isScanning = false;
+					prepareFileForList();
+					timerScan.cancel();
+                    break;       
+                }       
+                super.handleMessage(msg);   
+            }  
+        };   
+        TimerTask task = new TimerTask(){ 
+            public void run() {   
+                Message message = Message.obtain();
+                message.what = 0x5c;       
+                handler.sendMessage(message); 
+            }
+        };   
+        
+        timer.cancel();
+        timer = new Timer();
+    	timer.schedule(task, 500);
+    }
+
+	private void waitForScanFinish() {
+    	final Handler handler = new Handler(){   
+            public void handleMessage(Message msg) {   
+                switch (msg.what) {       
+                case 0x6c: 
+					scanCnt--;
+                	isScanning = false;
+					prepareFileForList();
+                    break;       
+                }       
+                super.handleMessage(msg);   
+            }  
+        };   
+        TimerTask task = new TimerTask(){ 
+            public void run() {   
+                Message message = Message.obtain();
+                message.what = 0x6c;       
+                handler.sendMessage(message); 
+            }
+        };   
+        
+        timerScan.cancel();
+        timerScan = new Timer();
+    	timerScan.schedule(task, 20000);
+    }
+
+	private BroadcastReceiver mScanListener = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			String action = intent.getAction();
+			if(Intent.ACTION_MEDIA_EJECT.equals(action)) {
+				prepareFileForList();
+			}
+			else if (Intent.ACTION_MEDIA_SCANNER_STARTED.equals(action)) {
+				if(!isScanning) {
+					isScanning = true;
+					setListAdapter(null);
+					showSpinner();
+					scanCnt++;
+					waitForScanFinish();
+				}
+			}
+			else if(Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
+				if((isScanning)&&(scanCnt==1)) {
+					scanCnt--;
+					waitForRescan();
+				}
+			}	
+			/*else if(Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
+			}
+			else if(Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
+			}*/
+		}
+	};
 	
     @Override
     public void onResume() {
         super.onResume();
-        File file = null;
-        if (PlayList.getinstance().rootPath != null)
-			file = new File(PlayList.getinstance().rootPath);
-			
-        if((file != null) && file.exists()) {
-			File[] the_Files;
-			the_Files = file.listFiles(new MyFilter(extensions));
-			if(the_Files == null) {
-				PlayList.getinstance().rootPath =root_path;
-			}
-			BrowserFile(PlayList.getinstance().rootPath);
+		if(!listAllFiles) {
+	        File file = null;
+	        if (PlayList.getinstance().rootPath != null)
+				file = new File(PlayList.getinstance().rootPath);
+				
+	        if((file != null) && file.exists()) {
+				File[] the_Files;
+				the_Files = file.listFiles(new MyFilter(extensions));
+				if(the_Files == null) {
+					PlayList.getinstance().rootPath =root_path;
+				}
+				BrowserFile(PlayList.getinstance().rootPath);
 
+			}
+			else {
+				PlayList.getinstance().rootPath =root_path;
+				BrowserFile(PlayList.getinstance().rootPath);
+			}
+			getListView().setSelectionFromTop(item_position_selected, fromtop_piexl);
+			StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+			m_storagemgr.registerListener(mListener);
 		}
 		else {
-			PlayList.getinstance().rootPath =root_path;
-			BrowserFile(PlayList.getinstance().rootPath);
+			IntentFilter f = new IntentFilter();
+			f.addAction(Intent.ACTION_MEDIA_EJECT);
+			f.addAction(Intent.ACTION_MEDIA_MOUNTED);
+			f.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+			f.addAction(Intent.ACTION_MEDIA_SCANNER_STARTED);
+  			f.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
+			f.addDataScheme("file");
+			registerReceiver(mScanListener, f);
 		}
-        
-        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-		m_storagemgr.registerListener(mListener);
-        getListView().setSelectionFromTop(item_position_selected, fromtop_piexl);
     }
+
+	public void onDestroy() {
+		super.onDestroy();
+	}
     
     @Override
     public void onPause() {
         super.onPause();
-        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-        m_storagemgr.unregisterListener(mListener);
+		if(!listAllFiles) {
+	        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+	        m_storagemgr.unregisterListener(mListener);
+		}
+		else {
+			isScanning = false;
+			isQuerying=false;
+			scanCnt=0;
+			timer.cancel();
+			timerScan.cancel();
+			unregisterReceiver(mScanListener);
+		}
     }
     
 	@Override
@@ -146,52 +272,64 @@ public class FileList extends ListActivity {
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
-	    
-	    try{
-	        Bundle bundle = new Bundle();
-	        bundle = this.getIntent().getExtras();
-	        if (bundle != null) {
-		        item_position_selected = bundle.getInt("item_position_selected");
-		        item_position_first = bundle.getInt("item_position_first");
-		        fromtop_piexl = bundle.getInt("fromtop_piexl");
-		        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
-		        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");	    	
-	        	pathLevel = fileDirectory_position_selected.size();
-	        }
-	    }
-	    catch (Exception e) {
-	    	e.printStackTrace();
-	    }
-	    currentlist = new ArrayList<String>();
-	    
-	    /* check whether use real sdcard*/
-		//isRealSD = Environment.isExternalStorageBeSdcard();
-		String path = System.getenv("INTERNAL_STORAGE");
-		if(path!=null) {
-			if(path.equals("/storage/sdcard0")) {
-				isRealSD = false;
+
+		listAllFiles = SystemProperties.getBoolean("ro.vplayer.listall", false);
+
+		currentlist = new ArrayList<String>();
+
+		if(!listAllFiles) {
+		    try{
+		        Bundle bundle = new Bundle();
+		        bundle = this.getIntent().getExtras();
+		        if (bundle != null) {
+			        item_position_selected = bundle.getInt("item_position_selected");
+			        item_position_first = bundle.getInt("item_position_first");
+			        fromtop_piexl = bundle.getInt("fromtop_piexl");
+			        fileDirectory_position_selected = bundle.getIntegerArrayList("fileDirectory_position_selected");
+			        fileDirectory_position_piexl = bundle.getIntegerArrayList("fileDirectory_position_piexl");	    	
+		        	pathLevel = fileDirectory_position_selected.size();
+		        }
+		    }
+		    catch (Exception e) {
+		    	e.printStackTrace();
+		    }
+		    
+		    /* check whether use real sdcard*/
+			//isRealSD = Environment.isExternalStorageBeSdcard();
+			String path = System.getenv("INTERNAL_STORAGE");
+			if(path!=null) {
+				if(path.equals("/storage/sdcard0")) {
+					isRealSD = false;
+				}
+				else {
+					isRealSD = true;
+				}
 			}
 			else {
-				isRealSD = true;
+				isRealSD = false;
 			}
+		    
+			if(PlayList.getinstance().rootPath==null)
+				PlayList.getinstance().rootPath =root_path;
+		    	
+		    BrowserFile(PlayList.getinstance().rootPath);
 		}
-		else {
-			isRealSD = false;
-		}
-	    
-		if(PlayList.getinstance().rootPath==null)
-			PlayList.getinstance().rootPath =root_path;
-	    	
-	    BrowserFile(PlayList.getinstance().rootPath);
-	    
+		
 	    Button home = (Button) findViewById(R.id.Button_home);
 	    home.setOnClickListener(new View.OnClickListener() 
 	    {
 
             public void onClick(View v) 
             {
-            	FileList.this.finish();
-            	PlayList.getinstance().rootPath =null;
+            	if(listAllFiles) {
+					if(!isScanning) {
+						reScanVideoFiles();
+					}
+				}
+				else {
+	            	FileList.this.finish();
+	            	PlayList.getinstance().rootPath =null;
+				}
             } 
        
 	    });
@@ -201,6 +339,11 @@ public class FileList extends ListActivity {
 
             public void onClick(View v) 
             {
+
+				if(listAllFiles) {
+					FileList.this.finish();
+					return;
+				}
             	
                 if(paths == null) 
                 {
@@ -243,7 +386,97 @@ public class FileList extends ListActivity {
             } 
        
 	    });
+
+		nofileText =(TextView) findViewById(R.id.TextView_nofile);
+		searchText =(TextView) findViewById(R.id.TextView_searching);
+		sp = (ProgressBar) findViewById(R.id.spinner);
+		if(listAllFiles) {
+			prepareFileForList();
+		}
         
+	}
+
+	private void showSpinner() {
+		if(listAllFiles) {
+			if((isScanning)||(isQuerying)) {
+				sp.setVisibility(View.VISIBLE);
+				searchText.setVisibility(View.VISIBLE);
+				nofileText.setVisibility(View.INVISIBLE);
+			}
+			else {
+				sp.setVisibility(View.INVISIBLE);
+				searchText.setVisibility(View.INVISIBLE);
+				int total = paths.size();
+				if(total==0) {
+					nofileText.setVisibility(View.VISIBLE);
+				}
+				else if(total>0) {
+					nofileText.setVisibility(View.INVISIBLE);
+				}
+			}
+		}
+		else {
+			sp.setVisibility(View.GONE);
+			nofileText.setVisibility(View.GONE);
+			searchText.setVisibility(View.GONE);
+		}
+	}
+
+
+	private void prepareFileForList() {
+		if(listAllFiles){
+		//Intent intent = getIntent();
+			//uri = intent.getData();
+			String[] mCursorCols = new String[] { 
+					MediaStore.Video.Media._ID,
+					MediaStore.Video.Media.DATA,
+					MediaStore.Video.Media.TITLE, 
+					MediaStore.Video.Media.SIZE,
+					MediaStore.Video.Media.DURATION,
+	//				MediaStore.Video.Media.BOOKMARK,
+	//				MediaStore.Video.Media.PLAY_TIMES
+					};
+			String patht = null;
+			String namet = null;
+			paths=new ArrayList<String>();
+			items=new ArrayList<String>();
+			paths.clear();
+			items.clear();
+			
+			setListAdapter(null);
+			isQuerying = true;
+			showSpinner();
+			
+			uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+			Cursor cursor = getContentResolver().query(uri, mCursorCols, null, null, null);
+			cursor.moveToFirst();
+			int colidx = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+			for (int i = 0; i < cursor.getCount(); i++) {
+				patht = cursor.getString(colidx);
+				//Log.e("wxl", "cursor["+colidx+"]:"+patht);
+				int index=patht.lastIndexOf("/");
+				if(index>=0)
+				{
+					namet=patht.substring(index);
+				}
+				items.add(namet);
+		    	paths.add(patht);
+				cursor.moveToNext();
+			}
+
+			tileText =(TextView) findViewById(R.id.TextView_path);
+	    	tileText.setText(R.string.all_file);
+			if(paths.size() > 0) {
+				setListAdapter(new MyAdapter(this,items,paths));
+			}
+
+			isQuerying = false;
+			showSpinner();
+			
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
 	}
 	
 	private void BrowserFile(String filePath) {
@@ -515,32 +748,35 @@ public class FileList extends ListActivity {
 			BrowserFile(iso_mount_dir);
 	    }else 
 	    {
-		//stopMediaPlayer();
-	    	//file = new File(file.getParent());
-	    	int pos = filterDir(file);
-	    	//Log.i(TAG, "play path:"+file.getPath()+", pos:"+Integer.toString(pos));
-	    	if(pos < 0) 
-	    		return;
-	    	PlayList.getinstance().rootPath= file.getParent();
-	    	//int dircount =listFiles.size()-listVideos.size();
-	    	
-	    	//if(dircount>=0&&(position-dircount)>=0)
-			//PlayList.getinstance().setlist(paths, position-dircount);
-			//else
-			//PlayList.getinstance().setlist(paths, position);
-	    	PlayList.getinstance().setlist(paths, pos);
-	    	
-			item_position_selected = getListView().getSelectedItemPosition();
-			item_position_first = getListView().getFirstVisiblePosition();
-			View cv = getListView().getChildAt(item_position_selected - item_position_first);
-	        if (cv != null) {
-	        	fromtop_piexl = cv.getTop();
-	        }
+	    	if(!listAllFiles) {
+		    	int pos = filterDir(file);
+		    	if(pos < 0) 
+		    		return;
+		    	PlayList.getinstance().rootPath= file.getParent();
+		    	PlayList.getinstance().setlist(paths, pos);
+				item_position_selected = getListView().getSelectedItemPosition();
+				item_position_first = getListView().getFirstVisiblePosition();
+
+				if(!listAllFiles) {
+					View cv = getListView().getChildAt(item_position_selected - item_position_first);
+			        if (cv != null) {
+			        	fromtop_piexl = cv.getTop();
+			        }
+				}
+	    	}
+			else {
+				PlayList.getinstance().setlist(paths, position);
+			}
 			showvideobar();
 	    }
 	}
     public boolean onKeyDown(int keyCode, KeyEvent event) { 
-        if (keyCode == KeyEvent.KEYCODE_BACK) {        	
+        if (keyCode == KeyEvent.KEYCODE_BACK) {     
+			if(listAllFiles) {
+				FileList.this.finish();
+				return true;
+			}
+			
             if(paths == null) 
             {
             	FileList.this.finish();
@@ -589,11 +825,13 @@ public class FileList extends ListActivity {
 		//* new an Intent object and ponit a class to start
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
-		bundle.putInt("item_position_selected", item_position_selected);
-	    bundle.putInt("item_position_first", item_position_first);
-	    bundle.putInt("fromtop_piexl", fromtop_piexl);
-	    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
-	    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
+		if(!listAllFiles) {
+			bundle.putInt("item_position_selected", item_position_selected);
+		    bundle.putInt("item_position_first", item_position_first);
+		    bundle.putInt("fromtop_piexl", fromtop_piexl);
+		    bundle.putIntegerArrayList("fileDirectory_position_selected", fileDirectory_position_selected);
+		    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
+		}
 	    bundle.putBoolean("backToOtherAPK", false);
 		intent.setClass(FileList.this, playermenu.class);
 		intent.putExtras(bundle);
@@ -669,6 +907,12 @@ public class FileList extends ListActivity {
 	        	return true;
         }
         return false;
+    }
+
+	public void reScanVideoFiles()
+    {
+    	Intent intent = new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + "/mnt"));
+    	this.sendBroadcast(intent);
     }
     
     public void stopMediaPlayer()//stop the backgroun music player
