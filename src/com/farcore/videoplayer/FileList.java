@@ -273,7 +273,7 @@ public class FileList extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.main);
 
-		listAllFiles = SystemProperties.getBoolean("ro.vplayer.listall", false);
+		listAllFiles = SystemProperties.getBoolean("vplayer.listall.enable", false);
 
 		currentlist = new ArrayList<String>();
 
