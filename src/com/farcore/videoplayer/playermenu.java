@@ -463,7 +463,7 @@ public class playermenu extends Activity {
         
         timer.cancel();
         timer = new Timer();
-    	timer.schedule(task, 5000);
+    	timer.schedule(task, 35000);
     }
 
 /// patch for hide OSD
@@ -3179,7 +3179,7 @@ public class playermenu extends Activity {
         
         timer.cancel();
         timer = new Timer();
-    	timer.schedule(task, 5000);
+    	timer.schedule(task, 35000);
     }
     
     protected void ResumeCountdown() {
@@ -3494,25 +3494,28 @@ public class playermenu extends Activity {
     		    	if(player_status == VideoInfo.PLAYER_RUNNING) {
     		    		if(subTitleView!=null&&sub_para.sub_id!=null)
     		    			subTitleView.tick(msg.arg1);
-				if(SystemProperties.getBoolean("3D_setting.enable", false)){
-					if(subTitleView_sm!=null&View.INVISIBLE ==subTitleView_sm.getVisibility()&&is3DVideoDisplayFlag){
-						subTitleView_sm.setVisibility(View.VISIBLE);
-					}
-					if(subTitleView_sm!=null&&sub_para.sub_id!=null)
-    		    				subTitleView_sm.tick(msg.arg1);
-					
-				}
+						if(SystemProperties.getBoolean("3D_setting.enable", false)){
+							if(subTitleView_sm!=null&View.INVISIBLE ==subTitleView_sm.getVisibility()&&is3DVideoDisplayFlag){
+								subTitleView_sm.setVisibility(View.VISIBLE);
+							}
+							if(subTitleView_sm!=null&&sub_para.sub_id!=null)
+		    		    				subTitleView_sm.tick(msg.arg1);
+							
+						}
     		    	}
-			if(ignoreupdatetimecnt<=0)/*don't update the time if just update the seek.*/		
-    		    		curtime = msg.arg1/1000;
-			else{
-				ignoreupdatetimecnt--;
-				return;
-			}		
-    		    			if(totaltime == 0)
+					
+					if(ignoreupdatetimecnt<=0)/*don't update the time if just update the seek.*/		
+		    		    curtime = msg.arg1/1000;
+					else {
+						ignoreupdatetimecnt--;
+						return;
+					}
+					
+    		    	if(totaltime == 0)
 						myProgressBar.setProgress(0);
 					else {
-						if((seek == 1) && (curtime >= (seek_cur_time-2))) {
+						//if((seek == 1) && (curtime >= (seek_cur_time-2))) {
+						if((seek == 1) && ((curtime >= (seek_cur_time-2))&&(curtime < seek_cur_time))) {
 							//Log.d(TAG, "count curtime: " + curtime);
 							//Log.d(TAG, "seek curtime: " + seek_cur_time);
 							return;
@@ -3527,6 +3530,7 @@ public class playermenu extends Activity {
 						seek = 0;
 						seek_cur_time = 0;
 						//if(!progressSliding)
+
 						myProgressBar.setProgress(curtime*100/totaltime);
 					}
     				break;
@@ -4591,7 +4595,7 @@ Handler mRotateHandler = new Handler() {
         
         timer.cancel();
         timer = new Timer();
-    	timer.schedule(task, 5000);
+    	timer.schedule(task, 35000);
     }
 
 	private void initOsdBar()
