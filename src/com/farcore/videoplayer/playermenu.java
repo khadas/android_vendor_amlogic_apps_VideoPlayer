@@ -463,7 +463,7 @@ public class playermenu extends Activity {
         
         timer.cancel();
         timer = new Timer();
-    	timer.schedule(task, 35000);
+    	timer.schedule(task, 5000);
     }
 
 /// patch for hide OSD
@@ -3179,7 +3179,7 @@ public class playermenu extends Activity {
         
         timer.cancel();
         timer = new Timer();
-    	timer.schedule(task, 35000);
+    	timer.schedule(task, 5000);
     }
     
     protected void ResumeCountdown() {
@@ -4595,7 +4595,7 @@ Handler mRotateHandler = new Handler() {
         
         timer.cancel();
         timer = new Timer();
-    	timer.schedule(task, 35000);
+    	timer.schedule(task, 5000);
     }
 
 	private void initOsdBar()
