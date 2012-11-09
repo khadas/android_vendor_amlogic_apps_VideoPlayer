@@ -983,6 +983,8 @@ public class playermenu extends Activity {
 							switch (position) {
 							case 0:
 								    writeFile(FormatMVC,FormatMVC_3doff);
+									Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
+									playermenu.this.sendBroadcast(intent_videoposition_change);
 									MBX_3D_status = 0;
 								break;
 							case 1:
@@ -991,20 +993,26 @@ public class playermenu extends Activity {
 							case 2:
 								    writeFile(FormatMVC,FormatMVC_3dlr);
 									MBX_3D_status = 2;
-									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")){
+									set3DVideoAxis();
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p") ||
+									   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
 										writeFile(RequestScaleFile,"17");
 										}
-									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")){
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p") ||
+									   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
 										writeFile(RequestScaleFile,"8 1");
 										}
 								break;
 							case 3:
 								    writeFile(FormatMVC,FormatMVC_3dtb);
+									set3DVideoAxis();
 									MBX_3D_status = 3;
-									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")){
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
+									   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
 										writeFile(RequestScaleFile,"18");
 										}
-									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")){
+									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p") ||
+									   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
 										writeFile(RequestScaleFile,"8 2");
 										}
 								break;
@@ -2145,6 +2153,8 @@ public class playermenu extends Activity {
 				case 0:
 					writeFile(FormatMVC,FormatMVC_3doff);
 					mbx_3d.setText(new String("3D OFF"));
+					Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
+					playermenu.this.sendBroadcast(intent_videoposition_change);
 					mbx_3d.show();
 					break;
 				case 1:
@@ -2153,11 +2163,29 @@ public class playermenu extends Activity {
 					break;
 				case 2:
 					writeFile(FormatMVC,FormatMVC_3dlr);
+					set3DVideoAxis();
 					mbx_3d.setText(new String("3D L/R"));
+					if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
+					   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
+						writeFile(RequestScaleFile,"17");
+					}
+					if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")||
+					   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
+						writeFile(RequestScaleFile,"8 1");
+					}
 					mbx_3d.show();
 					break;
 				case 3:
 					writeFile(FormatMVC,FormatMVC_3dtb);
+					set3DVideoAxis();
+					if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
+					   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
+							writeFile(RequestScaleFile,"18");
+					}
+					if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")||
+					   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
+							writeFile(RequestScaleFile,"8 2");
+					}
 					mbx_3d.setText(new String("3D T/B"));
 					mbx_3d.show();
 					break;
@@ -4952,6 +4980,15 @@ Handler mRotateHandler = new Handler() {
 		cancel.setNextFocusDownId(R.id.button_canncel);
 		cancel.setNextFocusLeftId(R.id.button_ok);
 		cancel.setNextFocusRightId(R.id.button_canncel);
+	}
+	private void set3DVideoAxis(){
+       String outputmode = SystemProperties.get("ubootenv.var.outputmode");
+	   if(outputmode.equals("720p")||outputmode.equals("720p50hz")){
+	   		writeFile(VideoAxisFile, "0 0 1280 720");
+	   	}
+	   if(outputmode.equals("1080p")||outputmode.equals("1080p50hz")){
+	   		writeFile(VideoAxisFile, "0 0 1920 1080");
+	   	} 	
 	}
 }
 
