@@ -4265,6 +4265,8 @@ public class playermenu extends Activity {
     		  type ="cp949";
     	else if(able.equals("IT")||able.equals("FR")||able.equals("DE"))
     		  type ="iso88591";
+		else if(able.equals("TR"))
+			  type ="cp1254";
     	else
     		  type ="GBK";
     	
