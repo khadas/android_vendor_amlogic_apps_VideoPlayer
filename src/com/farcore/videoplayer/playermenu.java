@@ -2280,7 +2280,7 @@ public class playermenu extends Activity {
 
         m1080scale = SystemProperties.getInt("ro.platform.has.1080scale", 0);
         outputmode = SystemProperties.get(STR_OUTPUT_MODE);
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
 	 			 	Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
 					playermenu.this.sendBroadcast(intent_video_on);
 					SystemProperties.set("mbx.hideStatusBar.enable","true");
