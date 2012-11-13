@@ -2224,6 +2224,7 @@ public class playermenu extends Activity {
         //uncaughtException execute
     	Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
     		public void uncaughtException(Thread thread, Throwable ex) {    
+    			playermenu.this.sendBroadcast(new Intent("com.farcore.videoplayer.PLAYER_CRASHED"));
     			
     			SystemProperties.set("vplayer.hideStatusBar.enable","false");
     			SystemProperties.set("mbx.hideStatusBar.enable","false");
@@ -2317,7 +2318,7 @@ public class playermenu extends Activity {
 		
 		mUri = it.getData();
         if(it.getData() != null) {
-        	if(it.getData().getScheme().equals("file")) {
+        	if(it.getData().getScheme() != null && it.getData().getScheme().equals("file")) {
         		List<String> paths = new ArrayList<String>();
 				int pos = getCurDirFile(mUri, paths);
                 //paths.add(it.getData().getPath());
@@ -2331,24 +2332,30 @@ public class playermenu extends Activity {
         	}
         	else {
                 Cursor cursor = managedQuery(it.getData(), null, null, null, null);
-                cursor.moveToFirst();
-
-                int index = cursor.getColumnIndex(MediaStore.Video.Media.DATA);
-                if((index == -1) || (cursor.getCount() <= 0)) {
-                    Log.e(TAG, "Cursor empty or failed\n"); 
-                }
-                else {
-                    List<String> paths = new ArrayList<String>();
+                if (cursor != null) {
                     cursor.moveToFirst();
-
-                    paths.add(cursor.getString(index));
-                    PlayList.getinstance().setlist(paths, 0);
-                    
-                    playmode_switch = false;
-                    //Log.d(TAG, "index = " + index);
-                    //Log.d(TAG, "From content providor DATA:" + cursor.getString(index));
-                    //Log.d(TAG, " -- MIME_TYPE :" + 
-                    		//cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)));
+    
+                    int index = cursor.getColumnIndex(MediaStore.Video.Media.DATA);
+                    if((index == -1) || (cursor.getCount() <= 0)) {
+                        Log.e(TAG, "Cursor empty or failed\n"); 
+                    }
+                    else {
+                        List<String> paths = new ArrayList<String>();
+                        cursor.moveToFirst();
+    
+                        paths.add(cursor.getString(index));
+                        PlayList.getinstance().setlist(paths, 0);
+                        
+                        playmode_switch = false;
+                        //Log.d(TAG, "index = " + index);
+                        //Log.d(TAG, "From content providor DATA:" + cursor.getString(index));
+                        //Log.d(TAG, " -- MIME_TYPE :" + 
+                        		//cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)));
+                    }
+                } else {
+                    // unsupported mUri, exit directly
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    return;
                 }
         	}
         }
