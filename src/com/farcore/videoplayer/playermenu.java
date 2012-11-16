@@ -1504,7 +1504,7 @@ public class playermenu extends Activity {
     					e.printStackTrace();
     				}
     				int item;
-    				if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_DIM + 10))
+    				if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_OFF + 10))
     					item = 0;
     				else if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_ON * 0.2f))
     					item = 1;
@@ -1523,7 +1523,7 @@ public class playermenu extends Activity {
     						int brightness;
     						switch(position) {
                         	case 0:
-                        	 	brightness = android.os.PowerManager.BRIGHTNESS_DIM + 10;
+                        	 	brightness = android.os.PowerManager.BRIGHTNESS_OFF + 10;
                         		break;
                         	case 1:
                         		brightness = (int)(android.os.PowerManager.BRIGHTNESS_ON * 0.2f);
@@ -1541,15 +1541,18 @@ public class playermenu extends Activity {
                         		brightness = android.os.PowerManager.BRIGHTNESS_ON;
                         	 	break;
                         	default:
-								brightness = android.os.PowerManager.BRIGHTNESS_DIM + 30;
+								brightness = android.os.PowerManager.BRIGHTNESS_OFF + 30;
                         		break;
                         	}
     						try {
     							IPowerManager power = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
     							if (power != null) {
+                                    /*
     								power.setBacklightBrightness(brightness);
     								Settings.System.putInt(playermenu.this.getContentResolver(), 
 				                    	Settings.System.SCREEN_BRIGHTNESS, brightness);
+                                    */
+                                    power.setTemporaryScreenBrightnessSettingOverride(brightness);
     							}
     						} 
     						catch (RemoteException doe) {
@@ -4811,7 +4814,7 @@ Handler mRotateHandler = new Handler() {
 			subTitleView.getPaddingLeft(),
 			subTitleView.getPaddingTop(),
 			subTitleView.getPaddingRight(),
-			getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
+			100); //TODO getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
 	}
 
 	private void initSubSetOptions(String color_text[])
