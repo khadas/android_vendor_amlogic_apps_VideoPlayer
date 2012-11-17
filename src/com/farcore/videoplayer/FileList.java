@@ -537,7 +537,8 @@ public class FileList extends ListActivity {
 	    			 tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
 	    		//delete used folder
 	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure"))&&
-	    			(!tpath.equals("/mnt/obb"))&&(!tpath.equals("/mnt/usbdrive")))
+	    			(!tpath.equals("/mnt/obb"))&&(!tpath.equals("/mnt/usbdrive"))
+	    			&&(!tpath.equals("/mnt/shell")))
 	    		{
 	    			//if(false==isRealSD)
     				//{
