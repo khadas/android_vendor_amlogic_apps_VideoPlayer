@@ -167,6 +167,7 @@ public class playermenu extends Activity {
 	public MediaInfo bMediaInfo = null;
 	private static int PRE_NEXT_FLAG = 0;
 	private static boolean isBackWard = false; //tony.wang add for played fail 
+	private static boolean exitAbort = false;//tong.wang add to indicate exit with abort
 	private int resumeSecond = 8;
 	private int player_status = VideoInfo.PLAYER_UNKNOWN;
 
@@ -3353,6 +3354,8 @@ public class playermenu extends Activity {
 	@Override
     public void onDestroy() {
         ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+		exitAbort = false;
+		
         //close sub;
         if(subTitleView!=null)
         	subTitleView.closeSubtitle();
@@ -3414,7 +3417,7 @@ public class playermenu extends Activity {
     public void onPause() {
 		Log.d(TAG,"onPause");
         super.onPause();		
-        mPaused = true;
+       /* mPaused = true;
 
 		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
 		try {			
@@ -3422,6 +3425,13 @@ public class playermenu extends Activity {
 		}		
 		catch (RemoteException e) {
 		}  
+
+		if(confirm_dialog != null && confirm_dialog.isShowing()&&exitAbort==false) {
+    		playPosition = 0;
+			exitAbort = true;
+        	confirm_dialog.dismiss();
+			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
+		}
 		
 		if(player_status == VideoInfo.PLAYER_PAUSE) {
 			lastPlayerStatus = VideoInfo.PLAYER_PAUSE;
@@ -3447,7 +3457,7 @@ public class playermenu extends Activity {
         unregisterReceiver(mMountReceiver);
 
         SystemProperties.set("vplayer.hideStatusBar.enable","false");      
-        
+  */      
         /*if(mSuspendFlag){
             if(player_status == VideoInfo.PLAYER_RUNNING) {
                 try{
@@ -3466,7 +3476,7 @@ public class playermenu extends Activity {
             }
             finish();
         }*/
-		if(mHdmiPlugged || SystemProperties.getBoolean("ro.panel.with.freescale", false)) {
+	/*	if(mHdmiPlugged || SystemProperties.getBoolean("ro.panel.with.freescale", false)) {
 			if(!backToFileList){
 			    PlayList.getinstance().rootPath =null;
             }
@@ -3491,7 +3501,86 @@ public class playermenu extends Activity {
 		MBX_3D_status = 0;
 		disable2XScale();
         ScreenMode.setScreenMode("0");
+*/
+		new Thread(pauseThread).start(); 
+
     }
+
+	Runnable pauseThread = new Runnable() {  
+        @Override  
+        public void run() {  
+			closeScreenOffTimeout();
+			
+            mPaused = true;
+
+			IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
+			try {			
+				iWindowManager.setAnimationScale(1, mTransitionAnimationScale);	
+			}		
+			catch (RemoteException e) {
+			}  
+
+			if(confirm_dialog != null && confirm_dialog.isShowing()&&exitAbort==false) {
+	    		playPosition = 0;
+				exitAbort = true;
+	        	confirm_dialog.dismiss();
+				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
+			}
+			
+			if(player_status == VideoInfo.PLAYER_PAUSE) {
+				lastPlayerStatus = VideoInfo.PLAYER_PAUSE;
+			}
+			else if(player_status == VideoInfo.PLAYER_RUNNING) {
+				lastPlayerStatus = VideoInfo.PLAYER_RUNNING;
+				try	{
+					m_Amplayer.Pause();
+				} 
+				catch(RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			
+	        SystemProperties.set("vplayer.playing","false");
+	        if(confirm_dialog != null && confirm_dialog.isShowing()) {
+	            confirm_dialog.dismiss();
+	        }        
+	        
+	        setOSDOnOff(true);
+	        unregisterReceiver(mMountReceiver);
+
+	        SystemProperties.set("vplayer.hideStatusBar.enable","false");      
+	        
+			if(mHdmiPlugged || SystemProperties.getBoolean("ro.panel.with.freescale", false)) {
+				if(!backToFileList){
+				    PlayList.getinstance().rootPath =null;
+	            }
+	            finish();
+			}
+			else {
+				if(m_Amplayer != null)
+					Amplayer_stop();
+				closeScreenOffTimeout();
+				mSuspendFlag = true;
+				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+			}
+			
+	        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+				SystemProperties.set("mbx.hideStatusBar.enable","false");
+				writeFile(VideoDisableFile,"1");
+				writeFile(Fb0Blank,"1");
+				Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
+				playermenu.this.sendBroadcast(intent_video_off);
+	        }
+	        
+			writeFile(FormatMVC,FormatMVC_3doff);
+			MBX_3D_status = 0;
+			disable2XScale();
+	        ScreenMode.setScreenMode("0"); 
+
+			openScreenOffTimeout();
+
+        }  
+    }; 
 
 	public void onStop(){
 		super.onStop();
@@ -4341,11 +4430,13 @@ public class playermenu extends Activity {
 	private class myAlertDialogDismiss implements DialogInterface.OnDismissListener {
 		public void onDismiss(DialogInterface arg0) {
 			// TODO Auto-generated method stub
-			if(!NOT_FIRSTTIME)
-    			StartPlayerService();
-        	else
-        		Amplayer_play();
-        	resumeSecond = 8;
+			if(!exitAbort) {
+				if(!NOT_FIRSTTIME)
+	    			StartPlayerService();
+	        	else
+	        		Amplayer_play();
+	        	resumeSecond = 8;
+			}
 		}
 		
 	}
@@ -4457,6 +4548,7 @@ public class playermenu extends Activity {
 		super.onResume();
 		mPaused = false;
 		isBackWard = false;
+		exitAbort = false;
 
 		mTransitionAnimationScale = Settings.System.getFloat(playermenu.this.getContentResolver(), Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
 		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
