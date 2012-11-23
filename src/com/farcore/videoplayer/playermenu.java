@@ -1504,7 +1504,7 @@ public class playermenu extends Activity {
     					e.printStackTrace();
     				}
     				int item;
-    				if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_OFF + 10))
+    				if (mBrightness <= (/*android.os.PowerManager.BRIGHTNESS_OFF*/20 + 10))
     					item = 0;
     				else if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_ON * 0.2f))
     					item = 1;
@@ -1523,7 +1523,7 @@ public class playermenu extends Activity {
     						int brightness;
     						switch(position) {
                         	case 0:
-                        	 	brightness = android.os.PowerManager.BRIGHTNESS_OFF + 10;
+                        	 	brightness = /*android.os.PowerManager.BRIGHTNESS_OFF*/20 + 10;
                         		break;
                         	case 1:
                         		brightness = (int)(android.os.PowerManager.BRIGHTNESS_ON * 0.2f);
@@ -1541,17 +1541,16 @@ public class playermenu extends Activity {
                         		brightness = android.os.PowerManager.BRIGHTNESS_ON;
                         	 	break;
                         	default:
-								brightness = android.os.PowerManager.BRIGHTNESS_OFF + 30;
+								brightness = /*android.os.PowerManager.BRIGHTNESS_OFF*/20 + 30;
                         		break;
                         	}
     						try {
     							IPowerManager power = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
     							if (power != null) {
-                                    /*
-    								power.setBacklightBrightness(brightness);
+    								//power.setBacklightBrightness(brightness);
     								Settings.System.putInt(playermenu.this.getContentResolver(), 
 				                    	Settings.System.SCREEN_BRIGHTNESS, brightness);
-                                    */
+                                    
                                     power.setTemporaryScreenBrightnessSettingOverride(brightness);
     							}
     						} 
