@@ -355,7 +355,7 @@ public class playermenu extends Activity {
                 break;
 
             case AUDIOTRACK:
-                if (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount())
+                if ((bMediaInfo != null) && (AudioTrackOperation.AudioStreamFormat.size() < bMediaInfo.getAudioTrackCount()))
                     AudioTrackOperation.setAudioStream(bMediaInfo);
                 int size_as = AudioTrackOperation.AudioStreamFormat.size();
 				if (size_as > 0) 
@@ -1048,7 +1048,7 @@ public class playermenu extends Activity {
 				if (player_status < VideoInfo.PLAYER_INITOK) {
     				return;
 				}
-				if(cur_audio_stream>=bMediaInfo.getAudioTrackCount())
+				if((bMediaInfo != null) && (cur_audio_stream>=bMediaInfo.getAudioTrackCount()))
 					cur_audio_stream = bMediaInfo.getAudioTrackCount()-1;
                 SimpleAdapter audioarray = getMorebarListAdapter(AUDIOTRACK, cur_audio_stream);
                 if((audio_flag == Errorno.PLAYER_NO_AUDIO) || (audioarray.getCount() <= 0) ) {
@@ -1070,7 +1070,7 @@ public class playermenu extends Activity {
                 listView.setAdapter(audioarray);
     			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
     			    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-    			    	if (bMediaInfo.getAudioTrackCount()>1) {
+    			    	if ((bMediaInfo != null) && (bMediaInfo.getAudioTrackCount()>1)) {
     			    		try {
     			    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
     			    			Log.d("audiostream","change audio stream to: " + arg2);
@@ -3366,8 +3366,9 @@ public class playermenu extends Activity {
 		mSuspendFlag = false;
 		smResume = -1;
 		aidResume = -1;
-        Amplayer_stop();
+        
         if(m_Amplayer != null)
+            Amplayer_stop();
 			try {
 				if(SystemProperties.getBoolean("3D_setting.enable", false)){
 					m_Amplayer.Set3Dgrating(0);
@@ -3500,13 +3501,11 @@ public class playermenu extends Activity {
 		writeFile(FormatMVC,FormatMVC_3doff);
 		MBX_3D_status = 0;
 		disable2XScale();
-        ScreenMode.setScreenMode("0");
-*/
-		new Thread(pauseThread).start(); 
-
+        ScreenMode.setScreenMode("0");*/
+		new Thread(onPauseThread).start(); 
     }
-
-	Runnable pauseThread = new Runnable() {  
+	
+		Runnable onPauseThread = new Runnable() {  
         @Override  
         public void run() {  
 			closeScreenOffTimeout();
@@ -3915,7 +3914,7 @@ public class playermenu extends Activity {
                         }
 
 						if(aidResume != -1) {
-							if (bMediaInfo.getAudioTrackCount()>1) {
+							if ((bMediaInfo != null) && (bMediaInfo.getAudioTrackCount()>1)) {
 					    		try {
 									getMorebarListAdapter(AUDIOTRACK, aidResume);
 					    			m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(aidResume).audio_id);
@@ -4542,6 +4541,22 @@ public class playermenu extends Activity {
         KeyEvent down = new KeyEvent(now, now, KeyEvent.ACTION_DOWN, eventCode, 0);
         onKeyDown(KeyEvent.KEYCODE_BACK, down);
     }
+
+	private static boolean isFileExit(String path){
+        if(path == null){
+            return false;
+        }
+        try{
+            File f = new File(path);
+            if(!f.exists()){
+                return false;
+            }
+        }catch (Exception e) {
+            e.printStackTrace(); 
+			return false;
+        }
+        return true;
+    }
 	
 	@Override
 	public void onResume() {
@@ -4598,7 +4613,10 @@ public class playermenu extends Activity {
 		{
 			lastPlayerStatus = VideoInfo.PLAYER_UNKNOWN;
 			try	{
-				m_Amplayer.Pause();
+                if(m_Amplayer != null)
+                {
+                    m_Amplayer.Pause();
+                }
 			} 
 			catch(RemoteException e) {
 				e.printStackTrace();
@@ -4623,7 +4641,20 @@ public class playermenu extends Activity {
         registerReceiver(mMountReceiver, intentFilter);
         
         SystemProperties.set("vplayer.playing","true");
+		if(!isFileExit(PlayList.getinstance().getcur())) {
+			//sendKeyEvent(KeyEvent.KEYCODE_BACK); 
+			//android.os.Process.killProcess(android.os.Process.myPid());
+			new Thread(killThread).start(); 
+			return;
+		}
     }
+    
+    Runnable killThread = new Runnable() {  
+        @Override  
+        public void run() { 
+			android.os.Process.killProcess(android.os.Process.myPid());
+        }  
+    }; 
 	
 	@Override
 	public void onConfigurationChanged(Configuration config) {

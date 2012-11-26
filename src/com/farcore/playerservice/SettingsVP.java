@@ -38,8 +38,13 @@ public class SettingsVP {
 	
 	public static Boolean getParaBoolean(String name)
 	{
-		Boolean para = setting.getBoolean(name, false);
-		return para;
+		if(setting!=null) {
+			Boolean para = setting.getBoolean(name, false);
+			return para;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public static int getParaInt(String name)
