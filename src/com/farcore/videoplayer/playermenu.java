@@ -160,6 +160,7 @@ public class playermenu extends Activity {
 	private BroadcastReceiver mReceiver = null;
 	private int morebar_status = 0;
 	private boolean backToOtherAPK = true;
+	final String POWER_KEY_SUSPEND_ACTION = "com.amlogic.vplayer.powerkey";
 
 	Timer timer = new Timer();
 	Toast ff_fb = null;
@@ -3390,6 +3391,8 @@ public class playermenu extends Activity {
         SettingsVP.disableVideoLayout();
         SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
+		unregisterReceiver(mMountReceiver);
+		unregisterReceiver(mPowerReceiver);
 
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
@@ -3398,18 +3401,6 @@ public class playermenu extends Activity {
         }
         finish();
         super.onDestroy();
-
-		if(backToOtherAPK) {
-			ActivityManager am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
-			List<RunningTaskInfo> list = am.getRunningTasks(100);
-			String MY_PKG_NAME = "com.farcore.videoplayer";
-			for (RunningTaskInfo info : list) {
-				if (info.topActivity.getPackageName().equals(MY_PKG_NAME) || info.baseActivity.getPackageName().equals(MY_PKG_NAME)) {
-					Process.killProcess(Process.myPid());
-					break;
-				}
-			}
-		}
     }
 
 	private int lastPlayerStatus = VideoInfo.PLAYER_UNKNOWN;
@@ -3417,91 +3408,7 @@ public class playermenu extends Activity {
 	@Override
     public void onPause() {
 		Log.d(TAG,"onPause");
-        super.onPause();		
-       /* mPaused = true;
-
-		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
-		try {			
-			iWindowManager.setAnimationScale(1, mTransitionAnimationScale);	
-		}		
-		catch (RemoteException e) {
-		}  
-
-		if(confirm_dialog != null && confirm_dialog.isShowing()&&exitAbort==false) {
-    		playPosition = 0;
-			exitAbort = true;
-        	confirm_dialog.dismiss();
-			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
-		}
-		
-		if(player_status == VideoInfo.PLAYER_PAUSE) {
-			lastPlayerStatus = VideoInfo.PLAYER_PAUSE;
-		}
-		else if(player_status == VideoInfo.PLAYER_RUNNING) {
-			lastPlayerStatus = VideoInfo.PLAYER_RUNNING;
-			try	{
-				m_Amplayer.Pause();
-			} 
-			catch(RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-		
-        SystemProperties.set("vplayer.playing","false");
-        if(confirm_dialog != null && confirm_dialog.isShowing()) {
-            confirm_dialog.dismiss();
-        }        
-        
-        setOSDOnOff(true);
-//        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-//        m_storagemgr.unregisterListener(mListener);
-        unregisterReceiver(mMountReceiver);
-
-        SystemProperties.set("vplayer.hideStatusBar.enable","false");      
-  */      
-        /*if(mSuspendFlag){
-            if(player_status == VideoInfo.PLAYER_RUNNING) {
-                try{
-                    m_Amplayer.Pause();
-                } 
-				catch(RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-            mSuspendFlag = false;
-            closeScreenOffTimeout();
-        }
-        else {
-            if(!backToFileList){
-			    PlayList.getinstance().rootPath =null;
-            }
-            finish();
-        }*/
-	/*	if(mHdmiPlugged || SystemProperties.getBoolean("ro.panel.with.freescale", false)) {
-			if(!backToFileList){
-			    PlayList.getinstance().rootPath =null;
-            }
-            finish();
-		}
-		else {
-			Amplayer_stop();
-			closeScreenOffTimeout();
-			mSuspendFlag = true;
-			ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
-		}
-		
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
-			SystemProperties.set("mbx.hideStatusBar.enable","false");
-			writeFile(VideoDisableFile,"1");
-			writeFile(Fb0Blank,"1");
-			Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
-			playermenu.this.sendBroadcast(intent_video_off);
-        }
-        
-		writeFile(FormatMVC,FormatMVC_3doff);
-		MBX_3D_status = 0;
-		disable2XScale();
-        ScreenMode.setScreenMode("0");*/
+        super.onPause();	
 		new Thread(onPauseThread).start(); 
     }
 	
@@ -3545,8 +3452,6 @@ public class playermenu extends Activity {
 	        }        
 	        
 	        setOSDOnOff(true);
-	        unregisterReceiver(mMountReceiver);
-
 	        SystemProperties.set("vplayer.hideStatusBar.enable","false");      
 	        
 			if(mHdmiPlugged || SystemProperties.getBoolean("ro.panel.with.freescale", false)) {
@@ -3578,16 +3483,17 @@ public class playermenu extends Activity {
 
 			openScreenOffTimeout();
 
+			if(!resumePlayEnable) {
+				PlayList.getinstance().rootPath=null;
+				playermenu.this.finish();
+			}
+
         }  
     }; 
 
 	public void onStop(){
 		super.onStop();
 		Log.d(TAG,"onStop");
-		/*if(!backToFileList){
-			PlayList.getinstance().rootPath =null;
-		}
-		finish();*/
 	}
     
 	//=========================================================
@@ -4495,11 +4401,11 @@ public class playermenu extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Uri uri = intent.getData();
-            String path = uri.getPath();                   
-            
-            if (action == null || path == null)
+            String path = uri.getPath();   
+			
+            if (action == null ||path == null)
             	return;
-
+			
 			path = pathTransferForJB(path);
             
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
@@ -4529,9 +4435,23 @@ public class playermenu extends Activity {
             } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
                 // SD card unavailable
                 // handled in ACTION_MEDIA_EJECT
-            } 
+            }
         }
     };	
+
+	private boolean resumePlayEnable = false;
+	private BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction(); 
+            if (action == null)
+            	return;
+
+			if(action.equals(POWER_KEY_SUSPEND_ACTION)) {
+				resumePlayEnable = true;
+			}
+        }
+    };
 
 	float mTransitionAnimationScale = 1.0f;
 	
@@ -4557,13 +4477,14 @@ public class playermenu extends Activity {
         }
         return true;
     }
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		mPaused = false;
 		isBackWard = false;
 		exitAbort = false;
+		resumePlayEnable = false;
 
 		mTransitionAnimationScale = Settings.System.getFloat(playermenu.this.getContentResolver(), Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
 		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
@@ -4639,6 +4560,10 @@ public class playermenu extends Activity {
         intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
+
+		IntentFilter pwrIntentFilter = new IntentFilter();
+		pwrIntentFilter.addAction(POWER_KEY_SUSPEND_ACTION);
+		registerReceiver(mPowerReceiver, pwrIntentFilter);
         
         SystemProperties.set("vplayer.playing","true");
 		if(!isFileExit(PlayList.getinstance().getcur())) {

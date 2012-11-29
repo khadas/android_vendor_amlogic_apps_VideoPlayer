@@ -39,11 +39,11 @@ public class SettingsVP {
 	public static Boolean getParaBoolean(String name)
 	{
 		if(setting!=null) {
-			Boolean para = setting.getBoolean(name, false);
+			Boolean para = setting.getBoolean(name, true);
 			return para;
 		}
 		else {
-			return false;
+			return true;
 		}
 	}
 	
