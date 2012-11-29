@@ -3355,7 +3355,6 @@ public class playermenu extends Activity {
 	@Override
     public void onDestroy() {
         ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
-		exitAbort = false;
 		
         //close sub;
         if(subTitleView!=null)
@@ -3384,8 +3383,10 @@ public class playermenu extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-        StopPlayerService();
+
+		if(!exitAbort)
+        	StopPlayerService();
+
         setDefCodecMips();
         openScreenOffTimeout();
         SettingsVP.disableVideoLayout();
@@ -3394,11 +3395,13 @@ public class playermenu extends Activity {
 		unregisterReceiver(mMountReceiver);
 		unregisterReceiver(mPowerReceiver);
 
+
         if(AmPlayer.getProductType() == 1) //1:MID 0:other
         	AmPlayer.enable_freescale(MID_FREESCALE);
 		if(!backToFileList){
 		    PlayList.getinstance().rootPath =null;
         }
+		exitAbort = false;
         finish();
         super.onDestroy();
     }
@@ -3408,7 +3411,7 @@ public class playermenu extends Activity {
 	@Override
     public void onPause() {
 		Log.d(TAG,"onPause");
-        super.onPause();	
+        super.onPause();
 		new Thread(onPauseThread).start(); 
     }
 	
@@ -3484,10 +3487,11 @@ public class playermenu extends Activity {
 			openScreenOffTimeout();
 
 			if(!resumePlayEnable) {
-				PlayList.getinstance().rootPath=null;
+				if(!backToFileList){
+				    PlayList.getinstance().rootPath =null;
+	            }
 				playermenu.this.finish();
 			}
-
         }  
     }; 
 
@@ -4528,7 +4532,6 @@ public class playermenu extends Activity {
 	        		Amplayer_play();
 			}
 		}
-
 
 		if(lastPlayerStatus == VideoInfo.PLAYER_PAUSE)
 		{
