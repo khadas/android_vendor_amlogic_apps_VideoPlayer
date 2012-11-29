@@ -3385,7 +3385,8 @@ public class playermenu extends Activity {
 			}
 
 		if(!exitAbort)
-        	StopPlayerService();
+			if(checkPlayerServiceStarted() == true)
+        		StopPlayerService();
 
         setDefCodecMips();
         openScreenOffTimeout();
@@ -4243,12 +4244,18 @@ public class playermenu extends Activity {
 		}
     };
 
+	private boolean playerServiceStarted = false;
+	public boolean checkPlayerServiceStarted () {
+		return playerServiceStarted;
+	}
+	
     public void StartPlayerService() {
     	Intent intent = new Intent();
     	ComponentName hcomponet = new ComponentName("com.farcore.videoplayer","com.farcore.playerservice.AmPlayer");
     	intent.setComponent(hcomponet);
     	this.startService(intent);
     	this.bindService(intent, m_PlayerConn, BIND_AUTO_CREATE);
+		playerServiceStarted = true;
     }
     
     public void StopPlayerService() {
@@ -4258,6 +4265,7 @@ public class playermenu extends Activity {
     	intent.setComponent(hcomponet);
     	this.stopService(intent);
     	m_Amplayer = null;
+		playerServiceStarted = false;
     }
 
     private String setSublanguage() {
