@@ -4507,6 +4507,7 @@ public class playermenu extends Activity {
 		}
 		
 		SettingsVP.enableVideoLayout();
+		SystemProperties.set("mbx.hideStatusBar.enable","true");
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
 			playPosition = ResumePlay.check(PlayList.getinstance().getcur());
