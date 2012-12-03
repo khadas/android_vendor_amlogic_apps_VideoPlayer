@@ -4397,10 +4397,12 @@ public class playermenu extends Activity {
 		String pathout = path;
 
 		if (path.startsWith("/storage/sd")) {
-			if(path.contains("/storage/sdcard0")) {
+			if (path.equals("/storage/sdcard1")) {
+				// jb-mr1
+				pathout = "/mnt/sdcard/external_sdcard";
+			} else if(path.contains("/storage/sdcard0")) {
 				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
-			}
-			else {
+			} else {
 				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
 			}
 		}
