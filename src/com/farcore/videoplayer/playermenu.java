@@ -4507,7 +4507,9 @@ public class playermenu extends Activity {
 		}
 		
 		SettingsVP.enableVideoLayout();
-		SystemProperties.set("mbx.hideStatusBar.enable","true");
+		if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
+			SystemProperties.set("mbx.hideStatusBar.enable","true");
+        }
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
 			playPosition = ResumePlay.check(PlayList.getinstance().getcur());
