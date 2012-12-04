@@ -46,6 +46,12 @@ import java.util.TimerTask;
 import android.os.Message;
 
 public class FileList extends ListActivity {
+	private static final String ROOT_PATH = "/storage";
+	private static final String SHEILD_EXT_STOR = "/storage/sdcard0/external_storage";
+	private static final String NAND_PATH = "/storage/sdcard0";
+	private static final String SD_PATH = "/storage/external_storage/sdcard1";
+	private static final String USB_PATH ="/storage/external_storage";
+	
 	private boolean listAllFiles = true;
 	private List<File> listFiles =null;
 	private List<File> listVideos =null;
@@ -53,7 +59,7 @@ public class FileList extends ListActivity {
 	private List<String> paths=null;
 	private List<String> currentlist=null;
 	private String currenturl = null;
-	private String root_path = "/mnt";
+	private String root_path = ROOT_PATH;
 	private String extensions ;
 	private static String ISOpath = null;
 	
@@ -74,27 +80,7 @@ public class FileList extends ListActivity {
 	private ArrayList<Integer> fileDirectory_position_piexl = new ArrayList<Integer>();
 	private int pathLevel = 0;
 	private final String iso_mount_dir = "/mnt/VIRTUAL_CDROM";
-	
-	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
-    private boolean isRealSD=false;
 	private Uri uri;
-
-	private String pathTransferForJB(String path) {
-		String pathout = path;
-
-		if (path.startsWith("/storage/external_storage/")) {
-			// jb-mr1
-			pathout = path.replaceFirst("/storage", "/mnt/sdcard");
-		} else if (path.startsWith("/storage/sd")) {
-			if(path.contains("/storage/sdcard0")) {
-				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
-			} else {
-				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
-			}
-		}
-
-		return pathout;
-	}
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)
@@ -107,11 +93,6 @@ public class FileList extends ListActivity {
                 Log.d(TAG, "onStorageStateChanged: "+path + " oldState=" + oldState + " newState=" + newState);
 	        	if (newState == null || path == null) 
 	        		return;
-
-				path = pathTransferForJB(path);
-                Log.d(TAG, "onStorageStateChanged: pathTransferForJB="+path +
-                    " rootPath=" + PlayList.getinstance().rootPath +
-                    " root_path=" + root_path);
 	        	
 	        	if(newState.compareTo("mounted") == 0)
 	        	{
@@ -300,21 +281,6 @@ public class FileList extends ListActivity {
 		    	e.printStackTrace();
 		    }
 		    
-		    /* check whether use real sdcard*/
-			//isRealSD = Environment.isExternalStorageBeSdcard();
-			String path = System.getenv("INTERNAL_STORAGE");
-			if(path!=null) {
-				if(path.equals("/storage/sdcard0")) {
-					isRealSD = false;
-				}
-				else {
-					isRealSD = true;
-				}
-			}
-			else {
-				isRealSD = false;
-			}
-		    
 			if(PlayList.getinstance().rootPath==null)
 				PlayList.getinstance().rootPath =root_path;
 		    	
@@ -366,21 +332,19 @@ public class FileList extends ListActivity {
                 	file = new File(paths.get(0).toString());
                 	currenturl =file.getParentFile().getParent();
                 	if((file.getParent().compareToIgnoreCase(root_path)!=0)&&(pathLevel>0)){
-						if(false==isRealSD)
-						{
-							String path = file.getParent();
-							if(path.equals(EXT_SD))
-							{
-								currenturl=root_path;
-								//pathLevel--;
-							}
+						String path = file.getParent();
+						String parent_path = file.getParentFile().getParent();
+						if((path.equals(NAND_PATH)||path.equals(SD_PATH)||parent_path.equals(USB_PATH))&&(pathLevel>0)) {
+							pathLevel=0;
+							BrowserFile(ROOT_PATH);
 						}
-						
-                		BrowserFile(currenturl);
-                		pathLevel--;
-                		getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
-                		fileDirectory_position_selected.remove(pathLevel);
-                		fileDirectory_position_piexl.remove(pathLevel);
+						else {
+							BrowserFile(currenturl);
+	                		pathLevel--;
+	                		getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
+	                		fileDirectory_position_selected.remove(pathLevel);
+	                		fileDirectory_position_piexl.remove(pathLevel);
+						}
                 	}
                 	else
                 	{
@@ -487,6 +451,7 @@ public class FileList extends ListActivity {
 	
 	private void BrowserFile(String filePath) {
 		int i = 0;
+		int dev_count=0;
 		file = new File(filePath);
 		listFiles = new ArrayList<File>();
 	    items=new ArrayList<String>();
@@ -515,15 +480,8 @@ public class FileList extends ListActivity {
 	    for(i=0;i<listFiles.size();i++) {
 	    	fs[i] = listFiles.get(i);
 	    }
-	    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
-
-		if(false==isRealSD)
-		{
-			if(filePath.equals("/mnt"))
-			{
-				Arrays.sort(fs, new MyComparator(MyComparator.NAME_DESCEND)); 
-			}
-		}
+		if (!filePath.equals(ROOT_PATH))
+	    	Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
 	    
 	    for(i=0;i<fs.length;i++)
 	    {
@@ -531,31 +489,28 @@ public class FileList extends ListActivity {
 	    	String tmppath = tempF.getName();
 	    	
 		    //change device name;	
-	    	if(filePath.equals("/mnt"))
+	    	if(filePath.equals(ROOT_PATH))
 	    	{
 	    		String tpath = tempF.getAbsolutePath();
 	    	
-	    		if (tpath.equals("/mnt/flash"))
-	    			 tmppath = "nand";
-				else if (tpath.equals(EXT_SD))
+	    		if (tpath.equals(NAND_PATH))
+	    			 tmppath = "sdcard";
+				else if (tpath.equals(SD_PATH))
 	    			 tmppath = "external_sdcard";
-	    		else if((!tpath.equals("/mnt/sdcard"))&&tpath.startsWith("/mnt/sd"))
-	    			 tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
+	    		else if((!tpath.equals(SD_PATH))&&tpath.startsWith(USB_PATH+"/sd")) {
+					 dev_count++;
+					 char data = (char) ('A' +dev_count-1);
+					 tmppath =  getText(R.string.usb_device_str) +"(" +data + ":)" ;
+	    			 //tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
+	    		}
+				
 	    		//delete used folder
 	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure"))&&
 	    			(!tpath.equals("/mnt/obb"))&&(!tpath.equals("/mnt/usbdrive"))
 	    			&&(!tpath.equals("/mnt/shell")))
 	    		{
-	    			//if(false==isRealSD)
-    				//{
-		    			String path=changeDevName(tmppath);
-		    			items.add(path);
-    				/*}
-					else
-					{
-						items.add(tmppath);
-					}*/
-					
+	    			String path=changeDevName(tmppath);
+	    			items.add(path);
 	    	    	paths.add(tempF.getPath());
 	    		}
 	    	}
@@ -587,10 +542,7 @@ public class FileList extends ListActivity {
 		}
 		else if(tmppath.equals("sdcard"))
 		{
-			if(true==isRealSD)
-				path=sdcardExt;
-			else
-				path=sdcard;
+			path=sdcard;
 		}
 		else if(tmppath.equals("usb"))
 		{
@@ -635,6 +587,34 @@ public class FileList extends ListActivity {
 		 }
 	    
 	    String curPath=file.getPath();
+		if(curPath.equals(root_path)) {
+			File dir = new File(NAND_PATH);
+			if (dir.exists() && dir.isDirectory()) {
+				listFiles.add(dir);
+			}
+
+			dir = new File(SD_PATH);
+			if (dir.exists() && dir.isDirectory()) {
+				listFiles.add(dir);
+			}
+
+			dir = new File(USB_PATH);
+			if (dir.exists() && dir.isDirectory()) { 
+				if (dir.listFiles() != null) {
+					for (File pfile : dir.listFiles()) {
+						if (pfile.isDirectory()) {
+							String devname = null;
+							String path = pfile.getAbsolutePath();
+							if (path.startsWith(USB_PATH+"/sd")&&!path.equals(SD_PATH)) {
+								listFiles.add(pfile);
+							}
+						}
+					}
+				}
+			}
+
+			return;
+		}
 
 	    for(int i=0;i<the_Files.length;i++) 
 	    {
@@ -644,37 +624,13 @@ public class FileList extends ListActivity {
 	    	{
 	    		if(!tempF.isHidden())
 	    			listFiles.add(tempF);
-				
-				if(false==isRealSD)
-				{
-		    		if(curPath.equals(root_path))
-		    		{
-		    			if((tempF.toString()).equals("/mnt/sdcard"))
-						{
-			    			File[] tempFSub = tempF.listFiles();
-			    			if((tempFSub != null) && (tempFSub.length>0))
-			    			{
-				    			for(int n=0;n<tempFSub.length;n++)
-				    			{
-				    				if(tempFSub[n].isDirectory() && tempFSub[n].exists())
-				    				{
-				    					String path=tempFSub[n].getAbsolutePath();
-				    					if(path.equals(EXT_SD))
-				    					{
-				    						if(!tempF.isHidden())
-				    							listFiles.add(tempFSub[n]);  
-				    					}
-				    				}
-				    			}
-			    			}
-						}
-		    		}
-		    		else if((tempF.toString()).equals(EXT_SD))
-		    		{
-		    			listFiles.remove(tempF);
-		    			continue;
-		    		}
-				}
+
+				//shield some path
+				if((tempF.toString()).equals(SHEILD_EXT_STOR))
+	    		{
+	    			listFiles.remove(tempF);
+	    			continue;
+	    		}
 	    	} 
 	    	else
 	    	{
@@ -803,20 +759,19 @@ public class FileList extends ListActivity {
 				}
             	currenturl =file.getParentFile().getParent();
             	if((file.getParent().compareToIgnoreCase(root_path)!=0)&&(pathLevel>0)){
-            		pathLevel--;
-
-					if(false==isRealSD)
-					{
-						String path = file.getParent();
-						if(path.equals(EXT_SD))
-						{
-							currenturl=root_path;
-						}
+					String path = file.getParent();
+					String parent_path = file.getParentFile().getParent();
+					if((path.equals(NAND_PATH)||path.equals(SD_PATH)||parent_path.equals(USB_PATH))&&(pathLevel>0)) {
+						pathLevel=0;
+						BrowserFile(ROOT_PATH);
 					}
-            		BrowserFile(currenturl);
-                    getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
-            		fileDirectory_position_selected.remove(pathLevel);
-            		fileDirectory_position_piexl.remove(pathLevel);
+					else {
+						BrowserFile(currenturl);
+                		pathLevel--;
+                		getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
+                		fileDirectory_position_selected.remove(pathLevel);
+                		fileDirectory_position_piexl.remove(pathLevel);
+					}
             	}
             	else
             	{
@@ -918,7 +873,7 @@ public class FileList extends ListActivity {
 
 	public void reScanVideoFiles()
     {
-    	Intent intent = new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + "/mnt"));
+    	Intent intent = new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + ROOT_PATH));
     	this.sendBroadcast(intent);
     }
     

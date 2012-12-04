@@ -4394,23 +4394,6 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 //		}
 //	};
 
-	private String pathTransferForJB(String path) {
-		String pathout = path;
-
-		if (path.startsWith("/storage/external_storage/")) {
-			// jb-mr1
-			pathout = path.replaceFirst("/storage", "/mnt/sdcard");
-		} else if (path.startsWith("/storage/sd")) {
-			if (path.contains("/storage/sdcard0")) {
-				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
-			} else {
-				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
-			}
-		}
-
-		return pathout;
-	}
-	
     private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -4421,10 +4404,6 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
             Log.d(TAG, "mountreciever action=" + action + " uri=" + uri + " path=" + path);
             if (action == null ||path == null)
             	return;
-			
-			path = pathTransferForJB(path);
-            Log.d(TAG, "mountreciever pathTransferForJB=" + path +
-                    " getcur=" + PlayList.getinstance().getcur());
             
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
 				if(PlayList.getinstance().getcur()!=null) {
