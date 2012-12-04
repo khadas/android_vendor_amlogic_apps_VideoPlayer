@@ -82,11 +82,11 @@ public class FileList extends ListActivity {
 	private String pathTransferForJB(String path) {
 		String pathout = path;
 
-		if (path.startsWith("/storage/sd")) {
-			if (path.equals("/storage/sdcard1")) {
-				// jb-mr1
-				pathout = "/mnt/sdcard/external_sdcard";
-			} else if(path.contains("/storage/sdcard0")) {
+		if (path.startsWith("/storage/external_storage/")) {
+			// jb-mr1
+			pathout = path.replaceFirst("/storage", "/mnt/sdcard");
+		} else if (path.startsWith("/storage/sd")) {
+			if(path.contains("/storage/sdcard0")) {
 				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
 			} else {
 				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
@@ -104,10 +104,14 @@ public class FileList extends ListActivity {
 	        }
 	        public void onStorageStateChanged(String path, String oldState, String newState)
 	        {
+                Log.d(TAG, "onStorageStateChanged: "+path + " oldState=" + oldState + " newState=" + newState);
 	        	if (newState == null || path == null) 
 	        		return;
 
 				path = pathTransferForJB(path);
+                Log.d(TAG, "onStorageStateChanged: pathTransferForJB="+path +
+                    " rootPath=" + PlayList.getinstance().rootPath +
+                    " root_path=" + root_path);
 	        	
 	        	if(newState.compareTo("mounted") == 0)
 	        	{
