@@ -3404,7 +3404,6 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		    PlayList.getinstance().rootPath =null;
         }
 		exitAbort = false;
-        finish();
         super.onDestroy();
     }
 
@@ -3468,7 +3467,6 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 			else {
 				if(m_Amplayer != null)
 					Amplayer_stop();
-				closeScreenOffTimeout();
 				mSuspendFlag = true;
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			}
@@ -3508,8 +3506,8 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
     	public void handleMessage(Message msg) {
     		switch(msg.what) {
     			case VideoInfo.TIME_INFO_MSG:
-    				//Log.d(TAG,"get time "+secToTime((msg.arg1)/1000,false));
-                    //Log.d(TAG,"total time "+secToTime(msg.arg2,false));
+    				//Log.d("wxl","get time "+secToTime((msg.arg1)/1000,false));
+                    //Log.d("wxl","total time "+secToTime(msg.arg2,false));
     		    	cur_time.setText(secToTime((msg.arg1)/1000, false));
     		    	total_time.setText(secToTime(msg.arg2, true));
 			
@@ -4492,6 +4490,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		}
 		
 		SettingsVP.enableVideoLayout();
+		closeScreenOffTimeout();
 		if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
 			SystemProperties.set("mbx.hideStatusBar.enable","true");
         }
