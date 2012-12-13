@@ -441,7 +441,7 @@ public class playermenu extends Activity {
         return list;
     }
 
-	protected void waitForHideVideoBar(){	//videoBar auto hide
+	/*protected void waitForHideVideoBar(){	//videoBar auto hide
     	final Handler handler = new Handler(){   
             public void handleMessage(Message msg) {   
                 switch (msg.what) {       
@@ -466,7 +466,7 @@ public class playermenu extends Activity {
         timer.cancel();
         timer = new Timer();
     	timer.schedule(task, 5000);
-    }
+    }*/
 
 /// patch for hide OSD
     private static final String OSD_BLANK_PATH = "/sys/class/graphics/fb0/blank";
@@ -538,7 +538,7 @@ public class playermenu extends Activity {
         }
     }    
 /// patch for hide OSD
-	private void hideVideoBar(){
+	/*private void hideVideoBar(){
 		if(null != morbar){
 			morbar.setVisibility(View.GONE);
 	    	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
@@ -556,7 +556,7 @@ public class playermenu extends Activity {
 				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 		}
-    }
+    }*/
 
 	private static SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
 		public void surfaceChanged(SurfaceHolder holder, int format,
@@ -3192,7 +3192,7 @@ public class playermenu extends Activity {
     		mScreenLock.release();
     }
     
-    protected void waitForHide() {
+    /*protected void waitForHide() {
     	final Handler handler = new Handler(){   
     		  
             public void handleMessage(Message msg) {   
@@ -3219,7 +3219,7 @@ public class playermenu extends Activity {
         timer.cancel();
         timer = new Timer();
     	timer.schedule(task, 5000);
-    }
+    }*/
     
     protected void ResumeCountdown() {
     	final Handler handler = new Handler(){   	  
@@ -3257,7 +3257,7 @@ public class playermenu extends Activity {
         resumeTimer.schedule(task, 1000);
     }
     
-    protected void hide_infobar() {
+    /*protected void hide_infobar() {
     	infobar.setVisibility(View.GONE);
 		if(subTitleView!=null)
 			subTitleView.redraw();
@@ -3278,7 +3278,7 @@ public class playermenu extends Activity {
     		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	}
     	setOSDOnOff(true);
-    }
+    }*/
     
 	public boolean onTouchEvent (MotionEvent event) {
     	super.onTouchEvent(event);
@@ -3456,7 +3456,8 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 	        }        
 	        
 	        setOSDOnOff(true);
-	        SystemProperties.set("vplayer.hideStatusBar.enable","false");      
+	        SystemProperties.set("vplayer.hideStatusBar.enable","false"); 
+			SystemProperties.set("sys.statusbar.forcehide","false");
 	        
 			if(mHdmiPlugged || SystemProperties.getBoolean("ro.panel.with.freescale", false)) {
 				if(!backToFileList){
@@ -4491,6 +4492,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		
 		SettingsVP.enableVideoLayout();
 		closeScreenOffTimeout();
+		SystemProperties.set("sys.statusbar.forcehide","true");
 		if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
 			SystemProperties.set("mbx.hideStatusBar.enable","true");
         }
