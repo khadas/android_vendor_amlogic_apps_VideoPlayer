@@ -35,8 +35,9 @@ public class AudioTrackOperation {
     public static final int AFORMAT_PCM_BLURAY = 16;
     public static final int AFORMAT_ALAC = 17;
     public static final int AFORMAT_VORBIS = 18;
-    public static final int AFORMAT_UNSUPPORT = 19;
-    public static final int AFORMAT_MAX    = 20;
+    public static final int AFORMAT_AAC_LATM = 19;
+    public static final int AFORMAT_UNSUPPORT = 20;
+    public static final int AFORMAT_MAX    = 21;
 	
 	public static void setAudioStream(MediaInfo mi)
 	{
