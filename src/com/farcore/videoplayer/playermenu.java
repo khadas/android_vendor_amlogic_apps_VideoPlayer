@@ -2980,6 +2980,10 @@ public class playermenu extends Activity {
 			
 			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
 				// TODO Auto-generated method stub
+				if(!INITOK)
+					return;
+				if(totaltime == -1)
+					return;
 				if(fromUser == true){
 					progressSliding = true;
 					timer.cancel();
@@ -2990,7 +2994,8 @@ public class playermenu extends Activity {
 					int pos_check = totaltime * (dest+1) - pos * 100;
 					if(pos_check>0) 
 						pos += 1;
-					
+					if(pos>=totaltime)
+						pos = totaltime;
 					
 					try {
 						if(m_Amplayer != null) {
@@ -3660,6 +3665,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 						AudioTrackOperation.AudioStreamInfo.clear();
 						INITOK = false;
 						PRE_NEXT_FLAG = 1;
+						totaltime = -1;//wxl add for seek bug
 						break;
 					case VideoInfo.PLAYER_ERROR:
 						String InfoStr = null;
