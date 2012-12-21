@@ -1,6 +1,7 @@
 package com.farcore.playerservice;
 
 import com.farcore.videoplayer.PlayList;
+import android.util.Log;
 
 public class Errorno{	
     // error no
@@ -53,7 +54,8 @@ public class Errorno{
 
     public static String getErrorInfo(int errID)
     {
-    	String errStr = null;		
+    	String errStr = null;
+		//Log.i("wxl","[getErrorInfo]errID:"+errID);
     	switch (errID)
     	{
 			case Errorno.PLAYER_UNSUPPORT:
@@ -95,6 +97,9 @@ public class Errorno{
 				break;
 			case Errorno.PLAYER_FFFB_UNSUPPORT:
 				errStr = "Unsupport ff/fb";
+				break;
+			case Errorno.PLAYER_SEEK_OVERSPILL:
+				errStr = "Seek out of range";
 				break;
 			default:
 				errStr = "Unknow Error";
