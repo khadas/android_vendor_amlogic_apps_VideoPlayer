@@ -278,35 +278,14 @@ public class playermenu extends Activity {
 	private int mLastRotationFlag = 0;
 	
 	public void setAngleTable() {
-		String hwrotation = SystemProperties.get("ro.sf.hwrotation");
-		if(hwrotation == null) {
-			angle_table[0] = 0;
-			angle_table[1] = 1;
-			angle_table[2] = 2;
-			angle_table[3] = 3;
-			Log.e(TAG, "setAngleTable, Can not get hw rotation!");
-			return;
-		}
+		String rotation180 = SystemProperties.get("ro.display.rotation180");
 		
-		if(hwrotation.equals("90")) {
-			angle_table[0] = 1;
-			angle_table[1] = 2;
-			angle_table[2] = 3;
-			angle_table[3] = 0;
-		}
-		else if(hwrotation.equals("180")) {
+		if(rotation180 != null && rotation180.equals("1")) {
 			angle_table[0] = 2;
 			angle_table[1] = 3;
 			angle_table[2] = 0;
 			angle_table[3] = 1;
-		}
-		else if(hwrotation.equals("270")) {
-			angle_table[0] = 3;
-			angle_table[1] = 0;
-			angle_table[2] = 1;
-			angle_table[3] = 2;
-		}
-		else {
+		}else{
 			angle_table[0] = 0;
 			angle_table[1] = 1;
 			angle_table[2] = 2;
