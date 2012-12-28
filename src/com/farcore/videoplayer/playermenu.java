@@ -3576,7 +3576,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 					case VideoInfo.PLAYER_SEARCHING:
 						if(!progressSliding) {
 							if(ignoreupdateiconcnt<=0) {
-								play.setImageResource(R.drawable.play);
+								play.setImageResource(R.drawable.pause);
 							}
 							else {
 								ignoreupdateiconcnt--;
@@ -4847,7 +4847,8 @@ Handler mRotateHandler = new Handler() {
 			subTitleView.getPaddingLeft(),
 			subTitleView.getPaddingTop(),
 			subTitleView.getPaddingRight(),
-			100); //TODO getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
+			//100); //TODO getWindowManager().getDefaultDisplay().getRawHeight()*sub_para.position_v/20+10);
+			getWindowManager().getDefaultDisplay().getHeight()*sub_para.position_v/20+10);
 	}
 
 	private void initSubSetOptions(String color_text[])
