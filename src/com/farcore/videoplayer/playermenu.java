@@ -4304,6 +4304,8 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		final int pos = ResumePlay.check(PlayList.getinstance().getcur());
 		Log.d(TAG, "resumePlay() pos is :"+pos);
 		if(pos > 0) {
+			setOSDOnOff(true);
+				
 			confirm_dialog = new AlertDialog.Builder(this)
 				.setTitle(R.string.setting_resume)  
 				.setMessage(R.string.str_resume_play) 
