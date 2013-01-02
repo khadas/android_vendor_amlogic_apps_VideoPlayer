@@ -4469,6 +4469,11 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		exitAbort = false;
 		resumePlayEnable = false;
 
+		/*
+		Log.i("wxl","############################");
+		Log.i("wxl","myUid():"+android.os.Process.myUid());
+		Log.i("wxl","############################");*/
+
 		mTransitionAnimationScale = Settings.System.getFloat(playermenu.this.getContentResolver(), Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
 		IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
 		try {			

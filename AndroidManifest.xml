@@ -26,7 +26,7 @@
 		</activity>
 		<activity android:name="playermenu" 
 			android:label="@string/main_activity"
-			android:configChanges="mnc|mcc|orientation|keyboardHidden|screenSize|screenLayout">
+			android:configChanges="mnc|mcc|orientation|keyboardHidden|screenSize|screenLayout|keyboard|navigation">
 			<intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
