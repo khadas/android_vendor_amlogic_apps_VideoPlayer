@@ -74,4 +74,5 @@
 	<string name="no_file">No Video File!</string>
 	<string name="searching">Searching...</string>
 	<string name="all_file">All Video Files</string>
+	<string name="not_support_3d">Your device does not support 3D format!</string>
 </resources>

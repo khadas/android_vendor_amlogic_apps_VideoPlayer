@@ -87,8 +87,19 @@ public class playermenu extends Activity {
 	private static String FormatMVC_3dtb= "3dtb";
 	private static String FormatMVC_3dlr= "3dlr";
 	private static String FormatMVC_3doff= "3doff";
-	private int MBX_3D_status = 0;		//0:3doff,1:auto,2:3dlr,3:3dtb
+	private static int MBX_3D_status = 0;		//0:3doff,1:auto,2:3dlr,3:3dtb
 	Toast mbx_3d = null;
+	
+	// used in VideoListener3D.java
+	public static int getMBX3DStatus()
+	{
+	        return MBX_3D_status;
+	}
+	
+	public static void setMBX3DStatus(int status)
+	{
+	        MBX_3D_status = status;
+	}
 
 	private static final int SET_OSD_ON= 1;
 	private static final int SET_OSD_OFF= 2;
@@ -277,6 +288,8 @@ public class playermenu extends Activity {
 	private int mLastRotation;
 	private int mLastRotationFlag = 0;
 	
+	private VideoListener3D m3DListener = null;
+	
 	public void setAngleTable() {
 		String hwrotation = SystemProperties.get("ro.sf.hwrotation");
 		
@@ -400,7 +413,8 @@ public class playermenu extends Activity {
 						map.put("item_sel", R.drawable.item_img_unsel);
 						list.add(map);
 					}
-					list.get(MBX_3D_status).put("item_sel", R.drawable.item_img_sel);                    					
+					// list.get(MBX_3D_status).put("item_sel", R.drawable.item_img_sel);   
+					list.get(getMBX3DStatus()).put("item_sel", R.drawable.item_img_sel); 
 				}else{
 					int size_3d =  string_3d_id.length;
 					for (int i = 0; i < size_3d; i++) {
@@ -957,23 +971,40 @@ public class playermenu extends Activity {
 					morebar_tileText.setText(R.string.setting_3d_mode);
 					ListView listView = (ListView)findViewById(R.id.AudioListView);
 					listView.setAdapter(getMorebarListAdapter(PLAY3D, mode_3d));
-					listView.setSelection(MBX_3D_status);
+					// listView.setSelection(MBX_3D_status);
+					listView.setSelection(getMBX3DStatus());
 					listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 							mode_3d = position;
 							switch (position) {
 							case 0:
+									// SystemProperties.set(VideoListener3D.mKeyVideoMode3D, "0"); 
 								    writeFile(FormatMVC,FormatMVC_3doff);
 									Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
 									playermenu.this.sendBroadcast(intent_videoposition_change);
-									MBX_3D_status = 0;
+									// MBX_3D_status = 0;
+									setMBX3DStatus(0);
+									
 								break;
 							case 1:
-									MBX_3D_status = 1;
+								// if(m3DListener.is3DSupport())
+								{
+									// MBX_3D_status = 1;
+							        setMBX3DStatus(1);
+									
+								}
+//								else
+//								{
+//									Toast.makeText(playermenu.this, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+//								}
 								break;
 							case 2:
+								// if(m3DListener.is3DSupport())
+								{
+									// SystemProperties.set(m3DListener.mKeyVideoMode3D, "1"); 
 								    writeFile(FormatMVC,FormatMVC_3dlr);
-									MBX_3D_status = 2;
+									// MBX_3D_status = 2;
+								        setMBX3DStatus(2);
 									set3DVideoAxis();
 									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p") ||
 									   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
@@ -983,11 +1014,21 @@ public class playermenu extends Activity {
 									   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
 										writeFile(RequestScaleFile,"8 1");
 										}
+								}
+//								else
+//								{
+//									Toast.makeText(playermenu.this, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+//								}
+								
 								break;
 							case 3:
+								// if(m3DListener.is3DSupport())
+								{
+									// SystemProperties.set(m3DListener.mKeyVideoMode3D, "2"); 
 								    writeFile(FormatMVC,FormatMVC_3dtb);
 									set3DVideoAxis();
-									MBX_3D_status = 3;
+									// MBX_3D_status = 3;
+									setMBX3DStatus(3);
 									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
 									   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
 										writeFile(RequestScaleFile,"18");
@@ -996,13 +1037,24 @@ public class playermenu extends Activity {
 									   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
 										writeFile(RequestScaleFile,"8 2");
 										}
+								}
+//								else
+//								{
+//									Toast.makeText(playermenu.this, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+//								}
+								
 								break;
                     							
 							default:
+									// SystemProperties.set(m3DListener.mKeyVideoMode3D, "0"); 
 									writeFile(FormatMVC,FormatMVC_3doff);
-									MBX_3D_status = 0;
+									// MBX_3D_status = 0;
+									setMBX3DStatus(0);
 								break;
                     		}
+							
+							m3DListener.changeUIOption();
+							
 							otherbar.setVisibility(View.GONE);
 							subTitleView.setViewStatus(true);
 							if(subTitleView_sm!=null&&SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
@@ -1796,6 +1848,12 @@ public class playermenu extends Activity {
 				backToFileList = true;
 				if(m_Amplayer != null)
 					Amplayer_stop();
+
+				// if(mPlayerHandler.tp != null)
+				// {
+				// 	mPlayerHandler.tp.cancel();
+				// }
+
 				//do disable2XScale in onPause()
 				if(!backToOtherAPK){
 					startActivity(selectFileIntent);
@@ -2132,8 +2190,10 @@ public class playermenu extends Activity {
 			if(MBX_3D_status == 1)		//NO auto setting
 				MBX_3D_status++;
 
-			switch(MBX_3D_status){
+			// switch(MBX_3D_status){
+		        switch(getMBX3DStatus()){
 				case 0:
+					// SystemProperties.set(m3DListener.mKeyVideoMode3D, "0"); 
 					writeFile(FormatMVC,FormatMVC_3doff);
 					mbx_3d.setText(new String("3D OFF"));
 					Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
@@ -2141,10 +2201,21 @@ public class playermenu extends Activity {
 					mbx_3d.show();
 					break;
 				case 1:
+					// if(m3DListener.is3DSupport())
+					{
+						// SystemProperties.set(VideoListener3D.mKeyVideoMode3D, "1"); 
 					mbx_3d.setText(new String("3D AUTO"));
 					mbx_3d.show();
+					}
+//					else
+//					{
+//						Toast.makeText(playermenu.this, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+//					}
 					break;
 				case 2:
+					// if(m3DListener.is3DSupport())
+					{
+						// SystemProperties.set(m3DListener.mKeyVideoMode3D, "1"); 
 					writeFile(FormatMVC,FormatMVC_3dlr);
 					set3DVideoAxis();
 					mbx_3d.setText(new String("3D L/R"));
@@ -2157,8 +2228,16 @@ public class playermenu extends Activity {
 						writeFile(RequestScaleFile,"8 1");
 					}
 					mbx_3d.show();
+					}
+//					else
+//					{
+//						Toast.makeText(playermenu.this, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+//					}
 					break;
 				case 3:
+					// if(m3DListener.is3DSupport())
+					{
+						// SystemProperties.set(m3DListener.mKeyVideoMode3D, "2"); 
 					writeFile(FormatMVC,FormatMVC_3dtb);
 					set3DVideoAxis();
 					if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
@@ -2171,8 +2250,15 @@ public class playermenu extends Activity {
 					}
 					mbx_3d.setText(new String("3D T/B"));
 					mbx_3d.show();
+					}
+//					else
+//					{
+//						Toast.makeText(playermenu.this, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+//					}
 					break;
 			}
+		        
+		    m3DListener.changeUIOption();
 		}
         /*
     	else if (keyCode == KeyEvent.KEYCODE_7) {
@@ -2193,6 +2279,22 @@ public class playermenu extends Activity {
     	return (true);
     }
     
+    // For video files with Philips' 3D format
+    private void start3DVideoListenerService()
+    {
+        if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)) {
+            m3DListener.startCheck();
+        }
+    }
+    
+    // For video files with Philips' 3D format
+    private void stop3DVideoListenerService()
+    {
+	if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)) {
+            m3DListener.stopCheck();
+	}
+    }
+    
     public void onCreate(Bundle savedInstanceState) {
         fb32 = SystemProperties.get("sys.fb.bits", "16").equals("32");
 
@@ -2202,6 +2304,7 @@ public class playermenu extends Activity {
         } else {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
+	        m3DListener = new VideoListener3D(this);
 
         super.onCreate(savedInstanceState);
         //uncaughtException execute
@@ -2469,7 +2572,7 @@ public class playermenu extends Activity {
 
 					if(ext.equals("rm") || ext.equals("rmvb") || ext.equals("avi")|| ext.equals("mkv") || 
 					ext.equals("mp4")|| ext.equals("wmv") || ext.equals("mov")|| ext.equals("flv") ||
-					ext.equals("asf")|| ext.equals("3gp")|| ext.equals("mpg") ||
+					ext.equals("asf")|| ext.equals("3gp")|| ext.equals("mpg") || ext.equals("mvc")||
 					ext.equals("m2ts")|| ext.equals("ts")|| ext.equals("swf") ||
 					ext.equals("divx")|| ext.equals("3gp2")|| ext.equals("3gpp") ||
 					ext.equals("m4v")|| ext.equals("mts")|| ext.equals("tp") ||
@@ -3387,6 +3490,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		if(!backToFileList){
 		    PlayList.getinstance().rootPath =null;
         }
+		// stop3DVideoListenerService();
 		exitAbort = false;
         super.onDestroy();
     }
@@ -3465,7 +3569,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 	        }
 	        
 			writeFile(FormatMVC,FormatMVC_3doff);
-			MBX_3D_status = 0;
+			setMBX3DStatus(0);
 			disable2XScale();
 	        ScreenMode.setScreenMode("0"); 
 
@@ -3479,15 +3583,25 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 			}
         }  
     }; 
+    
+    @Override
+    protected void onStart() 
+    {
+        super.onStart();
+        
+        start3DVideoListenerService();
+    }
 
 	public void onStop(){
 		super.onStop();
 		Log.d(TAG,"onStop");
+		
+		stop3DVideoListenerService();
 	}
     
 	//=========================================================
     private Messenger m_PlayerMsg = new Messenger(new Handler() {
-		Toast tp = null;
+		public Toast tp = null;
     	public void handleMessage(Message msg) {
     		switch(msg.what) {
     			case VideoInfo.TIME_INFO_MSG:
@@ -3670,13 +3784,25 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 					case VideoInfo.PLAYER_ERROR:
 						String InfoStr = null;
 						InfoStr = Errorno.getErrorInfo(msg.arg2);
+						/*
 						if(tp == null){
 							tp = Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_SHORT);															
 						}else{
 							tp.cancel();
 							tp.setText("Status Error:"+InfoStr);
 						}
-						tp.show();						
+						tp.show();
+						*/
+						if(tp == null)
+						{
+							tp = Toast.makeText(playermenu.this, "Status Error:"+InfoStr, Toast.LENGTH_SHORT);
+						}
+						else
+						{
+							tp.setText("Status Error:"+InfoStr);
+						}	
+						tp.show();
+					
 						Log.d(TAG, "Player error, msg.arg2 = " + Integer.toString(msg.arg2));
 						if (msg.arg2 < 0) {							
 							try	{
@@ -4026,12 +4152,25 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 					String errStr = null;
 					errStr = Errorno.getErrorInfo(msg.arg2);
     				audio_flag = msg.arg2;
+					/*
 					if(tp == null){
 						tp = Toast.makeText(playermenu.this, errStr, Toast.LENGTH_SHORT);						
 					}else{
 						tp.cancel();
 						tp.setText(errStr);
 					}					
+					tp.show();
+					*/
+
+					if(tp == null)
+					{
+						tp = Toast.makeText(playermenu.this, errStr, Toast.LENGTH_SHORT);
+					}
+					else
+					{
+						tp.setText(errStr);
+					}
+
 					tp.show();
     				break;
     			default:
@@ -4040,6 +4179,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
     		}
     	}
     });   
+  
 
 	private Uri mUri=null;
     public Player m_Amplayer = null;
