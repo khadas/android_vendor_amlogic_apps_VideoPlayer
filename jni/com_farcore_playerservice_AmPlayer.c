@@ -36,6 +36,7 @@ static URLProtocol android_protocol;
 //about player info updating interval
 #define PLAYER_INFO_POP_INTERVAL 500 // 0.5s
 
+#define DISABLE_FREESCALE_PROCESS 1 //wxl disable freescale process
 
 int vp_open(URLContext *h, const char *filename, int flags)
 {	
@@ -1142,6 +1143,10 @@ JNIEXPORT jint JNICALL Java_com_farcore_playerservice_AmPlayer_getProductType(JN
 #else
     LOGI("ENABLE_FREE_SCALE not define!\n");
     ret = 0;
+#endif
+
+#ifdef DISABLE_FREESCALE_PROCESS
+		ret = 0;
 #endif
     return ret;
 }

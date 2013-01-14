@@ -107,6 +107,12 @@ public class playermenu extends Activity {
 	private boolean mHdmiPlugged;
 	private boolean mHdmiPluggedBac;
 	private boolean mPaused;
+  /** 
+  	disable freescale process flag, 
+  	pls enable the same flag in /jni/com_farcore_playerservice_AmPlayer.c 
+  	in this way, the function AmPlayer.getProductType() will return 0 aways
+  */
+	private boolean disableFreescaleProcess = true;
 
   /** Called when the activity is first created. */
 	private int totaltime = 0;
@@ -2314,7 +2320,8 @@ public class playermenu extends Activity {
     			
     			SystemProperties.set("vplayer.hideStatusBar.enable","false");
     			SystemProperties.set("mbx.hideStatusBar.enable","false");
-    			SystemProperties.set("vplayer.playing","false");
+				if(!disableFreescaleProcess)
+    				SystemProperties.set("vplayer.playing","false");
     			  
     			Intent selectFileIntent = new Intent();
 				selectFileIntent.setClass(playermenu.this, FileList.class);
@@ -2447,7 +2454,8 @@ public class playermenu extends Activity {
         }
 		mode_3d = 0;
         SettingsVP.init(this);
-        SettingsVP.setVideoLayoutMode();
+		if(!disableFreescaleProcess)
+        	SettingsVP.setVideoLayoutMode(0, 0);
 		if(m1080scale == 2){            //set video position for MBX 
 		Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
 		playermenu.this.sendBroadcast(intent_videoposition_change);
@@ -2472,7 +2480,15 @@ public class playermenu extends Activity {
 	                = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
 	            
 	            if (!SystemProperties.getBoolean("ro.vout.player.exit", true)) {
-	                SettingsVP.setVideoLayoutMode();
+					int w = 0;
+					int h = 0;
+					if(disableFreescaleProcess) {
+						if(bMediaInfo != null) {
+							w = bMediaInfo.getWidth();
+							h = bMediaInfo.getHeight();
+						}
+					}
+					SettingsVP.setVideoLayoutMode(w, h);
 	                infobar = null;
 	                morbar = null;
 	                initOsdBar();
@@ -3538,7 +3554,8 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 				}
 			}
 			
-	        SystemProperties.set("vplayer.playing","false");
+			if(!disableFreescaleProcess)
+	        	SystemProperties.set("vplayer.playing","false");
 	        if(confirm_dialog != null && confirm_dialog.isShowing()) {
 	            confirm_dialog.dismiss();
 	        }        
@@ -3848,6 +3865,12 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 						} 
 						catch(RemoteException e) {
 							e.printStackTrace();
+						}
+
+						if(disableFreescaleProcess) {
+							if(bMediaInfo != null) {
+								SettingsVP.setVideoLayoutMode(bMediaInfo.getWidth(), bMediaInfo.getHeight());
+							}
 						}
 
 						if(bMediaInfo != null) {
@@ -4698,7 +4721,8 @@ Log.d(TAG, "registerReciever(mMountReceiver)");
 		pwrIntentFilter.addAction(POWER_KEY_SUSPEND_ACTION);
 		registerReceiver(mPowerReceiver, pwrIntentFilter);
         
-        SystemProperties.set("vplayer.playing","true");
+		if(!disableFreescaleProcess)
+        	SystemProperties.set("vplayer.playing","true");
 		if(!isFileExit(PlayList.getinstance().getcur())) {
 			//sendKeyEvent(KeyEvent.KEYCODE_BACK); 
 			//android.os.Process.killProcess(android.os.Process.myPid());

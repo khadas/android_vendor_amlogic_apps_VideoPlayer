@@ -80,8 +80,8 @@ public class SettingsVP {
 		  		 .putBoolean(name, para)
 		  		 .commit();
 	}
-	
-	public static boolean setVideoLayoutMode()
+
+	public static boolean setVideoLayoutMode(int Vw, int Vh)
 	{
     	String buf = null;
     	String dispMode = null;
@@ -123,14 +123,62 @@ public class SettingsVP {
 					Log.d(TAG, "Panel resolution: "+panel_resolution);
 
 				
-					if (dispMode.equals("panel"))
+					/*if (dispMode.equals("panel"))
 					{
 						buf = "0,0,"+axisstr[2]+","+axisstr[3];
 						Log.d(TAG, "Current display axis: "+buf);
 					}
-					else{
-						buf = "0 0 0 0";
-					}
+					else{*/
+						//buf = "0 0 0 0";
+						
+						int w = 0;
+						int h = 0;
+						int x1 = 0;
+						int y1 = 0;
+						int x2 = 0;
+						int y2 = 0;
+						
+						Log.i(TAG,"panel_width:"+panel_width+",panel_height:"+panel_height+",Vw:"+Vw+",Vh:"+Vh);
+						if((Vw != 0) && (Vh != 0) && (panel_width != 0) && (panel_height != 0)) {
+							/*if((Vw < panel_width) && (Vh < panel_height)) { //keep playing as initial size
+								w = Vw;
+								h = Vh;
+
+								x1 = (panel_width - w)/2;
+								y1 = (panel_height - h)/2;
+								x2 = x1 + w;
+								y2 = y1 + h;
+							}
+							else */{
+								if((Vw * panel_height) > (Vh * panel_width)) {
+									w = panel_width;
+									h = panel_width * Vh / Vw;
+
+									x1 = 0;
+									y1 = (panel_height - h)/2;
+									x2 = w;
+									y2 = y1 + h;
+								}
+								else {
+									w = panel_height * Vw / Vh;
+									h = panel_height;
+
+									x1 = (panel_width - w)/2;
+									y1 = 0;
+									x2 = x1 + w;
+									y2 = h;
+								}
+
+								
+							}
+							buf = Integer.toString(x1)+" "+Integer.toString(y1)+" "+Integer.toString(x2)+" "+Integer.toString(y2);
+							Log.i(TAG,"x1:"+x1+",y1:"+y1+",x2:"+x2+",y2:"+y2);
+						}
+						else {
+							buf = "0 0 0 0";
+						}
+						
+					//}
 
 				}	
 				display_mode = dispMode;
