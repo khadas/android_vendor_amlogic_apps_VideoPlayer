@@ -4391,7 +4391,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
             if (action == null ||path == null)
             	return;
             
-            if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
+            if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
 				if(PlayList.getinstance().getcur()!=null) {
 					if(PlayList.getinstance().getcur().startsWith(path)) {
 						Intent selectFileIntent = new Intent();
@@ -4415,7 +4415,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 				}				
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
                 // Nothing				
-            } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+            } else if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
                 // SD card unavailable
                 // handled in ACTION_MEDIA_EJECT
             }

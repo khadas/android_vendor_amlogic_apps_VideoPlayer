@@ -169,7 +169,7 @@ public class FileList extends ListActivity {
 		public void onReceive(Context context, Intent intent) {
 
 			String action = intent.getAction();
-			if(Intent.ACTION_MEDIA_EJECT.equals(action)) {
+			if(Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
 				prepareFileForList();
 			}
 			else if (Intent.ACTION_MEDIA_SCANNER_STARTED.equals(action)) {
@@ -189,7 +189,7 @@ public class FileList extends ListActivity {
 			}	
 			/*else if(Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
 			}
-			else if(Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
+			else if(Intent.ACTION_MEDIA_EJECT.equals(action)) {
 			}*/
 		}
 	};
