@@ -4226,9 +4226,9 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 			{
 				showOsdView();
 			}
-
-			setOSDOnOff(true);//make sure subtitle show ok
-
+            if(SystemProperties.getInt("ro.platform.has.1080scale", 0) != 2){
+			    setOSDOnOff(true);//make sure subtitle show ok
+            }
 			//reset sub;
 			subTitleView.clear();
 			subinit();
