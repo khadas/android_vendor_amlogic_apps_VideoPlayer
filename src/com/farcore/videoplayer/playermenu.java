@@ -2593,7 +2593,7 @@ public class playermenu extends Activity {
 					ext.equals("divx")|| ext.equals("3gp2")|| ext.equals("3gpp") ||
 					ext.equals("m4v")|| ext.equals("mts")|| ext.equals("tp") ||
 					ext.equals("webm")|| ext.equals("3g2")|| ext.equals("f4v") ||
-					ext.equals("mpeg") || ext.equals("vob") || ext.equals("dat"))
+					ext.equals("mpeg") || ext.equals("vob") || ext.equals("dat") || ext.equals("m2v"))
 					{
 						list.add(pathFull); 
 					}
