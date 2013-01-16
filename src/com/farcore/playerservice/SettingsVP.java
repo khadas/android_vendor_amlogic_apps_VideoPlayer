@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.os.SystemProperties;
+import android.app.SystemWriteManager; 
 
 public class SettingsVP {
 
@@ -29,11 +30,17 @@ public class SettingsVP {
 	public static int panel_height = 0;
 	public static final String RESUME_MODE = "ResumeMode";
 	public static final String DISPLAY_MODE = "DisplayMode";
+	public static SystemWriteManager sw; 
 	
 	public static void init(Activity act)
 	{
 		setting = act.getSharedPreferences(SettingsVP.SETTING_INFOS, 
 												Activity.MODE_PRIVATE);
+	}
+
+	public static void setSystemWrite(SystemWriteManager sysWrite)
+	{
+		sw = sysWrite;
 	}
 	
 	public static Boolean getParaBoolean(String name)
@@ -177,7 +184,7 @@ public class SettingsVP {
 						else {
 							buf = "0 0 0 0";
 						}
-						if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+						if(sw.getPropertyBoolean("ro.platform.has.mbxuimode", false)){
 							buf = "0 0 0 0";
 						}
 						
@@ -198,7 +205,9 @@ public class SettingsVP {
 		} 
 		
 		//write
-		try
+		boolean ret = sw.writeSysfs(video_axis_path,buf);
+		return ret;
+		/*try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(video_axis_path), 32);
     		try
@@ -215,7 +224,7 @@ public class SettingsVP {
 			e.printStackTrace();
 			Log.e(TAG, "IOException when write "+video_axis_path);
 			return false;
-		}
+		}*/
 	}
 	
 	public static boolean disableVideoLayout()
@@ -250,7 +259,9 @@ public class SettingsVP {
 		} 
 		
 		//write
-		try
+		boolean ret = sw.writeSysfs(video_layout_disable,"2");
+		return ret;
+		/*try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(video_layout_disable), 32);
     		try
@@ -266,7 +277,7 @@ public class SettingsVP {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+video_layout_disable);
 			return false;
-		}
+		}*/
 	}
 	
 	public static boolean enableVideoLayout()
@@ -275,8 +286,11 @@ public class SettingsVP {
 		if (!file.exists()) {        	
         	return false;
         }
+
+		boolean ret = sw.writeSysfs(video_layout_disable,"2");
+		return ret;
 		
-		try
+		/*try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(video_layout_disable), 32);
     		try
@@ -293,7 +307,7 @@ public class SettingsVP {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write "+video_layout_disable);
 			return false;
-		}
+		}*/
 	}
 
 	public static boolean setVideoRotateAngle(int angle)
@@ -333,7 +347,9 @@ public class SettingsVP {
 			return false;
 		}
 		//write
-		try
+		boolean ret = sw.writeSysfs(video_rotate_path,buf);
+		return ret;
+		/*try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(video_rotate_path), 32);
     		try
@@ -349,12 +365,12 @@ public class SettingsVP {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when write " + video_rotate_path);
 			return false;
-		}
+		}*/
 	}
 
 	public static boolean chkEnableOSD2XScale() {
 		boolean enable = false;
-		String temp_scale=SystemProperties.get("rw.fb.need2xscale");
+		String temp_scale=sw.getProperty("rw.fb.need2xscale");
 		if(temp_scale.equals("ok")) {
 			/*
 			String tmp_output = SystemProperties.get("ubootenv.var.outputmode");

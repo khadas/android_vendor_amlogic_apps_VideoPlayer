@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import android.util.Log;
+import android.app.SystemWriteManager; 
 
 public class ScreenMode {
 	private static String TAG = "ScreenMode";
@@ -18,6 +19,12 @@ public class ScreenMode {
 	public static final int RATIO4_3 = 2;
 	public static final int RATIO16_9 = 3;
 	public static final int NORMAL_NOSCALEUP = 4;
+	public static SystemWriteManager sw;
+
+	public static void setSystemWrite(SystemWriteManager sysWrite)
+	{
+		sw = sysWrite;
+	}
 	
 	public static int getScreenMode()
 	{
@@ -58,8 +65,14 @@ public class ScreenMode {
 		if (!file.exists()) {        	
         	return 0;
         }
+
+		boolean ret = sw.writeSysfs(ScreenModeFile,mode);
+		if(ret)
+			return 1;
+		else
+			return 0;
 		
-		try
+		/*try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(ScreenModeFile), 32);
     		try
@@ -75,6 +88,6 @@ public class ScreenMode {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "IOException when setScreenMode ");
 			return 0;
-		}
+		}*/
 	}
 }

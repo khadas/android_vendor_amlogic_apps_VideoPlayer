@@ -22,6 +22,7 @@ import android.util.Log;
 import android.os.SystemProperties;
 import android.view.WindowManagerPolicy;
 import android.widget.Toast;
+import android.app.SystemWriteManager; 
 
 public class VideoListener3D
 {
@@ -53,6 +54,12 @@ public class VideoListener3D
     private int mLastVideoFormat = 0;  
     private boolean mLastPlugState = false;
     private boolean mLast3DSupport = false;
+
+	private static SystemWriteManager sw; 
+	public static void setSystemWrite(SystemWriteManager sysWrite)
+	{
+		sw = sysWrite;
+	}
     
     public boolean is3DSupport()
     {
@@ -334,7 +341,7 @@ public class VideoListener3D
         
     private void changeTo2DMode()
     {
-	  	SystemProperties.set(mKeyVideoMode3D, "0");     
+	  	sw.setProperty(mKeyVideoMode3D, "0");     
 	  	
 	  	writeSysFile(mHDMIConfigFile, "3doff");
 	  	
@@ -352,7 +359,7 @@ public class VideoListener3D
     {
         if(mLast3DSupport)
         {
-      		SystemProperties.set(mKeyVideoMode3D, "1");
+      		sw.setProperty(mKeyVideoMode3D, "1");
       		
       		writeSysFile(mHDMIConfigFile, "3dlr");
       		
@@ -375,7 +382,7 @@ public class VideoListener3D
     {
         if(mLast3DSupport)
         {
-    	  	SystemProperties.set(mKeyVideoMode3D, "2");
+    	  	sw.setProperty(mKeyVideoMode3D, "2");
     	  	
     	  	writeSysFile(mHDMIConfigFile, "3dtb");
     	  	
@@ -398,7 +405,7 @@ public class VideoListener3D
     {
         String outputmode = null;
         
-        outputmode = SystemProperties.get("ubootenv.var.outputmode");
+        outputmode = sw.getProperty("ubootenv.var.outputmode");
         
         return outputmode;
     }
@@ -437,7 +444,7 @@ public class VideoListener3D
                 
                 // changeTo2DMode();
                 
-                SystemProperties.set(mKeyVideoMode3D, "0"); 
+                sw.setProperty(mKeyVideoMode3D, "0"); 
                 
                 Logd("checking exit... set to 2d mode");
             }
@@ -517,7 +524,7 @@ public class VideoListener3D
     private boolean writeSysFile(String pathname, String value)
     {
         boolean result = true;
-        
+        /*
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         
@@ -550,7 +557,9 @@ public class VideoListener3D
         catch(IOException e)
         {
             e.printStackTrace();
-        }
+        }*/
+
+		sw.writeSysfs(pathname,value);
         
         return result;
     }
