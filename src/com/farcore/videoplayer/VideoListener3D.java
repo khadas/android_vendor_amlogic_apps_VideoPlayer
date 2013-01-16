@@ -2,6 +2,7 @@ package com.farcore.videoplayer;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ import android.os.Message;
 import android.util.Log;
 
 import android.os.SystemProperties;
+import android.view.Gravity;
 import android.view.WindowManagerPolicy;
 import android.widget.Toast;
 import android.app.SystemWriteManager; 
@@ -29,11 +31,19 @@ public class VideoListener3D
     public VideoListener3D(Context context)
     {
         mContext = context;
+        
+        // mbx_3d = Toast.makeText(mContext, "",Toast.LENGTH_SHORT );
+        // mbx_3d.setGravity(Gravity.TOP,10,10);
+        // mbx_3d.setDuration(0x00000001);
+        
+        m3DToast = Toast.makeText(mContext, "", Toast.LENGTH_LONG);
     }
+    
+    private Toast m3DToast = null;
     
     private Context mContext = null;
     
-    private boolean mDebug = false;
+    private boolean mDebug = true;
     private void Logd(String msg)
     {
         if(mDebug)
@@ -48,13 +58,47 @@ public class VideoListener3D
     private final String mHDMIConfigFile = "/sys/class/amhdmitx/amhdmitx0/config";
     private final String mHDMIPlugFile = "/sys/class/amhdmitx/amhdmitx0/hpd_state";
     private final String mHDMIDisp3DFile = "/sys/class/amhdmitx/amhdmitx0/disp_cap_3d";
-    private final String mRequest2XScaleFile = "/sys/class/graphics/fb0/request2XScale";     
+    private final String mRequest2XScaleFile = "/sys/class/graphics/fb0/request2XScale"; 
+    private final String VideoAxisFile= "/sys/class/video/axis";
     
     private int mLastUIOption = 0;
     private int mLastVideoFormat = 0;  
     private boolean mLastPlugState = false;
     private boolean mLast3DSupport = false;
+    // private Toast mbx_3d = null;
+    
+    private void set3DVideoAxis(){
+        String outputmode = SystemProperties.get("ubootenv.var.outputmode");
+        if(outputmode.equals("720p")||outputmode.equals("720p50hz")){
+             writeFile(VideoAxisFile, "0 0 1280 720");
+         }
+        if(outputmode.equals("1080p")||outputmode.equals("1080p50hz")){
+             writeFile(VideoAxisFile, "0 0 1920 1080");
+         }   
+     }
+    
+    public void writeFile(String file, String value){
+        File OutputFile = new File(file);
+        if(!OutputFile.exists()) {          
+            return;
+        }
 
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(OutputFile), 32);
+            try {
+                // Log.d(TAG, "set" + file + ": " + value);
+                out.write(value);    
+            } 
+            finally {
+                out.close();
+            }
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            // Log.e(TAG, "IOException when write "+OutputFile);
+        }
+    }
+	
 	private static SystemWriteManager sw; 
 	public static void setSystemWrite(SystemWriteManager sysWrite)
 	{
@@ -129,12 +173,25 @@ public class VideoListener3D
             {
             case 0:
             {
+                // mbx_3d.setText(new String("3D OFF"));
+                // mbx_3d.show();
+                
+               //  m3DToast.cancel();
+                m3DToast.setText("3D OFF");
+                m3DToast.show();
                 changeTo2DMode();
             }
             break;
             
             case 1:
             {
+                // mbx_3d.setText(new String("3D AUTO"));
+                // mbx_3d.show();
+                
+                // m3DToast.cancel();
+                m3DToast.setText("3D AUTO");
+                m3DToast.show();
+
                 switch(mLastVideoFormat)
                 {
                 case TVIN_TFMT_2D:
@@ -163,12 +220,18 @@ public class VideoListener3D
                 
             case 2:
             {
+                // mbx_3d.setText(new String("3D L/R"));
+                // mbx_3d.show();
+                
                 changeTo3DLRMode();
             }
             break;
                 
             case 3:
             {
+                // mbx_3d.setText(new String("3D T/B"));
+                // mbx_3d.show();
+                
                 changeTo3DTBMode();
             }
             break;
@@ -341,6 +404,9 @@ public class VideoListener3D
         
     private void changeTo2DMode()
     {
+//        mbx_3d.setText(new String("3D OFF"));
+//        mbx_3d.show();
+        
 	  	sw.setProperty(mKeyVideoMode3D, "0");     
 	  	
 	  	writeSysFile(mHDMIConfigFile, "3doff");
@@ -352,16 +418,21 @@ public class VideoListener3D
         else if(getCurrentOutputmode().contains("1080p"))
         {
         	writeSysFile(mRequest2XScaleFile, "8");
-        }        
+        }     
     }
         
     private void changeTo3DLRMode()
     {
         if(mLast3DSupport)
         {
+//            mbx_3d.setText(new String("3D L/R"));
+//            mbx_3d.show();
+            
       		sw.setProperty(mKeyVideoMode3D, "1");
       		
       		writeSysFile(mHDMIConfigFile, "3dlr");
+      		
+      		set3DVideoAxis();
       		
             if(getCurrentOutputmode().contains("720p"))
             {
@@ -373,8 +444,11 @@ public class VideoListener3D
             }
         }
         else
-        {
-            Toast.makeText(mContext, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+        {  
+            // m3DToast.cancel();
+            m3DToast.setText("3D LR    " + mContext.getResources().getString(R.string.not_support_3d));
+            m3DToast.show(); 
+            // Toast.makeText(mContext, R.string.not_support_3d, Toast.LENGTH_LONG).show();
         }
     }
         
@@ -382,9 +456,14 @@ public class VideoListener3D
     {
         if(mLast3DSupport)
         {
+//            mbx_3d.setText(new String("3D T/B"));
+//            mbx_3d.show();
+            
     	  	sw.setProperty(mKeyVideoMode3D, "2");
     	  	
     	  	writeSysFile(mHDMIConfigFile, "3dtb");
+    	  	
+    	  	set3DVideoAxis();
     	  	
             if(getCurrentOutputmode().contains("720p"))
             {
@@ -397,7 +476,10 @@ public class VideoListener3D
         }
         else
         {
-            Toast.makeText(mContext, R.string.not_support_3d, Toast.LENGTH_LONG).show();
+            // m3DToast.cancel();
+            m3DToast.setText("3D TB    " + mContext.getResources().getString(R.string.not_support_3d));
+            m3DToast.show();
+            // Toast.makeText(mContext, R.string.not_support_3d, Toast.LENGTH_LONG).show();
         }
     }
         
@@ -479,6 +561,8 @@ public class VideoListener3D
     public void stopCheck()
     {
         mContext.unregisterReceiver(mHDMIPlugReceiver);
+        
+        m3DToast.cancel();
         
         Message stop_msg = mCheckHandler.obtainMessage(STOP_CHECK_MSG);
         mCheckHandler.sendMessageAtFrontOfQueue(stop_msg);
