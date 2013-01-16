@@ -177,6 +177,9 @@ public class SettingsVP {
 						else {
 							buf = "0 0 0 0";
 						}
+						if(SystemProperties.getBoolean("ro.platform.has.mbxuimode", false)){
+							buf = "0 0 0 0";
+						}
 						
 					//}
 
