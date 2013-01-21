@@ -2390,9 +2390,9 @@ public class playermenu extends Activity {
         m1080scale = sw.getPropertyInt("ro.platform.has.1080scale", 0);
         outputmode = sw.getProperty(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
-	 			 	Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
-					playermenu.this.sendBroadcast(intent_video_on);
-					sw.setProperty("mbx.hideStatusBar.enable","true");
+            //Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
+            //playermenu.this.sendBroadcast(intent_video_on);
+            sw.setProperty("mbx.hideStatusBar.enable","true");
         }
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
@@ -4503,7 +4503,10 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		final int pos = ResumePlay.check(PlayList.getinstance().getcur());
 		Log.d(TAG, "resumePlay() pos is :"+pos);
 		if(pos > 0) {
-			setOSDOnOff(true);
+            
+            if(sw.getPropertyInt("ro.platform.has.1080scale", 0) != 2){
+                setOSDOnOff(true);
+            }
 				
 			confirm_dialog = new AlertDialog.Builder(this)
 				.setTitle(R.string.setting_resume)  
@@ -4684,8 +4687,10 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		SettingsVP.enableVideoLayout();
 		closeScreenOffTimeout();
 		sw.setProperty("sys.statusbar.forcehide","true");
-		if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
-			sw.setProperty("mbx.hideStatusBar.enable","true");
+        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
+            Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
+            playermenu.this.sendBroadcast(intent_video_on);
+            sw.setProperty("mbx.hideStatusBar.enable","true");
         }
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
