@@ -4033,7 +4033,9 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 						}
 						break;
 					case VideoInfo.PLAYER_SEARCHOK:
-						//progressSliding = false;
+					    if(sw.getPropertyBoolean("ro.platform.has.mbxuimode",false)){
+					        progressSliding = false;
+					    }
 						break;
 					case VideoInfo.DIVX_AUTHOR_ERR:
 					    Log.d(TAG, "Authorize Error");
