@@ -43,7 +43,7 @@ public class VideoListener3D
     
     private Context mContext = null;
     
-    private boolean mDebug = true;
+    private boolean mDebug = false;
     private void Logd(String msg)
     {
         if(mDebug)
