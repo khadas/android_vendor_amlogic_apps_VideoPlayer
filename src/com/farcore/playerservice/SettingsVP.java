@@ -105,6 +105,9 @@ public class SettingsVP {
         	return false;
         }
 		
+        if(sw.getPropertyBoolean("ro.platform.has.mbxuimode", false)){
+            return true;
+        }
 		//read
 		try
 		{
@@ -182,9 +185,6 @@ public class SettingsVP {
 							Log.i(TAG,"x1:"+x1+",y1:"+y1+",x2:"+x2+",y2:"+y2);
 						}
 						else {
-							buf = "0 0 0 0";
-						}
-						if(sw.getPropertyBoolean("ro.platform.has.mbxuimode", false)){
 							buf = "0 0 0 0";
 						}
 						
