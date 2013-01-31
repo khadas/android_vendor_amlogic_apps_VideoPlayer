@@ -3613,7 +3613,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			}
 			
-	        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+	        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p"))))){
 				sw.setProperty("mbx.hideStatusBar.enable","false");
 				writeFile(VideoDisableFile,"1");
 				writeFile(Fb0Blank,"1");
@@ -4671,7 +4671,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		mPaused = false;
 		isBackWard = false;
 		exitAbort = false;
-		resumePlayEnable = false;
+		
 
 		/*
 		Log.i("wxl","############################");
@@ -4689,11 +4689,13 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		SettingsVP.enableVideoLayout();
 		closeScreenOffTimeout();
 		sw.setProperty("sys.statusbar.forcehide","true");
-        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
+        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p"))))){
             Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
             playermenu.this.sendBroadcast(intent_video_on);
             sw.setProperty("mbx.hideStatusBar.enable","true");
         }
+		resumePlayEnable = false;
+		
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
 			playPosition = ResumePlay.check(PlayList.getinstance().getcur());
