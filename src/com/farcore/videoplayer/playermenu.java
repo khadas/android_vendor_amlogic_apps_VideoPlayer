@@ -292,7 +292,7 @@ public class playermenu extends Activity {
 	PowerManager.WakeLock mScreenLock = null;
 	private Handler mDelayHandler;
 	private final static long ScrnOff_delay = 2*1000;
-    private final static int GETROTATION_TIMEOUT = 500;
+    private final static int GETROTATION_TIMEOUT = 0;//500;
 	private final static int GETROTATION = 0x0001;
 	private int mLastRotation;
 	private int mLastRotationFlag = 0;
@@ -4734,13 +4734,14 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 				e.printStackTrace();
 			}
 		}
-		
+
 		int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
 		if((getRotation >= 0) && (getRotation <= 3)) {
 		    SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
 			mLastRotation = getRotation;
 		}
+		
 //        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 //        m_storagemgr.registerListener(mListener);
 
@@ -4791,6 +4792,15 @@ Log.d(TAG, "registerReciever(mMountReceiver)");
 			//if((getRotation < 0) || (getRotation > 3))
 			//	return;
 			//SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+			int w = 0;
+			int h = 0;
+			if(disableFreescaleProcess) {
+				if(bMediaInfo != null) {
+					w = bMediaInfo.getWidth();
+					h = bMediaInfo.getHeight();
+				}
+			}
+			SettingsVP.setVideoLayoutMode(w, h);
 			
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 				//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

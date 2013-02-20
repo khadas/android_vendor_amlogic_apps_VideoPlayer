@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.os.SystemProperties;
 import android.app.SystemWriteManager; 
+import android.view.Display;
 
 public class SettingsVP {
 
@@ -31,9 +32,11 @@ public class SettingsVP {
 	public static final String RESUME_MODE = "ResumeMode";
 	public static final String DISPLAY_MODE = "DisplayMode";
 	public static SystemWriteManager sw; 
+	private static Activity mActivity;
 	
 	public static void init(Activity act)
 	{
+		mActivity = act;
 		setting = act.getSharedPreferences(SettingsVP.SETTING_INFOS, 
 												Activity.MODE_PRIVATE);
 	}
@@ -92,6 +95,8 @@ public class SettingsVP {
 	{
     	String buf = null;
     	String dispMode = null;
+		int Videow = Vw;
+		int Videoh = Vh;
 		File file = new File(displaymode_path);
 		if (!file.exists()) {        	
         	return false;
@@ -122,13 +127,19 @@ public class SettingsVP {
 					buf = "0 0 1919 1079";
 					
 				}else{
-					String[] axisstr = dispaxis.split(" ", 5);
+					Display display = mActivity.getWindowManager().getDefaultDisplay();  
+					boolean isPortrait = display.getWidth() < display.getHeight(); 
+					Log.d(TAG, "isPortrait: "+isPortrait);
+					if(isPortrait) {
+						Videow = Vh;
+						Videoh = Vw;
+					}
 					
+					String[] axisstr = dispaxis.split(" ", 5);
 					panel_resolution = axisstr[2]+"x"+axisstr[3];
 					panel_width = Integer.parseInt(axisstr[2]);
 					panel_height = Integer.parseInt(axisstr[3]);
 					Log.d(TAG, "Panel resolution: "+panel_resolution);
-
 				
 					/*if (dispMode.equals("panel"))
 					{
@@ -145,8 +156,8 @@ public class SettingsVP {
 						int x2 = 0;
 						int y2 = 0;
 						
-						Log.i(TAG,"panel_width:"+panel_width+",panel_height:"+panel_height+",Vw:"+Vw+",Vh:"+Vh);
-						if((Vw != 0) && (Vh != 0) && (panel_width != 0) && (panel_height != 0)) {
+						Log.i(TAG,"panel_width:"+panel_width+",panel_height:"+panel_height+",Videow:"+Videow+",Videoh:"+Videoh);
+						if((Videow != 0) && (Videoh != 0) && (panel_width != 0) && (panel_height != 0)) {
 							/*if((Vw < panel_width) && (Vh < panel_height)) { //keep playing as initial size
 								w = Vw;
 								h = Vh;
@@ -157,9 +168,9 @@ public class SettingsVP {
 								y2 = y1 + h;
 							}
 							else */{
-								if((Vw * panel_height) > (Vh * panel_width)) {
+								if((Videow * panel_height) > (Videoh * panel_width)) {
 									w = panel_width;
-									h = panel_width * Vh / Vw;
+									h = panel_width * Videoh / Videow;
 
 									x1 = 0;
 									y1 = (panel_height - h)/2;
@@ -167,7 +178,7 @@ public class SettingsVP {
 									y2 = y1 + h;
 								}
 								else {
-									w = panel_height * Vw / Vh;
+									w = panel_height * Videow/ Videoh;
 									h = panel_height;
 
 									x1 = (panel_width - w)/2;
@@ -259,7 +270,7 @@ public class SettingsVP {
 		} 
 		
 		//write
-		boolean ret = sw.writeSysfs(video_layout_disable,"2");
+		boolean ret = sw.writeSysfs(video_layout_disable,"1");
 		return ret;
 		/*try
 		{
