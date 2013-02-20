@@ -89,7 +89,7 @@ public class playermenu extends Activity {
 	private static String FormatMVC_3dlr= "3dlr";
 	private static String FormatMVC_3doff= "3doff";
 	private static int MBX_3D_status = 0;		//0:3doff,1:auto,2:3dlr,3:3dtb
-	Toast mbx_3d = null;
+	// Toast mbx_3d = null;
 	
 	// used in VideoListener3D.java
 	public static int getMBX3DStatus()
@@ -1016,18 +1016,18 @@ public class playermenu extends Activity {
 								// if(m3DListener.is3DSupport())
 								{
 									// SystemProperties.set(m3DListener.mKeyVideoMode3D, "1"); 
-								    writeFile(FormatMVC,FormatMVC_3dlr);
+								    // writeFile(FormatMVC,FormatMVC_3dlr);
 									// MBX_3D_status = 2;
 								        setMBX3DStatus(2);
-									set3DVideoAxis();
-									if(sw.getProperty("ubootenv.var.outputmode").equals("720p") ||
-									   sw.getProperty("ubootenv.var.outputmode").equals("720p50hz")){
-										writeFile(RequestScaleFile,"17");
-										}
-									if(sw.getProperty("ubootenv.var.outputmode").equals("1080p") ||
-									   sw.getProperty("ubootenv.var.outputmode").equals("1080p50hz")){
-										writeFile(RequestScaleFile,"8 1");
-										}
+									// set3DVideoAxis();
+//									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p") ||
+//									   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
+//										writeFile(RequestScaleFile,"17");
+//										}
+//									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p") ||
+//									   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
+//										writeFile(RequestScaleFile,"8 1");
+//										}
 								}
 //								else
 //								{
@@ -1039,18 +1039,18 @@ public class playermenu extends Activity {
 								// if(m3DListener.is3DSupport())
 								{
 									// SystemProperties.set(m3DListener.mKeyVideoMode3D, "2"); 
-								    writeFile(FormatMVC,FormatMVC_3dtb);
-									set3DVideoAxis();
+								    // writeFile(FormatMVC,FormatMVC_3dtb);
+									// set3DVideoAxis();
 									// MBX_3D_status = 3;
 									setMBX3DStatus(3);
-									if(sw.getProperty("ubootenv.var.outputmode").equals("720p")||
-									   sw.getProperty("ubootenv.var.outputmode").equals("720p50hz")){
-										writeFile(RequestScaleFile,"18");
-										}
-									if(sw.getProperty("ubootenv.var.outputmode").equals("1080p") ||
-									   sw.getProperty("ubootenv.var.outputmode").equals("1080p50hz")){
-										writeFile(RequestScaleFile,"8 2");
-										}
+//									if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
+//									   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
+//										writeFile(RequestScaleFile,"18");
+//										}
+//									if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p") ||
+//									   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
+//										writeFile(RequestScaleFile,"8 2");
+//										}
 								}
 //								else
 //								{
@@ -2209,17 +2209,17 @@ public class playermenu extends Activity {
 				case 0:
 					// SystemProperties.set(m3DListener.mKeyVideoMode3D, "0"); 
 					writeFile(FormatMVC,FormatMVC_3doff);
-					mbx_3d.setText(new String("3D OFF"));
+//					mbx_3d.setText(new String("3D OFF"));
 					Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
 					playermenu.this.sendBroadcast(intent_videoposition_change);
-					mbx_3d.show();
+//					mbx_3d.show();
 					break;
 				case 1:
 					// if(m3DListener.is3DSupport())
 					{
 						// SystemProperties.set(VideoListener3D.mKeyVideoMode3D, "1"); 
-					mbx_3d.setText(new String("3D AUTO"));
-					mbx_3d.show();
+//					mbx_3d.setText(new String("3D AUTO"));
+//					mbx_3d.show();
 					}
 //					else
 //					{
@@ -2230,18 +2230,18 @@ public class playermenu extends Activity {
 					// if(m3DListener.is3DSupport())
 					{
 						// SystemProperties.set(m3DListener.mKeyVideoMode3D, "1"); 
-					writeFile(FormatMVC,FormatMVC_3dlr);
-					set3DVideoAxis();
-					mbx_3d.setText(new String("3D L/R"));
-					if(sw.getProperty("ubootenv.var.outputmode").equals("720p")||
-					   sw.getProperty("ubootenv.var.outputmode").equals("720p50hz")){
-						writeFile(RequestScaleFile,"17");
-					}
-					if(sw.getProperty("ubootenv.var.outputmode").equals("1080p")||
-					   sw.getProperty("ubootenv.var.outputmode").equals("1080p50hz")){
-						writeFile(RequestScaleFile,"8 1");
-					}
-					mbx_3d.show();
+					// writeFile(FormatMVC,FormatMVC_3dlr);
+					// set3DVideoAxis();
+//					mbx_3d.setText(new String("3D L/R"));
+//					if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
+//					   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
+//						writeFile(RequestScaleFile,"17");
+//					}
+//					if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")||
+//					   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
+//						writeFile(RequestScaleFile,"8 1");
+//					}
+//					mbx_3d.show();
 					}
 //					else
 //					{
@@ -2252,18 +2252,18 @@ public class playermenu extends Activity {
 					// if(m3DListener.is3DSupport())
 					{
 						// SystemProperties.set(m3DListener.mKeyVideoMode3D, "2"); 
-					writeFile(FormatMVC,FormatMVC_3dtb);
-					set3DVideoAxis();
-					if(sw.getProperty("ubootenv.var.outputmode").equals("720p")||
-					   sw.getProperty("ubootenv.var.outputmode").equals("720p50hz")){
-							writeFile(RequestScaleFile,"18");
-					}
-					if(sw.getProperty("ubootenv.var.outputmode").equals("1080p")||
-					   sw.getProperty("ubootenv.var.outputmode").equals("1080p50hz")){
-							writeFile(RequestScaleFile,"8 2");
-					}
-					mbx_3d.setText(new String("3D T/B"));
-					mbx_3d.show();
+					// writeFile(FormatMVC,FormatMVC_3dtb);
+					// set3DVideoAxis();
+//					if(SystemProperties.get("ubootenv.var.outputmode").equals("720p")||
+//					   SystemProperties.get("ubootenv.var.outputmode").equals("720p50hz")){
+//							writeFile(RequestScaleFile,"18");
+//					}
+//					if(SystemProperties.get("ubootenv.var.outputmode").equals("1080p")||
+//					   SystemProperties.get("ubootenv.var.outputmode").equals("1080p50hz")){
+//							writeFile(RequestScaleFile,"8 2");
+//					}
+//					mbx_3d.setText(new String("3D T/B"));
+//					mbx_3d.show();
 					}
 //					else
 //					{
@@ -2390,9 +2390,9 @@ public class playermenu extends Activity {
         m1080scale = sw.getPropertyInt("ro.platform.has.1080scale", 0);
         outputmode = sw.getProperty(STR_OUTPUT_MODE);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
-	 			 	Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
-					playermenu.this.sendBroadcast(intent_video_on);
-					sw.setProperty("mbx.hideStatusBar.enable","true");
+            //Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
+            //playermenu.this.sendBroadcast(intent_video_on);
+            sw.setProperty("mbx.hideStatusBar.enable","true");
         }
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
@@ -2412,9 +2412,9 @@ public class playermenu extends Activity {
         ff_fb =Toast.makeText(playermenu.this, "",Toast.LENGTH_SHORT );
         ff_fb.setGravity(Gravity.TOP | Gravity.RIGHT,10,10);
 		ff_fb.setDuration(0x00000001);
-		mbx_3d = Toast.makeText(playermenu.this, "",Toast.LENGTH_SHORT );
-		mbx_3d.setGravity(Gravity.TOP,10,10);
-		mbx_3d.setDuration(0x00000001);
+//		mbx_3d = Toast.makeText(playermenu.this, "",Toast.LENGTH_SHORT );
+//		mbx_3d.setGravity(Gravity.TOP,10,10);
+//		mbx_3d.setDuration(0x00000001);
 
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
         		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
@@ -3613,7 +3613,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 			}
 			
-	        if(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p")))){
+	        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p"))))){
 				sw.setProperty("mbx.hideStatusBar.enable","false");
 				writeFile(VideoDisableFile,"1");
 				writeFile(Fb0Blank,"1");
@@ -4033,7 +4033,9 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 						}
 						break;
 					case VideoInfo.PLAYER_SEARCHOK:
-						//progressSliding = false;
+					    if(sw.getPropertyBoolean("ro.platform.has.mbxuimode",false)){
+					        progressSliding = false;
+					    }
 						break;
 					case VideoInfo.DIVX_AUTHOR_ERR:
 					    Log.d(TAG, "Authorize Error");
@@ -4503,7 +4505,10 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		final int pos = ResumePlay.check(PlayList.getinstance().getcur());
 		Log.d(TAG, "resumePlay() pos is :"+pos);
 		if(pos > 0) {
-			setOSDOnOff(true);
+            
+            if(sw.getPropertyInt("ro.platform.has.1080scale", 0) != 2){
+                setOSDOnOff(true);
+            }
 				
 			confirm_dialog = new AlertDialog.Builder(this)
 				.setTitle(R.string.setting_resume)  
@@ -4666,7 +4671,7 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		mPaused = false;
 		isBackWard = false;
 		exitAbort = false;
-		resumePlayEnable = false;
+		
 
 		/*
 		Log.i("wxl","############################");
@@ -4684,9 +4689,13 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		SettingsVP.enableVideoLayout();
 		closeScreenOffTimeout();
 		sw.setProperty("sys.statusbar.forcehide","true");
-		if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
-			sw.setProperty("mbx.hideStatusBar.enable","true");
+        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p"))))){
+            Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
+            playermenu.this.sendBroadcast(intent_video_on);
+            sw.setProperty("mbx.hideStatusBar.enable","true");
         }
+		resumePlayEnable = false;
+		
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
 			playPosition = ResumePlay.check(PlayList.getinstance().getcur());
