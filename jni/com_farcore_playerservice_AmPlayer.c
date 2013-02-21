@@ -36,7 +36,7 @@ static URLProtocol android_protocol;
 //about player info updating interval
 #define PLAYER_INFO_POP_INTERVAL 500 // 0.5s
 
-#define DISABLE_FREESCALE_PROCESS 1 //wxl disable freescale process
+//#define DISABLE_FREESCALE_PROCESS 1 //wxl disable freescale process
 
 int vp_open(URLContext *h, const char *filename, int flags)
 {	

@@ -113,7 +113,7 @@ public class playermenu extends Activity {
   	pls enable the same flag in /jni/com_farcore_playerservice_AmPlayer.c 
   	in this way, the function AmPlayer.getProductType() will return 0 aways
   */
-	private boolean disableFreescaleProcess = true;
+	private boolean disableFreescaleProcess = false;
 
   	private static SystemWriteManager sw; 
 
