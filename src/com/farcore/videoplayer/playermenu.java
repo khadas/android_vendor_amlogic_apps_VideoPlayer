@@ -89,6 +89,7 @@ public class playermenu extends Activity {
 	private static String FormatMVC_3dlr= "3dlr";
 	private static String FormatMVC_3doff= "3doff";
 	private static int MBX_3D_status = 0;		//0:3doff,1:auto,2:3dlr,3:3dtb
+	private boolean isEjectOrUnmoutProcessed = false;
 	// Toast mbx_3d = null;
 	
 	// used in VideoListener3D.java
@@ -4595,9 +4596,13 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
             if (action == null ||path == null)
             	return;
             
-            if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+            if ((action.equals(Intent.ACTION_MEDIA_EJECT))||(action.equals(Intent.ACTION_MEDIA_UNMOUNTED))) {
 				if(PlayList.getinstance().getcur()!=null) {
 					if(PlayList.getinstance().getcur().startsWith(path)) {
+						if(isEjectOrUnmoutProcessed)
+							return;
+						else
+							isEjectOrUnmoutProcessed = true;
 						Intent selectFileIntent = new Intent();
 						selectFileIntent.setClass(playermenu.this, FileList.class);
 						//close sub;
@@ -4619,10 +4624,11 @@ Log.d(TAG, "unregisterReciever(mMountReceiver)");
 				}				
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
                 // Nothing				
-            } else if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
+            } 
+			/*else if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
                 // SD card unavailable
                 // handled in ACTION_MEDIA_EJECT
-            }
+            }*/
         }
     };	
 
