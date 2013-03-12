@@ -3531,7 +3531,7 @@ public class playermenu extends Activity {
         setDefCodecMips();
         openScreenOffTimeout();
         SettingsVP.disableVideoLayout();
-        SettingsVP.setVideoRotateAngle(0);
+        //SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
 Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		unregisterReceiver(mMountReceiver);
