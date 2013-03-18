@@ -3533,7 +3533,6 @@ public class playermenu extends Activity {
         SettingsVP.disableVideoLayout();
         //SettingsVP.setVideoRotateAngle(0);
         unregisterReceiver(mReceiver);
-Log.d(TAG, "unregisterReciever(mMountReceiver)");
 		unregisterReceiver(mMountReceiver);
 		unregisterReceiver(mPowerReceiver);
 

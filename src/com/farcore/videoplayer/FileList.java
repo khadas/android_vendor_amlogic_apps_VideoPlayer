@@ -454,79 +454,85 @@ public class FileList extends ListActivity {
 	
 	private void BrowserFile(String filePath) {
 		int i = 0;
-		int dev_count=0;
+		int dev_usb_count=0;
+		int dev_cd_count=0;
 		file = new File(filePath);
 		listFiles = new ArrayList<File>();
-	    items=new ArrayList<String>();
-	    paths=new ArrayList<String>();
+		items=new ArrayList<String>();
+		paths=new ArrayList<String>();
 		String[] files =file.list();  
 		if (files != null) {
-	        for(i=0;i<files.length;i++){			
-	            if(files[i].equals("VIRTUAL_CDROM")){                    
-	                execCmd("vdc loop unmount");
+			for(i=0;i<files.length;i++){			
+				if(files[i].equals("VIRTUAL_CDROM")){                    
+					execCmd("vdc loop unmount");
 					break;
-	            }
+				}
 			}
 		}
-	    searchFile(file);
-	    if(listFiles.isEmpty()) {
-	    	Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
-	    	//paths =currentlist;
-	    	paths.clear();
-	    	paths.addAll(currentlist);
-	    	return;
-	    }
-	    Log.d(TAG, "BrowserFile():"+filePath);
-	    PlayList.getinstance().rootPath =filePath;
-	    
-	    File [] fs = new File[listFiles.size()];
-	    for(i=0;i<listFiles.size();i++) {
-	    	fs[i] = listFiles.get(i);
-	    }
+		searchFile(file);
+		if(listFiles.isEmpty()) {
+			Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
+			//paths =currentlist;
+			paths.clear();
+			paths.addAll(currentlist);
+			return;
+		}
+		Log.d(TAG, "BrowserFile():"+filePath);
+		PlayList.getinstance().rootPath =filePath;
+
+		File [] fs = new File[listFiles.size()];
+		for(i=0;i<listFiles.size();i++) {
+			fs[i] = listFiles.get(i);
+		}
 		if (!filePath.equals(ROOT_PATH))
-	    	Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
-	    
-	    for(i=0;i<fs.length;i++)
-	    {
-	    	File tempF = fs[i];
-	    	String tmppath = tempF.getName();
-	    	
-		    //change device name;	
-	    	if(filePath.equals(ROOT_PATH))
-	    	{
-	    		String tpath = tempF.getAbsolutePath();
-	    	
-	    		if (tpath.equals(NAND_PATH))
-	    			 tmppath = "sdcard";
+			Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
+
+		for(i=0;i<fs.length;i++)
+		{
+			File tempF = fs[i];
+			String tmppath = tempF.getName();
+
+			//change device name;	
+			if(filePath.equals(ROOT_PATH))
+			{
+				String tpath = tempF.getAbsolutePath();
+
+				if (tpath.equals(NAND_PATH))
+					tmppath = "sdcard";
 				else if (tpath.equals(SD_PATH))
-	    			 tmppath = "external_sdcard";
-	    		else if((!tpath.equals(SD_PATH))&&tpath.startsWith(USB_PATH+"/sd")) {
-					 dev_count++;
-					 char data = (char) ('A' +dev_count-1);
-					 tmppath =  getText(R.string.usb_device_str) +"(" +data + ":)" ;
-	    			 //tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
-	    		}
-				
-	    		//delete used folder
-	    		if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure"))&&
-	    			(!tpath.equals("/mnt/obb"))&&(!tpath.equals("/mnt/usbdrive"))
-	    			&&(!tpath.equals("/mnt/shell")))
-	    		{
-	    			String path=changeDevName(tmppath);
-	    			items.add(path);
-	    	    	paths.add(tempF.getPath());
-	    		}
-	    	}
-	    	else
-	    	{
-	    		items.add(tmppath);
-	    		paths.add(tempF.getPath());
-	    	}
-		 }
-		    
-	    tileText =(TextView) findViewById(R.id.TextView_path);
-	    tileText.setText(catShowFilePath(filePath));
-	    setListAdapter(new MyAdapter(this,items,paths));
+					tmppath = "external_sdcard";
+				else if((!tpath.equals(SD_PATH))&&tpath.startsWith(USB_PATH+"/sd")) {
+					dev_usb_count++;
+					char data = (char) ('A' +dev_usb_count-1);
+					tmppath =  getText(R.string.usb_device_str) +"(" +data + ":)" ;
+					//tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
+				}
+				else if((!tpath.equals(SD_PATH))&&tpath.startsWith(USB_PATH+"/sr")) {
+					dev_cd_count++;
+					char data = (char) ('A' +dev_cd_count-1);
+					tmppath =  getText(R.string.cdrom_device_str) +"(" +data + ":)" ;
+				}
+
+				//delete used folder
+				if((!tpath.equals("/mnt/asec"))&&(!tpath.equals("/mnt/secure"))&&
+					(!tpath.equals("/mnt/obb"))&&(!tpath.equals("/mnt/usbdrive"))
+					&&(!tpath.equals("/mnt/shell")))
+				{
+					String path=changeDevName(tmppath);
+					items.add(path);
+					paths.add(tempF.getPath());
+				}
+			}
+			else
+			{
+				items.add(tmppath);
+				paths.add(tempF.getPath());
+			}
+		}
+
+		tileText =(TextView) findViewById(R.id.TextView_path);
+		tileText.setText(catShowFilePath(filePath));
+		setListAdapter(new MyAdapter(this,items,paths));
 	}
 
 	private String changeDevName(String tmppath)
@@ -535,6 +541,7 @@ public class FileList extends ListActivity {
 		String internal = getString(R.string.memory_device_str);
 		String sdcard = getString(R.string.sdcard_device_str);
 		String usb = getString(R.string.usb_device_str);
+		String cdrom = getString(R.string.cdrom_device_str);
 		String sdcardExt = getString(R.string.ext_sdcard_device_str);
 
 		//Log.i("wxl","[changeDevName]tmppath:"+tmppath);
@@ -550,6 +557,10 @@ public class FileList extends ListActivity {
 		else if(tmppath.equals("usb"))
 		{
 			path=usb;
+		}
+		else if(tmppath.equals("cd-rom"))
+		{
+			path=cdrom;
 		}
 		else if(tmppath.equals("external_sdcard"))
 		{
@@ -608,7 +619,7 @@ public class FileList extends ListActivity {
 						if (pfile.isDirectory()) {
 							String devname = null;
 							String path = pfile.getAbsolutePath();
-							if (path.startsWith(USB_PATH+"/sd")&&!path.equals(SD_PATH)) {
+							if ((path.startsWith(USB_PATH+"/sd")||path.startsWith(USB_PATH+"/sr"))&&!path.equals(SD_PATH)) {
 								listFiles.add(pfile);
 							}
 						}

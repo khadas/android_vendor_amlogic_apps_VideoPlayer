@@ -71,6 +71,7 @@
 	<string name="ext_sdcard_device_str">外部存儲卡</string>
 	<string name="sata_device_str">SATA</string>
 	<string name="usb_device_str">USB設備</string>
+	<string name="cdrom_device_str">光盤驅動器</string>
 	<string name="no_file">沒有視頻文件！</string>
 	<string name="searching">搜索中...</string>
 	<string name="all_file">視頻列表</string>
