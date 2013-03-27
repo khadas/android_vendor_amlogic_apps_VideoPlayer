@@ -289,16 +289,16 @@ public class playermenu extends Activity {
 //	private static final String ACTION_HDMISWITCH_MODE_CHANGED =
 //		"com.amlogic.HdmiSwitch.HDMISWITCH_MODE_CHANGED";
 	
-	private boolean mSuspendFlag = false;
-	PowerManager.WakeLock mScreenLock = null;
-	private Handler mDelayHandler;
-	private final static long ScrnOff_delay = 2*1000;
-    private final static int GETROTATION_TIMEOUT = 0;//500;
-	private final static int GETROTATION = 0x0001;
-	private int mLastRotation;
-	private int mLastRotationFlag = 0;
-	
-	private VideoListener3D m3DListener = null;
+    private boolean mSuspendFlag = false;
+    PowerManager.WakeLock mScreenLock = null;
+    private Handler mDelayHandler;
+    private final static long ScrnOff_delay = 2*1000;
+    private final static int GETROTATION_TIMEOUT = 500;
+    private final static int GETROTATION = 0x0001;
+    private int mLastRotation;
+    private int mLastRotationFlag = 0;
+
+    private VideoListener3D m3DListener = null;
 	
 	public void setAngleTable() {
 		String hwrotation = sw.getProperty("ro.sf.hwrotation");
