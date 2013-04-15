@@ -2418,7 +2418,7 @@ public class playermenu extends Activity {
 //		mbx_3d.setDuration(0x00000001);
 
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
-        		PowerManager.SCREEN_BRIGHT_WAKE_LOCK,TAG);
+        		PowerManager.SCREEN_BRIGHT_WAKE_LOCK |PowerManager.ON_AFTER_RELEASE,TAG);
         closeScreenOffTimeout();
 
 		
