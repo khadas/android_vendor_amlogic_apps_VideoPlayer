@@ -4033,9 +4033,14 @@ public class playermenu extends Activity {
 						}
 						break;
 					case VideoInfo.PLAYER_SEARCHOK:
-					    if(sw.getPropertyBoolean("ro.platform.has.mbxuimode",false)){
-					        progressSliding = false;
-					    }
+					    //if(sw.getPropertyBoolean("ro.platform.has.mbxuimode",false)){
+					    //    progressSliding = false;
+					    //}                                            
+                                            ff_fb.cancel();
+                                            FF_FLAG = false;
+                                            FB_FLAG = false;
+                                            FF_LEVEL = 0;
+                                            FB_LEVEL = 0;
 						break;
 					case VideoInfo.DIVX_AUTHOR_ERR:
 					    Log.d(TAG, "Authorize Error");
