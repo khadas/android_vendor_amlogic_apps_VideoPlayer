@@ -2376,8 +2376,8 @@ public class playermenu extends Activity {
 				}
 					
 				finish();
-    		  	onPause(); //for disable 2Xscale
-    		  	onDestroy(); //set freescale when exception
+    		  	//onPause(); //for disable 2Xscale
+    		  	//onDestroy(); //set freescale when exception
     			Log.d(TAG,"----------------uncaughtException--------------------");
 				
     		  	android.os.Process.killProcess(android.os.Process.myPid());
@@ -3609,18 +3609,18 @@ public class playermenu extends Activity {
 	        sw.setProperty("vplayer.hideStatusBar.enable","false"); 
 			sw.setProperty("sys.statusbar.forcehide","false");
 	        
-			if(mHdmiPlugged || sw.getPropertyBoolean("ro.panel.with.freescale", false)) {
-				if(!backToFileList){
-				    PlayList.getinstance().rootPath =null;
-	            }
-	            finish();
-			}
-			else {
-				if(m_Amplayer != null)
-					Amplayer_stop();
-				mSuspendFlag = true;
-				ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
-			}
+            if(mHdmiPlugged || sw.getPropertyBoolean("ro.panel.with.freescale", false)) {
+                //if(!backToFileList){
+                //  PlayList.getinstance().rootPath =null;
+                //}
+                //finish();
+            }
+            else {
+                if(m_Amplayer != null)
+                    Amplayer_stop();
+                    mSuspendFlag = true;
+                    ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+            }
 			
 	        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p"))))){
 				sw.setProperty("mbx.hideStatusBar.enable","false");
@@ -3635,14 +3635,17 @@ public class playermenu extends Activity {
 			disable2XScale();
 	        ScreenMode.setScreenMode("0"); 
 
-			openScreenOffTimeout();
+            openScreenOffTimeout();
 
-			if(!resumePlayEnable) {
-				if(!backToFileList){
-				    PlayList.getinstance().rootPath =null;
-	            }
-				playermenu.this.finish();
-			}
+            if(!resumePlayEnable) {
+                if(!backToFileList){
+                    PlayList.getinstance().rootPath =null;
+                }
+                //playermenu.this.finish();
+            }
+
+            if(mHdmiPlugged || sw.getPropertyBoolean("ro.panel.with.freescale", false))
+                onDestroy();
         }  
     }; 
     
