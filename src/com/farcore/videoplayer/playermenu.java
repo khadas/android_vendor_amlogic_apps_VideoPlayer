@@ -3105,6 +3105,7 @@ public class playermenu extends Activity {
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
+				myProgressBar.requestFocusFromTouch();
 				progressSliding = false;
 			}
 			
