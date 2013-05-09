@@ -608,21 +608,21 @@ public class playermenu extends Activity {
     private void videobar() {
 		FrameLayout baselayout2 = (FrameLayout)findViewById(R.id.BaseLayout2);
 		if(AmPlayer.getProductType() == 1){
-			if (SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
+			if (SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height >= 480) {
 				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
 				if (SettingsVP.panel_width > 720)
 				    frameParams.width = 720;
 				frameParams.height = 480 - 50;
 				frameParams.gravity = Gravity.TOP;
 				baselayout2.setLayoutParams(frameParams);
-			} else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height > 720) {
+			} else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height >= 720) {
 				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
 				if (SettingsVP.panel_width > 1280)
 				    frameParams.width = 1280;
 				frameParams.height = 720 - 50;
 				frameParams.gravity = Gravity.TOP;
 				baselayout2.setLayoutParams(frameParams);
-			} else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height > 1080) {
+			} else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height >= 1080) {
 				FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
 				if (SettingsVP.panel_width > 1920)
 				    frameParams.width = 1920;
@@ -2469,24 +2469,6 @@ public class playermenu extends Activity {
         	}
         }
 		mode_3d = 0;
-        SettingsVP.init(this);
-		if(!disableFreescaleProcess)
-        	SettingsVP.setVideoLayoutMode(0, 0);
-		if(m1080scale == 2){            //set video position for MBX 
-		Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
-		playermenu.this.sendBroadcast(intent_videoposition_change);
-		}
-        ///SettingsVP.enableVideoLayout();
-//        if(AmPlayer.getProductType() == 1){
-//	        if(SettingsVP.display_mode.equals("480p")) {
-//	        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
-//	        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//	        }
-//        }
-		subinit();
-		displayinit();
-		firstInvokFlag=1;//tony.wang 20120601
-		initOsdBar();
 		
 		IntentFilter intentFilter = new IntentFilter(WindowManagerPolicy.ACTION_HDMI_PLUGGED);
 		mReceiver = new BroadcastReceiver() {
@@ -2504,7 +2486,10 @@ public class playermenu extends Activity {
 							h = bMediaInfo.getHeight();
 						}
 					}
-					SettingsVP.setVideoLayoutMode(w, h);
+					if (SystemProperties.getBoolean("ro.vout.dualdisplay4", false))
+					    SettingsVP.setVideoLayoutMode(w, h, plugged);
+					else
+					    SettingsVP.setVideoLayoutMode(w, h, false);
 	                infobar = null;
 	                morbar = null;
 	                initOsdBar();
@@ -2536,6 +2521,29 @@ public class playermenu extends Activity {
 	        // Retrieve current sticky dock event broadcast.
 	        mHdmiPlugged = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false);
 		} 		
+		
+        SettingsVP.init(this);
+		if(!disableFreescaleProcess) {
+		    if (SystemProperties.getBoolean("ro.vout.dualdisplay4", false))
+        	    SettingsVP.setVideoLayoutMode(0, 0, mHdmiPlugged);
+        	else
+        	    SettingsVP.setVideoLayoutMode(0, 0, false);
+        }
+		if(m1080scale == 2){            //set video position for MBX 
+		Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
+		playermenu.this.sendBroadcast(intent_videoposition_change);
+		}
+        ///SettingsVP.enableVideoLayout();
+//        if(AmPlayer.getProductType() == 1){
+//	        if(SettingsVP.display_mode.equals("480p")) {
+//	        	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+//	        			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//	        }
+//        }
+		subinit();
+		displayinit();
+		firstInvokFlag=1;//tony.wang 20120601
+		initOsdBar();		
 		
 		mWindowManager = getWindowManager();
         setAngleTable();
@@ -2700,7 +2708,7 @@ public class playermenu extends Activity {
 	}
 
     	if(AmPlayer.getProductType() == 1){
-	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
+	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height >= 480) {
 	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
             	if (SettingsVP.panel_width > 720)
             	    linearParams.width = 720;
@@ -2709,7 +2717,7 @@ public class playermenu extends Activity {
 				if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
 					subTitleView_sm.setLayoutParams(linearParams);
 				}				
-	        } else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height > 720) {
+	        } else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height >= 720) {
 	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
 	        	if (SettingsVP.panel_width > 1280)
             	    linearParams.width = 1280;
@@ -2718,7 +2726,7 @@ public class playermenu extends Activity {
 				if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
 					subTitleView_sm.setLayoutParams(linearParams);
 				}				
-	        } else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height > 1080) {
+	        } else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height >= 1080) {
 	        	linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
 	        	if (SettingsVP.panel_width > 1920)
             	    linearParams.width = 1920;
@@ -2767,19 +2775,19 @@ public class playermenu extends Activity {
 			infobar.setVisibility(View.GONE);
 		
     	if(AmPlayer.getProductType() == 1){
-	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height > 480) {
+	        if(SettingsVP.display_mode.equals("480p") && SettingsVP.panel_height >= 480) {
 	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
 	        	if (SettingsVP.panel_width > 720)
             	    linearParams.width = 720;
             	linearParams.bottomMargin = SettingsVP.panel_height - 480 + 10;	        	
 	        	subTitleView.setLayoutParams(linearParams);				
-	        } else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height > 720) {
+	        } else if (SettingsVP.display_mode.equals("720p") && SettingsVP.panel_height >= 720) {
 	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
 	        	if (SettingsVP.panel_width > 1280)
             	    linearParams.width = 1280;
             	linearParams.bottomMargin = SettingsVP.panel_height - 720 + 10;
 				subTitleView.setLayoutParams(linearParams);			
-	        } else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height > 1080) {
+	        } else if (SettingsVP.display_mode.equals("1080p") && SettingsVP.panel_height >= 1080) {
 	        	linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
 	        	if (SettingsVP.panel_width > 1920)
             	    linearParams.width = 1920;
@@ -3906,7 +3914,10 @@ public class playermenu extends Activity {
 
 						if(disableFreescaleProcess) {
 							if(bMediaInfo != null) {
-								SettingsVP.setVideoLayoutMode(bMediaInfo.getWidth(), bMediaInfo.getHeight());
+                    		    if (SystemProperties.getBoolean("ro.vout.dualdisplay4", false))
+                            	    SettingsVP.setVideoLayoutMode(bMediaInfo.getWidth(), bMediaInfo.getHeight(), mHdmiPlugged);
+                            	else							    
+								    SettingsVP.setVideoLayoutMode(bMediaInfo.getWidth(), bMediaInfo.getHeight(), false);
 							}
 						}
 
@@ -4758,7 +4769,12 @@ public class playermenu extends Activity {
 		int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 		//Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
 		if((getRotation >= 0) && (getRotation <= 3)) {
-		    SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+        if(mHdmiPlugged && SystemProperties.getBoolean("ro.vout.dualdisplay4", false)
+            && SystemProperties.getBoolean("ro.vout.dualdisplay4.ver-panel", false)) {
+            SettingsVP.setVideoRotateAngle(0);    
+        } else {		    
+            SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+        }
 			mLastRotation = getRotation;
 		}
 		
@@ -4820,7 +4836,10 @@ Log.d(TAG, "registerReciever(mMountReceiver)");
 					h = bMediaInfo.getHeight();
 				}
 			}
-			SettingsVP.setVideoLayoutMode(w, h);
+		    if (SystemProperties.getBoolean("ro.vout.dualdisplay4", false))
+        	    SettingsVP.setVideoLayoutMode(w, h, mHdmiPlugged);
+        	else			
+			    SettingsVP.setVideoLayoutMode(w, h, false);
 			
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 				//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -4841,7 +4860,12 @@ Handler mRotateHandler = new Handler() {
 				int getRotation = mWindowManager.getDefaultDisplay().getRotation();
 			//	Log.d("sensor", "rotate angle: "+Integer.toString(getRotation));
 				if((getRotation >= 0) && (getRotation <= 3) && (getRotation != mLastRotation)) {
-					SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+                if(mHdmiPlugged && SystemProperties.getBoolean("ro.vout.dualdisplay4", false)
+                    && SystemProperties.getBoolean("ro.vout.dualdisplay4.ver-panel", false)) {
+                    SettingsVP.setVideoRotateAngle(0);    
+                } else {				    
+                    SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+                }
 					mLastRotation = getRotation;
 				}
 				mRotateHandler.sendEmptyMessageDelayed(GETROTATION, GETROTATION_TIMEOUT);

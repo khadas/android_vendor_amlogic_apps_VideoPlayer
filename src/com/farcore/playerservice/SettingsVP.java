@@ -22,6 +22,8 @@ public class SettingsVP {
 	private static String video_rotate_path = "/sys/class/ppmgr/angle";
 	private static String displaymode_path = "/sys/class/display/mode";
 	private static String displayaxis_path = "/sys/class/display/axis";
+	private static String display2mode_path = "/sys/class/display2/mode";
+	private static String display2axis_path = "/sys/class/display2/axis";		
 	private static String video_axis_path = "/sys/class/video/axis";
 	private static String video_layout_disable = "/sys/class/video/disable_video";
 	private static String TAG = "SettingVideoPlayer";
@@ -91,7 +93,15 @@ public class SettingsVP {
 		  		 .commit();
 	}
 
-	public static boolean setVideoLayoutMode(int Vw, int Vh)
+	public static boolean setVideoLayoutMode(int Vw, int Vh, boolean hdmi)
+	{
+	    if (hdmi)
+	        return setVideoLayoutModeDisplay2(Vw, Vh);
+	    else
+	        return setVideoLayoutModeDisplay1(Vw, Vh);
+	}
+
+	public static boolean setVideoLayoutModeDisplay1(int Vw, int Vh)
 	{
     	String buf = null;
     	String dispMode = null;
@@ -237,6 +247,154 @@ public class SettingsVP {
 			return false;
 		}*/
 	}
+
+	public static boolean setVideoLayoutModeDisplay2(int Vw, int Vh)
+	{
+    	String buf = null;
+    	String dispMode = null;
+		int Videow = Vw;
+		int Videoh = Vh;
+		File file = new File(display2mode_path);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		file = new File(video_axis_path);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		file = new File(display2axis_path);
+		if (!file.exists()) {        	
+        	return false;
+        }
+		
+        if(sw.getPropertyBoolean("ro.platform.has.mbxuimode", false)){
+            return true;
+        }
+		//read
+		try
+		{
+			BufferedReader in = new BufferedReader(new FileReader(display2mode_path), 32);
+			BufferedReader in_axis = new BufferedReader(new FileReader(display2axis_path), 32);
+			try
+			{
+				dispMode = in.readLine();
+				
+				String dispaxis = in_axis.readLine();
+				if(dispMode== null ||dispaxis== null){//not exist,default m2,lvds1080p
+					dispMode = "lvds1080p";
+					panel_width = 1919;
+					panel_height = 1079;
+					buf = "0 0 1919 1079";
+					
+				}else{
+					Display display = mActivity.getWindowManager().getDefaultDisplay();  
+					boolean isPortrait = display.getWidth() < display.getHeight(); 
+					Log.d(TAG, "isPortrait: "+isPortrait);
+					if(isPortrait) {
+						Videow = Vh;
+						Videoh = Vw;
+					}
+					
+					String[] axisstr = dispaxis.split(" ", 5);
+					panel_resolution = axisstr[2]+"x"+axisstr[3];
+					panel_width = Integer.parseInt(axisstr[2]);
+					panel_height = Integer.parseInt(axisstr[3]);
+					Log.d(TAG, "Panel resolution: "+panel_resolution);
+				
+					/*if (dispMode.equals("panel"))
+					{
+						buf = "0,0,"+axisstr[2]+","+axisstr[3];
+						Log.d(TAG, "Current display axis: "+buf);
+					}
+					else{*/
+						//buf = "0 0 0 0";
+						
+						int w = 0;
+						int h = 0;
+						int x1 = 0;
+						int y1 = 0;
+						int x2 = 0;
+						int y2 = 0;
+						
+						Log.i(TAG,"panel_width:"+panel_width+",panel_height:"+panel_height+",Videow:"+Videow+",Videoh:"+Videoh);
+						if((Videow != 0) && (Videoh != 0) && (panel_width != 0) && (panel_height != 0)) {
+							/*if((Vw < panel_width) && (Vh < panel_height)) { //keep playing as initial size
+								w = Vw;
+								h = Vh;
+
+								x1 = (panel_width - w)/2;
+								y1 = (panel_height - h)/2;
+								x2 = x1 + w;
+								y2 = y1 + h;
+							}
+							else */{
+								if((Videow * panel_height) > (Videoh * panel_width)) {
+									w = panel_width;
+									h = panel_width * Videoh / Videow;
+
+									x1 = 0;
+									y1 = (panel_height - h)/2;
+									x2 = w;
+									y2 = y1 + h;
+								}
+								else {
+									w = panel_height * Videow/ Videoh;
+									h = panel_height;
+
+									x1 = (panel_width - w)/2;
+									y1 = 0;
+									x2 = x1 + w;
+									y2 = h;
+								}
+
+								
+							}
+							buf = Integer.toString(x1)+" "+Integer.toString(y1)+" "+Integer.toString(x2)+" "+Integer.toString(y2);
+							Log.i(TAG,"x1:"+x1+",y1:"+y1+",x2:"+x2+",y2:"+y2);
+						}
+						else {
+							buf = "0 0 0 0";
+						}
+						
+					//}
+
+				}	
+				display_mode = dispMode;
+				Log.d(TAG, "Current display mode: "+display_mode);
+			} finally {
+    			in.close();
+    			in_axis.close();
+    		} 
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Log.e(TAG, "IOException when read "+display2mode_path);
+		} 
+		
+		//write
+		boolean ret = sw.writeSysfs(video_axis_path,buf);
+		return ret;
+		/*try
+		{
+			BufferedWriter out = new BufferedWriter(new FileWriter(video_axis_path), 32);
+    		try
+    		{
+    			out.write(buf);    
+    			Log.d(TAG, "set video window as:"+buf);
+    		} finally {
+				out.close();
+			}
+			 return true;
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Log.e(TAG, "IOException when write "+video_axis_path);
+			return false;
+		}*/
+	}
+	
 	
 	public static boolean disableVideoLayout()
 	{
