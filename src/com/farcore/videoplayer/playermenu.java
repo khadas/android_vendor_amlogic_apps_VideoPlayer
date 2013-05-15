@@ -3113,7 +3113,8 @@ public class playermenu extends Activity {
         myProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
-				myProgressBar.requestFocusFromTouch();
+				if((sw.getPropertyString("ro.platform.has.mbxuimode","false")).equalsIgnoreCase("true"))
+				    myProgressBar.requestFocusFromTouch();
 				progressSliding = false;
 			}
 			
