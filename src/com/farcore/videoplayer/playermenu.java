@@ -3964,23 +3964,27 @@ public class playermenu extends Activity {
                                 e.printStackTrace();
                             }
                         }
-						sub_para.totalnum =subtitleUtils.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
-						if(sub_para.totalnum >0){
-        						
-							sub_para.curid = subtitleUtils.getCurrentInSubtitleIndexByJni();
-							//change by jeff.yang	
-							if(sub_para.curid == 0xff||sub_para.enable==false)
-							    sub_para.curid = sub_para.totalnum;
-							if(sub_para.totalnum>0)
-					    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
-							else
-							    sub_para.sub_id = null;
+                        sub_para.totalnum =subtitleUtils.getExSubTotal()+InternalSubtitleInfo.getInsubNum();
+                        if(sub_para.totalnum >0){
 
-							setSubtitleView();
-							openFile(sub_para.sub_id);
-						}else{
-							sub_para.sub_id = null;
-						}
+                            sub_para.curid = subtitleUtils.getCurrentInSubtitleIndexByJni();
+                            //change by jeff.yang	
+                            if(sub_para.curid == 0xff||sub_para.enable==false)
+                                sub_para.curid = sub_para.totalnum;
+                            if(sub_para.totalnum>0)
+                                sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
+                            else
+                                sub_para.sub_id = null;
+
+                            setSubtitleView();
+                            new Thread () {
+                                public void run () {
+                                    openFile(sub_para.sub_id);
+                                }
+                            }.start();
+                        }else{
+                            sub_para.sub_id = null;
+                        }
 						
 						if(bMediaInfo != null&&bMediaInfo.seekable == 0) {
 							myProgressBar.setEnabled(false);
