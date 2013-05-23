@@ -1241,7 +1241,11 @@ public class playermenu extends Activity {
 						}
     			    	showOsdView();
 						setSubtitleView();
-						openFile(sub_para.sub_id);
+						new Thread () {
+                            public void run () {
+                                openFile(sub_para.sub_id);
+                            }
+                        }.start();
 						if (sub_para.sub_id != null) {
 			  				if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx")) {
 								disableSubSetOptions();
@@ -1272,7 +1276,11 @@ public class playermenu extends Activity {
 				}						
 						showOsdView();
 						setSubtitleView();
-						openFile(sub_para.sub_id);
+						new Thread () {
+                            public void run () {
+                                openFile(sub_para.sub_id);
+                            }
+                        }.start();
 						if (sub_para.sub_id != null) {
 			  				if(sub_para.sub_id.filename.equals("INSUB")||sub_para.sub_id.filename.endsWith(".idx")) {
 								disableSubSetOptions();
@@ -2759,7 +2767,11 @@ public class playermenu extends Activity {
 				subTitleView_sm.setLayoutParams(linearParams);
 			}							
 		}
-    	openFile(sub_para.sub_id);
+    	new Thread () {
+            public void run () {
+                openFile(sub_para.sub_id);
+            }
+        }.start();
 	
         ImageButton browser = (ImageButton)findViewById(R.id.BrowserBtn);
         ImageButton more = (ImageButton)findViewById(R.id.moreBtn);
