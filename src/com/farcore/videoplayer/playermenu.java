@@ -2329,9 +2329,9 @@ public class playermenu extends Activity {
     			playermenu.this.sendBroadcast(new Intent("com.farcore.videoplayer.PLAYER_CRASHED"));
     			
     			//SystemProperties.set("vplayer.hideStatusBar.enable","false");
-    			//SystemProperties.set("mbx.hideStatusBar.enable","false");
+    			//SystemProperties.set("sys.hideStatusBar.enable","false");
 				sw.setProperty("vplayer.hideStatusBar.enable","false");
-    			sw.setProperty("mbx.hideStatusBar.enable","false");
+    			sw.setProperty("sys.hideStatusBar.enable","false");
 				if(!disableFreescaleProcess)
     				sw.setProperty("vplayer.playing","false");
     			  
@@ -2393,7 +2393,7 @@ public class playermenu extends Activity {
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
             //Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
             //playermenu.this.sendBroadcast(intent_video_on);
-            sw.setProperty("mbx.hideStatusBar.enable","true");
+            sw.setProperty("sys.hideStatusBar.enable","true");
         }
         if(AmPlayer.getProductType() == 1)
         	AmPlayer.disable_freescale(MID_FREESCALE);
@@ -3624,7 +3624,7 @@ public class playermenu extends Activity {
             }
 			
 	        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p"))))){
-				sw.setProperty("mbx.hideStatusBar.enable","false");
+				sw.setProperty("sys.hideStatusBar.enable","false");
 				writeFile(VideoDisableFile,"1");
 				writeFile(Fb0Blank,"1");
 				Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
@@ -4718,7 +4718,7 @@ public class playermenu extends Activity {
         if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p"))))){
             Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
             playermenu.this.sendBroadcast(intent_video_on);
-            sw.setProperty("mbx.hideStatusBar.enable","true");
+            sw.setProperty("sys.hideStatusBar.enable","true");
         }
 		resumePlayEnable = false;
 		
