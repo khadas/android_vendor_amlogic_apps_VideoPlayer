@@ -1214,6 +1214,7 @@ public class playermenu extends Activity {
     			    	else
     			    	{
     			    		sub_para.enable = true;
+                            sub_para.sub_id_bac = sub_para.sub_id;
     			    		sub_para.sub_id =subtitleUtils.getSubID(sub_para.curid);
     			    	}
     			    	if(sub_color_state==0)
@@ -1243,7 +1244,8 @@ public class playermenu extends Activity {
 						setSubtitleView();
 						new Thread () {
                             public void run () {
-                                openFile(sub_para.sub_id);
+                                if(sub_para.sub_id_bac != sub_para.sub_id)
+                                    openFile(sub_para.sub_id);
                             }
                         }.start();
 						if (sub_para.sub_id != null) {
@@ -1278,7 +1280,7 @@ public class playermenu extends Activity {
 						setSubtitleView();
 						new Thread () {
                             public void run () {
-                                openFile(sub_para.sub_id);
+                                //openFile(sub_para.sub_id);
                             }
                         }.start();
 						if (sub_para.sub_id != null) {
@@ -5326,6 +5328,7 @@ class subview_set{
 	public int color;
 	public int font; 
 	public SubID sub_id;
+    public SubID sub_id_bac;
 	public boolean enable;
 	public int position_v;
 }
