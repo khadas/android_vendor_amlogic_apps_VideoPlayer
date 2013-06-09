@@ -3659,8 +3659,8 @@ public class playermenu extends Activity {
                 //playermenu.this.finish();
             }
 
-            if(mHdmiPlugged || sw.getPropertyBoolean("ro.panel.with.freescale", false))
-                onDestroy();
+            //if(mHdmiPlugged || sw.getPropertyBoolean("ro.panel.with.freescale", false))
+            //    onDestroy();
         }  
     }; 
     
