@@ -3625,10 +3625,10 @@ public class playermenu extends Activity {
 			sw.setProperty("sys.statusbar.forcehide","false");
 	        
             if(mHdmiPlugged || sw.getPropertyBoolean("ro.panel.with.freescale", false)) {
-                //if(!backToFileList){
-                //  PlayList.getinstance().rootPath =null;
-                //}
-                //finish();
+                if(!backToFileList){
+                  PlayList.getinstance().rootPath =null;
+                }
+                finish();
             }
             else {
                 if(m_Amplayer != null)
