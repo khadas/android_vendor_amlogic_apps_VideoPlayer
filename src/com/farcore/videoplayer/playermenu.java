@@ -3893,7 +3893,7 @@ public class playermenu extends Activity {
 							catch(RemoteException e) {
 								e.printStackTrace();
 							}
-							ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
+							//ResumePlay.saveResumePara(PlayList.getinstance().getcur(), 0);
 							playPosition = 0;
 							if(m_playmode == REPEATLIST) {
 								smResume = -1;
@@ -3909,7 +3909,16 @@ public class playermenu extends Activity {
 							AudioTrackOperation.AudioStreamFormat.clear();
 							AudioTrackOperation.AudioStreamInfo.clear();
 							INITOK = false;
-							PRE_NEXT_FLAG = 1;							
+							PRE_NEXT_FLAG = 1;
+							if(m_playmode==2){                              
+								Intent selectFileIntent = new Intent();                               
+								selectFileIntent.setClass(playermenu.this, FileList.class);                             
+								if(m_Amplayer != null)              
+									Amplayer_stop();
+								backToFileList = true;
+								startActivity(selectFileIntent);
+								playermenu.this.finish();
+							}
 						}
 						break;
 					case VideoInfo.PLAYER_INITOK:
