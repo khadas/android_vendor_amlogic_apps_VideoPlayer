@@ -3577,12 +3577,14 @@ public class playermenu extends Activity {
     public void onPause() {
 		Log.d(TAG,"onPause");
         super.onPause();
-		new Thread(onPauseThread).start(); 
+		//new Thread(onPauseThread).start(); 
+		onPauseHandle();
     }
 	
-		Runnable onPauseThread = new Runnable() {  
-        @Override  
-        public void run() {  
+	//	Runnable onPauseThread = new Runnable() {  
+        //@Override  
+        //public void run() {  
+        private void onPauseHandle() {
 			closeScreenOffTimeout();
 			
             mPaused = true;
@@ -3662,7 +3664,7 @@ public class playermenu extends Activity {
             //if(mHdmiPlugged || sw.getPropertyBoolean("ro.panel.with.freescale", false))
             //    onDestroy();
         }  
-    }; 
+    //}; 
     
     @Override
     protected void onStart() 
