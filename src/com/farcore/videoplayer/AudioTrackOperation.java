@@ -36,8 +36,11 @@ public class AudioTrackOperation {
     public static final int AFORMAT_ALAC = 17;
     public static final int AFORMAT_VORBIS = 18;
     public static final int AFORMAT_AAC_LATM = 19;
-    public static final int AFORMAT_UNSUPPORT = 20;
-    public static final int AFORMAT_MAX    = 21;
+    public static final int AFORMAT_APE   = 20;
+    public static final int AFORMAT_EAC3   = 21;   
+    public static final int AFORMAT_PCM_WIFIDISPLAY = 22;
+    public static final int AFORMAT_UNSUPPORT = 23;
+    public static final int AFORMAT_MAX = 24; 
 	
 	public static void setAudioStream(MediaInfo mi)
 	{

@@ -27,8 +27,11 @@ public class AudioMediaInfo {
     public static final int AFORMAT_ALAC = 17;
     public static final int AFORMAT_VORBIS = 18;
     public static final int AFORMAT_AAC_LATM = 19;
-    public static final int AFORMAT_UNSUPPORT = 20;
-    public static final int AFORMAT_MAX    = 21;
+    public static final int AFORMAT_APE   = 20;
+    public static final int AFORMAT_EAC3   = 21;   
+    public static final int AFORMAT_PCM_WIFIDISPLAY = 22;
+    public static final int AFORMAT_UNSUPPORT = 23;
+    public static final int AFORMAT_MAX = 24; 
     
 	public int getUid() {
 		return uid;
@@ -101,6 +104,15 @@ public class AudioMediaInfo {
 		case AFORMAT_AAC_LATM:
 			type = "AAC_LATM";
 			break;
+             case AFORMAT_APE:
+                    type = "APE";
+                    break;
+             case AFORMAT_EAC3:
+                    type = "EAC3";
+                    break;
+             case AFORMAT_PCM_WIFIDISPLAY:
+                    type = "PCM_WIFIDISPLAY";
+                    break;
 		case AFORMAT_UNSUPPORT:
 			type = "UNSUPPORT";
 			break;
