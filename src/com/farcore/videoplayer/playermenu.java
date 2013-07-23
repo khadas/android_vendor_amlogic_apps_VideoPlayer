@@ -91,6 +91,8 @@ public class playermenu extends Activity {
 	private static int MBX_3D_status = 0;		//0:3doff,1:auto,2:3dlr,3:3dtb
 	private boolean isEjectOrUnmoutProcessed = false;
 	// Toast mbx_3d = null;
+	private boolean onPauseDone = false;
+    private boolean onDestoryDone = false;
 	
 	// used in VideoListener3D.java
 	public static int getMBX3DStatus()
@@ -3518,56 +3520,60 @@ public class playermenu extends Activity {
 
 	@Override
     public void onDestroy() {
-        ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
+        if(onDestoryDone == false) {
+            Log.i(TAG,"onDestroy");
+            onDestoryDone = true;
+	        ResumePlay.saveResumePara(PlayList.getinstance().getcur(), curtime);
 		
-        //close sub;
-        if(subTitleView!=null)
-        	subTitleView.closeSubtitle();
-	if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
-	     subTitleView_sm.closeSubtitle();
-	}		
-        backToFileList = true;
-		mSuspendFlag = false;
-		smResume = -1;
-		aidResume = -1;
+	        //close sub;
+	        if(subTitleView!=null)
+	        	subTitleView.closeSubtitle();
+		if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
+		     subTitleView_sm.closeSubtitle();
+		}		
+	        backToFileList = true;
+			mSuspendFlag = false;
+			smResume = -1;
+			aidResume = -1;
         
-        if(m_Amplayer != null)
-            Amplayer_stop();
-			try {
-				if(sw.getPropertyBoolean("3D_setting.enable", false)){
-					m_Amplayer.Set3Dgrating(0);
-					m_Amplayer.Set3Dmode(0); //close 3D
+	        if(m_Amplayer != null)
+	            Amplayer_stop();
+				try {
+					if(sw.getPropertyBoolean("3D_setting.enable", false)){
+						m_Amplayer.Set3Dgrating(0);
+						m_Amplayer.Set3Dmode(0); //close 3D
 					
+					}
+					if(!fb32){
+						m_Amplayer.DisableColorKey();
+					}
+				} 
+				catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				if(!fb32){
-					m_Amplayer.DisableColorKey();
-				}
-			} 
-			catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 
-		if(!exitAbort)
-			if(checkPlayerServiceStarted() == true)
-        		StopPlayerService();
+			if(!exitAbort)
+				if(checkPlayerServiceStarted() == true)
+	        		StopPlayerService();
 
-        setDefCodecMips();
-        openScreenOffTimeout();
-        SettingsVP.disableVideoLayout();
-        //SettingsVP.setVideoRotateAngle(0);
-        unregisterReceiver(mReceiver);
-		unregisterReceiver(mMountReceiver);
-		unregisterReceiver(mPowerReceiver);
+	        setDefCodecMips();
+	        openScreenOffTimeout();
+	        SettingsVP.disableVideoLayout();
+	        //SettingsVP.setVideoRotateAngle(0);
+	        unregisterReceiver(mReceiver);
+			unregisterReceiver(mMountReceiver);
+			unregisterReceiver(mPowerReceiver);
 
 
-        if(AmPlayer.getProductType() == 1) //1:MID 0:other
-        	AmPlayer.enable_freescale(MID_FREESCALE);
-		if(!backToFileList){
-		    PlayList.getinstance().rootPath =null;
-        }
-		// stop3DVideoListenerService();
-		exitAbort = false;
+	        if(AmPlayer.getProductType() == 1) //1:MID 0:other
+	        	AmPlayer.enable_freescale(MID_FREESCALE);
+			if(!backToFileList){
+			    PlayList.getinstance().rootPath =null;
+	        }
+			// stop3DVideoListenerService();
+			exitAbort = false;
+		}
         super.onDestroy();
     }
 
@@ -3575,10 +3581,13 @@ public class playermenu extends Activity {
 
 	@Override
     public void onPause() {
-		Log.d(TAG,"onPause");
-        super.onPause();
-		//new Thread(onPauseThread).start(); 
-		onPauseHandle();
+        super.onPause();	
+        //new Thread(onPauseThread).start(); 
+        if(onPauseDone == false) {
+            Log.d(TAG,"onPause");
+            onPauseDone = true;
+            onPauseHandle();
+        }
     }
 	
 	//	Runnable onPauseThread = new Runnable() {  
@@ -3642,7 +3651,7 @@ public class playermenu extends Activity {
 	        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.equals("1080p") || outputmode.equals("1080i") || outputmode.equals("720p"))))){
 				sw.setProperty("sys.hideStatusBar.enable","false");
 				writeFile(VideoDisableFile,"1");
-				writeFile(Fb0Blank,"1");
+				//writeFile(Fb0Blank,"1");
 				Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
 				playermenu.this.sendBroadcast(intent_video_off);
 	        }
@@ -3685,6 +3694,9 @@ public class playermenu extends Activity {
     private Messenger m_PlayerMsg = new Messenger(new Handler() {
 		public Toast tp = null;
     	public void handleMessage(Message msg) {
+				if(mPaused == true){
+					return;
+				}
     		switch(msg.what) {
     			case VideoInfo.TIME_INFO_MSG:
     				//Log.d("wxl","get time "+secToTime((msg.arg1)/1000,false));
@@ -4835,6 +4847,8 @@ Log.d(TAG, "registerReciever(mMountReceiver)");
 			new Thread(killThread).start(); 
 			return;
 		}
+       onPauseDone = false;
+       onDestoryDone = false;
     }
     
     Runnable killThread = new Runnable() {  
