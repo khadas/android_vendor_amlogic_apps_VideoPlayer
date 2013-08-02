@@ -2323,16 +2323,18 @@ public class playermenu extends Activity {
     }
     
     public void onCreate(Bundle savedInstanceState) {
-		sw = (SystemWriteManager) getSystemService("system_write"); 
-		
+        sw = (SystemWriteManager) getSystemService("system_write"); 
+
         fb32 = sw.getPropertyString("sys.fb.bits", "16").equals("32");
         if(fb32) {
             //setTheme(R.style.theme_trans);
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
         } else {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
-	        m3DListener = new VideoListener3D(this);
+        m3DListener = new VideoListener3D(this);
+
+        Errorno.setContext(this);
 
         super.onCreate(savedInstanceState);
         //uncaughtException execute

@@ -76,4 +76,20 @@
 	<string name="searching">Searching...</string>
 	<string name="all_file">All Video Files</string>
 	<string name="not_support_3d">Your device does not support 3D format!</string>
+
+	<string name="unsupport_media">Unsupport Media</string>
+	<string name="unsupport_video_format">Unsupport Video format</string>
+	<string name="unsupport_audio_format">Unsupport Audio format</string>
+	<string name="open_file">Open file ( </string>
+	<string name="parser_file">Parser file ( </string>
+	<string name="failed"> ) failed</string>
+	<string name="decode_init_failed">Decode Init failed</string>
+	<string name="file_have_no_video">file have no video</string>
+	<string name="set_playback_without_video">set playback without video</string>
+	<string name="set_playback_without_audio">set playback without audio</string>
+	<string name="not_authorized_to_play">This player is not authorized to play this video</string>
+	<string name="unsupport_video_codec">Unsupport Video codec</string>
+	<string name="unsupport_ff_fb">Unsupport ff/fb</string>
+	<string name="seek_out_of_range">Seek out of range</string>
+	<string name="unknow_error">Unknow Error</string>
 </resources>

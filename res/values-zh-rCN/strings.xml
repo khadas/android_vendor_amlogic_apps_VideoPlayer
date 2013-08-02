@@ -75,4 +75,20 @@
 	<string name="no_file">没有视频文件！</string>
 	<string name="searching">搜索中...</string>
 	<string name="all_file">视频列表</string>
+	
+	<string name="unsupport_media">不支持媒体文件</string>
+	<string name="unsupport_video_format">不支持视频格式</string>
+	<string name="unsupport_audio_format">不支持音频格式</string>
+	<string name="open_file">打开文件 ( </string>
+	<string name="parser_file">解析文件 ( </string>
+	<string name="failed"> ) 失败</string>
+	<string name="decode_init_failed">解码器初始化失败</string>
+	<string name="file_have_no_video">文件没有视频</string>
+	<string name="set_playback_without_video">没有视频播放</string>
+	<string name="set_playback_without_audio">没有音频播放</string>
+	<string name="not_authorized_to_play">视频播放器没有权限播放该视频</string>
+	<string name="unsupport_video_codec">视频解码器不支持</string>
+	<string name="unsupport_ff_fb">不支持快进快退</string>
+	<string name="seek_out_of_range">搜索超出范围</string>
+	<string name="unknow_error">未知错误</string>
 </resources>
