@@ -1954,53 +1954,57 @@ public class playermenu extends Activity {
 			}
 			return (true);
 		}
-    	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
-            play.requestFocus();
+    else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
+        play.requestFocus();
 
-			int flag = getCurOsdViewFlag();
-			if(OSD_INFO_BAR==flag)
-			{
-				showOsdView();
-			}
-			else if(OSD_MORE_BAR==flag)
-			{
-				switchOsdView();
-			}
+        int flag = getCurOsdViewFlag();
+        if(OSD_INFO_BAR==flag)
+        {
+            showOsdView();
+        }
+        else if(OSD_MORE_BAR==flag)
+        {
+            switchOsdView();
+        }
 
-			if (player_status == VideoInfo.PLAYER_RUNNING) {
-				try	{
-					m_Amplayer.Pause();
-				} 
-				catch(RemoteException e) {
-					e.printStackTrace();
-				}
-			}
-			else if (player_status == VideoInfo.PLAYER_PAUSE) {
-				try	{
-					m_Amplayer.Resume();
-				} 
-				catch(RemoteException e)	{
-					e.printStackTrace();
-				}
-			}
-			else if (player_status == VideoInfo.PLAYER_SEARCHING) {
-				try	{
-					ff_fb.cancel();
-					if(FF_FLAG)
-						m_Amplayer.FastForward(0);
-					if(FB_FLAG)
-						m_Amplayer.BackForward(0);
-					FF_FLAG = false;
-					FB_FLAG = false;
-					FF_LEVEL = 0;
-					FB_LEVEL = 0;
-				} 
-				catch(RemoteException e) {
-					e.printStackTrace();
-				}
-			}
-			return (true);
-		}
+        if (player_status == VideoInfo.PLAYER_RUNNING) {
+            try	{
+                m_Amplayer.Pause();
+                player_status = VideoInfo.PLAYER_PAUSE;
+                play.setImageResource(R.drawable.play);
+            } 
+            catch(RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (player_status == VideoInfo.PLAYER_PAUSE) {
+            try	{
+                m_Amplayer.Resume();
+                player_status = VideoInfo.PLAYER_RUNNING;
+                play.setImageResource(R.drawable.pause);
+            } 
+            catch(RemoteException e)	{
+                e.printStackTrace();
+            }
+        }
+        else if (player_status == VideoInfo.PLAYER_SEARCHING) {
+            try	{
+                ff_fb.cancel();
+                if(FF_FLAG)
+                    m_Amplayer.FastForward(0);
+                if(FB_FLAG)
+                    m_Amplayer.BackForward(0);
+                FF_FLAG = false;
+                FB_FLAG = false;
+                FF_LEVEL = 0;
+                FB_LEVEL = 0;
+            } 
+            catch(RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return (true);
+    }
     	else if (keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
 			if (!INITOK)
 				return false;
