@@ -1745,6 +1745,10 @@ public class playermenu extends Activity {
             touchVolFlag = false;
             waitForHideOsd();
         }
+
+        if(progressSliding == true) {
+            progressSliding = false;
+        }
 		
         return false;
     }
@@ -3861,7 +3865,6 @@ public class playermenu extends Activity {
     				break;
     			case VideoInfo.STATUS_CHANGED_INFO_MSG:
     				player_status = msg.arg1;
-    				
     				switch(player_status) {
 					case VideoInfo.PLAYER_RUNNING:
 						if(!progressSliding)
