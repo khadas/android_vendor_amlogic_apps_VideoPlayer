@@ -200,13 +200,15 @@ public class playermenu extends Activity {
 
 	// MBX freescale mode
 	private int m1080scale = 0;
-	private String outputmode = "720p";
+	//private String outputmode = "720p";
 	private static String VideoDisableFile= "/sys/class/video/disable_video";
 	private static String VideoAxisFile= "/sys/class/video/axis";
 	private static String RegFile= "/sys/class/display/wr_reg";
 	private static String Fb0Blank= "/sys/class/graphics/fb0/blank";
 	private static String Fb1Blank= "/sys/class/graphics/fb1/blank";
-	private static final String STR_OUTPUT_MODE = "ubootenv.var.outputmode";
+	//private static final String STR_OUTPUT_MODE = "ubootenv.var.outputmode";
+	private static String displaymode_path = "/sys/class/display/mode";
+	private String outputmode = readFile(displaymode_path);
 	
 	private boolean intouch_flag = false;
 	private int item_position_selected, item_position_first, fromtop_piexl, item_position_selected_init;
@@ -640,16 +642,23 @@ public class playermenu extends Activity {
                 baselayout2.requestLayout();	                    
 			}
 		}
+
 		
-		if(m1080scale == 2)
-		{
-			FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
-			frameParams.leftMargin = 50;
-			frameParams.width = 1180;
-			frameParams.height = 660;
-			frameParams.gravity = Gravity.TOP;
-			baselayout2.setLayoutParams(frameParams);							
-		}
+            if(m1080scale == 2)
+            {
+                FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) baselayout2.getLayoutParams();
+                frameParams.leftMargin = 50;
+                if((sw.getPropertyBoolean("ro.platform.has.realoutputmode", false)) && (outputmode.contains("1080"))) {
+                    frameParams.width = 1820;
+                    frameParams.height = 1020;
+                }
+                else {
+                    frameParams.width = 1180;
+                    frameParams.height = 660;
+                }
+                frameParams.gravity = Gravity.TOP;
+                baselayout2.setLayoutParams(frameParams);	
+            }
 		
 		if(sw.getPropertyBoolean("3D_setting.enable", false)){
 		    	subTitleView_sm = (SubtitleView) findViewById(R.id.subTitle_more_sm);
@@ -2403,7 +2412,8 @@ public class playermenu extends Activity {
 		m3DListener.setSystemWrite(sw);
 
         m1080scale = sw.getPropertyInt("ro.platform.has.1080scale", 0);
-        outputmode = sw.getProperty(STR_OUTPUT_MODE);
+        //outputmode = sw.getProperty(STR_OUTPUT_MODE);
+        outputmode = readFile(displaymode_path);
         if(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p")))){
             //Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
             //playermenu.this.sendBroadcast(intent_video_on);
@@ -2416,7 +2426,12 @@ public class playermenu extends Activity {
         foreground.setForeground(null);
 		
         if(fb32) {
-            setContentView(R.layout.infobar32);
+            if((true == sw.getPropertyBoolean("ro.platform.has.realoutputmode", false)) && outputmode.contains("1080")) {
+                setContentView(R.layout.infobar32_1080p);
+            }
+            else {
+                setContentView(R.layout.infobar32);
+            }
             setTitle(null);
         } 
         else {
@@ -2543,10 +2558,12 @@ public class playermenu extends Activity {
         	else
         	    SettingsVP.setVideoLayoutMode(0, 0, false);
         }
-		if(m1080scale == 2){            //set video position for MBX 
-		Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
-		playermenu.this.sendBroadcast(intent_videoposition_change);
-		}
+        if(m1080scale == 2){            //set video position for MBX 
+            if(!sw.getPropertyBoolean("ro.platform.has.realoutputmode", false)) {
+                Intent intent_videoposition_change = new Intent(ACTION_VIDEOPOSITION_CHANGE);
+                playermenu.this.sendBroadcast(intent_videoposition_change);
+            }
+        }
         ///SettingsVP.enableVideoLayout();
 //        if(AmPlayer.getProductType() == 1){
 //	        if(SettingsVP.display_mode.equals("480p")) {
@@ -2571,8 +2588,8 @@ public class playermenu extends Activity {
         	else
         		Amplayer_play();
 		}*/
-		
-		set2XScale();
+		if(!sw.getPropertyBoolean("ro.platform.has.realoutputmode", false))
+		    set2XScale();
 
         if(infobar != null) {
             infobar.setVisibility(View.VISIBLE);
@@ -2762,17 +2779,22 @@ public class playermenu extends Activity {
                 }				
 	        } 
     	}
-		if(m1080scale == 2)
-		{
-			linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
-			linearParams.leftMargin = 50;
-           	linearParams.width = 1180;
-           	linearParams.bottomMargin = 40;	        	
-	        subTitleView.setLayoutParams(linearParams);
-			if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
-				subTitleView_sm.setLayoutParams(linearParams);
-			}							
-		}
+        if(m1080scale == 2)
+        {
+            linearParams = (LinearLayout.LayoutParams) subTitleView.getLayoutParams();
+            linearParams.leftMargin = 50;
+            linearParams.bottomMargin = 40;	   
+            if((sw.getPropertyBoolean("ro.platform.has.realoutputmode", false)) && (outputmode.contains("1080"))) {
+                linearParams.width = 1820;
+            }
+            else {
+                linearParams.width = 1180;
+            }
+            subTitleView.setLayoutParams(linearParams);
+            if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
+                subTitleView_sm.setLayoutParams(linearParams);
+            }
+        }
     	new Thread () {
             public void run () {
                 openFile(sub_para.sub_id);
@@ -2814,17 +2836,22 @@ public class playermenu extends Activity {
 	        } 
     	}        
 		
-		if(m1080scale == 2)
-		{
-			linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
-			linearParams.leftMargin = 50;
-           	linearParams.width = 1180;
-           	linearParams.bottomMargin = 40;	        	
-	        subTitleView.setLayoutParams(linearParams);
-			if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
-				subTitleView_sm.setLayoutParams(linearParams);
-			}							
-		}
+        if(m1080scale == 2)
+        {
+            linearParams = (LinearLayout.LayoutParams) infobar.getLayoutParams();
+            linearParams.leftMargin = 50;
+            linearParams.bottomMargin = 40;	   
+            if((sw.getPropertyBoolean("ro.platform.has.realoutputmode", false)) && (outputmode.contains("1080"))) {
+                linearParams.width = 1820;
+            }
+            else {
+                linearParams.width = 1180;
+            }
+            subTitleView.setLayoutParams(linearParams);
+            if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
+                subTitleView_sm.setLayoutParams(linearParams);
+            }	
+        }
 
         myProgressBar = (SeekBar)findViewById(R.id.SeekBar02);
     	cur_time = (TextView)findViewById(R.id.TextView03);
@@ -3196,6 +3223,31 @@ public class playermenu extends Activity {
     	else if(path.startsWith("/mnt/sdcard"))
     		text=path.replaceFirst("/mnt/sdcard","/mnt/sdcard");
     	return text;
+    }
+
+    static String readFile(String fileName){	
+        String res=""; 	
+        File file = new File(fileName);
+        if (!file.exists()) { 
+            Log.e(TAG, "file not exists: "+fileName);
+            return res;
+        }
+        
+        try
+        {
+            BufferedReader in = new BufferedReader(new FileReader(fileName), 32);
+            try
+            {
+                res = in.readLine();
+            }finally {
+                in.close();
+            } 
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "IOException when read "+fileName);
+        } 
+
+        return res;
     }
     
     public static int setCodecMips() {
@@ -3654,13 +3706,16 @@ public class playermenu extends Activity {
 				sw.setProperty("sys.hideStatusBar.enable","false");
 				writeFile(VideoDisableFile,"1");
 				//writeFile(Fb0Blank,"1");
-				Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
-				playermenu.this.sendBroadcast(intent_video_off);
+				if(!sw.getPropertyBoolean("ro.platform.has.realoutputmode", false)) {
+    				Intent intent_video_off = new Intent(ACTION_REALVIDEO_OFF);
+    				playermenu.this.sendBroadcast(intent_video_off);
+                 }
 	        }
 	        
 			writeFile(FormatMVC,FormatMVC_3doff);
 			setMBX3DStatus(0);
-			disable2XScale();
+            if(!sw.getPropertyBoolean("ro.platform.has.realoutputmode", false))
+			    disable2XScale();
 	        ScreenMode.setScreenMode("0"); 
 
             openScreenOffTimeout();
@@ -4758,11 +4813,14 @@ public class playermenu extends Activity {
 		SettingsVP.enableVideoLayout();
 		closeScreenOffTimeout();
 		sw.setProperty("sys.statusbar.forcehide","true");
-        if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p"))))){
-            Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
-            playermenu.this.sendBroadcast(intent_video_on);
-            sw.setProperty("sys.hideStatusBar.enable","true");
-        }
+            outputmode = readFile(displaymode_path);
+            if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p"))))){
+                if(!sw.getPropertyBoolean("ro.platform.has.realoutputmode", false)){
+                    Intent intent_video_on = new Intent(ACTION_REALVIDEO_ON);
+                    playermenu.this.sendBroadcast(intent_video_on);
+                }
+                sw.setProperty("sys.hideStatusBar.enable","true");
+            }
 		resumePlayEnable = false;
 		
 		if(mSuspendFlag) {
@@ -5339,7 +5397,7 @@ Handler mRotateHandler = new Handler() {
 		cancel.setNextFocusRightId(R.id.button_canncel);
 	}
 	private void set3DVideoAxis(){
-       String outputmode = sw.getProperty("ubootenv.var.outputmode");
+       //String outputmode = sw.getProperty("ubootenv.var.outputmode");
 	   if(outputmode.equals("720p")||outputmode.equals("720p50hz")){
 	   		writeFile(VideoAxisFile, "0 0 1280 720");
 	   	}

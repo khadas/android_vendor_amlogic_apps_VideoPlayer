@@ -121,7 +121,7 @@ public class SettingsVP {
         }
 		
         if(sw.getPropertyBoolean("ro.platform.has.mbxuimode", false)){
-            return true;
+            //return true; //wxl debug for real 1080p 20130912
         }
 		//read
 		try
@@ -147,12 +147,30 @@ public class SettingsVP {
 						Videow = Vh;
 						Videoh = Vw;
 					}
-					
+
+                    /*
 					String[] axisstr = dispaxis.split(" ", 5);
 					panel_resolution = axisstr[2]+"x"+axisstr[3];
 					panel_width = Integer.parseInt(axisstr[2]);
 					panel_height = Integer.parseInt(axisstr[3]);
-					Log.d(TAG, "Panel resolution: "+panel_resolution);
+					Log.d(TAG, "Panel resolution: "+panel_resolution);*/
+
+                                    if(dispMode.contains("480")){
+                                        panel_width = 719;
+                                        panel_height = 479;
+                                    }
+                                    else if(dispMode.contains("720")) {
+                                        panel_width= 1280;
+                                        panel_height = 719;
+                                    }
+                                    else if(dispMode.contains("1080")) {
+                                        panel_width = 1919;
+                                        panel_height = 1079;
+                                    }
+                                    else {
+                                        panel_width = 1280;
+                                        panel_height = 719;
+                                    }
 				
 					/*if (dispMode.equals("panel"))
 					{
