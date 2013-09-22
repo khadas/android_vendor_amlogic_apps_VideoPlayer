@@ -1752,9 +1752,23 @@ public class playermenu extends Activity {
         	}
         }
 
-        if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
-            touchVolFlag = true;
-        } 
+    if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
+        touchVolFlag = true;
+    } 
+    else if(keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+        if((morbar.getVisibility() == View.GONE)&&(infobar.getVisibility() == View.GONE)) {
+            showOsdView();
+
+            int flag = getCurOsdViewFlag();
+            if(OSD_INFO_BAR==flag) {
+                if(sw.getPropertyBoolean("ro.platform.has.mbxuimode", false)) {
+                    play.requestFocusFromTouch();
+                    play.requestFocus();
+                }
+            }
+        }
+        return true;
+    }
 		else if (keyCode == KeyEvent.KEYCODE_POWER) {
     		if (player_status == VideoInfo.PLAYER_RUNNING) {
     			try {
