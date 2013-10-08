@@ -318,6 +318,14 @@ public class playermenu extends Activity {
 			angle_table[2] = 2;
 			angle_table[3] = 3;
 		}
+
+		String osd1rotation = sw.getProperty("ro.osd1.rotate");
+		if(osd1rotation != null && osd1rotation.equals("270")) {
+                        angle_table[0] = 3;
+                        angle_table[1] = 0;
+                        angle_table[2] = 1;
+                        angle_table[3] = 2;
+                }
 	}
 	
     private SimpleAdapter getMorebarListAdapter(int id, int pos) {
