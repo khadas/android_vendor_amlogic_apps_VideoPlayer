@@ -4840,8 +4840,16 @@ public class playermenu extends Activity {
 		catch (RemoteException e) { 
 		}
 		
-		SettingsVP.enableVideoLayout();
-		closeScreenOffTimeout();
+            SettingsVP.enableVideoLayout();
+            if(bMediaInfo != null)
+            {
+                if (SystemProperties.getBoolean("ro.vout.dualdisplay4", false))
+                    SettingsVP.setVideoLayoutMode(0, 0, mHdmiPlugged);
+                else {
+                    SettingsVP.setVideoLayoutMode(0, 0, false);
+                }
+            }
+            closeScreenOffTimeout();
 		sw.setProperty("sys.statusbar.forcehide","true");
             outputmode = readFile(displaymode_path);
             if((!resumePlayEnable)&&(m1080scale == 2 || (m1080scale == 1 && (outputmode.contains("1080p") || outputmode.contains("1080i") || outputmode.contains("720p"))))){
