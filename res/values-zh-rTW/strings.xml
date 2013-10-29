@@ -8,6 +8,7 @@
     <string name="color_blue">藍</string>
     <string name="sub_switch">切換:</string>
     <string name="sub_no_subtitle">沒有字幕!</string>
+    <string name="cannot_switch_track">快進快退時不能切換音軌!</string>
     <string name="str_no_file">沒有文件!</string>
     <string name="str_exit">退出</string>
     <string name="setting_resume">斷點播放</string>

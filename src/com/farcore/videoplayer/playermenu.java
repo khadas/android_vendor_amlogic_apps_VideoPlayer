@@ -1136,40 +1136,46 @@ public class playermenu extends Activity {
                     listView.setAdapter(audioarray);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
                         public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                            boolean AudioTrackUnsuppoert = false;
-                            if ((bMediaInfo != null) && (bMediaInfo.getAudioTrackCount()>1)) {
-                                try {
-                                    if(AudioTrackOperation.AudioStreamFormat.get(arg2) != "UNSUPPORT") {
-                                        m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
-                                        Log.d("audiostream","change audio stream to: " + arg2);
-                                        cur_audio_stream = arg2;
-                                        aidResume = arg2;
+                            if(player_status != VideoInfo.PLAYER_SEARCHING) {
+                                boolean AudioTrackUnsuppoert = false;
+                                if ((bMediaInfo != null) && (bMediaInfo.getAudioTrackCount()>1)) {
+                                    try {
+                                        if(AudioTrackOperation.AudioStreamFormat.get(arg2) != "UNSUPPORT") {
+                                            m_Amplayer.SwitchAID(AudioTrackOperation.AudioStreamInfo.get(arg2).audio_id);
+                                            Log.d("audiostream","change audio stream to: " + arg2);
+                                            cur_audio_stream = arg2;
+                                            aidResume = arg2;
+                                        }
+                                        else {
+                                            AudioTrackUnsuppoert = true;
+                                        }
                                     }
-                                    else {
-                                        AudioTrackUnsuppoert = true;
+                                    catch (RemoteException e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        m_Amplayer.GetMediaInfo();
+                                    } 
+                                    catch (RemoteException e) {
+                                        e.printStackTrace();
                                     }
                                 }
-                                catch (RemoteException e) {
-                                    e.printStackTrace();
-                                }
-                                try {
-                                    m_Amplayer.GetMediaInfo();
-                                } 
-                                catch (RemoteException e) {
-                                    e.printStackTrace();
+                                if(AudioTrackUnsuppoert == false) {
+                                    otherbar.setVisibility(View.GONE);
+                                    subTitleView.setViewStatus(true);
+                                    if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
+                                        subTitleView_sm.setViewStatus(true);
+                                    }						
+                                    morbar.setVisibility(View.VISIBLE);
+                                    ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
+                                    audiotrack.requestFocus();
+
+                                    waitForHideOsd();
                                 }
                             }
-                            if(AudioTrackUnsuppoert == false) {
-                                otherbar.setVisibility(View.GONE);
-                                subTitleView.setViewStatus(true);
-                                if(subTitleView_sm!=null&&sw.getPropertyBoolean("3D_setting.enable", false)){
-                                    subTitleView_sm.setViewStatus(true);
-                                }						
-                                morbar.setVisibility(View.VISIBLE);
-                                ImageButton audiotrack = (ImageButton) findViewById(R.id.ChangetrackBtn);
-                                audiotrack.requestFocus();
-
-                                waitForHideOsd();
+                            else {
+                                Toast toast_track_switch =Toast.makeText(playermenu.this, R.string.cannot_switch_track,Toast.LENGTH_SHORT );
+                                toast_track_switch.show();
                             }
                         }	
                     });

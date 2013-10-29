@@ -8,6 +8,7 @@
     <string name="color_blue">Blue</string>
     <string name="sub_switch">switch:</string>
     <string name="sub_no_subtitle">No subtitle!</string>
+    <string name="cannot_switch_track">Can not switch audio track when seeking!</string>
     <string name="str_no_file">No file Found!</string>
     <string name="str_exit">exit</string>
     <string name="setting_resume">Resume Mode</string>
