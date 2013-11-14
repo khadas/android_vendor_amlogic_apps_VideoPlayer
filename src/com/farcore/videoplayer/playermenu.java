@@ -4928,7 +4928,8 @@ public class playermenu extends Activity {
         if(mHdmiPlugged && SystemProperties.getBoolean("ro.vout.dualdisplay4", false)
             && SystemProperties.getBoolean("ro.vout.dualdisplay4.ver-panel", false)) {
             SettingsVP.setVideoRotateAngle(0);    
-        } else {		    
+        } else if((SystemProperties.getBoolean("ro.screen.portrait", false)&&
+            ( SystemProperties.get("ro.product.model","null").contains("M8"))&&mHdmiPlugged)==false){		    
             SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
         }
 			mLastRotation = getRotation;
