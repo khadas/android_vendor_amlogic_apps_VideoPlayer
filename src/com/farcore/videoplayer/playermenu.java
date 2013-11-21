@@ -4928,11 +4928,20 @@ public class playermenu extends Activity {
         if(mHdmiPlugged && SystemProperties.getBoolean("ro.vout.dualdisplay4", false)
             && SystemProperties.getBoolean("ro.vout.dualdisplay4.ver-panel", false)) {
             SettingsVP.setVideoRotateAngle(0);    
+
         } else if((SystemProperties.getBoolean("ro.screen.portrait", false)&&
-            ( SystemProperties.get("ro.product.model","null").contains("M8"))&&mHdmiPlugged)==false){		    
+            ( SystemProperties.getBoolean("ro.module.dualscaler",false))&&mHdmiPlugged)==false){		    
             SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
-        }
+            
+        }else if((SystemProperties.getBoolean("ro.screen.portrait", false)&&
+            ( SystemProperties.getBoolean("ro.module.dualscaler",false))&&(!mHdmiPlugged))==false)
+         {
+            SettingsVP.setVideoRotateAngle(0);    
+         }
+        else
+        {
 			mLastRotation = getRotation;
+		}
 		}
 		
 //        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
