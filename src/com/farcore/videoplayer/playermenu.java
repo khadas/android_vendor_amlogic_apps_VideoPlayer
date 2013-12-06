@@ -5032,7 +5032,11 @@ Handler mRotateHandler = new Handler() {
                     && SystemProperties.getBoolean("ro.vout.dualdisplay4.ver-panel", false)) {
                     SettingsVP.setVideoRotateAngle(0);    
                 } else {				    
-                    SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+                    if(mHdmiPlugged){
+                        SettingsVP.setVideoRotateAngle(0);//we open osd rotation when hdmi plug in ,so no need to rotate video layer
+                    }else {
+                        SettingsVP.setVideoRotateAngle(angle_table[getRotation]);
+                    }
                 }
 					mLastRotation = getRotation;
 				}
