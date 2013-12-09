@@ -2549,7 +2549,12 @@ public class playermenu extends Activity {
 	        public void onReceive(Context context, Intent intent) {
 	        	boolean plugged
 	                = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
-	            
+
+                if(SystemProperties.getBoolean("ro.screen.portrait", false)){
+                    //set mLastRoation =0 to update rotation because mWindowManager.getDefaultDisplay().getRotation() is never changed.
+                    mLastRotation = 0 ;
+                }
+                
 	            if (!sw.getPropertyBoolean("ro.vout.player.exit", true)) {
 					int w = 0;
 					int h = 0;
