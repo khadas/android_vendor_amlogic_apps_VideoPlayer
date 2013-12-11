@@ -4881,17 +4881,18 @@ public class playermenu extends Activity {
 		
 		if(mSuspendFlag) {
 			mSuspendFlag = false;
+                    if ((mHdmiPlugged != mHdmiPluggedBac) && (mHdmiPlugged == true)){
+                	    mHdmiPluggedBac = mHdmiPlugged;
+                	    sendKeyEvent(KeyEvent.KEYCODE_BACK); 
+                         return;
+                	}
+                    
 			playPosition = ResumePlay.check(PlayList.getinstance().getcur());
 
 			if(!NOT_FIRSTTIME)
     			StartPlayerService();
         	else
         		Amplayer_play();
-				
-        	if ((mHdmiPlugged != mHdmiPluggedBac) && (mHdmiPlugged == true)){
-        	    mHdmiPluggedBac = mHdmiPlugged;
-        	    sendKeyEvent(KeyEvent.KEYCODE_BACK); 
-        	}
 			
 //			if ((mHdmiPlugged != mHdmiPluggedBac) && (mHdmiPlugged == true)){
 //				PlayList.getinstance().rootPath =null;
