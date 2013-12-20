@@ -21,11 +21,11 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := VideoPlayer
 LOCAL_CERTIFICATE := platform
-LOCAL_STATIC_JAVA_LIBRARIES := amlogic.subtitle
+#LOCAL_STATIC_JAVA_LIBRARIES := amlogic.subtitle
 
-LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
+#LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
 
-LOCAL_PROGUARD_ENABLED := disabled
+#LOCAL_PROGUARD_ENABLED := disabled
 #LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
 include $(BUILD_PACKAGE)

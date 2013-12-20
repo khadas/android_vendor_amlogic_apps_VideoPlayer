@@ -1,9 +1,9 @@
-package com.farcore.videoplayer;
+package com.meson.videoplayer;
 
 import java.io.File;
 import java.util.List;
 
-import com.farcore.videoplayer.R;
+import com.meson.videoplayer.R;
 
 import android.content.Context;
 import android.graphics.Bitmap;

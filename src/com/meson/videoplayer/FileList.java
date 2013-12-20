@@ -1,4 +1,4 @@
-package com.farcore.videoplayer;
+package com.meson.videoplayer;
 
 import android.os.storage.*;
 import java.io.File;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.farcore.videoplayer.R;
+import com.meson.videoplayer.R;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -31,7 +31,6 @@ import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.SystemProperties;
-import com.farcore.playerservice.SettingsVP;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.System;
@@ -260,7 +259,8 @@ public class FileList extends ListActivity {
 		extensions = getResources().getString(R.string.support_video_extensions);
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-	    setContentView(R.layout.main);
+	    setContentView(R.layout.file_list);
+         PlayList.setContext(this);
 
 		sw = (SystemWriteManager) getSystemService("system_write"); 
 		listAllFiles = sw.getPropertyBoolean("vplayer.listall.enable", false);
@@ -456,11 +456,14 @@ public class FileList extends ListActivity {
 		int i = 0;
 		int dev_usb_count=0;
 		int dev_cd_count=0;
+        Log.i("wxl","[BrowserFile]filePath:"+filePath);
 		file = new File(filePath);
 		listFiles = new ArrayList<File>();
 		items=new ArrayList<String>();
 		paths=new ArrayList<String>();
 		String[] files =file.list();  
+            Log.i("wxl","[BrowserFile]files:"+files);
+             Log.i("wxl","[BrowserFile]files.length:"+files.length);
 		if (files != null) {
 			for(i=0;i<files.length;i++){			
 				if(files[i].equals("VIRTUAL_CDROM")){                    
@@ -471,6 +474,7 @@ public class FileList extends ListActivity {
 		}
 		searchFile(file);
 		if(listFiles.isEmpty()) {
+                    Log.i("wxl","no file 0");
 			Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
 			//paths =currentlist;
 			paths.clear();
@@ -591,11 +595,13 @@ public class FileList extends ListActivity {
     
 	public void searchFile(File file)
 	{
+	    Log.i("wxl","[searchFile]file:"+file);
 	    File[] the_Files;
 	    the_Files = file.listFiles(new MyFilter(extensions));
 	
 	    if(the_Files == null)
 	    {
+	        Log.i("wxl","no file 1");
 		  Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
 		  return;
 		 }
@@ -809,16 +815,17 @@ public class FileList extends ListActivity {
 		    bundle.putIntegerArrayList("fileDirectory_position_piexl", fileDirectory_position_piexl);
 		}
 	    bundle.putBoolean("backToOtherAPK", false);
-		intent.setClass(FileList.this, playermenu.class);
-		intent.putExtras(bundle);
+        intent.setClass(FileList.this, VideoPlayer.class);
+        intent.putExtras(bundle);
 
-		SettingsVP.setSystemWrite(sw);
-		if(SettingsVP.chkEnableOSD2XScale() == true)
-  	  		this.setVisible(false);
+        ///wxl delete
+        /*SettingsVP.setSystemWrite(sw);
+        if(SettingsVP.chkEnableOSD2XScale() == true)
+            this.setVisible(false);*/
 
-		startActivity(intent);
-		FileList.this.finish();
-	}
+        startActivity(intent);
+        FileList.this.finish();
+    }
 	
 	public int filterDir(File file)
 	{
@@ -874,7 +881,7 @@ public class FileList extends ListActivity {
 	        case MENU_ABOUT:
 				try {
 					Toast.makeText(FileList.this, " VideoPlayer \n Version: " +
-		        			FileList.this.getPackageManager().getPackageInfo("com.farcore.videoplayer", 0).versionName,
+                    FileList.this.getPackageManager().getPackageInfo("com.meson.videoplayer", 0).versionName,
 		        			Toast.LENGTH_SHORT)
 		        			.show();
 				} catch (NameNotFoundException e) {

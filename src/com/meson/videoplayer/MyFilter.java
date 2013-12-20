@@ -1,4 +1,4 @@
-package com.farcore.videoplayer;
+package com.meson.videoplayer;
 
 import java.io.File; 
 import java.io.FileFilter; 
