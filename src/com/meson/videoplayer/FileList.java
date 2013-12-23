@@ -456,14 +456,11 @@ public class FileList extends ListActivity {
 		int i = 0;
 		int dev_usb_count=0;
 		int dev_cd_count=0;
-        Log.i("wxl","[BrowserFile]filePath:"+filePath);
 		file = new File(filePath);
 		listFiles = new ArrayList<File>();
 		items=new ArrayList<String>();
 		paths=new ArrayList<String>();
 		String[] files =file.list();  
-            Log.i("wxl","[BrowserFile]files:"+files);
-             Log.i("wxl","[BrowserFile]files.length:"+files.length);
 		if (files != null) {
 			for(i=0;i<files.length;i++){			
 				if(files[i].equals("VIRTUAL_CDROM")){                    
@@ -474,7 +471,6 @@ public class FileList extends ListActivity {
 		}
 		searchFile(file);
 		if(listFiles.isEmpty()) {
-                    Log.i("wxl","no file 0");
 			Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
 			//paths =currentlist;
 			paths.clear();
@@ -595,13 +591,11 @@ public class FileList extends ListActivity {
     
 	public void searchFile(File file)
 	{
-	    Log.i("wxl","[searchFile]file:"+file);
 	    File[] the_Files;
 	    the_Files = file.listFiles(new MyFilter(extensions));
 	
 	    if(the_Files == null)
 	    {
-	        Log.i("wxl","no file 1");
 		  Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
 		  return;
 		 }

@@ -69,7 +69,7 @@ import java.util.TimerTask;
 
 public class VideoPlayer extends Activity { 
     private static String TAG = "VideoPlayer";
-    private boolean DEBUG = false;
+    private boolean DEBUG = true;
     private Context mContext;
     
     private static SystemWriteManager sw; 
@@ -293,11 +293,13 @@ public class VideoPlayer extends Activity {
             curtime = getCurrentPosition();
             totaltime = getDuration();
 
-            if(curtime <= 1000) { //current time is equal or smaller than 1S stop fw/fb
+            // add for seeking to head
+            /*if(curtime <= 1000) { //current time is equal or smaller than 1S stop fw/fb
                 stopFWFB();
                 mState = STATE_PLAYING;
                 updateIconResource();
-            }
+            }*/
+                
             //LOGI(TAG,"[updateProgressbar]curtime:"+curtime+",totaltime:"+totaltime);
             if(curTimeTx!=null && totalTimeTx!=null && progressBar!=null) {
                 int flag = getCurOsdViewFlag();
@@ -1107,18 +1109,10 @@ public class VideoPlayer extends Activity {
     }
 
     private void displayModeImpl () {
-        // TODO: implement display mode switch
-        Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
-        toast.setGravity(Gravity.BOTTOM,110,0);
-        toast.setDuration(0x00000001);
-        toast.show();
-        startOsdTimeout();
-        return;
-        /*
-        LOGI(TAG,"[displayModeImpl]");
-        if(mOption != null) {
-            //mOption.getDisplayMode();
-        }*/
+        if (mMediaPlayer != null && mOption != null) {
+            LOGI(TAG,"[displayModeImpl]mode:"+mOption.getDisplayMode());
+            mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_FORCE_SCREEN_MODE,mOption.getDisplayMode());
+        }
     }
 
     private void audioTrackImpl(int idx) {
@@ -1403,6 +1397,7 @@ public class VideoPlayer extends Activity {
             LOGI(TAG,"[FBimpl]para:"+para);
             if(para > 0) {
                 mState = STATE_SEARCHING;
+                mStateBac = STATE_PLAYING; // add to update icon resource and status for FB to head 
             }
             else if(para == 0) {
                 mState = STATE_PLAYING;
@@ -1457,7 +1452,6 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[start]mMediaPlayer:"+mMediaPlayer);
         if(mMediaPlayer != null) {
             mMediaPlayer.start();
-            Log.i("wxl","[mPreparedListener]mMediaPlayer.isPlaying():"+mMediaPlayer.isPlaying());
             mState = STATE_PLAYING;
             updateIconResource();
             
@@ -1701,6 +1695,8 @@ public class VideoPlayer extends Activity {
                     mStateBac = STATE_ERROR;
                     LOGI(TAG,"[onSeekComplete]mStateBac = STATE_ERROR.");
                 }
+
+                mStateBac = STATE_STOP;
             }
 
             //start update progress bar
