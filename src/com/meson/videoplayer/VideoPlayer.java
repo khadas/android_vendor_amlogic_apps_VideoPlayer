@@ -6,6 +6,8 @@ import android.app.AlertDialog.Builder;
 import android.app.SystemWriteManager; 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContentResolver;
+import android.content.res.AssetFileDescriptor;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
@@ -69,7 +71,7 @@ import java.util.TimerTask;
 
 public class VideoPlayer extends Activity { 
     private static String TAG = "VideoPlayer";
-    private boolean DEBUG = true;
+    private boolean DEBUG = false;
     private Context mContext;
     
     private static SystemWriteManager sw; 
@@ -152,7 +154,6 @@ public class VideoPlayer extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LOGI(TAG,"[onCreate]");
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.control_bar);
         setTitle(null);
 
@@ -306,7 +307,9 @@ public class VideoPlayer extends Activity {
                 if((OSD_CTL_BAR == flag) &&  (null!=ctlbar)&&(View.VISIBLE==ctlbar.getVisibility())) { // check control bar is showing
                     curTimeTx.setText(secToTime(curtime/1000));
                     totalTimeTx.setText(secToTime(totaltime/1000));
-                    progressBar.setProgress(curtime*100/totaltime);
+                    if(totaltime != 0) {
+                        progressBar.setProgress(curtime*100/totaltime);
+                    }
                 }
             }
         }
@@ -380,7 +383,7 @@ public class VideoPlayer extends Activity {
     
     private void initView() {
         LOGI(TAG,"initView");
-        mContext = VideoPlayer.this;//getApplicationContext();
+        mContext = this.getApplicationContext();
         initVideoView();
 
         ff_fb =Toast.makeText(VideoPlayer.this, "",Toast.LENGTH_SHORT );
@@ -574,6 +577,7 @@ public class VideoPlayer extends Activity {
     private void initVideoView() {
         LOGI(TAG,"[initVideoView]");
         mVideoView = (VideoView) findViewById(R.id.VideoView);
+        showSystemUi(false);
         //getHolder().setFormat(PixelFormat.VIDEO_HOLE_REAL);
         if(mVideoView != null) {
             mVideoView.getHolder().addCallback(mSHCallback);
@@ -614,11 +618,12 @@ public class VideoPlayer extends Activity {
                     if(ext.equals("rm") || ext.equals("rmvb") || ext.equals("avi")|| ext.equals("mkv") || 
                         ext.equals("mp4")|| ext.equals("wmv") || ext.equals("mov")|| ext.equals("flv") ||
                         ext.equals("asf")|| ext.equals("3gp")|| ext.equals("mpg") || ext.equals("mvc")||
-                        ext.equals("m2ts")|| ext.equals("ts")|| ext.equals("swf") ||
-                        ext.equals("divx")|| ext.equals("3gp2")|| ext.equals("3gpp") ||
+                        ext.equals("m2ts")|| ext.equals("ts")|| ext.equals("swf") || ext.equals("mlv") ||
+                        ext.equals("divx")|| ext.equals("3gp2")|| ext.equals("3gpp") || ext.equals("h265") ||
                         ext.equals("m4v")|| ext.equals("mts")|| ext.equals("tp") || ext.equals("bit") ||
                         ext.equals("webm")|| ext.equals("3g2")|| ext.equals("f4v") || ext.equals("pmp") ||
-                        ext.equals("mpeg") || ext.equals("vob") || ext.equals("dat") || ext.equals("m2v")) {
+                        ext.equals("mpeg") || ext.equals("vob") || ext.equals("dat") || ext.equals("m2v") ||
+                        ext.equals("iso")) {
                         list.add(pathFull); 
                     }
                 }
@@ -956,7 +961,6 @@ public class VideoPlayer extends Activity {
         toast.show();
         startOsdTimeout();
         return;
-        //wxl close for android_kk
         /*
         subtitle_prepare();
         LOGI(TAG,"[subtitleSelect] sub_para.totalnum:"+sub_para.totalnum);
@@ -1549,12 +1553,82 @@ public class VideoPlayer extends Activity {
             //updateIconResource();
         } 
     }
-
+    
     private void setVideoPath(String path) {
+        //LOGI(TAG,"[setVideoPath]path:"+path);
+        /*Uri uri = null;
+        String[] cols = new String[] {
+            MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.DATA
+        };
+        
+        if(mContext == null) {
+            LOGE(TAG,"[setVideoPath]mContext=null error!!!");
+            return;
+        }
+
+        //change path to uri such as content://media/external/video/media/8206
+        ContentResolver resolver = mContext.getContentResolver();
+        String where = MediaStore.Video.Media.DATA + "=?" + path;
+        Cursor cursor = resolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cols, where , null, null);
+        if (cursor != null && cursor.getCount() == 1) {
+            int colidx = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
+            cursor.moveToFirst();
+            int id = cursor.getInt(colidx);
+            uri = MediaStore.Video.Media.getContentUri("external");
+            String uriStr = uri.toString() + "/" + Integer.toString(id);
+            uri = Uri.parse(uriStr);
+            LOGI(TAG,"[setVideoPath]uri:"+uri.toString());
+        }
+
+        if(uri == null) {
+            LOGE(TAG,"[setVideoPath]uri=null error!!!");
+            return;
+        }
+        setVideoURI(uri);*/
+
+        /*LOGI(TAG,"[setVideoPath]Uri.parse(path):"+Uri.parse(path));
+        Uri uri = Uri.parse(path);
+        AssetFileDescriptor fd = null;
+        try {
+            ContentResolver resolver = mContext.getContentResolver();
+            fd = resolver.openAssetFileDescriptor(uri, "r");
+            if (fd == null) {
+                LOGE(TAG,"[setVideoPath]fd =null error!!!");
+                return;
+            }
+            if (fd.getDeclaredLength() < 0) {
+                mMediaPlayer.setDataSource(fd.getFileDescriptor());
+            } else {
+                mMediaPlayer.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getDeclaredLength());
+            }
+            mMediaPlayer.prepare();
+            return;
+        } catch (SecurityException ex) {
+            LOGE(TAG, "[SecurityException]Unable to open content: " + mUri+",ex:"+ex);
+            mState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+        } catch (IOException ex) {
+            LOGE(TAG, "[IOException]Unable to open content: " + mUri+",ex:"+ex);
+            mState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+        } catch (IllegalArgumentException ex) {
+            LOGE(TAG, "[IllegalArgumentException]Unable to open content: " + mUri+",ex:"+ex);
+            mState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+        }finally {
+            if (fd != null) {
+                try {
+                    fd.close();
+                } catch (IOException ex) {}
+            }
+        }*/
+
         LOGI(TAG,"[setVideoPath]Uri.parse(path):"+Uri.parse(path));
         setVideoURI(Uri.parse(path));
     }
 
+    //----not used----
     private void setVideoURI(Uri uri) {
         LOGI(TAG,"[setVideoURI]uri:"+uri);
         setVideoURI(uri, null);
@@ -1579,6 +1653,7 @@ public class VideoPlayer extends Activity {
         //requestLayout();
         //invalidate();
     }
+    //----end not used----
 
     private void initPlayer() {
         LOGI(TAG,"[initPlayer]mSurfaceHolder:"+mSurfaceHolder);
@@ -1995,6 +2070,7 @@ public class VideoPlayer extends Activity {
             otherwidget.setVisibility(View.GONE);
         if ((null!=infowidget)&&(View.VISIBLE==infowidget.getVisibility()))
             infowidget.setVisibility(View.GONE);
+        showSystemUi(false);
 
         //@@getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
         //@@WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -2023,6 +2099,7 @@ public class VideoPlayer extends Activity {
                 showCtlBar();
             break;
         }
+        showSystemUi(true);
     }
 
     private void switchOsdView() {
@@ -2046,6 +2123,21 @@ public class VideoPlayer extends Activity {
                 showCtlBar();
             break;
         }
+    }
+
+    private void showSystemUi(boolean visible) {
+        //int flag = View.SYSTEM_UI_FLAG_FULLSCREEN //View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            //| View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        int flag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        if (!visible) {
+        // We used the deprecated "STATUS_BAR_HIDDEN" for unbundling
+        flag |= View.STATUS_BAR_HIDDEN | View.SYSTEM_UI_FLAG_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+        mVideoView.setSystemUiVisibility(flag);
     }
 
     //@@--------this part for touch and key event-------------------------------------------------------------------
@@ -2308,16 +2400,13 @@ public class VideoPlayer extends Activity {
     }
 
     private void subtitle_prepare() {
-        //wxl close for android_kk
-        /*
         if(mMediaPlayer != null) {
             sub_para.totalnum = mMediaPlayer.subtitleTotal();
-        }*/
+        }
     }
 
     private void setSubtitleView() {
-        //wxl close for android_kk
-        /*LOGI(TAG,"[setSubtitleView]mMediaPlayer:"+mMediaPlayer);
+        LOGI(TAG,"[setSubtitleView]mMediaPlayer:"+mMediaPlayer);
         if(mMediaPlayer != null) {
             mMediaPlayer.subtitleClear();
             mMediaPlayer.subtitleSetGravity(Gravity.CENTER);
@@ -2325,12 +2414,11 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.subtitleSetTextSize(sub_para.font);
             mMediaPlayer.subtitleSetTextStyle(Typeface.BOLD);
             mMediaPlayer.subtitleSetPosHeight(getWindowManager().getDefaultDisplay().getHeight()*sub_para.position_v/20+10);
-        }*/
+        }
     }
 
     private void subtitle_control() {
-        //wxl close for android_kk
-        /*LOGI(TAG,"[subtitle_control]");
+        LOGI(TAG,"[subtitle_control]");
         
         final String color_text[]={ 
             VideoPlayer.this.getResources().getString(R.string.color_white),
@@ -2518,7 +2606,7 @@ public class VideoPlayer extends Activity {
         }
         else {
             initSubSetOptions(color_text);
-        }*/
+        }
     }
 	
     private void initSubSetOptions(String color_text[]) {
@@ -2741,6 +2829,10 @@ public class VideoPlayer extends Activity {
                             map.put("item_name", mMediaInfo.getAudioFormatStr(mMediaInfo.getAudioFormat(i)));
                             map.put("item_sel", R.drawable.item_img_unsel);
                             list.add(map);
+                    }
+                    LOGI(TAG,"list.size():"+list.size()+",pos:"+pos+",audio_total_num:"+audio_total_num);
+                    if(pos < 0) {
+                        pos = 0;
                     }
                     list.get(pos).put("item_sel", R.drawable.item_img_sel);
                 }
