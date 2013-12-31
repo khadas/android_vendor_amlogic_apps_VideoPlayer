@@ -183,7 +183,7 @@ public class VideoPlayer extends Activity {
         }
 
         //WakeLock acquire
-        //closeScreenOffTimeout();
+        closeScreenOffTimeout();
         
         // Tell the music playback service to pause
         Intent intent = new Intent("com.android.music.musicservicecommand");
@@ -206,8 +206,10 @@ public class VideoPlayer extends Activity {
                     String tempP = mPlayList.get(i);
                     if(tempP.equals(path)) {
                         // find the same file in the list and play
-                        LOGI(TAG,"[onResume] start resume play");
+                        LOGI(TAG,"[onResume] start resume play, path:"+path);
                         initVideoView();
+                        initPlayer();
+                        playFile(path);
                         break;
                     }
                 }
@@ -241,7 +243,7 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        //openScreenOffTimeout();
+        openScreenOffTimeout();
         unregisterHdmiReceiver();
         unregisterMountReceiver();
         unregisterPowerReceiver();
@@ -261,6 +263,9 @@ public class VideoPlayer extends Activity {
             mResumePlay.setEnable(true); //resume play function ON/OFF
             if(true == mResumePlay.getEnable()) {
                 mResumePlay.set(mPlayList.getcur(), curtime);
+                LOGI(TAG,"[onPause]mStateBac:"+mState);
+                mStateBac = mState;
+                stop();
             }
         }
     }
@@ -620,10 +625,10 @@ public class VideoPlayer extends Activity {
                         ext.equals("asf")|| ext.equals("3gp")|| ext.equals("mpg") || ext.equals("mvc")||
                         ext.equals("m2ts")|| ext.equals("ts")|| ext.equals("swf") || ext.equals("mlv") ||
                         ext.equals("divx")|| ext.equals("3gp2")|| ext.equals("3gpp") || ext.equals("h265") ||
-                        ext.equals("m4v")|| ext.equals("mts")|| ext.equals("tp") || ext.equals("bit") ||
+                        ext.equals("m4v")|| ext.equals("mts")|| ext.equals("tp") || ext.equals("bit") || 
                         ext.equals("webm")|| ext.equals("3g2")|| ext.equals("f4v") || ext.equals("pmp") ||
                         ext.equals("mpeg") || ext.equals("vob") || ext.equals("dat") || ext.equals("m2v") ||
-                        ext.equals("iso")) {
+                        ext.equals("iso") || ext.equals("hm10")) {
                         list.add(pathFull); 
                     }
                 }
@@ -759,6 +764,7 @@ public class VideoPlayer extends Activity {
 
     SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+            LOGI(TAG,"[surfaceChanged]format:"+format+",w:"+w+",h:"+h);
             //@@
             /*mSurfaceWidth = w;
             mSurfaceHeight = h;
@@ -1479,7 +1485,7 @@ public class VideoPlayer extends Activity {
 
     private void stop() {
         LOGI(TAG,"[stop]mMediaPlayer:"+mMediaPlayer);
-        if(mMediaPlayer != null) {
+        if(mMediaPlayer != null && mState != STATE_STOP) {
             mMediaPlayer.stop();
             mMediaPlayer.reset();
             mState = STATE_STOP;
@@ -1493,6 +1499,7 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.release();
             mMediaPlayer = null;
             mState = STATE_STOP;
+            mStateBac = STATE_STOP;
             mSeekState = SEEK_END;
         }
     }
@@ -1716,7 +1723,12 @@ public class VideoPlayer extends Activity {
             
             if(mResumePlay.getEnable() == true) {
                 mResumePlay.setEnable(false);
+                int targetState = mStateBac; //get mStateBac first for seekTo will change mStateBac
                 seekTo(mResumePlay.getTime());
+                LOGI(TAG,"[mPreparedListener]targetState:"+targetState);
+                if(targetState == STATE_PAUSED) {
+                    pause();
+                }
                 return;
             }
             
@@ -2126,9 +2138,6 @@ public class VideoPlayer extends Activity {
     }
 
     private void showSystemUi(boolean visible) {
-        //int flag = View.SYSTEM_UI_FLAG_FULLSCREEN //View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            //| View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
         int flag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
