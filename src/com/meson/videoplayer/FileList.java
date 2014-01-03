@@ -79,7 +79,7 @@ public class FileList extends ListActivity {
 	private ArrayList<Integer> fileDirectory_position_selected = new ArrayList<Integer>();
 	private ArrayList<Integer> fileDirectory_position_piexl = new ArrayList<Integer>();
 	private int pathLevel = 0;
-	private final String iso_mount_dir = "/mnt/VIRTUAL_CDROM";
+	private final String iso_mount_dir = "/storage/external_storage/VIRTUAL_CDROM";
 	private Uri uri;
 	private SystemWriteManager sw;
 	
