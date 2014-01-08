@@ -796,11 +796,19 @@ public class VideoPlayer extends Activity {
     //@@--------this part for broadcast receiver-------------------------------------------------------------------------------------
     private final String POWER_KEY_SUSPEND_ACTION = "com.amlogic.vplayer.powerkey";
     private boolean isEjectOrUnmoutProcessed = false;
+    private boolean isHdmiPluggedbac = false;
     private boolean isHdmiPlugged = false;
 
     private BroadcastReceiver mHdmiReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            boolean isHdmiPlugged = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
+            isHdmiPlugged = intent.getBooleanExtra(WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false); 
+            if((isHdmiPluggedbac != isHdmiPlugged) && (isHdmiPlugged == false)) {
+                 if(mState == STATE_PLAYING) {
+                    pause();
+                }
+                startOsdTimeout();
+            }
+            isHdmiPluggedbac = isHdmiPlugged;
         }
     };
 
@@ -2319,14 +2327,18 @@ public class VideoPlayer extends Activity {
             playNext();    			
         }
         else if(keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD) {
-            fastForward();
-            fastforwordBtn.requestFocusFromTouch();
-            fastforwordBtn.requestFocus();
+            if(mCanSeek) {
+                fastForward();
+                fastforwordBtn.requestFocusFromTouch();
+                fastforwordBtn.requestFocus();
+            }
         }
         else if(keyCode == KeyEvent.KEYCODE_MEDIA_REWIND) {
-            fastBackward();
-            fastreverseBtn.requestFocusFromTouch();
-            fastreverseBtn.requestFocus(); 
+            if(mCanSeek) {
+                fastBackward();
+                fastreverseBtn.requestFocusFromTouch();
+                fastreverseBtn.requestFocus(); 
+            }
         } 
         else if (keyCode == KeyEvent.KEYCODE_MUTE) {
             int flag = getCurOsdViewFlag();
