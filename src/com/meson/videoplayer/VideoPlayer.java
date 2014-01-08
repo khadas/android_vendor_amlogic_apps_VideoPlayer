@@ -207,9 +207,16 @@ public class VideoPlayer extends Activity {
                     if(tempP.equals(path)) {
                         // find the same file in the list and play
                         LOGI(TAG,"[onResume] start resume play, path:"+path);
-                        initVideoView();
-                        initPlayer();
-                        playFile(path);
+                        if(new File(path).exists()) {
+                            initVideoView();
+                            initPlayer();
+                            playFile(path);
+                        }
+                        else {
+                            if(mContext != null)
+                                Toast.makeText(mContext,mContext.getText(R.string.str_no_file),Toast.LENGTH_SHORT).show();  
+                            browserBack();
+                        }
                         break;
                     }
                 }
@@ -269,7 +276,6 @@ public class VideoPlayer extends Activity {
             }
         }
     }
-
 
     //@@--------this part for message handle---------------------------------------------------------------------
     private static final long MSG_SEND_DELAY = 0; //1000;//1s
@@ -1190,6 +1196,7 @@ public class VideoPlayer extends Activity {
 
     private void resetVariate() {
         progressBarSeekFlag = false;
+        haveTried = false;
     }
     
     private void playFile(String path) {
@@ -1643,7 +1650,6 @@ public class VideoPlayer extends Activity {
         setVideoURI(Uri.parse(path));
     }
 
-    //----not used----
     private void setVideoURI(Uri uri) {
         LOGI(TAG,"[setVideoURI]uri:"+uri);
         setVideoURI(uri, null);
@@ -1658,8 +1664,14 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.prepare();
         } catch (IOException ex) {
             LOGE(TAG, "Unable to open content: " + mUri+",ex:"+ex);
-            mState = STATE_ERROR;
-            mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+            if(haveTried == false) {
+                haveTried = true;
+                trySetVideoURIAgain(uri, headers);
+            }
+            else {
+                mState = STATE_ERROR;
+                mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+            }
         } catch (IllegalArgumentException ex) {
             LOGE(TAG, "Unable to open content: " + mUri+",ex:"+ex);
             mState = STATE_ERROR;
@@ -1668,7 +1680,67 @@ public class VideoPlayer extends Activity {
         //requestLayout();
         //invalidate();
     }
-    //----end not used----
+
+    private boolean haveTried = false;
+    private void trySetVideoURIAgain(Uri uri, Map<String, String> headers) {
+        if(uri == null) {
+            LOGE(TAG,"[trySetVideoURIAgain]init uri=null error!!!");
+            return;
+        }
+
+        if(mContext == null) {
+            LOGE(TAG,"[trySetVideoURIAgain]mContext=null error!!!");
+            return;
+        }
+        
+        LOGI(TAG,"[trySetVideoURIAgain]path:"+uri.getPath());
+        Uri uriTmp = null;
+        String path = uri.getPath();
+        String[] cols = new String[] {
+            MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.DATA
+        };
+        
+        //change path to uri such as content://media/external/video/media/8206
+        ContentResolver resolver = mContext.getContentResolver();
+        Cursor cursor = resolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cols, null, null, null);
+        if(cursor != null && cursor.getCount() > 0) {
+            int destIdx = -1;
+            int len = cursor.getCount();
+            LOGI(TAG,"[trySetVideoURIAgain]len:"+len); 
+            String [] pathList = new String[len];
+            cursor.moveToFirst();
+            int dataIdx = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            int idIdx = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
+            for(int i=0;i<len;i++) {
+                LOGI(TAG,"[trySetVideoURIAgain]cursor.getString(dataIdx):"+cursor.getString(dataIdx)); 
+                if((cursor.getString(dataIdx)).startsWith(path)) {
+                    destIdx = cursor.getInt(idIdx);
+                    LOGI(TAG,"[trySetVideoURIAgain]destIdx:"+destIdx); 
+                    break;
+                }
+                else {
+                    cursor.moveToNext();
+                }
+            }
+
+            if(destIdx >= 0) {
+                uriTmp = MediaStore.Video.Media.getContentUri("external");
+                String uriStr = uriTmp.toString() + "/" + Integer.toString(destIdx);
+                uriTmp = Uri.parse(uriStr);
+                LOGI(TAG,"[trySetVideoURIAgain]uriTmp:"+uriTmp.toString());  
+            }
+        }
+
+        cursor.close();
+
+        if(uriTmp == null) {
+            LOGE(TAG,"[trySetVideoURIAgain]uriTmp=null error!!!");
+            return;
+        }
+        LOGI(TAG,"[trySetVideoURIAgain]setVideoURI uriTmp:"+uriTmp);  
+        setVideoURI(uriTmp);
+    }
 
     private void initPlayer() {
         LOGI(TAG,"[initPlayer]mSurfaceHolder:"+mSurfaceHolder);
