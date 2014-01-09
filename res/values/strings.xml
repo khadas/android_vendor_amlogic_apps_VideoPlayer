@@ -93,4 +93,5 @@
 	<string name="unsupport_ff_fb">Unsupport ff/fb</string>
 	<string name="seek_out_of_range">Seek out of range</string>
 	<string name="unknow_error">Unknow Error</string>
+	<string name="wait_for_scan">Media scanning, please try again a few time later.</string>
 </resources>

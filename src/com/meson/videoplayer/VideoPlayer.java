@@ -209,8 +209,9 @@ public class VideoPlayer extends Activity {
                         LOGI(TAG,"[onResume] start resume play, path:"+path);
                         if(new File(path).exists()) {
                             initVideoView();
-                            initPlayer();
-                            playFile(path);
+                            //file play will do in surface create
+                            //initPlayer();
+                            //playFile(path);
                         }
                         else {
                             if(mContext != null)
@@ -228,7 +229,9 @@ public class VideoPlayer extends Activity {
     public void onDestroy() {
         super.onDestroy();
         LOGI(TAG,"[onDestroy]");
-        //mResumePlay.setEnable(false); //disable resume play
+        if(mResumePlay != null) {
+            mResumePlay.setEnable(false); //disable resume play 
+        }
         release();
     }
 
@@ -788,13 +791,52 @@ public class VideoPlayer extends Activity {
             LOGI(TAG,"[surfaceCreated]");
             mSurfaceHolder = holder;
             initPlayer();
-            LOGI(TAG,"[surfaceCreated]path:"+mPlayList.getcur());
-            playFile(mPlayList.getcur());
+            LOGI(TAG,"[surfaceCreated]mResumePlay:"+mResumePlay);
+            if(mResumePlay != null) {
+                LOGI(TAG,"[surfaceCreated]mResumePlay.getEnable():"+mResumePlay.getEnable());
+                if(mResumePlay.getEnable() == true) {
+                    LOGI(TAG,"[surfaceCreated] mResumePlay.getFilepath():"+mResumePlay.getFilepath());
+                    String path = mResumePlay.getFilepath();
+
+                    if(mPlayList != null) {
+                        if(mPlayList.getindex()<0) {
+                            List<String> paths = new ArrayList<String>();
+                            Uri uri = Uri.parse(path);
+                            if(uri != null) {
+                                int pos = getCurDirFile(uri, paths);
+                                if(pos != -1) {
+                                    mPlayList.setlist(paths, pos);
+                                }
+                            }
+                        }
+                        path = mPlayList.getcur();
+                        LOGI(TAG,"[surfaceCreated]mResumePlay prepare path:"+path);
+                        if(path != null) {
+                            playFile(path);
+                        }
+                        else {
+                            browserBack();
+                        }
+                    }
+                    else {
+                        browserBack(); // mPlayList is null, resume play function error, and then back to file list
+                    }
+                }
+                else {
+                    LOGI(TAG,"[surfaceCreated]0path:"+mPlayList.getcur());
+                    playFile(mPlayList.getcur());
+                }
+            }
+            else {
+                LOGI(TAG,"[surfaceCreated]1path:"+mPlayList.getcur());
+                playFile(mPlayList.getcur());
+            }
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
             LOGI(TAG,"[surfaceDestroyed]");
             mSurfaceHolder = null;
+            mVideoView = null;
             release();
         }
     };
@@ -1222,6 +1264,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void browserBack() {
+        LOGI(TAG,"[browserBack]");
         item_position_selected = item_position_selected_init + mPlayList.getindex();
         backToFileList = true;
         //mPlayList.rootPath = null;
@@ -1514,7 +1557,7 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.release();
             mMediaPlayer = null;
             mState = STATE_STOP;
-            mStateBac = STATE_STOP;
+            //mStateBac = STATE_STOP; //shield for resume play while is in pause status
             mSeekState = SEEK_END;
         }
     }
@@ -1736,6 +1779,8 @@ public class VideoPlayer extends Activity {
 
         if(uriTmp == null) {
             LOGE(TAG,"[trySetVideoURIAgain]uriTmp=null error!!!");
+            Toast.makeText(mContext,mContext.getText(R.string.wait_for_scan),Toast.LENGTH_SHORT).show();  
+            browserBack();
             return;
         }
         LOGI(TAG,"[trySetVideoURIAgain]setVideoURI uriTmp:"+uriTmp);  
@@ -1795,7 +1840,9 @@ public class VideoPlayer extends Activity {
                 mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
             }
 
-            start();
+            if(mStateBac != STATE_PAUSED) {
+                start();
+            }
             initSubtitle();
             initMediaInfo();
             // TODO: should open
@@ -1804,9 +1851,11 @@ public class VideoPlayer extends Activity {
             if(mResumePlay.getEnable() == true) {
                 mResumePlay.setEnable(false);
                 int targetState = mStateBac; //get mStateBac first for seekTo will change mStateBac
+                mState = mStateBac; //prepare mState before seekTo 
                 seekTo(mResumePlay.getTime());
                 LOGI(TAG,"[mPreparedListener]targetState:"+targetState);
                 if(targetState == STATE_PAUSED) {
+                    start();
                     pause();
                 }
                 return;
@@ -1846,7 +1895,7 @@ public class VideoPlayer extends Activity {
     private MediaPlayer.OnSeekCompleteListener mSeekCompleteListener = 
         new MediaPlayer.OnSeekCompleteListener() {
         public void onSeekComplete(MediaPlayer mp) {
-            LOGI(TAG,"[onSeekComplete] progressBarSeekFlag:"+progressBarSeekFlag);
+            LOGI(TAG,"[onSeekComplete] progressBarSeekFlag:"+progressBarSeekFlag+",mStateBac:"+mStateBac);
 
             if(progressBarSeekFlag == false) { //onStopTrackingTouch
                 if(mStateBac == STATE_PLAYING) {
@@ -2218,6 +2267,10 @@ public class VideoPlayer extends Activity {
     }
 
     private void showSystemUi(boolean visible) {
+        if(mVideoView == null) {
+            return;
+        }
+        
         int flag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;

@@ -92,5 +92,5 @@
 	<string name="unsupport_ff_fb">不支持快進快退</string>
 	<string name="seek_out_of_range">蒐索超齣範圍</string>
 	<string name="unknow_error">未知錯誤</string>
-
+	<string name="wait_for_scan">媒體文件蒐索中，請稍後再試。</string>
 </resources>
