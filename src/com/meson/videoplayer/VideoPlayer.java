@@ -123,6 +123,7 @@ public class VideoPlayer extends Activity {
      // All the stuff we need for playing and showing a video
     private VideoView mVideoView;
     private SurfaceHolder mSurfaceHolder = null;
+    private boolean surfaceDestroyedFlag = true;
     private int totaltime = 0;
     private int curtime = 0;
     //@@private int mVideoWidth;
@@ -206,9 +207,14 @@ public class VideoPlayer extends Activity {
                     String tempP = mPlayList.get(i);
                     if(tempP.equals(path)) {
                         // find the same file in the list and play
-                        LOGI(TAG,"[onResume] start resume play, path:"+path);
+                        LOGI(TAG,"[onResume] start resume play, path:"+path+",surfaceDestroyedFlag:"+surfaceDestroyedFlag);
                         if(new File(path).exists()) {
-                            initVideoView();
+                            if(surfaceDestroyedFlag) { //add for press power key quickly 
+                                initVideoView();
+                            }
+                            else {
+                                browserBack();
+                            }
                             //file play will do in surface create
                             //initPlayer();
                             //playFile(path);
@@ -233,6 +239,8 @@ public class VideoPlayer extends Activity {
             mResumePlay.setEnable(false); //disable resume play 
         }
         release();
+        surfaceDestroyedFlag = true;
+        LOGI(TAG,"[onDestroy] surfaceDestroyedFlag:"+surfaceDestroyedFlag);
     }
 
     @Override
@@ -270,12 +278,21 @@ public class VideoPlayer extends Activity {
         }
 
         if(mResumePlay != null) {
-            mResumePlay.setEnable(true); //resume play function ON/OFF
-            if(true == mResumePlay.getEnable()) {
-                mResumePlay.set(mPlayList.getcur(), curtime);
-                LOGI(TAG,"[onPause]mStateBac:"+mState);
-                mStateBac = mState;
-                stop();
+            if(mContext != null) {
+                boolean resumeEnable = mContext.getResources().getBoolean(R.bool.config_resume_play_enable); 
+                LOGI(TAG,"[onPause] resumeEnable:"+resumeEnable);
+                if(resumeEnable == true) {
+                    mResumePlay.setEnable(true); //resume play function ON/OFF
+                    if(true == mResumePlay.getEnable()) {
+                        mResumePlay.set(mPlayList.getcur(), curtime);
+                        LOGI(TAG,"[onPause]mStateBac:"+mState);
+                        mStateBac = mState;
+                        stop();
+                    }
+                }
+                else {
+                    // TODO: do nothing
+                }
             }
         }
     }
@@ -790,8 +807,9 @@ public class VideoPlayer extends Activity {
         public void surfaceCreated(SurfaceHolder holder) {
             LOGI(TAG,"[surfaceCreated]");
             mSurfaceHolder = holder;
+            surfaceDestroyedFlag = false;
             initPlayer();
-            LOGI(TAG,"[surfaceCreated]mResumePlay:"+mResumePlay);
+            LOGI(TAG,"[surfaceCreated]mResumePlay:"+mResumePlay+",surfaceDestroyedFlag:"+surfaceDestroyedFlag);
             if(mResumePlay != null) {
                 LOGI(TAG,"[surfaceCreated]mResumePlay.getEnable():"+mResumePlay.getEnable());
                 if(mResumePlay.getEnable() == true) {
@@ -838,6 +856,8 @@ public class VideoPlayer extends Activity {
             mSurfaceHolder = null;
             mVideoView = null;
             release();
+            surfaceDestroyedFlag = true;
+            LOGI(TAG,"[surfaceDestroyed]surfaceDestroyedFlag:"+surfaceDestroyedFlag);
         }
     };
 
@@ -985,8 +1005,9 @@ public class VideoPlayer extends Activity {
     }
 
     private void audiotrackSelect() {
-        LOGI(TAG,"[audiotrackSelect]");
+        LOGI(TAG,"[audiotrackSelect] mMediaInfo:"+mMediaInfo);
         if(mMediaInfo != null) {
+            LOGI(TAG,"[audiotrackSelect] mMediaInfo.getAudioTotalNum():"+mMediaInfo.getAudioTotalNum());
             if(/*(audio_flag == Errorno.PLAYER_NO_AUDIO) || */(mMediaInfo.getAudioTotalNum() <= 0 ) ) {
                 Toast toast =Toast.makeText(VideoPlayer.this, R.string.file_have_no_audio,Toast.LENGTH_SHORT );
                 toast.setGravity(Gravity.BOTTOM,110,0);
@@ -1017,13 +1038,13 @@ public class VideoPlayer extends Activity {
     }
 
     private void subtitleSelect() {
-        Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
+        /*Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
         toast.setGravity(Gravity.BOTTOM,110,0);
         toast.setDuration(0x00000001);
         toast.show();
         startOsdTimeout();
-        return;
-        /*
+        return;*/
+        
         subtitle_prepare();
         LOGI(TAG,"[subtitleSelect] sub_para.totalnum:"+sub_para.totalnum);
         if(sub_para.totalnum<=0) {
@@ -1035,7 +1056,7 @@ public class VideoPlayer extends Activity {
             return;
         }
         showSubWidget(R.string.setting_subtitle);
-        subtitle_control();*/
+        subtitle_control();
     }
 
     private void displayModeSelect() {
@@ -1618,7 +1639,7 @@ public class VideoPlayer extends Activity {
             //updateIconResource();
         } 
     }
-    
+
     private void setVideoPath(String path) {
         //LOGI(TAG,"[setVideoPath]path:"+path);
         /*Uri uri = null;
@@ -1690,15 +1711,15 @@ public class VideoPlayer extends Activity {
         }*/
 
         LOGI(TAG,"[setVideoPath]Uri.parse(path):"+Uri.parse(path));
-        setVideoURI(Uri.parse(path));
+        setVideoURI(Uri.parse(path), path); //add path to resolve special character for uri, such as  ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |"$" | ","
     }
 
-    private void setVideoURI(Uri uri) {
-        LOGI(TAG,"[setVideoURI]uri:"+uri);
-        setVideoURI(uri, null);
+    private void setVideoURI(Uri uri, String path) {
+        LOGI(TAG,"[setVideoURI]uri:"+uri+",path:"+path);
+        setVideoURI(uri, null, path);
     }
 
-    private void setVideoURI(Uri uri, Map<String, String> headers) {
+    private void setVideoURI(Uri uri, Map<String, String> headers, String path) {
         LOGI(TAG,"[setVideoURI]uri:"+uri+",headers:"+headers);
         mUri = uri;
         mHeaders = headers;
@@ -1709,7 +1730,7 @@ public class VideoPlayer extends Activity {
             LOGE(TAG, "Unable to open content: " + mUri+",ex:"+ex);
             if(haveTried == false) {
                 haveTried = true;
-                trySetVideoURIAgain(uri, headers);
+                trySetVideoPathAgain(uri, headers, path);
             }
             else {
                 mState = STATE_ERROR;
@@ -1725,7 +1746,7 @@ public class VideoPlayer extends Activity {
     }
 
     private boolean haveTried = false;
-    private void trySetVideoURIAgain(Uri uri, Map<String, String> headers) {
+    private void trySetVideoURIAgain(Uri uri, Map<String, String> headers, String paramPath) {
         if(uri == null) {
             LOGE(TAG,"[trySetVideoURIAgain]init uri=null error!!!");
             return;
@@ -1784,7 +1805,24 @@ public class VideoPlayer extends Activity {
             return;
         }
         LOGI(TAG,"[trySetVideoURIAgain]setVideoURI uriTmp:"+uriTmp);  
-        setVideoURI(uriTmp);
+        setVideoURI(uriTmp, paramPath);
+    }
+
+    private void trySetVideoPathAgain(Uri uri, Map<String, String> headers, String path) {
+        LOGI(TAG,"[trySetVideoPathAgain]path:"+path);
+        try{
+            mMediaPlayer.setDataSource(path);
+            mMediaPlayer.prepare();
+        } catch (IOException ex) {
+            LOGE(TAG, "[trySetVideoPathAgain] Unable to open content: " + path+",ex:"+ex);
+            trySetVideoURIAgain(uri, headers, path); // should debug, maybe some error
+            mState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+        } catch (IllegalArgumentException ex) {
+            LOGE(TAG, "[trySetVideoPathAgain] Unable to open content: " + path+",ex:"+ex);
+            mState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+        }
     }
 
     private void initPlayer() {
