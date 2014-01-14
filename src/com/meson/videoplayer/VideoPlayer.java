@@ -291,8 +291,8 @@ public class VideoPlayer extends Activity {
                     }
                 }
                 else {
-                    // TODO: do nothing
-                }
+                    browserBack();
+		}
             }
         }
     }
