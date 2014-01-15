@@ -497,7 +497,8 @@ public class VideoPlayer extends Activity {
         fastforwordBtn.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v) {
                 LOGI(TAG,"fastforwordBtn onClick");
-                fastForward();
+                if(mCanSeek) 
+                    fastForward();
             }
         });
 
@@ -511,7 +512,8 @@ public class VideoPlayer extends Activity {
         fastreverseBtn.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v) {
                 LOGI(TAG,"fastreverseBtn onClick");
-                fastBackward();
+                if(mCanSeek) 
+                    fastBackward();
             }
         });
 
@@ -1317,17 +1319,29 @@ public class VideoPlayer extends Activity {
     }
 
     private void playPrev() {
-        stopFWFB();
-        stop();
-        mBookmark.set(mPlayList.getcur(), curtime);
-        playFile(mPlayList.moveprev());
+        LOGI(TAG,"[playPrev]mState:"+mState);
+        if(mState != STATE_PREPARING) { // avoid status error for preparing
+            stopFWFB();
+            stop();
+            mBookmark.set(mPlayList.getcur(), curtime);
+            playFile(mPlayList.moveprev());
+        }
+        else {
+            LOGI(TAG,"[playPrev]mState=STATE_PREPARING, error status do nothing only waitting");
+        }
     }
 
     private void playNext() {
-        stopFWFB();
-        stop();
-        mBookmark.set(mPlayList.getcur(), curtime);
-        playFile(mPlayList.movenext());
+        LOGI(TAG,"[playNext]mState:"+mState);
+         if(mState != STATE_PREPARING) { // avoid status error for preparing
+             stopFWFB();
+             stop();
+            mBookmark.set(mPlayList.getcur(), curtime);
+            playFile(mPlayList.movenext());
+        }
+        else {
+            LOGI(TAG,"[playNext]mState=STATE_PREPARING, error status do nothing only waitting");
+        }
     }
 
     private void playCur() {
@@ -1563,7 +1577,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void stop() {
-        LOGI(TAG,"[stop]mMediaPlayer:"+mMediaPlayer);
+        LOGI(TAG,"[stop]mMediaPlayer:"+mMediaPlayer+",mState:"+mState);
         if(mMediaPlayer != null && mState != STATE_STOP) {
             mMediaPlayer.stop();
             mMediaPlayer.reset();
@@ -1720,11 +1734,12 @@ public class VideoPlayer extends Activity {
     }
 
     private void setVideoURI(Uri uri, Map<String, String> headers, String path) {
-        LOGI(TAG,"[setVideoURI]uri:"+uri+",headers:"+headers);
+        LOGI(TAG,"[setVideoURI]uri:"+uri+",headers:"+headers+",mState:"+mState);
         mUri = uri;
         mHeaders = headers;
         try{
             mMediaPlayer.setDataSource(mContext, mUri, mHeaders);
+            mState = STATE_PREPARING;
             mMediaPlayer.prepare();
         } catch (IOException ex) {
             LOGE(TAG, "Unable to open content: " + mUri+",ex:"+ex);
@@ -1812,6 +1827,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[trySetVideoPathAgain]path:"+path);
         try{
             mMediaPlayer.setDataSource(path);
+            mState = STATE_PREPARING;
             mMediaPlayer.prepare();
         } catch (IOException ex) {
             LOGE(TAG, "[trySetVideoPathAgain] Unable to open content: " + path+",ex:"+ex);
@@ -1839,7 +1855,6 @@ public class VideoPlayer extends Activity {
         mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
         mMediaPlayer.setOnErrorListener(mErrorListener);
         mMediaPlayer.setDisplay(mSurfaceHolder);
-        mState = STATE_PREPARING;
     }
 
     //@@--------this part for listener----------------------------------------------------------------------------------------------
