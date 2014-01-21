@@ -191,10 +191,6 @@ public class VideoPlayer extends Activity {
         intent.putExtra("command", "pause");
         mContext.sendBroadcast(intent);
 
-        registerHdmiReceiver();
-        registerMountReceiver();
-        registerPowerReceiver();
-
         if(mResumePlay != null && mPlayList != null) {
             if(true == mResumePlay.getEnable()) {
                 if(isHdmiPlugged == true) {
@@ -209,26 +205,31 @@ public class VideoPlayer extends Activity {
                         // find the same file in the list and play
                         LOGI(TAG,"[onResume] start resume play, path:"+path+",surfaceDestroyedFlag:"+surfaceDestroyedFlag);
                         if(new File(path).exists()) {
+                            LOGI(TAG,"[onResume] resume play file exists,  path:"+path);
                             if(surfaceDestroyedFlag) { //add for press power key quickly 
-                                initVideoView();
+                                initVideoView(); //file play will do in surface create
                             }
                             else {
-                                browserBack();
+                                //browserBack();
+                                initPlayer();
+                                playFile(path);
                             }
-                            //file play will do in surface create
-                            //initPlayer();
-                            //playFile(path);
                         }
                         else {
-                            if(mContext != null)
+                            /*if(mContext != null)
                                 Toast.makeText(mContext,mContext.getText(R.string.str_no_file),Toast.LENGTH_SHORT).show();  
-                            browserBack();
+                            browserBack();*/
+                            retryPlay();
                         }
                         break;
                     }
                 }
             }
         }
+
+        registerHdmiReceiver();
+        registerMountReceiver();
+        registerPowerReceiver();
     }
 
     @Override
@@ -261,6 +262,7 @@ public class VideoPlayer extends Activity {
             }
         }
 
+        resetVariate();
         openScreenOffTimeout();
         unregisterHdmiReceiver();
         unregisterMountReceiver();
@@ -268,6 +270,8 @@ public class VideoPlayer extends Activity {
 
         if(mHandler != null) {
             mHandler.removeMessages(MSG_UPDATE_PROGRESS);
+            mHandler.removeMessages(MSG_RETRY_PLAY);
+            mHandler.removeMessages(MSG_RETRY_END);
         }
 
         IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
@@ -300,10 +304,13 @@ public class VideoPlayer extends Activity {
     //@@--------this part for message handle---------------------------------------------------------------------
     private static final long MSG_SEND_DELAY = 0; //1000;//1s
     private static final int MSG_UPDATE_PROGRESS = 0xF1;//random value
+    private static final int MSG_RETRY_PLAY = 0xF2;
+    private static final int MSG_RETRY_END = 0xF3;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             int pos;
+            //LOGI(TAG,"[handleMessage]msg:"+msg);
             switch (msg.what) {
                 case MSG_UPDATE_PROGRESS:
                     //LOGI(TAG,"[handleMessage]MSG_UPDATE_PROGRESS mState:"+mState+",mSeekState:"+mSeekState);
@@ -315,6 +322,30 @@ public class VideoPlayer extends Activity {
                         msg = obtainMessage(MSG_UPDATE_PROGRESS);
                         sendMessageDelayed(msg, 1000 - (pos % 1000));
                     }
+                    break;
+                case MSG_RETRY_PLAY:
+                    LOGI(TAG,"[handleMessage]MSG_RETRY_PLAY");
+                    String path = mResumePlay.getFilepath();
+                    if(new File(path).exists()) {
+                        if(surfaceDestroyedFlag) { //add for press power key quickly 
+                            initVideoView();
+                        }
+                        else {
+                            //browserBack();
+                            initPlayer();
+                            playFile(path);
+                        }
+                    }
+                    else {
+                        LOGI(TAG,"retry fail, retry again.");
+                        retryPlay();
+                    }
+                    break;
+                case MSG_RETRY_END:
+                    LOGI(TAG,"[handleMessage]MSG_RETRY_END");
+                    if(mContext != null)
+                        Toast.makeText(mContext,mContext.getText(R.string.str_no_file),Toast.LENGTH_SHORT).show();  
+                    browserBack();
                     break;
             }
         }
@@ -888,8 +919,12 @@ public class VideoPlayer extends Activity {
             Uri uri = intent.getData();
             String path = uri.getPath();  
             
-            LOGI(TAG, "[mMountReceiver] action=" + action + " uri=" + uri + " path=" + path);
+            LOGI(TAG, "[mMountReceiver] action=" + action + ",uri=" + uri + ",path=" + path +", mRetrying:"+mRetrying);
             if (action == null ||path == null) {
+                return;
+            }
+
+            if(mRetrying == true) {
                 return;
             }
 
@@ -900,7 +935,7 @@ public class VideoPlayer extends Activity {
                             return;
                         else
                             isEjectOrUnmoutProcessed = true;
-                            browserBack();
+                        browserBack();
                     }
                 }				
             } 
@@ -1229,6 +1264,11 @@ public class VideoPlayer extends Activity {
     private static int FB_SPEED[] = {0, 2, 4, 8, 16, 32};
     private static int FF_STEP[] =  {0, 1, 2, 4, 8, 16};
     private static int FB_STEP[] =  {0, 1, 2, 4, 8, 16};
+    private static int mRetryTimesMax = 10; // retry play after volume unmounted 
+    private static int mRetryTimes = mRetryTimesMax; 
+    private static int mRetryStep = 1000; //1000ms
+    private boolean mRetrying = false;
+    private Timer retryTimer = new Timer();
 
     private void updateIconResource() {
         if(mState == STATE_PLAYING) {
@@ -1262,6 +1302,8 @@ public class VideoPlayer extends Activity {
     private void resetVariate() {
         progressBarSeekFlag = false;
         haveTried = false;
+        mRetrying = false;
+        mRetryTimes = mRetryTimesMax;
     }
     
     private void playFile(String path) {
@@ -1284,6 +1326,49 @@ public class VideoPlayer extends Activity {
             setVideoPath(path);
         }
         showCtlBar();
+    }
+
+    private void retryPlay() {
+        LOGI(TAG,"[retryPlay]mRetryTimes:"+mRetryTimes+",mRetryStep:"+mRetryStep+",mResumePlay:"+mResumePlay);
+        if(mResumePlay == null) {
+            browserBack(); // no need to retry, back to file list
+            return;
+        }
+
+        LOGI(TAG,"[retryPlay]mResumePlay.getEnable():"+mResumePlay.getEnable());
+        if(false == mResumePlay.getEnable()) {
+            browserBack(); // no need to retry, back to file list
+            return;
+        }
+
+        mRetrying = true;
+
+        TimerTask task = new TimerTask(){   
+            public void run() {
+                LOGI(TAG,"[retryPlay]TimerTask run mRetryTimes:"+mRetryTimes);
+                if(mRetryTimes > 0) {
+                    mRetryTimes--;
+                    if(mHandler != null) {
+                        Message msg = mHandler.obtainMessage(MSG_RETRY_PLAY);
+                        mHandler.sendMessageDelayed(msg, MSG_SEND_DELAY);
+                        LOGI(TAG,"[retryPlay]sendMessageDelayed MSG_SEND_DELAY");
+                    }
+                }
+                else {
+                    retryTimer.cancel();
+                    retryTimer = null;
+                    mRetrying = false;
+                    if(mHandler != null) {
+                        Message msg = mHandler.obtainMessage(MSG_RETRY_END);
+                        mHandler.sendMessageDelayed(msg, MSG_SEND_DELAY);
+                        LOGI(TAG,"[retryPlay]sendMessageDelayed MSG_RETRY_END");
+                    }
+                }
+            }     
+        };   
+        
+        retryTimer = new Timer();
+        retryTimer.schedule(task, mRetryStep);
     }
 
     private void browserBack() {
@@ -1628,7 +1713,7 @@ public class VideoPlayer extends Activity {
 
     private void seekTo(int msec) {
         LOGI(TAG,"[seekTo]msec:"+msec+",mState:"+mState);
-        if (mMediaPlayer != null) {
+        if (mMediaPlayer != null && mCanSeek == true) {
             // stop update progress bar
             mSeekState = SEEK_START;
             if(mHandler != null) {
