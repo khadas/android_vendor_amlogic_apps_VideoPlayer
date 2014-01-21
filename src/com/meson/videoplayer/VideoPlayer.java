@@ -1264,7 +1264,7 @@ public class VideoPlayer extends Activity {
     private static int FB_SPEED[] = {0, 2, 4, 8, 16, 32};
     private static int FF_STEP[] =  {0, 1, 2, 4, 8, 16};
     private static int FB_STEP[] =  {0, 1, 2, 4, 8, 16};
-    private static int mRetryTimesMax = 10; // retry play after volume unmounted 
+    private static int mRetryTimesMax = 5; // retry play after volume unmounted 
     private static int mRetryTimes = mRetryTimesMax; 
     private static int mRetryStep = 1000; //1000ms
     private boolean mRetrying = false;
