@@ -102,7 +102,7 @@ public class VideoPlayer extends Activity {
     private ImageButton ctlBtn = null; // all the follow for OSD bar layer 2
     private ImageButton resumeModeBtn = null;
     private ImageButton repeatModeBtn = null; 
-    private ImageButton audiotrackBtn = null;
+    private ImageButton audiooptionBtn = null;
     private ImageButton subtitleSwitchBtn = null;
     private ImageButton displayModeBtn = null;
     private ImageButton brigtnessBtn = null;
@@ -481,7 +481,7 @@ public class VideoPlayer extends Activity {
         ctlBtn = (ImageButton) findViewById(R.id.BackBtn);
         resumeModeBtn = (ImageButton) findViewById(R.id.ResumeBtn);
         repeatModeBtn = (ImageButton) findViewById(R.id.PlaymodeBtn);
-        audiotrackBtn = (ImageButton) findViewById(R.id.ChangetrackBtn);
+        audiooptionBtn = (ImageButton) findViewById(R.id.ChangetrackBtn);
         subtitleSwitchBtn = (ImageButton) findViewById(R.id.SubtitleBtn);
         displayModeBtn = (ImageButton) findViewById(R.id.DisplayBtn);
         brigtnessBtn = (ImageButton) findViewById(R.id.BrightnessBtn);
@@ -589,10 +589,10 @@ public class VideoPlayer extends Activity {
             repeatModeBtn.setImageDrawable(getResources().getDrawable(R.drawable.mode_disable));
         }
 
-        audiotrackBtn.setOnClickListener(new View.OnClickListener() {
+        audiooptionBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                LOGI(TAG,"audiotrackBtn onClick");
-                audiotrackSelect();
+                LOGI(TAG,"audiooptionBtn onClick");
+                audioOption();
             } 
         });
 
@@ -1041,10 +1041,10 @@ public class VideoPlayer extends Activity {
         showOtherWidget(R.string.setting_playmode);
     }
 
-    private void audiotrackSelect() {
-        LOGI(TAG,"[audiotrackSelect] mMediaInfo:"+mMediaInfo);
+    private void audioOption() {
+        LOGI(TAG,"[audioOption] mMediaInfo:"+mMediaInfo);
         if(mMediaInfo != null) {
-            LOGI(TAG,"[audiotrackSelect] mMediaInfo.getAudioTotalNum():"+mMediaInfo.getAudioTotalNum());
+            LOGI(TAG,"[audioOption] mMediaInfo.getAudioTotalNum():"+mMediaInfo.getAudioTotalNum());
             if(/*(audio_flag == Errorno.PLAYER_NO_AUDIO) || */(mMediaInfo.getAudioTotalNum() <= 0 ) ) {
                 Toast toast =Toast.makeText(VideoPlayer.this, R.string.file_have_no_audio,Toast.LENGTH_SHORT );
                 toast.setGravity(Gravity.BOTTOM,110,0);
@@ -1060,7 +1060,25 @@ public class VideoPlayer extends Activity {
             toast_track_switch.show();
             return;
         }
-        
+
+        SimpleAdapter audiooptionarray = getMorebarListAdapter(AUDIO_OPTION, 0);
+        ListView listView = (ListView)findViewById(R.id.ListView);
+        listView.setAdapter(audiooptionarray);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0) {
+                    audiotrackSelect();
+                }
+                else if(position == 1) {
+                    soundtrackSelect();
+                }
+            }	
+        });
+        showOtherWidget(R.string.setting_audiooption);
+    }
+
+    private void audiotrackSelect() {
+        LOGI(TAG,"[audiotrackSelect]");
         SimpleAdapter audioarray = getMorebarListAdapter(AUDIO_TRACK, mOption.getAudioTrack());
         ListView listView = (ListView)findViewById(R.id.ListView);
         listView.setAdapter(audioarray);
@@ -1068,10 +1086,25 @@ public class VideoPlayer extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mOption.setAudioTrack(position);
                 audioTrackImpl(position);
-                exitOtherWidget(audiotrackBtn);
+                exitOtherWidget(audiooptionBtn);
             }	
         });
         showOtherWidget(R.string.setting_audiotrack);
+    }
+
+    private void soundtrackSelect() {
+        LOGI(TAG,"[soundtrackSelect]");
+        SimpleAdapter soundarray = getMorebarListAdapter(SOUND_TRACK, mOption.getSoundTrack());
+        ListView listView = (ListView)findViewById(R.id.ListView);
+        listView.setAdapter(soundarray);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mOption.setSoundTrack(position);
+                soundTrackImpl(position);
+                exitOtherWidget(audiooptionBtn);
+            }	
+        });
+        showOtherWidget(R.string.setting_soundtrack);
     }
 
     private void subtitleSelect() {
@@ -1251,6 +1284,24 @@ public class VideoPlayer extends Activity {
         }
     }
 
+    private void soundTrackImpl(int idx) {
+        if (mMediaPlayer != null && mMediaInfo != null) {
+            LOGI(TAG,"[soundTrackImpl]idx:"+idx);
+            String soundTrackStr = "stereo";
+            if(idx == 0) {
+                soundTrackStr = "stereo";
+            }
+            else if(idx == 1) {
+                soundTrackStr = "lmono";
+            }
+            else if(idx == 2) {
+                soundTrackStr = "rmono";
+            }
+            LOGI(TAG,"[soundTrackImpl]soundTrackStr:"+soundTrackStr);
+            mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
+        }
+    }
+
     //@@--------this part for play function implement--------------------------------------------------------------------------------
     // The ffmpeg step is 2*step
     private Toast ff_fb = null;
@@ -1283,10 +1334,28 @@ public class VideoPlayer extends Activity {
 
         if(mCanSeek) {
             progressBar.setEnabled(true);
-            fastforwordBtn.setEnabled(true);
-            fastreverseBtn.setEnabled(true);
-            fastforwordBtn.setImageResource(R.drawable.ff);
-            fastreverseBtn.setImageResource(R.drawable.rewind);
+
+            if(mMediaPlayer != null) {
+                String playerTypeStr = mMediaPlayer.getStringParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_TYPE_STR);
+                if(playerTypeStr.equals("AMLOGIC_PLAYER")) {
+                    fastforwordBtn.setEnabled(true);
+                    fastreverseBtn.setEnabled(true);
+                    fastforwordBtn.setImageResource(R.drawable.ff);
+                    fastreverseBtn.setImageResource(R.drawable.rewind);
+                }
+                else {
+                    fastforwordBtn.setEnabled(false);
+                    fastreverseBtn.setEnabled(false);
+                    fastforwordBtn.setImageResource(R.drawable.ff_disable);
+                    fastreverseBtn.setImageResource(R.drawable.rewind_disable);
+                }
+            }
+            else {
+                fastforwordBtn.setEnabled(false);
+                fastreverseBtn.setEnabled(false);
+                fastforwordBtn.setImageResource(R.drawable.ff_disable);
+                fastreverseBtn.setImageResource(R.drawable.rewind_disable);
+            }
         }
         else {
             progressBar.setEnabled(false);
@@ -2169,10 +2238,12 @@ public class VideoPlayer extends Activity {
 
     private final int RESUME_MODE = 0;
     private final int REPEAT_MODE = 1;
-    private final int AUDIO_TRACK = 2;
-    private final int DISPLAY_MODE = 3;
-    private final int BRIGHTNESS = 4;
-    private final int PLAY3D = 5;
+    private final int AUDIO_OPTION = 2;
+    private final int AUDIO_TRACK = 3;
+    private final int SOUND_TRACK = 4;
+    private final int DISPLAY_MODE = 5;
+    private final int BRIGHTNESS = 6;
+    private final int PLAY3D = 7;
     private int otherwidgetStatus = 0;
 	
     protected void startOsdTimeout() {
@@ -2217,10 +2288,12 @@ public class VideoPlayer extends Activity {
     }
 
     private void showOtherWidget(int StrId) {
-        if((null!=otherwidget)&&(View.GONE==otherwidget.getVisibility())) {
-            otherwidget.setVisibility(View.VISIBLE);
-            if ((null!=optbar)&&(View.VISIBLE==optbar.getVisibility()))
-                optbar.setVisibility(View.GONE);
+        if(null!=otherwidget) {
+            if(View.GONE==otherwidget.getVisibility()) {
+                otherwidget.setVisibility(View.VISIBLE);
+                if ((null!=optbar)&&(View.VISIBLE==optbar.getVisibility()))
+                    optbar.setVisibility(View.GONE);
+            }
             otherwidgetTitleTx.setText(StrId);
             otherwidget.requestFocus();
             otherwidgetStatus = StrId;
@@ -2525,9 +2598,13 @@ public class VideoPlayer extends Activity {
                             play3dBtn.requestFocusFromTouch();
                             play3dBtn.requestFocus();
                         break;
+                        case R.string.setting_audiooption:
+                            audiooptionBtn.requestFocusFromTouch();
+                            audiooptionBtn.requestFocus();
+                        break;
                         case R.string.setting_audiotrack:
-                            audiotrackBtn.requestFocusFromTouch();
-                            audiotrackBtn.requestFocus();
+                        case R.string.setting_soundtrack:
+                            audioOption();
                         break;
                         case R.string.setting_subtitle:
                             subtitleSwitchBtn.requestFocusFromTouch();
@@ -3105,6 +3182,34 @@ public class VideoPlayer extends Activity {
                 list.get(pos).put("item_sel", R.drawable.item_img_sel);
             break;
 
+            case AUDIO_OPTION:
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_audiotrack));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_soundtrack));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+            break;
+
+            case SOUND_TRACK:
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_soundtrack_stereo));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_soundtrack_lmono));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_soundtrack_rmono));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+
+                list.get(pos).put("item_sel", R.drawable.item_img_sel);
+            break;
+            
             case AUDIO_TRACK:
                 if (mMediaInfo != null) {
                     int audio_total_num = mMediaInfo.getAudioTotalNum();
@@ -3209,6 +3314,7 @@ class Option {
     private boolean resume = false;
     private int repeat = 0;
     private int audiotrack = -1;
+    private int soundtrack = -1;
     private int display = 0;
     
     public static final int REPEATLIST = 0;
@@ -3219,7 +3325,8 @@ class Option {
     public static final int DISP_MODE_RATIO16_9 = 3;
     private String RESUME_MODE = "ResumeMode";
     private String REPEAT_MODE = "RepeatMode";
-    private String AUDIOT_RACK = "AudioTrack";
+    private String AUDIO_TRACK = "AudioTrack";
+    private String SOUND_TRACK = "SoundTrack";
     private String DISPLAY_MODE = "DisplayMode";
 
     public Option(Activity act) {
@@ -3241,8 +3348,14 @@ class Option {
 
     public int getAudioTrack() {
         if(sp != null)
-            audiotrack = sp.getInt(AUDIOT_RACK, 0);
+            audiotrack = sp.getInt(AUDIO_TRACK, 0);
         return audiotrack;
+    }
+
+    public int getSoundTrack() {
+        if(sp != null)
+            soundtrack = sp.getInt(SOUND_TRACK, 0);
+        return soundtrack;
     }
 
     public int getDisplayMode() {
@@ -3270,7 +3383,15 @@ class Option {
     public void setAudioTrack(int para) {
         if(sp != null) {
             sp.edit()
-                .putInt(AUDIOT_RACK, para)
+                .putInt(AUDIO_TRACK, para)
+                .commit();
+        }
+    }
+
+    public void setSoundTrack(int para) {
+        if(sp != null) {
+            sp.edit()
+                .putInt(SOUND_TRACK, para)
                 .commit();
         }
     }

@@ -15,7 +15,12 @@
     <string name="setting_playmode">播放模式</string>
     <string name="setting_playmode_repeatall">目錄循環</string>
     <string name="setting_playmode_repeatone">單首循環</string>
+    <string name="setting_audiooption">聲音設置</string>
+    <string name="setting_soundtrack">聲道</string>
     <string name="setting_audiotrack">音軌</string>
+    <string name="setting_soundtrack_stereo">立體聲</string>
+    <string name="setting_soundtrack_lmono">左聲道</string>
+    <string name="setting_soundtrack_rmono">右聲道</string>
     <string name="setting_subtitle">字幕</string>
     <string name="setting_displaymode">顯示模式</string>
     <string name="setting_displaymode_normal">正常</string>

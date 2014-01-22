@@ -15,7 +15,12 @@
     <string name="setting_playmode">Play Mode</string>
     <string name="setting_playmode_repeatall">Repeat All</string>
     <string name="setting_playmode_repeatone">Repeat One</string>
+    <string name="setting_audiooption">Audio Option</string>
+    <string name="setting_soundtrack">Sound Track</string>
     <string name="setting_audiotrack">Audio Track</string>
+    <string name="setting_soundtrack_stereo">Stereo</string>
+    <string name="setting_soundtrack_lmono">Left Mono</string>
+    <string name="setting_soundtrack_rmono">Right Mono</string>
     <string name="setting_subtitle">Subtitle</string>
     <string name="setting_displaymode">Display Mode</string>
     <string name="setting_displaymode_normal">Normal</string>
