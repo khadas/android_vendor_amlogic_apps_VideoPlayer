@@ -2501,8 +2501,8 @@ public class VideoPlayer extends Activity {
             if (mState == STATE_PLAYING 
                 || mState == STATE_PAUSED
                 || mState == STATE_SEARCHING) {
-                //pause();
-                stop();
+                pause();
+                //stop();
             }
         }
         else if (keyCode == KeyEvent.KEYCODE_BACK) {
