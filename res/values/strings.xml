@@ -21,6 +21,7 @@
     <string name="setting_soundtrack_stereo">Stereo</string>
     <string name="setting_soundtrack_lmono">Left Mono</string>
     <string name="setting_soundtrack_rmono">Right Mono</string>
+    <string name="setting_soundtrack_lrmix">Sound Mixing</string>
     <string name="setting_subtitle">Subtitle</string>
     <string name="setting_displaymode">Display Mode</string>
     <string name="setting_displaymode_normal">Normal</string>

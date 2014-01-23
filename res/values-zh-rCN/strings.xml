@@ -21,6 +21,7 @@
     <string name="setting_soundtrack_stereo">立体声</string>
     <string name="setting_soundtrack_lmono">左声道</string>
     <string name="setting_soundtrack_rmono">右声道</string>
+    <string name="setting_soundtrack_lrmix">混音</string>
     <string name="setting_subtitle">字幕</string>
     <string name="setting_displaymode">显示模式</string>
     <string name="setting_displaymode_normal">正常</string>

@@ -296,7 +296,7 @@ public class VideoPlayer extends Activity {
                 }
                 else {
                     browserBack();
-		}
+                }
             }
         }
     }
@@ -1297,6 +1297,9 @@ public class VideoPlayer extends Activity {
             else if(idx == 2) {
                 soundTrackStr = "rmono";
             }
+            else if(idx == 3) {
+                soundTrackStr = "lrmix";
+            }
             LOGI(TAG,"[soundTrackImpl]soundTrackStr:"+soundTrackStr);
             mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
         }
@@ -1441,7 +1444,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void browserBack() {
-        LOGI(TAG,"[browserBack]");
+        LOGI(TAG,"[browserBack]backToOtherAPK:"+backToOtherAPK);
         item_position_selected = item_position_selected_init + mPlayList.getindex();
         backToFileList = true;
         //mPlayList.rootPath = null;
@@ -3204,6 +3207,10 @@ public class VideoPlayer extends Activity {
                 list.add(map);
                 map = new HashMap<String, Object>();
                 map.put("item_name", getResources().getString(R.string.setting_soundtrack_rmono));
+                map.put("item_sel", R.drawable.item_img_unsel);
+                list.add(map);
+                map = new HashMap<String, Object>();
+                map.put("item_name", getResources().getString(R.string.setting_soundtrack_lrmix));
                 map.put("item_sel", R.drawable.item_img_unsel);
                 list.add(map);
 
