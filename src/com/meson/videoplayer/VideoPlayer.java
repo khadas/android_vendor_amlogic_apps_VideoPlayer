@@ -262,6 +262,8 @@ public class VideoPlayer extends Activity {
             }
         }
 
+        if(progressBar != null) //add for focus changed to highlight playing item in file list
+            progressBar.requestFocus();
         resetVariate();
         openScreenOffTimeout();
         unregisterHdmiReceiver();
@@ -2056,7 +2058,7 @@ public class VideoPlayer extends Activity {
             initSubtitle();
             initMediaInfo();
             // TODO: should open
-            //displayModeImpl(); // init display mode
+            //displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
             
             if(mResumePlay.getEnable() == true) {
                 mResumePlay.setEnable(false);
