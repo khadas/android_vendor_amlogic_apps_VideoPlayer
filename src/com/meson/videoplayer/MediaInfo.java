@@ -117,7 +117,7 @@ public class MediaInfo{
         return str_type;
     }
 	
-    public String getFileSize() {
+    /*public String getFileSize() {
         long fs = mInfo.file_size;
         String str_size = "0";
         if(fs <= 1024)
@@ -133,6 +133,10 @@ public class MediaInfo{
             str_size = fs + "MB";
         }
         return str_size;
+    }*/
+
+    public String getFileSize() {
+        return mInfo.file_size;
     }
 
     public String getResolution() {
