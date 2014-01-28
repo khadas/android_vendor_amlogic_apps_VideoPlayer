@@ -1,5 +1,6 @@
 package com.meson.videoplayer;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -643,6 +644,7 @@ public class VideoPlayer extends Activity {
     private void initVideoView() {
         LOGI(TAG,"[initVideoView]");
         mVideoView = (VideoView) findViewById(R.id.VideoView);
+        setOnSystemUiVisibilityChangeListener(); // TODO:ATTENTION: this is very import to keep osd bar show or hide synchronize with touch event, bug86905
         showSystemUi(false);
         //getHolder().setFormat(PixelFormat.VIDEO_HOLE_REAL);
         if(mVideoView != null) {
@@ -2428,7 +2430,6 @@ public class VideoPlayer extends Activity {
         if ((null!=infowidget)&&(View.VISIBLE==infowidget.getVisibility()))
             infowidget.setVisibility(View.GONE);
         showSystemUi(false);
-
         //@@getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
         //@@WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
@@ -2482,7 +2483,10 @@ public class VideoPlayer extends Activity {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void showSystemUi(boolean visible) {
+        LOGI(TAG,"[showSystemUi]visible:"+visible+",mVideoView:"+mVideoView);
         if(mVideoView == null) {
             return;
         }
@@ -2498,8 +2502,27 @@ public class VideoPlayer extends Activity {
         mVideoView.setSystemUiVisibility(flag);
     }
 
+    private int mLastSystemUiVis = 0;
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void setOnSystemUiVisibilityChangeListener() {
+        //if (!ApiHelper.HAS_VIEW_SYSTEM_UI_FLAG_HIDE_NAVIGATION) return;
+        mVideoView.setOnSystemUiVisibilityChangeListener(
+                new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                int diff = mLastSystemUiVis ^ visibility;
+                mLastSystemUiVis = visibility;
+                if ((diff & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
+                        && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
+                    showOsdView();
+                }
+            }
+        });
+    }
+
     //@@--------this part for touch and key event-------------------------------------------------------------------
     public boolean onTouchEvent (MotionEvent event) {
+        LOGI(TAG,"[onTouchEvent]ctlbar.getVisibility():"+ctlbar.getVisibility()+",event.getAction():"+event.getAction());
         super.onTouchEvent(event);
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             if((ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE)) {
@@ -2524,6 +2547,7 @@ public class VideoPlayer extends Activity {
     }
 
     public boolean onKeyUp(int keyCode, KeyEvent msg) {
+        LOGI(TAG,"[onKeyUp]keyCode:"+keyCode+",ctlbar.getVisibility():"+ctlbar.getVisibility());
         /*if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
             startOsdTimeout();
         }*/
@@ -2533,7 +2557,7 @@ public class VideoPlayer extends Activity {
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
-        LOGI(TAG,"[onKeyDown]keyCode:"+keyCode);
+        LOGI(TAG,"[onKeyDown]keyCode:"+keyCode+",ctlbar.getVisibility():"+ctlbar.getVisibility());
         if((ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE)) {
             if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
                 startOsdTimeout();
