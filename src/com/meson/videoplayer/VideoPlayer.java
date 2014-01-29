@@ -1515,6 +1515,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void fastForward() {
+        LOGI(TAG,"[fastForward]mState:"+mState+",FF_FLAG:"+FF_FLAG+",FF_LEVEL:"+FF_LEVEL+",FB_FLAG:"+FB_FLAG+",FB_LEVEL:"+FB_LEVEL);
         if(mState == STATE_SEARCHING) {
             if(FF_FLAG) {
                 if(FF_LEVEL < FF_MAX) {
@@ -2112,6 +2113,7 @@ public class VideoPlayer extends Activity {
             LOGI(TAG,"[onSeekComplete] progressBarSeekFlag:"+progressBarSeekFlag+",mStateBac:"+mStateBac);
 
             if(progressBarSeekFlag == false) { //onStopTrackingTouch
+                stopFWFB(); //reset fw/fb status
                 if(mStateBac == STATE_PLAYING) {
                     start();
                 }
