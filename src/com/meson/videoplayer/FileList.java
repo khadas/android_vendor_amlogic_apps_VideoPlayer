@@ -484,8 +484,13 @@ public class FileList extends ListActivity {
 		for(i=0;i<listFiles.size();i++) {
 			fs[i] = listFiles.get(i);
 		}
-		if (!filePath.equals(ROOT_PATH))
-			Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
+		if (!filePath.equals(ROOT_PATH)) {
+                System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+                try{
+                    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
+                }catch(IllegalArgumentException ex){
+                }
+             }
 
 		for(i=0;i<fs.length;i++)
 		{
