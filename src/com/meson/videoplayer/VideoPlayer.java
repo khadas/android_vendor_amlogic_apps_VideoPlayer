@@ -632,7 +632,7 @@ public class VideoPlayer extends Activity {
                 LOGI(TAG,"play3dBtn onClick");
                 // TODO:
                 Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
-                toast.setGravity(Gravity.BOTTOM,110,0);
+                toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
                 toast.setDuration(0x00000001);
                 toast.show();
                 startOsdTimeout();
@@ -1051,7 +1051,7 @@ public class VideoPlayer extends Activity {
             LOGI(TAG,"[audioOption] mMediaInfo.getAudioTotalNum():"+mMediaInfo.getAudioTotalNum());
             if(/*(audio_flag == Errorno.PLAYER_NO_AUDIO) || */(mMediaInfo.getAudioTotalNum() <= 0 ) ) {
                 Toast toast =Toast.makeText(VideoPlayer.this, R.string.file_have_no_audio,Toast.LENGTH_SHORT );
-                toast.setGravity(Gravity.BOTTOM,110,0);
+                toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
                 toast.setDuration(0x00000001);
                 toast.show();
                 startOsdTimeout();
@@ -1123,7 +1123,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[subtitleSelect] sub_para.totalnum:"+sub_para.totalnum);
         if(sub_para.totalnum<=0) {
             Toast toast =Toast.makeText(VideoPlayer.this, R.string.sub_no_subtitle,Toast.LENGTH_SHORT );
-            toast.setGravity(Gravity.BOTTOM,110,0);
+            toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
             toast.setDuration(0x00000001);
             toast.show();
             startOsdTimeout();
@@ -2147,7 +2147,7 @@ public class VideoPlayer extends Activity {
             mState = STATE_ERROR;
             String InfoStr = mErrorInfo.getErrorInfo(what, mPlayList.getcur());
             Toast toast =Toast.makeText(VideoPlayer.this, "Status Error:"+InfoStr,Toast.LENGTH_SHORT );
-            toast.setGravity(Gravity.BOTTOM,110,0);
+            toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
             toast.setDuration(0x00000001);
             toast.show();
             return true;
