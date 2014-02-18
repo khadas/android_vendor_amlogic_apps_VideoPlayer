@@ -333,6 +333,11 @@ public class FileList extends ListActivity {
                 		PlayList.getinstance().rootPath =null;
                 	}
                 	file = new File(paths.get(0).toString());
+                    if(file.getParent().compareTo(iso_mount_dir) == 0 && ISOpath != null) {					
+                        file = new File(ISOpath+"/VIRTUAL_CDROM");
+                        Log.i(TAG,"[exit button]file:"+file);
+                        ISOpath = null;
+                    }
                 	currenturl =file.getParentFile().getParent();
                 	if((file.getParent().compareToIgnoreCase(root_path)!=0)&&(pathLevel>0)){
 						String path = file.getParent();
@@ -728,6 +733,9 @@ public class FileList extends ListActivity {
 			Log.d(TAG, "ISO path:"+ISOpath);	 			
 			execCmd(cm);
 			BrowserFile(iso_mount_dir);
+                    fileDirectory_position_selected.add(item_position_selected);
+                    fileDirectory_position_piexl.add(fromtop_piexl);
+                    pathLevel++;
 	    }else 
 	    {
 	    	if(!listAllFiles) {
@@ -754,49 +762,46 @@ public class FileList extends ListActivity {
 	}
     public boolean onKeyDown(int keyCode, KeyEvent event) { 
         if (keyCode == KeyEvent.KEYCODE_BACK) {     
-			if(listAllFiles) {
-				FileList.this.finish();
-				return true;
-			}
-			
-            if(paths == null) 
-            {
-            	FileList.this.finish();
-            	PlayList.getinstance().rootPath =null;
+            if(listAllFiles) {
+                FileList.this.finish();
+                return true;
             }
-            else
-            {
-            	if(paths.isEmpty())
-            	{
-            		FileList.this.finish();
-            		PlayList.getinstance().rootPath =null;
-            	}
-            	file = new File(paths.get(0).toString());
-				if(file.getParent().compareTo(iso_mount_dir) == 0 && ISOpath != null) {					
-					file = new File(ISOpath);
-					ISOpath = null;
-				}
-            	currenturl =file.getParentFile().getParent();
-            	if((file.getParent().compareToIgnoreCase(root_path)!=0)&&(pathLevel>0)){
-					String path = file.getParent();
-					String parent_path = file.getParentFile().getParent();
-					if((path.equals(NAND_PATH)||path.equals(SD_PATH)||parent_path.equals(USB_PATH))&&(pathLevel>0)) {
-						pathLevel=0;
-						BrowserFile(ROOT_PATH);
-					}
-					else {
-						BrowserFile(currenturl);
-                		pathLevel--;
-                		getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
-                		fileDirectory_position_selected.remove(pathLevel);
-                		fileDirectory_position_piexl.remove(pathLevel);
-					}
-            	}
-            	else
-            	{
-        			FileList.this.finish();
-        			PlayList.getinstance().rootPath =null;
-            	}
+
+            if(paths == null) {
+                FileList.this.finish();
+                PlayList.getinstance().rootPath =null;
+            }
+            else {
+                if(paths.isEmpty()) {
+                    FileList.this.finish();
+                    PlayList.getinstance().rootPath =null;
+                }
+                file = new File(paths.get(0).toString());
+                if(file.getParent().compareTo(iso_mount_dir) == 0 && ISOpath != null) {					
+                    file = new File(ISOpath+"/VIRTUAL_CDROM");
+                    Log.i(TAG,"[onKeyDown]file:"+file);
+                    ISOpath = null;
+                }
+                currenturl =file.getParentFile().getParent();
+                if((file.getParent().compareToIgnoreCase(root_path)!=0)&&(pathLevel>0)){
+                    String path = file.getParent();
+                    String parent_path = file.getParentFile().getParent();
+                    if((path.equals(NAND_PATH)||path.equals(SD_PATH)||parent_path.equals(USB_PATH))&&(pathLevel>0)) {
+                        pathLevel=0;
+                        BrowserFile(ROOT_PATH);
+                    }
+                    else {
+                        BrowserFile(currenturl);
+                        pathLevel--;
+                        getListView().setSelectionFromTop(fileDirectory_position_selected.get(pathLevel), fileDirectory_position_piexl.get(pathLevel));
+                        fileDirectory_position_selected.remove(pathLevel);
+                        fileDirectory_position_piexl.remove(pathLevel);
+                    }
+                }
+                else {
+                    FileList.this.finish();
+                    PlayList.getinstance().rootPath =null;
+                }
             }  
             return true;                 
         }
