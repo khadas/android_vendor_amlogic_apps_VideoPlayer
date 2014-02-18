@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContentResolver;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.Configuration;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
@@ -828,6 +829,10 @@ public class VideoPlayer extends Activity {
     SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
             LOGI(TAG,"[surfaceChanged]format:"+format+",w:"+w+",h:"+h);
+            if(mVideoView != null) {
+                mVideoView.requestLayout();
+                mVideoView.invalidate();
+            }
             //@@
             /*mSurfaceWidth = w;
             mSurfaceHeight = h;
@@ -897,7 +902,14 @@ public class VideoPlayer extends Activity {
             LOGI(TAG,"[surfaceDestroyed]surfaceDestroyedFlag:"+surfaceDestroyedFlag);
         }
     };
-
+    
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        if(mVideoView != null) {
+            mVideoView.requestLayout();
+            mVideoView.invalidate();
+        }
+    }
     //@@--------this part for broadcast receiver-------------------------------------------------------------------------------------
     private final String POWER_KEY_SUSPEND_ACTION = "com.amlogic.vplayer.powerkey";
     private boolean isEjectOrUnmoutProcessed = false;
@@ -2512,8 +2524,10 @@ public class VideoPlayer extends Activity {
                 new View.OnSystemUiVisibilityChangeListener() {
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
+                LOGI(TAG,"[onSystemUiVisibilityChange]visibility:"+visibility+",mLastSystemUiVis:"+mLastSystemUiVis);
                 int diff = mLastSystemUiVis ^ visibility;
                 mLastSystemUiVis = visibility;
+                LOGI(TAG,"[onSystemUiVisibilityChange]diff:"+diff);
                 if ((diff & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
                         && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
                     showOsdView();
