@@ -185,6 +185,8 @@ public class VideoPlayer extends Activity {
             catch (RemoteException e) {
         }
 
+	backToFileList = false;
+
         //WakeLock acquire
         closeScreenOffTimeout();
         
