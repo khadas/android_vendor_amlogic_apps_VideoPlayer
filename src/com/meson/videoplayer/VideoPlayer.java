@@ -1460,7 +1460,9 @@ public class VideoPlayer extends Activity {
     }
 
     private void browserBack() {
-        LOGI(TAG,"[browserBack]backToOtherAPK:"+backToOtherAPK);
+        LOGI(TAG,"[browserBack]backToOtherAPK:"+backToOtherAPK+",backToFileList:"+backToFileList);
+        if(backToFileList == true)
+            return;
         item_position_selected = item_position_selected_init + mPlayList.getindex();
         backToFileList = true;
         //mPlayList.rootPath = null;
