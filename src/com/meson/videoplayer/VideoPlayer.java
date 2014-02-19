@@ -648,7 +648,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[initVideoView]");
         mVideoView = (VideoView) findViewById(R.id.VideoView);
         setOnSystemUiVisibilityChangeListener(); // TODO:ATTENTION: this is very import to keep osd bar show or hide synchronize with touch event, bug86905
-        showSystemUi(false);
+        //showSystemUi(false);
         //getHolder().setFormat(PixelFormat.VIDEO_HOLE_REAL);
         if(mVideoView != null) {
             mVideoView.getHolder().addCallback(mSHCallback);
@@ -1405,7 +1405,8 @@ public class VideoPlayer extends Activity {
 
         if(mResumePlay.getEnable() == true) {
             setVideoPath(path);
-            showCtlBar();
+            //showCtlBar();
+            showOsdView();
             return;
         }
         
@@ -1415,7 +1416,8 @@ public class VideoPlayer extends Activity {
         else {
             setVideoPath(path);
         }
-        showCtlBar();
+        //showCtlBar();
+        showOsdView();
     }
 
     private void retryPlay() {
