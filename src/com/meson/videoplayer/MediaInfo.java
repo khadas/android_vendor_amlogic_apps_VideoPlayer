@@ -147,6 +147,22 @@ public class MediaInfo{
         return str;
     }
 
+    public int getVideoWidth() {
+        int width = -1;
+        if(mInfo != null) {
+            width = mInfo.videoInfo[0].width;
+        }
+        return width;
+    }
+
+    public int getVideoHeight() {
+        int height = -1;
+        if(mInfo != null) {
+            height = mInfo.videoInfo[0].height;
+        }
+        return height;
+    }
+
     public int getDuration() {
         int ret = -1;
         if(mInfo != null) {

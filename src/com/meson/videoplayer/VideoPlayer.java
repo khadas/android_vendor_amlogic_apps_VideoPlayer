@@ -37,6 +37,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -48,12 +49,15 @@ import android.view.WindowManager;
 import android.view.WindowManagerPolicy;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -124,6 +128,7 @@ public class VideoPlayer extends Activity {
 
      // All the stuff we need for playing and showing a video
     private VideoView mVideoView;
+    private View mVideoViewRoot; 
     private SurfaceHolder mSurfaceHolder = null;
     private boolean surfaceDestroyedFlag = true;
     private int totaltime = 0;
@@ -646,7 +651,8 @@ public class VideoPlayer extends Activity {
 
     private void initVideoView() {
         LOGI(TAG,"[initVideoView]");
-        mVideoView = (VideoView) findViewById(R.id.VideoView);
+        mVideoViewRoot = findViewById(R.id.VideoViewRoot);
+        mVideoView = (VideoView) mVideoViewRoot.findViewById(R.id.VideoView);
         setOnSystemUiVisibilityChangeListener(); // TODO:ATTENTION: this is very import to keep osd bar show or hide synchronize with touch event, bug86905
         //showSystemUi(false);
         //getHolder().setFormat(PixelFormat.VIDEO_HOLE_REAL);
@@ -832,6 +838,7 @@ public class VideoPlayer extends Activity {
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
             LOGI(TAG,"[surfaceChanged]format:"+format+",w:"+w+",h:"+h);
             if(mVideoView != null) {
+                displayModeImpl(); 
                 mVideoView.requestLayout();
                 mVideoView.invalidate();
             }
@@ -908,6 +915,7 @@ public class VideoPlayer extends Activity {
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         if(mVideoView != null) {
+            displayModeImpl(); 
             mVideoView.requestLayout();
             mVideoView.invalidate();
         }
@@ -1284,9 +1292,89 @@ public class VideoPlayer extends Activity {
     }
 
     private void displayModeImpl () {
-        if (mMediaPlayer != null && mOption != null) {
+        /*if (mMediaPlayer != null && mOption != null) {
             LOGI(TAG,"[displayModeImpl]mode:"+mOption.getDisplayMode());
             mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_FORCE_SCREEN_MODE,mOption.getDisplayMode());
+        }*/
+        int videoWidth = -1;
+        int videoHeight = -1;
+        int dispWidth = -1;
+        int dispHeight = -1;
+        int width = -1;
+        int height = -1;
+        int ratio = 0;
+
+        DisplayMetrics dm = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getRealMetrics(dm);
+        dispWidth = dm.widthPixels;
+        dispHeight = dm.heightPixels;	
+        LOGI(TAG,"[displayModeImpl]dispWidth:"+dispWidth+",dispHeight:"+dispHeight);
+
+        if(mMediaInfo != null) {
+            videoWidth = mMediaInfo.getVideoWidth();
+            videoHeight = mMediaInfo.getVideoHeight();
+            LOGI(TAG,"[displayModeImpl]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
+        }
+
+        if(mMediaPlayer != null && mOption != null && mVideoView != null) {
+            LOGI(TAG,"[displayModeImpl]mode:"+mOption.getDisplayMode());
+            //ViewGroup.LayoutParams lp = mVideoView.getLayoutParams();
+            if(mOption.getDisplayMode() == 0) { // normal
+                if ( videoWidth * dispHeight  < dispWidth * videoHeight ) {
+                    //image too wide
+                    width = dispHeight * videoWidth / videoHeight;
+                    height = dispHeight;
+                } else if ( videoWidth * dispHeight  > dispWidth * videoHeight ) {
+                    //image too tall
+                    width = dispWidth;
+                    height = dispWidth * videoHeight / videoWidth;
+                }
+                else {
+                    width = dispWidth;
+                    height = dispHeight;
+                }
+            }
+            else if(mOption.getDisplayMode() == 1) { // full screen
+                width = dispWidth;
+                height = dispHeight;
+            }
+            else if(mOption.getDisplayMode() == 2) { // 4:3
+                videoWidth = 4*videoHeight /3;
+                if ( videoWidth * dispHeight  < dispWidth * videoHeight ) {
+                    //image too wide
+                    width = dispHeight * videoWidth / videoHeight;
+                    height = dispHeight;
+                } else if ( videoWidth * dispHeight  > dispWidth * videoHeight ) {
+                    //image too tall
+                    width = dispWidth;
+                    height = dispWidth * videoHeight / videoWidth;
+                }
+                else {
+                    width = dispWidth;
+                    height = dispHeight;
+                }
+            }
+            else if(mOption.getDisplayMode() == 3) { // 16:9
+               videoWidth = 16*videoHeight /9;
+               if ( videoWidth * dispHeight  < dispWidth * videoHeight ) {
+                    //image too wide
+                    width = dispHeight * videoWidth / videoHeight;
+                    height = dispHeight;
+                } else if ( videoWidth * dispHeight  > dispWidth * videoHeight ) {
+                    //image too tall
+                    width = dispWidth;
+                    height = dispWidth * videoHeight / videoWidth;
+                }
+                else {
+                    width = dispWidth;
+                    height = dispHeight;
+                }
+            }
+            LOGI(TAG,"[displayModeImpl]width:"+width+",height:"+height);
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(width, height);
+            lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+            mVideoViewRoot.setLayoutParams(lp); 
+            mVideoViewRoot.requestLayout();
         }
     }
 
@@ -2079,7 +2167,7 @@ public class VideoPlayer extends Activity {
             initSubtitle();
             initMediaInfo();
             // TODO: should open
-            //displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
+            displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
             
             if(mResumePlay.getEnable() == true) {
                 mResumePlay.setEnable(false);
@@ -2805,9 +2893,12 @@ public class VideoPlayer extends Activity {
         sub_para = new subview_set();
         sub_para.totalnum = 0;
         sub_para.curid = 0;
-        sub_para.color = subSp.getInt("color", android.graphics.Color.WHITE);
-        sub_para.font=subSp.getInt("font", 20);
-        sub_para.position_v=subSp.getInt("position_v", 0);
+        sub_para.color = android.graphics.Color.WHITE;
+        sub_para.font=20;
+        sub_para.position_v=0;
+        //sub_para.color = subSp.getInt("color", android.graphics.Color.WHITE);
+        //sub_para.font=subSp.getInt("font", 20);
+        //sub_para.position_v=subSp.getInt("position_v", 0);
         setSubtitleView();
     }
 

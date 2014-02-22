@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/Control_Layer1" 
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" 
     android:background="@color/transparent_background">
 
-    <VideoView
-        android:id="@+id/VideoView"
+    <RelativeLayout
+        android:id="@+id/VideoViewRoot"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_centerInParent="true">
-    </VideoView>
+        <VideoView
+            android:id="@+id/VideoView"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_centerInParent="true">
+        </VideoView>
+    </RelativeLayout>
 
     <LinearLayout
         android:orientation="vertical" 
         android:layout_gravity="bottom" 
         android:layout_marginBottom="48dp" 
         android:layout_height="wrap_content" 
-        android:layout_width="fill_parent">
+        android:layout_width="fill_parent"
+        android:layout_alignParentBottom="true">
 	    
 	<LinearLayout
 	    android:layout_width="fill_parent"
@@ -152,10 +159,11 @@
 
 
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/Control_Layer2" 
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" 
+        android:layout_alignParentBottom="true"
         android:background="@color/transparent_background"> 
     
         <LinearLayout 
@@ -165,7 +173,8 @@
             android:orientation="vertical" 
             android:background="@drawable/minding_bk" 
             android:layout_gravity="center"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_centerInParent="true">
 	    
             <LinearLayout 
                 android:layout_width="wrap_content" 
@@ -396,7 +405,8 @@
             android:layout_height="wrap_content" 
             android:layout_width="wrap_content" 
             android:layout_gravity="center"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_centerInParent="true">
             <TextView 
                 android:layout_width="wrap_content" 
                 android:id="@+id/more_title" 
@@ -427,7 +437,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_centerInParent="true">
 		
             <TextView
                 android:id="@+id/info_title" 
@@ -506,5 +517,5 @@
         </LinearLayout>
 	
         <include layout="@layout/morebar" />
-    </FrameLayout>
-</FrameLayout>
+    </RelativeLayout>
+</RelativeLayout>

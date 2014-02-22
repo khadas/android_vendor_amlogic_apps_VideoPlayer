@@ -9,7 +9,8 @@
 	android:layout_width="fill_parent"
 	android:gravity="center"
 	android:paddingLeft="10dp"
-	android:paddingRight="10dp">
+	android:paddingRight="10dp"
+	android:layout_alignParentBottom="true">
 	        
 	<ImageButton 
 		android:id="@+id/BackBtn" 
