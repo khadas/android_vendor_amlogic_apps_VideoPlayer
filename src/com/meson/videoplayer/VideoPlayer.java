@@ -3006,7 +3006,7 @@ public class VideoPlayer extends Activity {
                 if(mMediaPlayer != null) {
                     String subNameStr = mMediaPlayer.subtitleGetCurName();
                     if(subNameStr != null) {
-                        if(subNameStr.equals("INSUB") || subNameStr.endsWith(".idx")) {
+                        if(/*subNameStr.equals("INSUB") ||*/ subNameStr.endsWith(".idx")) {
                             disableSubSetOptions();
                         }
                         else {
@@ -3124,7 +3124,7 @@ public class VideoPlayer extends Activity {
         if(mMediaPlayer != null) {
             String subNameStr = mMediaPlayer.subtitleGetCurName();
             if(subNameStr != null) {
-                if(subNameStr.equals("INSUB") || subNameStr.endsWith(".idx")) {
+                if(/*subNameStr.equals("INSUB") ||*/ subNameStr.endsWith(".idx")) {
                     disableSubSetOptions();
                 }
                 else {
