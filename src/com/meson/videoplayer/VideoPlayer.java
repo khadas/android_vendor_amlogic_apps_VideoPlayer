@@ -68,6 +68,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -168,6 +169,17 @@ public class VideoPlayer extends Activity {
         sw = (SystemWriteManager) getSystemService("system_write"); 
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK |PowerManager.ON_AFTER_RELEASE,TAG);
+        
+        //uncaughtException execute
+        Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+            public void uncaughtException(Thread thread, Throwable ex) {    
+                VideoPlayer.this.sendBroadcast(new Intent("com.meson.videoplayer.PLAYER_CRASHED"));
+                LOGI(TAG,"----------------uncaughtException--------------------");
+                showSystemUi(true);
+                stop();
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+        });
 
         init();
         if(0 != checkUri()) return;
@@ -1158,6 +1170,17 @@ public class VideoPlayer extends Activity {
     private void displayModeSelect() {
         LOGI(TAG,"[displayModeSelect]");
         // TODO: check 3D
+        if(mMediaInfo != null) {
+            int videoNum = mMediaInfo.getVideoNum();
+            if(videoNum <= 0) {
+                Toast toast =Toast.makeText(VideoPlayer.this, R.string.file_have_no_video,Toast.LENGTH_SHORT );
+                toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                toast.setDuration(0x00000001);
+                toast.show();
+                startOsdTimeout();
+                return;
+            }
+        }
         ListView listView = (ListView)findViewById(R.id.ListView);
         listView.setAdapter(getMorebarListAdapter(DISPLAY_MODE, mOption.getDisplayMode()));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -1296,6 +1319,7 @@ public class VideoPlayer extends Activity {
             LOGI(TAG,"[displayModeImpl]mode:"+mOption.getDisplayMode());
             mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_FORCE_SCREEN_MODE,mOption.getDisplayMode());
         }*/
+        int videoNum= -1;
         int videoWidth = -1;
         int videoHeight = -1;
         int dispWidth = -1;
@@ -1311,6 +1335,10 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[displayModeImpl]dispWidth:"+dispWidth+",dispHeight:"+dispHeight);
 
         if(mMediaInfo != null) {
+            videoNum = mMediaInfo.getVideoNum();
+            if(videoNum <= 0) {
+                return;
+            }
             videoWidth = mMediaInfo.getVideoWidth();
             videoHeight = mMediaInfo.getVideoHeight();
             LOGI(TAG,"[displayModeImpl]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
