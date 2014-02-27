@@ -490,7 +490,7 @@ public class FileList extends ListActivity {
 			fs[i] = listFiles.get(i);
 		}
 		if (!filePath.equals(ROOT_PATH)) {
-                System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+                //System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
                 try{
                     Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));
                 }catch(IllegalArgumentException ex){
@@ -858,7 +858,11 @@ public class FileList extends ListActivity {
 	    for(int i=0;i<listVideos.size();i++) {
 	    	fs[i] = listVideos.get(i);
 	    }
-	    Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));   
+            
+        try{
+            Arrays.sort(fs, new MyComparator(MyComparator.NAME_ASCEND));   
+        }catch(IllegalArgumentException ex){
+        }
 	    
 	    for(int i=0;i<fs.length;i++) {
 	    	File tempF = fs[i];

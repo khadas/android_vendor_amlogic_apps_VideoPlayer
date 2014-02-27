@@ -40,11 +40,13 @@ public class MyComparator implements Comparator<File> {
 				else if(f1.isFile() && f2.isDirectory())
 					result = 1;
 				else {
-					result = ustrcasecmp(returnString(f1.getName(), 0), returnString(f2.getName(), 0));
+					/*result = ustrcasecmp(returnString(f1.getName(), 0), returnString(f2.getName(), 0));
 					if(result > 0)
 						result = 1;
 					else if(result < 0)
-						result = -1;
+						result = -1;*/
+
+                                result = f1.getName().compareToIgnoreCase(f2.getName());
 				}
 				break;
 			case NAME_DESCEND:
