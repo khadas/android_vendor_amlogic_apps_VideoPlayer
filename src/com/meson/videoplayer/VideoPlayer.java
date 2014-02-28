@@ -1339,14 +1339,17 @@ public class VideoPlayer extends Activity {
             if(videoNum <= 0) {
                 return;
             }
-            videoWidth = mMediaInfo.getVideoWidth();
-            videoHeight = mMediaInfo.getVideoHeight();
-            LOGI(TAG,"[displayModeImpl]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
+            //videoWidth = mMediaInfo.getVideoWidth();
+            //videoHeight = mMediaInfo.getVideoHeight();
+            //LOGI(TAG,"[displayModeImpl]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
         }
 
         if(mMediaPlayer != null && mOption != null && mVideoView != null) {
             LOGI(TAG,"[displayModeImpl]mode:"+mOption.getDisplayMode());
             //ViewGroup.LayoutParams lp = mVideoView.getLayoutParams();
+            videoWidth = mMediaPlayer.getVideoWidth();
+            videoHeight = mMediaPlayer.getVideoHeight();
+            LOGI(TAG,"[displayModeImpl]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
             if(mOption.getDisplayMode() == 0) { // normal
                 if ( videoWidth * dispHeight  < dispWidth * videoHeight ) {
                     //image too wide
