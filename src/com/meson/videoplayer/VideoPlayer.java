@@ -2924,6 +2924,7 @@ public class VideoPlayer extends Activity {
         sub_para = new subview_set();
         sub_para.totalnum = 0;
         sub_para.curid = 0;
+        sub_para.curidbac = 0;
         sub_para.color = android.graphics.Color.WHITE;
         sub_para.font=20;
         sub_para.position_v=0;
@@ -2987,7 +2988,10 @@ public class VideoPlayer extends Activity {
                         mMediaPlayer.subtitleHide();
                     }
                     else {
-                        mMediaPlayer.subtitleOpenIdx(sub_para.curid);
+                        if(sub_para.curidbac != sub_para.curid) {
+                            mMediaPlayer.subtitleOpenIdx(sub_para.curid);
+                            sub_para.curidbac = sub_para.curid;
+                        }
                     }
                 }
                 
@@ -3735,6 +3739,7 @@ class ResumePlay {
 class subview_set{
     public int totalnum; 
     public int curid;
+    public int curidbac;
     public int color;
     public int font; 
     public int position_v;
