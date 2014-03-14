@@ -2190,6 +2190,7 @@ public class VideoPlayer extends Activity {
                 mCanSeekForward = !data.has(Metadata.SEEK_FORWARD_AVAILABLE)
                     || data.getBoolean(Metadata.SEEK_FORWARD_AVAILABLE);
                 mCanSeek = mCanSeekBack && mCanSeekForward;
+                LOGI(TAG,"[mPreparedListener]mCanSeek:"+mCanSeek);
             } else {
                 mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
             }
@@ -2700,7 +2701,7 @@ public class VideoPlayer extends Activity {
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
-        LOGI(TAG,"[onKeyDown]keyCode:"+keyCode+",ctlbar.getVisibility():"+ctlbar.getVisibility());
+        LOGI(TAG,"[onKeyDown]keyCode:"+keyCode+",ctlbar.getVisibility():"+ctlbar.getVisibility()+",intouch_flag:"+intouch_flag);
         if((ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE)) {
             if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
                 startOsdTimeout();
@@ -2725,6 +2726,16 @@ public class VideoPlayer extends Activity {
                     }
                     intouch_flag = false;
                 }
+            }
+        }
+
+        if(keyCode == KeyEvent.KEYCODE_DPAD_UP) { // add for progressBar request focus fix bug 87713
+            if(getCurOsdViewFlag() == OSD_CTL_BAR) {
+                if(progressBar != null) 
+                    progressBar.requestFocus();
+            }
+            else{
+                return true;
             }
         }
         
