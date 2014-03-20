@@ -150,7 +150,8 @@ public class VideoPlayer extends Activity {
     MediaInfo mMediaInfo = null;
     ErrorInfo mErrorInfo = null;
     
-    private boolean backToFileList = false;
+    private boolean browserBackDoing = false;
+    private boolean browserBackInvokeFromOnPause = false; //browserBack invoked by back keyevent and browserBack button as usually, if invoked from OnPause suppose to meaning HOME key pressed
     private boolean playmode_switch = true;
 
     private float mTransitionAnimationScale = 1.0f;
@@ -202,7 +203,8 @@ public class VideoPlayer extends Activity {
             catch (RemoteException e) {
         }
 
-	backToFileList = false;
+        browserBackDoing = false;
+        browserBackInvokeFromOnPause = false;
 
         //WakeLock acquire
         closeScreenOffTimeout();
@@ -318,6 +320,7 @@ public class VideoPlayer extends Activity {
                     }
                 }
                 else {
+                    browserBackInvokeFromOnPause = true;
                     browserBack();
                 }
             }
@@ -1583,18 +1586,22 @@ public class VideoPlayer extends Activity {
     }
 
     private void browserBack() {
-        LOGI(TAG,"[browserBack]backToOtherAPK:"+backToOtherAPK+",backToFileList:"+backToFileList);
-        if(backToFileList == true)
+        LOGI(TAG,"[browserBack]backToOtherAPK:"+backToOtherAPK+",browserBackDoing:"+browserBackDoing);
+        if(browserBackDoing == true)
             return;
         item_position_selected = item_position_selected_init + mPlayList.getindex();
-        backToFileList = true;
-        //mPlayList.rootPath = null;
-        if(!backToOtherAPK) {
-            Intent selectFileIntent = new Intent();
-            Bundle bundle = getFilePos();
-            selectFileIntent.setClass(VideoPlayer.this, FileList.class);
-            selectFileIntent.putExtras(bundle);
-            startActivity(selectFileIntent);
+        browserBackDoing = true;
+        if(browserBackInvokeFromOnPause == true) {
+            mPlayList.rootPath =null;
+        }
+        else {
+            if(!backToOtherAPK) {
+                Intent selectFileIntent = new Intent();
+                Bundle bundle = getFilePos();
+                selectFileIntent.setClass(VideoPlayer.this, FileList.class);
+                selectFileIntent.putExtras(bundle);
+                startActivity(selectFileIntent);
+            }
         }
         stop();
         finish();
@@ -2116,7 +2123,7 @@ public class VideoPlayer extends Activity {
 
         if(uriTmp == null) {
             LOGE(TAG,"[trySetVideoURIAgain]uriTmp=null error!!!");
-            Toast.makeText(mContext,mContext.getText(R.string.wait_for_scan),Toast.LENGTH_SHORT).show();  
+            Toast.makeText(mContext,mContext.getText(R.string.wait_for_scan),Toast.LENGTH_SHORT).show();
             browserBack();
             return;
         }
