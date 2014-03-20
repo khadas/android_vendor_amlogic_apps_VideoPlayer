@@ -2995,7 +2995,7 @@ public class VideoPlayer extends Activity {
                 sub_para.font = sub_font_state;
                 sub_para.position_v = sub_position_v_state;
 
-                LOGI(TAG,"[subtitle_control]sub_para.curid:"+sub_para.curid);
+                LOGI(TAG,"[subtitle_control]sub_para.curid:"+sub_para.curid+",sub_para.curidbac:"+sub_para.curidbac);
                 if(mMediaPlayer != null) {
                     if(sub_para.curid==sub_para.totalnum) {
                         mMediaPlayer.subtitleHide();
@@ -3004,6 +3004,9 @@ public class VideoPlayer extends Activity {
                         if(sub_para.curidbac != sub_para.curid) {
                             mMediaPlayer.subtitleOpenIdx(sub_para.curid);
                             sub_para.curidbac = sub_para.curid;
+                        }
+                        else {
+                            mMediaPlayer.subtitleDisplay();
                         }
                     }
                 }
