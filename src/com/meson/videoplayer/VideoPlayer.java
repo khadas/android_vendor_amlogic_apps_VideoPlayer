@@ -172,7 +172,7 @@ public class VideoPlayer extends Activity {
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK |PowerManager.ON_AFTER_RELEASE,TAG);
         
         //uncaughtException execute
-        Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+        /*Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
             public void uncaughtException(Thread thread, Throwable ex) {    
                 VideoPlayer.this.sendBroadcast(new Intent("com.meson.videoplayer.PLAYER_CRASHED"));
                 LOGI(TAG,"----------------uncaughtException--------------------");
@@ -180,7 +180,7 @@ public class VideoPlayer extends Activity {
                 stop();
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
-        });
+        });*/
 
         init();
         if(0 != checkUri()) return;
