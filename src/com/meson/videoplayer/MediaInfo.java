@@ -1,5 +1,6 @@
 package com.meson.videoplayer;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 import java.io.File;
@@ -8,11 +9,13 @@ import java.io.File;
 public class MediaInfo{
     private static final String TAG = "MediaInfo";
     private static final boolean DEBUG = false;
+    private static Context mContext = null;
     private MediaPlayer mp = null;
     private MediaPlayer.MediaInfo mInfo = null;
     
-    public MediaInfo(MediaPlayer mediaPlayer) {
+    public MediaInfo(MediaPlayer mediaPlayer, Context context) {
         mp = mediaPlayer;
+        mContext = context;
     }
     
     public void initMediaInfo() {
@@ -141,13 +144,13 @@ public class MediaInfo{
 
     public String getResolution() {
         String str = null;
-        if(mInfo != null) {
+        if(mInfo != null && getVideoTotalNum() > 0) {
             str = mInfo.videoInfo[0].width + "*" + mInfo.videoInfo[0].height;
         }
         return str;
     }
 
-    public int getVideoNum() {
+    public int getVideoTotalNum() {
         int num = 0;
         if(mInfo != null) {
             num = mInfo.total_video_num;
@@ -157,7 +160,7 @@ public class MediaInfo{
 
     public int getVideoWidth() {
         int width = -1;
-        if(mInfo != null && getVideoNum() > 0) {
+        if(mInfo != null && getVideoTotalNum() > 0) {
             width = mInfo.videoInfo[0].width;
         }
         return width;
@@ -165,7 +168,7 @@ public class MediaInfo{
 
     public int getVideoHeight() {
         int height = -1;
-        if(mInfo != null && getVideoNum() > 0) {
+        if(mInfo != null && getVideoTotalNum() > 0) {
             height = mInfo.videoInfo[0].height;
         }
         return height;
@@ -211,7 +214,7 @@ public class MediaInfo{
     public int getCurAudioIdx() {
         int ret = -1;
         int aIdx = -1;
-        if(mInfo != null) {
+        if(mInfo != null && getAudioTotalNum() > 0) {
             aIdx = mInfo.cur_audio_index;// current audio track index, should tranfer to list index
             for(int i=0;i<mInfo.total_audio_num;i++) {
                 if(mInfo.cur_audio_index == mInfo.audioInfo[i].index) {
@@ -232,7 +235,7 @@ public class MediaInfo{
 
     public int getAudioIdx(int listIdx) {
         int ret = -1;
-        if(mInfo != null) {
+        if(mInfo != null && getAudioTotalNum() > 0) {
             ret = mInfo.audioInfo[listIdx].index;
         }
         return ret;
@@ -240,7 +243,7 @@ public class MediaInfo{
 
     public int getAudioFormat(int i) {
         int ret = -1;
-        if(mInfo != null) {
+        if(mInfo != null && getAudioTotalNum() > 0) {
             ret = mInfo.audioInfo[i].aformat;
         }
         return ret;
@@ -332,6 +335,57 @@ public class MediaInfo{
                 break;
         }
         return type;
+    }
+
+    //@@--------this part for media info show on OSD--------------------------------------------------------
+    //media info no, must sync with media_info_type in MediaPlayer.h
+    public static final int MEDIA_INFO_UNKNOWN = 1;
+    public static final int MEDIA_INFO_STARTED_AS_NEXT = 2;
+    public static final int MEDIA_INFO_RENDERING_START = 3;
+    public static final int MEDIA_INFO_VIDEO_TRACK_LAGGING = 700;
+    public static final int MEDIA_INFO_BUFFERING_START = 701;
+    public static final int MEDIA_INFO_BUFFERING_END = 702;
+    public static final int MEDIA_INFO_NETWORK_BANDWIDTH = 703;
+    public static final int MEDIA_INFO_BAD_INTERLEAVING = 800;
+    public static final int MEDIA_INFO_NOT_SEEKABLE = 801;
+    public static final int MEDIA_INFO_METADATA_UPDATE = 802;
+    public static final int MEDIA_INFO_TIMED_TEXT_ERROR = 900;
+    public static final int MEDIA_INFO_AMLOGIC_BASE = 8000;	
+    public static final int MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT=MEDIA_INFO_AMLOGIC_BASE+1;
+    public static final int MEDIA_INFO_AMLOGIC_AUDIO_NOT_SUPPORT = MEDIA_INFO_AMLOGIC_BASE+2;
+    public static final int MEDIA_INFO_AMLOGIC_NO_VIDEO = MEDIA_INFO_AMLOGIC_BASE+3;
+    public static final int MEDIA_INFO_AMLOGIC_NO_AUDIO = MEDIA_INFO_AMLOGIC_BASE+4;	
+    
+    public boolean needShowOnUI(int info) {
+        boolean ret = false;
+        if((info == MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT) 
+            || (info == MEDIA_INFO_AMLOGIC_AUDIO_NOT_SUPPORT)
+            || (info == MEDIA_INFO_AMLOGIC_NO_VIDEO)
+            || (info == MEDIA_INFO_AMLOGIC_NO_AUDIO)) {
+            ret = true;
+        }
+        return ret;
+    }
+
+    public String getInfo(int info) {
+        String infoStr = null;
+        switch(info) {
+            case MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT:
+                infoStr = mContext.getResources().getString(R.string.unsupport_video_format);//"Unsupport Video format";
+                break;
+            case MEDIA_INFO_AMLOGIC_AUDIO_NOT_SUPPORT:
+                infoStr = mContext.getResources().getString(R.string.unsupport_audio_format);//"Unsupport Audio format";
+                break;
+            case MEDIA_INFO_AMLOGIC_NO_VIDEO:
+                infoStr = mContext.getResources().getString(R.string.file_have_no_video);//"file have no video";
+                break;
+            case MEDIA_INFO_AMLOGIC_NO_AUDIO:
+                infoStr = mContext.getResources().getString(R.string.file_have_no_audio);//"file have no audio";
+                break;
+            default:
+                break;
+        }
+        return infoStr;
     }
     
     private void printMediaInfo() {

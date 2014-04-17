@@ -139,9 +139,6 @@ public class VideoPlayer extends Activity {
     //@@private int mSurfaceWidth;
     //@@private int mSurfaceHeight;
     private OnCompletionListener mOnCompletionListener;
-    private MediaPlayer.OnPreparedListener mOnPreparedListener;
-    private OnErrorListener mOnErrorListener;
-    private OnInfoListener mOnInfoListener;
 
     Option mOption = null;
     Bookmark mBookmark = null;
@@ -451,7 +448,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void initMediaInfo() {
-        mMediaInfo = new MediaInfo(mMediaPlayer);
+        mMediaInfo = new MediaInfo(mMediaPlayer, VideoPlayer.this);
         mMediaInfo.initMediaInfo();
 
         //prepare for audio track
@@ -854,8 +851,8 @@ public class VideoPlayer extends Activity {
             LOGI(TAG,"[surfaceChanged]format:"+format+",w:"+w+",h:"+h);
             if(mVideoView != null) {
                 displayModeImpl(); 
-                mVideoView.requestLayout();
-                mVideoView.invalidate();
+                //mVideoView.requestLayout();
+                //mVideoView.invalidate();
             }
             //@@
             /*mSurfaceWidth = w;
@@ -1174,7 +1171,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[displayModeSelect]");
         // TODO: check 3D
         if(mMediaInfo != null) {
-            int videoNum = mMediaInfo.getVideoNum();
+            int videoNum = mMediaInfo.getVideoTotalNum();
             if(videoNum <= 0) {
                 Toast toast =Toast.makeText(VideoPlayer.this, R.string.file_have_no_video,Toast.LENGTH_SHORT );
                 toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
@@ -1338,7 +1335,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[displayModeImpl]dispWidth:"+dispWidth+",dispHeight:"+dispHeight);
 
         if(mMediaInfo != null) {
-            videoNum = mMediaInfo.getVideoNum();
+            videoNum = mMediaInfo.getVideoTotalNum();
             if(videoNum <= 0) {
                 return;
             }
@@ -1408,7 +1405,7 @@ public class VideoPlayer extends Activity {
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(width, height);
             lp.addRule(RelativeLayout.CENTER_IN_PARENT);
             mVideoViewRoot.setLayoutParams(lp); 
-            mVideoViewRoot.requestLayout();
+            //mVideoViewRoot.requestLayout();
         }
     }
 
@@ -1475,12 +1472,16 @@ public class VideoPlayer extends Activity {
             playBtn.setImageResource(R.drawable.play);
         }
 
+        if((progressBar == null) || (fastforwordBtn == null) || (fastreverseBtn == null)) {
+            return;
+        }
+
         if(mCanSeek) {
             progressBar.setEnabled(true);
 
             if(mMediaPlayer != null) {
                 String playerTypeStr = mMediaPlayer.getStringParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_TYPE_STR);
-                if(playerTypeStr.equals("AMLOGIC_PLAYER")) {
+                if((playerTypeStr != null) && (playerTypeStr.equals("AMLOGIC_PLAYER"))) {
                     fastforwordBtn.setEnabled(true);
                     fastreverseBtn.setEnabled(true);
                     fastforwordBtn.setImageResource(R.drawable.ff);
@@ -2162,6 +2163,7 @@ public class VideoPlayer extends Activity {
         mMediaPlayer.setOnCompletionListener(mCompletionListener);
         mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
         mMediaPlayer.setOnErrorListener(mErrorListener);
+        mMediaPlayer.setOnInfoListener(mInfoListener);
         mMediaPlayer.setDisplay(mSurfaceHolder);
     }
 
@@ -2173,13 +2175,19 @@ public class VideoPlayer extends Activity {
     MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
         new MediaPlayer.OnVideoSizeChangedListener() {
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                //@@
-                /*mVideoWidth = mp.getVideoWidth();
-                mVideoHeight = mp.getVideoHeight();
-                if (mVideoWidth != 0 && mVideoHeight != 0) {
-                    getHolder().setFixedSize(mVideoWidth, mVideoHeight);
-                    requestLayout();
-                }*/
+                LOGI(TAG,"[onVideoSizeChanged]");
+                displayModeImpl();
+                if(mMediaPlayer != null && mVideoView != null) {
+                    int videoWidth = mMediaPlayer.getVideoWidth();
+                    int videoHeight = mMediaPlayer.getVideoHeight();
+                    LOGI(TAG,"[onVideoSizeChanged]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
+                    if (videoWidth != 0 && videoHeight != 0) {
+                        displayModeImpl();
+                        mVideoView.requestLayout();
+                        /*mVideoView.getHolder().setFixedSize(videoWidth, videoHeight);
+                        mVideoView.requestLayout();*/
+                    }
+                }
             }
     };
 
@@ -2290,13 +2298,33 @@ public class VideoPlayer extends Activity {
     private MediaPlayer.OnErrorListener mErrorListener =
         new MediaPlayer.OnErrorListener() {
         public boolean onError(MediaPlayer mp, int what, int extra) {
-            Log.d(TAG, "Error: " + what + "," + extra);
+            Log.e(TAG, "Error: " + what + "," + extra);
             mState = STATE_ERROR;
-            String InfoStr = mErrorInfo.getErrorInfo(what, mPlayList.getcur());
-            Toast toast =Toast.makeText(VideoPlayer.this, "Status Error:"+InfoStr,Toast.LENGTH_SHORT );
+            String infoStr = mErrorInfo.getErrorInfo(what, mPlayList.getcur());
+            Toast toast =Toast.makeText(VideoPlayer.this, "Status Error:"+infoStr,Toast.LENGTH_SHORT );
             toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
             toast.setDuration(0x00000001);
             toast.show();
+            return true;
+        }
+    };
+
+    private MediaPlayer.OnInfoListener mInfoListener =
+        new MediaPlayer.OnInfoListener() {
+        public  boolean onInfo(MediaPlayer mp, int arg1, int arg2) {
+            //LOGI(TAG, "[onInfo] mp: " + mp + ",arg1:" + arg1 + ",arg2:"+arg2);
+            if (mp != null) {
+                boolean needShow= mMediaInfo.needShowOnUI(arg1);
+                //LOGI(TAG, "[onInfo] needShow: " + needShow);
+                if(needShow == true) {
+                    String infoStr = mMediaInfo.getInfo(arg1);
+                    //LOGI(TAG, "[onInfo] infoStr: " + infoStr);
+                    Toast toast =Toast.makeText(VideoPlayer.this, "Media Info:"+infoStr,Toast.LENGTH_SHORT );
+                    toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                    toast.setDuration(0x00000001);
+                    toast.show();
+                }
+            }
             return true;
         }
     };
@@ -2742,7 +2770,7 @@ public class VideoPlayer extends Activity {
                     progressBar.requestFocus();
             }
             else{
-                return true;
+                return false;
             }
         }
         
