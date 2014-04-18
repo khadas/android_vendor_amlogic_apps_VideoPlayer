@@ -1462,6 +1462,10 @@ public class VideoPlayer extends Activity {
     private Timer retryTimer = new Timer();
 
     private void updateIconResource() {
+        if((progressBar == null) || (fastforwordBtn == null) || (fastreverseBtn == null) || (playBtn == null)) {
+            return;
+        }
+        
         if(mState == STATE_PLAYING) {
             playBtn.setImageResource(R.drawable.pause);
         }
@@ -1470,10 +1474,6 @@ public class VideoPlayer extends Activity {
         }
         else if(mState == STATE_SEARCHING) {
             playBtn.setImageResource(R.drawable.play);
-        }
-
-        if((progressBar == null) || (fastforwordBtn == null) || (fastreverseBtn == null)) {
-            return;
         }
 
         if(mCanSeek) {
@@ -1626,6 +1626,7 @@ public class VideoPlayer extends Activity {
 
     private void playPrev() {
         LOGI(TAG,"[playPrev]mState:"+mState);
+        stopOsdTimeout();
         if(mState != STATE_PREPARING) { // avoid status error for preparing
             stopFWFB();
             stop();
@@ -1639,6 +1640,7 @@ public class VideoPlayer extends Activity {
 
     private void playNext() {
         LOGI(TAG,"[playNext]mState:"+mState);
+        stopOsdTimeout();
          if(mState != STATE_PREPARING) { // avoid status error for preparing
              stopFWFB();
              stop();
@@ -1651,6 +1653,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void playCur() {
+        stopOsdTimeout();
         stopFWFB();
         stop();
         curtime = 0;
@@ -2451,15 +2454,20 @@ public class VideoPlayer extends Activity {
                 //@@}   
             }
         }; 
-        
-        timer.cancel();
-        timer = new Timer();
-        timer.schedule(task, OSD_FADE_TIME);
+
+        stopOsdTimeout();
+        if(timer == null) {
+            timer = new Timer();
+        }
+        if(timer != null) {
+            timer.schedule(task, OSD_FADE_TIME);
+        }
     }
 
     private void stopOsdTimeout() {
         if(timer!=null)
             timer.cancel();
+            timer = null;
     }
 
     private int getCurOsdViewFlag() {
