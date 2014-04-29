@@ -18,6 +18,28 @@
         </VideoView>
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/CertificationView"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true">
+        <ImageView
+            android:id="@+id/CertificationDobly"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/certifi_dobly"
+            android:visibility="gone">
+        </ImageView>
+        <ImageView
+            android:id="@+id/CertificationDTS"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/certifi_dts"
+            android:visibility="gone">
+        </ImageView>
+    </RelativeLayout>
+
     <LinearLayout
         android:orientation="vertical" 
         android:layout_gravity="bottom" 

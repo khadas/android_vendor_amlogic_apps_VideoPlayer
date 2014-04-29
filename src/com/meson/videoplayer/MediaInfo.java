@@ -337,6 +337,21 @@ public class MediaInfo{
         return type;
     }
 
+    //@@--------this part for certification check-------------------------------------------------------------
+    public static final int CERTIFI_Dolby  = 1;
+    public static final int CERTIFI_DTS  = 2;
+    public int checkAudioCertification(int aFormat) {
+        int ret = -1;
+        if((aFormat == AFORMAT_AC3) || (aFormat == AFORMAT_EAC3)) {
+            ret = CERTIFI_Dolby;
+        }
+        else if(aFormat == AFORMAT_DTS) {
+            ret = CERTIFI_DTS;
+        }
+        // add more ...
+        return ret;
+    }
+
     //@@--------this part for media info show on OSD--------------------------------------------------------
     //media info no, must sync with media_info_type in MediaPlayer.h
     public static final int MEDIA_INFO_UNKNOWN = 1;

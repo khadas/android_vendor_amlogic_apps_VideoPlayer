@@ -55,6 +55,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -117,6 +118,10 @@ public class VideoPlayer extends Activity {
     private ImageButton play3dBtn = null;
     private TextView otherwidgetTitleTx = null;
     private boolean progressBarSeekFlag = false;
+
+    //certification view
+    private ImageView certificationDoblyView = null;
+    private ImageView certificationDTSView = null;
 
     //store index of file postion for back to file list
     private int item_position_selected; // for back to file list view
@@ -269,6 +274,9 @@ public class VideoPlayer extends Activity {
         super.onPause();
         LOGI(TAG,"[onPause] curtime:"+curtime);
 
+        //close certification
+        closeCertification();
+
         //set book mark
         if(mBookmark != null) {
             if(confirm_dialog != null && confirm_dialog.isShowing() && exitAbort == false) {
@@ -386,7 +394,7 @@ public class VideoPlayer extends Activity {
                 updateIconResource();
             }*/
                 
-            //LOGI(TAG,"[updateProgressbar]curtime:"+curtime+",totaltime:"+totaltime);
+            LOGI(TAG,"[updateProgressbar]curtime:"+curtime+",totaltime:"+totaltime+",progressBar:"+progressBar+",ctlbar:"+ctlbar+",ctlbar.getVisibility():"+ctlbar.getVisibility());
             if(curTimeTx!=null && totalTimeTx!=null && progressBar!=null) {
                 int flag = getCurOsdViewFlag();
                 if((OSD_CTL_BAR == flag) &&  (null!=ctlbar)&&(View.VISIBLE==ctlbar.getVisibility())) { // check control bar is showing
@@ -469,11 +477,18 @@ public class VideoPlayer extends Activity {
     private void initView() {
         LOGI(TAG,"initView");
         mContext = this.getApplicationContext();
+        //videView
         initVideoView();
 
         ff_fb =Toast.makeText(VideoPlayer.this, "",Toast.LENGTH_SHORT );
         ff_fb.setGravity(Gravity.TOP | Gravity.RIGHT,10,10);
         ff_fb.setDuration(0x00000001);
+
+        //certification image
+        certificationDoblyView = (ImageView)findViewById(R.id.CertificationDobly);
+        certificationDTSView = (ImageView)findViewById(R.id.CertificationDTS);
+        certificationDoblyView.setVisibility(View.GONE);
+        certificationDTSView.setVisibility(View.GONE);
 
         ctlbar = (LinearLayout)findViewById(R.id.infobarLayout);
         optbar = (LinearLayout)findViewById(R.id.morebarLayout);
@@ -650,12 +665,12 @@ public class VideoPlayer extends Activity {
         play3dBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 LOGI(TAG,"play3dBtn onClick");
-                // TODO:
                 Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
-                toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                toast.setGravity(Gravity.BOTTOM,0,0);
                 toast.setDuration(0x00000001);
                 toast.show();
                 startOsdTimeout();
+                //play3DSelect();
             } 
         }); 
         
@@ -1125,6 +1140,7 @@ public class VideoPlayer extends Activity {
                 mOption.setAudioTrack(position);
                 audioTrackImpl(position);
                 exitOtherWidget(audiooptionBtn);
+                showCertification(); //update certification status and icon
             }	
         });
         showOtherWidget(R.string.setting_audiotrack);
@@ -1143,6 +1159,21 @@ public class VideoPlayer extends Activity {
             }	
         });
         showOtherWidget(R.string.setting_soundtrack);
+    }
+
+    private void play3DSelect() {
+        LOGI(TAG,"[play3DSelect]");
+        SimpleAdapter _3darray = getMorebarListAdapter(PLAY3D, mOption.get3DMode());
+        ListView listView = (ListView)findViewById(R.id.ListView);
+        listView.setAdapter(_3darray);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mOption.set3DMode(position);
+                play3DImpl(position);
+                exitOtherWidget(play3dBtn);
+            }	
+        });
+        showOtherWidget(R.string.setting_3d_mode);
     }
 
     private void subtitleSelect() {
@@ -1442,6 +1473,25 @@ public class VideoPlayer extends Activity {
         }
     }
 
+    private void play3DImpl(int idx) {
+        LOGI(TAG,"[play3DSelect]idx:"+idx);
+        boolean ret = false;
+        if (mMediaPlayer != null) {
+            // TODO: should open after 3d function debug ok
+            //ret = mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+            if(!ret) {
+                if(mOption != null) {
+                    mOption.set3DMode(0);
+                }
+                Toast toast =Toast.makeText(VideoPlayer.this, getResources().getString(R.string.not_support_3d),Toast.LENGTH_SHORT );
+                toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                toast.setDuration(0x00000001);
+                toast.show();
+                startOsdTimeout();
+            }
+        }
+    }
+
     //@@--------this part for play function implement--------------------------------------------------------------------------------
     // The ffmpeg step is 2*step
     private Toast ff_fb = null;
@@ -1508,8 +1558,6 @@ public class VideoPlayer extends Activity {
             fastforwordBtn.setImageResource(R.drawable.ff_disable);
             fastreverseBtn.setImageResource(R.drawable.rewind_disable);
         }
-
-        // TODO: 3D button (play3dBtn) 
     }
 
     private void resetVariate() {
@@ -1653,6 +1701,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void playCur() {
+        LOGI(TAG,"[playCur]");
         stopOsdTimeout();
         stopFWFB();
         stop();
@@ -2213,13 +2262,15 @@ public class VideoPlayer extends Activity {
                 mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
             }
 
+            data.recycleParcel();
+
             if(mStateBac != STATE_PAUSED) {
                 start();
             }
             initSubtitle();
             initMediaInfo();
-            // TODO: should open
             displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
+            showCertification(); // show certification 
             
             if(mResumePlay.getEnable() == true) {
                 mResumePlay.setEnable(false);
@@ -2243,6 +2294,7 @@ public class VideoPlayer extends Activity {
     private MediaPlayer.OnCompletionListener mCompletionListener =
         new MediaPlayer.OnCompletionListener() {
         public void onCompletion(MediaPlayer mp) {
+            LOGI(TAG, "[onCompletion] mOption.getRepeatMode():"+mOption.getRepeatMode());
             mState = STATE_PLAY_COMPLETED;
             curtime = 0; // reset current time
             if(mOption.getRepeatMode() == mOption.REPEATONE) {
@@ -2316,7 +2368,7 @@ public class VideoPlayer extends Activity {
         new MediaPlayer.OnInfoListener() {
         public  boolean onInfo(MediaPlayer mp, int arg1, int arg2) {
             //LOGI(TAG, "[onInfo] mp: " + mp + ",arg1:" + arg1 + ",arg2:"+arg2);
-            if (mp != null) {
+            if (mp != null && mMediaInfo != null) {
                 boolean needShow= mMediaInfo.needShowOnUI(arg1);
                 //LOGI(TAG, "[onInfo] needShow: " + needShow);
                 if(needShow == true) {
@@ -2707,6 +2759,58 @@ public class VideoPlayer extends Activity {
         });
     }
 
+    //@@--------this part for showing certification of Dolby and DTS----------------------------------------------------
+    private void showCertification() {
+        if(certificationDoblyView == null && certificationDTSView == null)
+            return;
+        if(mMediaInfo == null) 
+            return;
+        if(mOption == null)
+            return;
+
+        closeCertification();
+        if(mMediaInfo.getAudioTotalNum() <= 0)
+            return;
+
+        int track = mOption.getAudioTrack();
+        if(track < 0) {
+            track = 0;
+        }
+        else if(track >= mMediaInfo.getAudioTotalNum()) {
+            track = mMediaInfo.getAudioTotalNum() - 1;
+        }
+        
+        int ret = mMediaInfo.checkAudioCertification(mMediaInfo.getAudioFormat(track/*mMediaInfo.getCurAudioIdx()*/));
+        LOGI(TAG,"[showCertification]ret:"+ret);
+        if(ret == mMediaInfo.CERTIFI_Dolby) {
+            if(sw.getPropertyBoolean("ro.platform.support.dolby",false)) {
+                certificationDoblyView.setVisibility(View.VISIBLE);
+                certificationDTSView.setVisibility(View.GONE);
+            }
+        }
+        else if(ret == mMediaInfo.CERTIFI_DTS) {
+            if(sw.getPropertyBoolean("ro.platform.support.dts",false)) {
+                certificationDoblyView.setVisibility(View.GONE);
+                certificationDTSView.setVisibility(View.VISIBLE);
+            }
+        }
+        else {
+            certificationDoblyView.setVisibility(View.GONE);
+            certificationDTSView.setVisibility(View.GONE);
+        }
+    }
+
+    private void closeCertification() {
+        if(certificationDoblyView != null && certificationDTSView != null) {
+            if(certificationDoblyView.getVisibility() == View.VISIBLE) {
+                certificationDoblyView.setVisibility(View.GONE);
+            }
+            if(certificationDTSView.getVisibility() == View.VISIBLE) {
+                certificationDTSView.setVisibility(View.GONE);
+            }
+        }
+    }
+
     //@@--------this part for touch and key event-------------------------------------------------------------------
     public boolean onTouchEvent (MotionEvent event) {
         LOGI(TAG,"[onTouchEvent]ctlbar.getVisibility():"+ctlbar.getVisibility()+",event.getAction():"+event.getAction());
@@ -2773,7 +2877,7 @@ public class VideoPlayer extends Activity {
         }
 
         if(keyCode == KeyEvent.KEYCODE_DPAD_UP) { // add for progressBar request focus fix bug 87713
-            if(getCurOsdViewFlag() == OSD_CTL_BAR) {
+            if((getCurOsdViewFlag() == OSD_CTL_BAR) && (ctlbar.getVisibility() == View.VISIBLE)){
                 if(progressBar != null) 
                     progressBar.requestFocus();
             }
@@ -3070,9 +3174,16 @@ public class VideoPlayer extends Activity {
                 
                 setSubtitleView();
                 if(mMediaPlayer != null) {
+                    //still have error with new method
+                    /*if(mMediaPlayer.subtitleGetSubType() == 1) { //bitmap
+                        disableSubSetOptions();
+                    }
+                    else {
+                        initSubSetOptions(color_text);
+                    }*/
                     String subNameStr = mMediaPlayer.subtitleGetCurName();
                     if(subNameStr != null) {
-                        if(/*subNameStr.equals("INSUB") ||*/ subNameStr.endsWith(".idx")) {
+                        if(subNameStr.equals("INSUB") || subNameStr.endsWith(".idx")) {
                             disableSubSetOptions();
                         }
                         else {
@@ -3188,9 +3299,16 @@ public class VideoPlayer extends Activity {
         });
 
         if(mMediaPlayer != null) {
+            //still have error with new method
+            /*if(mMediaPlayer.subtitleGetSubType() == 1) { //bitmap
+                disableSubSetOptions();
+            }
+            else {
+                initSubSetOptions(color_text);
+            }*/
             String subNameStr = mMediaPlayer.subtitleGetCurName();
             if(subNameStr != null) {
-                if(/*subNameStr.equals("INSUB") ||*/ subNameStr.endsWith(".idx")) {
+                if(subNameStr.equals("INSUB") || subNameStr.endsWith(".idx")) {
                     disableSubSetOptions();
                 }
                 else {
@@ -3379,6 +3497,29 @@ public class VideoPlayer extends Activity {
 
     //@@--------this part for other widget list view--------------------------------------------------------------------------------
     private String[] m_brightness= {"1","2","3","4","5","6"}; // for brightness
+    private int[] string_3d_id = {
+        R.string.setting_3d_diable,
+        R.string.setting_3d_lr,
+        R.string.setting_3d_bt,
+        /*R.string.setting_3d_auto,
+        R.string.setting_3d_2d_l,
+        R.string.setting_3d_2d_r,
+        R.string.setting_3d_2d_t,
+        R.string.setting_3d_2d_b,
+        R.string.setting_3d_2d_auto1,
+        R.string.setting_3d_2d_auto2,	
+        R.string.setting_2d_3d,
+        R.string.setting_3d_field_depth,
+        R.string.setting_3d_auto_switch,
+        R.string.setting_3d_lr_switch,
+        R.string.setting_3d_tb_switch,
+        R.string.setting_3d_full_off,
+        R.string.setting_3d_lr_full,
+        R.string.setting_3d_tb_full,
+        R.string.setting_3d_grating_open,
+        R.string.setting_3d_grating_close,*/
+    };
+    
     private SimpleAdapter getMorebarListAdapter(int id, int pos) {
         return new SimpleAdapter(this, getMorebarListData(id, pos),
             R.layout.list_row, 
@@ -3510,29 +3651,16 @@ public class VideoPlayer extends Activity {
             break;
             
             case PLAY3D:
-                //@@
-                /*
-                if(sw.getPropertyBoolean("ro.platform.has.mbxuimode", false)){
-                int size_3d = 4;
+                int size_3d = 3;
                 for (int i = 0; i < size_3d; i++) {
-                map = new HashMap<String, Object>();
-                map.put("item_name", getResources().getString(string_3d_id[i]));
-                map.put("item_sel", R.drawable.item_img_unsel);
-                list.add(map);
+                    map = new HashMap<String, Object>();
+                    map.put("item_name", getResources().getString(string_3d_id[i]));
+                    map.put("item_sel", R.drawable.item_img_unsel);
+                    list.add(map);
+                } 
+                if(mOption != null) {
+                    list.get(mOption.get3DMode()).put("item_sel", R.drawable.item_img_sel); 
                 }
-                // list.get(MBX_3D_status).put("item_sel", R.drawable.item_img_sel);   
-                list.get(getMBX3DStatus()).put("item_sel", R.drawable.item_img_sel); 
-                }else{
-                int size_3d =  string_3d_id.length;
-                for (int i = 0; i < size_3d; i++) {
-                map = new HashMap<String, Object>();
-                map.put("item_name", getResources().getString(string_3d_id[i]));
-                map.put("item_sel", R.drawable.item_img_unsel);
-                list.add(map);
-                }
-
-                list.get(pos).put("item_sel", R.drawable.item_img_sel);
-                }*/
             break;
             
             default:
@@ -3556,6 +3684,7 @@ class Option {
     private int audiotrack = -1;
     private int soundtrack = -1;
     private int display = 0;
+    private int _3dmode = 0;
     
     public static final int REPEATLIST = 0;
     public static final int REPEATONE = 1;
@@ -3604,6 +3733,10 @@ class Option {
         return display;
     }
 
+    public int get3DMode() {
+        return _3dmode;
+    }
+
     public void setResumeMode(boolean para) {
         if(sp != null) {
             sp.edit()
@@ -3642,6 +3775,10 @@ class Option {
                 .putInt(DISPLAY_MODE, para)
                 .commit();
         }
+    }
+
+    public void set3DMode(int para) {
+        _3dmode = para;
     }
 }
 
