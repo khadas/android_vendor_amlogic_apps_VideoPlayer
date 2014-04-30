@@ -24,6 +24,7 @@ import android.media.Metadata;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
+import android.media.MediaPlayerAmlogic;
 import android.net.Uri;
 //import android.os.Bundle;
 //import android.os.Handler;
@@ -1530,6 +1531,7 @@ public class VideoPlayer extends Activity {
             progressBar.setEnabled(true);
 
             if(mMediaPlayer != null) {
+				  /*
                 String playerTypeStr = mMediaPlayer.getStringParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_TYPE_STR);
                 if((playerTypeStr != null) && (playerTypeStr.equals("AMLOGIC_PLAYER"))) {
                     fastforwordBtn.setEnabled(true);
@@ -1543,6 +1545,11 @@ public class VideoPlayer extends Activity {
                     fastforwordBtn.setImageResource(R.drawable.ff_disable);
                     fastreverseBtn.setImageResource(R.drawable.rewind_disable);
                 }
+                */
+                    fastforwordBtn.setEnabled(true);
+                    fastreverseBtn.setEnabled(true);
+                    fastforwordBtn.setImageResource(R.drawable.ff);
+                    fastreverseBtn.setImageResource(R.drawable.rewind);
             }
             else {
                 fastforwordBtn.setEnabled(false);
@@ -1847,12 +1854,14 @@ public class VideoPlayer extends Activity {
                 mState = STATE_PLAYING;
             }
             updateIconResource();
-            
+ /*           
             String str = Integer.toString(para);
             StringBuilder builder = new StringBuilder();
             builder.append("forward:"+str);
             LOGI(TAG,"[FFimpl]"+builder.toString());
             mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_FORWARD,builder.toString());
+*/
+	    mMediaPlayer.fastForward(para);
         }
     }
 
@@ -1867,12 +1876,14 @@ public class VideoPlayer extends Activity {
                 mState = STATE_PLAYING;
             }
             updateIconResource();
-            
+/*            
             String str = Integer.toString(para);
             StringBuilder builder = new StringBuilder();
             builder.append("backward:"+str);
             LOGI(TAG,"[FBimpl]"+builder.toString());
             mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_BACKWARD,builder.toString());
+*/           
+	     mMediaPlayer.fastBackward(para);
         }
     }
 
@@ -1894,7 +1905,7 @@ public class VideoPlayer extends Activity {
     }
 
     //@@--------this part for play control------------------------------------------------------------------------------------------
-    private MediaPlayer mMediaPlayer = null;
+    private MediaPlayerAmlogic mMediaPlayer = null;
     private static final int STATE_ERROR = -1;
     private static final int STATE_STOP = 0;
     private static final int STATE_PREPARING = 1;
@@ -2209,7 +2220,7 @@ public class VideoPlayer extends Activity {
         }
         
         release();
-        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer = new MediaPlayerAmlogic();
         mMediaPlayer.setOnPreparedListener(mPreparedListener);
         mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
         mMediaPlayer.setOnCompletionListener(mCompletionListener);
