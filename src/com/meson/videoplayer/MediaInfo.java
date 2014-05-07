@@ -339,11 +339,15 @@ public class MediaInfo{
 
     //@@--------this part for certification check-------------------------------------------------------------
     public static final int CERTIFI_Dolby  = 1;
-    public static final int CERTIFI_DTS  = 2;
+    public static final int CERTIFI_Dolby_Plus  = 2;
+    public static final int CERTIFI_DTS  = 3;
     public int checkAudioCertification(int aFormat) {
         int ret = -1;
-        if((aFormat == AFORMAT_AC3) || (aFormat == AFORMAT_EAC3)) {
+        if(aFormat == AFORMAT_AC3) {
             ret = CERTIFI_Dolby;
+        }
+        else if(aFormat == AFORMAT_EAC3) {
+            ret = CERTIFI_Dolby_Plus;
         }
         else if(aFormat == AFORMAT_DTS) {
             ret = CERTIFI_DTS;

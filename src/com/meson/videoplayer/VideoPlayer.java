@@ -78,6 +78,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import java.util.Random;
+
 public class VideoPlayer extends Activity { 
     private static String TAG = "VideoPlayer";
     private boolean DEBUG = false;
@@ -122,6 +124,7 @@ public class VideoPlayer extends Activity {
 
     //certification view
     private ImageView certificationDoblyView = null;
+    private ImageView certificationDoblyPlusView = null;
     private ImageView certificationDTSView = null;
 
     //store index of file postion for back to file list
@@ -166,11 +169,12 @@ public class VideoPlayer extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sw = (SystemWriteManager) getSystemService("system_write"); 
+        
         LOGI(TAG,"[onCreate]");
         setContentView(R.layout.control_bar);
         setTitle(null);
 
-        sw = (SystemWriteManager) getSystemService("system_write"); 
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK |PowerManager.ON_AFTER_RELEASE,TAG);
         
@@ -275,8 +279,15 @@ public class VideoPlayer extends Activity {
         super.onPause();
         LOGI(TAG,"[onPause] curtime:"+curtime);
 
+        if(randomSeekEnable()) { // random seek for test
+            randomSeekTestFlag = true;
+        }
+
         //close certification
         closeCertification();
+
+        //close 3D
+        close3D();
 
         //set book mark
         if(mBookmark != null) {
@@ -409,12 +420,20 @@ public class VideoPlayer extends Activity {
         }
     }
 
+    private boolean getDebugEnable() {
+        if(sw == null) {
+            sw = (SystemWriteManager) getSystemService("system_write"); 
+        }
+        boolean ret = sw.getPropertyBoolean("sys.videoplayer.debug",false);
+        return ret;
+    }
+
     private void LOGI(String tag, String msg) {
-         if(DEBUG) Log.i(tag, msg);
+         if(DEBUG || getDebugEnable()) Log.i(tag, msg);
     }
 
     private void LOGD(String tag, String msg) {
-         if(DEBUG) Log.d(tag, msg);
+         if(DEBUG || getDebugEnable()) Log.d(tag, msg);
     }
 
     private void LOGE(String tag, String msg) {
@@ -487,8 +506,10 @@ public class VideoPlayer extends Activity {
 
         //certification image
         certificationDoblyView = (ImageView)findViewById(R.id.CertificationDobly);
+        certificationDoblyPlusView = (ImageView)findViewById(R.id.CertificationDoblyPlus);
         certificationDTSView = (ImageView)findViewById(R.id.CertificationDTS);
         certificationDoblyView.setVisibility(View.GONE);
+        certificationDoblyPlusView.setVisibility(View.GONE);
         certificationDTSView.setVisibility(View.GONE);
 
         ctlbar = (LinearLayout)findViewById(R.id.infobarLayout);
@@ -659,7 +680,12 @@ public class VideoPlayer extends Activity {
         fileinfoBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 LOGI(TAG,"fileinfoBtn onClick");
-                fileinfoShow();
+                if(randomSeekEnable()) { // random seek, shield for default
+                    randomSeekTest();
+                }
+                else {
+                    fileinfoShow();
+                }
             } 
         }); 
 
@@ -1491,6 +1517,54 @@ public class VideoPlayer extends Activity {
                 startOsdTimeout();
             }
         }
+    }
+
+    private void close3D() {
+        LOGI(TAG,"[close3D]");
+        if (mMediaPlayer != null && mOption != null) {
+            mOption.set3DMode(0);
+            //mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+        }
+    }
+
+    //@@--------random seek function-------------------------------------------------------------------------------------------
+    private boolean randomSeekTestFlag = false;
+    private Random r = new Random(99);  
+    private boolean randomSeekEnable() {
+        if(sw == null) {
+            sw = (SystemWriteManager) getSystemService("system_write"); 
+        }
+        boolean ret = sw.getPropertyBoolean("sys.vprandomseek.enable",false);
+        return ret;
+    }
+    private void randomSeekTest() {
+        if(!randomSeekEnable())
+            return;
+        
+        if(r == null) {
+            r = new Random();  
+        }
+        int i = r.nextInt();
+        LOGI(TAG,"[randomSeekTest]0i:"+i);
+        if(i<0) {
+            i = i * -1;
+        }
+
+        i = i%80;
+        LOGI(TAG,"[randomSeekTest]1i:"+i);
+        
+        int pos = totaltime * (i+1) / 100;
+        randomSeekTestFlag = true;
+
+        //check for small stream while seeking
+        int pos_check = totaltime * (i+1) - pos * 100;
+        if(pos_check>0) 
+            pos += 1;
+        if(pos>=totaltime)
+            pos = totaltime;
+
+        LOGI(TAG,"[randomSeekTest]seekTo:"+pos);
+        seekTo(pos);
     }
 
     //@@--------this part for play function implement--------------------------------------------------------------------------------
@@ -2358,6 +2432,12 @@ public class VideoPlayer extends Activity {
                 Message msg = mHandler.obtainMessage(MSG_UPDATE_PROGRESS);
                 mHandler.sendMessageDelayed(msg, MSG_SEND_DELAY+1000);
             }
+
+            if(randomSeekEnable()) {
+                if(randomSeekTestFlag) {
+                    randomSeekTest();
+                }
+            }
         }
     };
 
@@ -2772,13 +2852,13 @@ public class VideoPlayer extends Activity {
 
     //@@--------this part for showing certification of Dolby and DTS----------------------------------------------------
     private void showCertification() {
-        if(certificationDoblyView == null && certificationDTSView == null)
+        if(certificationDoblyView == null &&  certificationDoblyPlusView == null && certificationDTSView == null)
             return;
         if(mMediaInfo == null) 
             return;
         if(mOption == null)
             return;
-
+        
         closeCertification();
         if(mMediaInfo.getAudioTotalNum() <= 0)
             return;
@@ -2796,25 +2876,38 @@ public class VideoPlayer extends Activity {
         if(ret == mMediaInfo.CERTIFI_Dolby) {
             if(sw.getPropertyBoolean("ro.platform.support.dolby",false)) {
                 certificationDoblyView.setVisibility(View.VISIBLE);
+                certificationDoblyPlusView.setVisibility(View.GONE);
+                certificationDTSView.setVisibility(View.GONE);
+            }
+        }
+        else if(ret == mMediaInfo.CERTIFI_Dolby_Plus) {
+            if(sw.getPropertyBoolean("ro.platform.support.dolby",false)) {
+                certificationDoblyView.setVisibility(View.GONE);
+                certificationDoblyPlusView.setVisibility(View.VISIBLE);
                 certificationDTSView.setVisibility(View.GONE);
             }
         }
         else if(ret == mMediaInfo.CERTIFI_DTS) {
             if(sw.getPropertyBoolean("ro.platform.support.dts",false)) {
                 certificationDoblyView.setVisibility(View.GONE);
+                certificationDoblyPlusView.setVisibility(View.GONE);
                 certificationDTSView.setVisibility(View.VISIBLE);
             }
         }
         else {
             certificationDoblyView.setVisibility(View.GONE);
+            certificationDoblyPlusView.setVisibility(View.GONE);
             certificationDTSView.setVisibility(View.GONE);
         }
     }
 
     private void closeCertification() {
-        if(certificationDoblyView != null && certificationDTSView != null) {
+        if(certificationDoblyView != null && certificationDoblyPlusView != null && certificationDTSView != null) {
             if(certificationDoblyView.getVisibility() == View.VISIBLE) {
                 certificationDoblyView.setVisibility(View.GONE);
+            }
+            if(certificationDoblyPlusView.getVisibility() == View.VISIBLE) {
+                certificationDoblyPlusView.setVisibility(View.GONE);
             }
             if(certificationDTSView.getVisibility() == View.VISIBLE) {
                 certificationDTSView.setVisibility(View.GONE);
