@@ -286,9 +286,6 @@ public class VideoPlayer extends Activity {
         //close certification
         closeCertification();
 
-        //close 3D
-        close3D();
-
         //set book mark
         if(mBookmark != null) {
             if(confirm_dialog != null && confirm_dialog.isShowing() && exitAbort == false) {
@@ -692,12 +689,12 @@ public class VideoPlayer extends Activity {
         play3dBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 LOGI(TAG,"play3dBtn onClick");
-                Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
+                /*Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
                 toast.setGravity(Gravity.BOTTOM,0,0);
                 toast.setDuration(0x00000001);
                 toast.show();
-                startOsdTimeout();
-                //play3DSelect();
+                startOsdTimeout();*/
+                play3DSelect();
             } 
         }); 
         
@@ -986,6 +983,9 @@ public class VideoPlayer extends Activity {
             if((isHdmiPluggedbac != isHdmiPlugged) && (isHdmiPlugged == false)) {
                  if(mState == STATE_PLAYING) {
                     pause();
+
+                    //close 3D
+                    close3D();
                 }
                 startOsdTimeout();
             }
@@ -1505,7 +1505,8 @@ public class VideoPlayer extends Activity {
         boolean ret = false;
         if (mMediaPlayer != null) {
             // TODO: should open after 3d function debug ok
-            //ret = mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+            ret = mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+            LOGI(TAG,"[play3DSelect]ret:"+ret);
             if(!ret) {
                 if(mOption != null) {
                     mOption.set3DMode(0);
@@ -1520,10 +1521,10 @@ public class VideoPlayer extends Activity {
     }
 
     private void close3D() {
-        LOGI(TAG,"[close3D]");
+        LOGI(TAG,"[close3D]mMediaPlayer:"+mMediaPlayer+",mOption:"+mOption);
         if (mMediaPlayer != null && mOption != null) {
             mOption.set3DMode(0);
-            //mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+            mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
         }
     }
 
@@ -1719,6 +1720,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[browserBack]backToOtherAPK:"+backToOtherAPK+",browserBackDoing:"+browserBackDoing);
         if(browserBackDoing == true)
             return;
+        
         item_position_selected = item_position_selected_init + mPlayList.getindex();
         browserBackDoing = true;
         if(browserBackInvokeFromOnPause == true) {
@@ -1733,6 +1735,10 @@ public class VideoPlayer extends Activity {
                 startActivity(selectFileIntent);
             }
         }
+        
+        //close 3D
+        close3D();
+        
         stop();
         finish();
     }
@@ -1757,6 +1763,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[playPrev]mState:"+mState);
         stopOsdTimeout();
         if(mState != STATE_PREPARING) { // avoid status error for preparing
+            close3D();
             stopFWFB();
             stop();
             mBookmark.set(mPlayList.getcur(), curtime);
@@ -1772,8 +1779,9 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[playNext]mState:"+mState);
         stopOsdTimeout();
          if(mState != STATE_PREPARING) { // avoid status error for preparing
-             stopFWFB();
-             stop();
+            close3D();
+            stopFWFB();
+            stop();
             mBookmark.set(mPlayList.getcur(), curtime);
             mStateBac = STATE_STOP;
             playFile(mPlayList.movenext());
