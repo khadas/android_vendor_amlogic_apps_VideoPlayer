@@ -391,7 +391,7 @@ public class MediaInfo{
     public static final int MEDIA_INFO_AMLOGIC_NO_VIDEO = MEDIA_INFO_AMLOGIC_BASE+3;
     public static final int MEDIA_INFO_AMLOGIC_NO_AUDIO = MEDIA_INFO_AMLOGIC_BASE+4;	
     
-    public boolean needShowOnUI(int info) {
+    public static boolean needShowOnUI(int info) {
         boolean ret = false;
         if((info == MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT) 
             || (info == MEDIA_INFO_AMLOGIC_AUDIO_NOT_SUPPORT)
@@ -402,20 +402,20 @@ public class MediaInfo{
         return ret;
     }
 
-    public String getInfo(int info) {
+    public static String getInfo(int info, Context context) {
         String infoStr = null;
         switch(info) {
             case MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT:
-                infoStr = mContext.getResources().getString(R.string.unsupport_video_format);//"Unsupport Video format";
+                infoStr = context.getResources().getString(R.string.unsupport_video_format);//"Unsupport Video format";
                 break;
             case MEDIA_INFO_AMLOGIC_AUDIO_NOT_SUPPORT:
-                infoStr = mContext.getResources().getString(R.string.unsupport_audio_format);//"Unsupport Audio format";
+                infoStr = context.getResources().getString(R.string.unsupport_audio_format);//"Unsupport Audio format";
                 break;
             case MEDIA_INFO_AMLOGIC_NO_VIDEO:
-                infoStr = mContext.getResources().getString(R.string.file_have_no_video);//"file have no video";
+                infoStr = context.getResources().getString(R.string.file_have_no_video);//"file have no video";
                 break;
             case MEDIA_INFO_AMLOGIC_NO_AUDIO:
-                infoStr = mContext.getResources().getString(R.string.file_have_no_audio);//"file have no audio";
+                infoStr = context.getResources().getString(R.string.file_have_no_audio);//"file have no audio";
                 break;
             default:
                 break;

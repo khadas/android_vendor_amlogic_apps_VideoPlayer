@@ -2469,14 +2469,14 @@ public class VideoPlayer extends Activity {
     private MediaPlayer.OnInfoListener mInfoListener =
         new MediaPlayer.OnInfoListener() {
         public  boolean onInfo(MediaPlayer mp, int arg1, int arg2) {
-            //LOGI(TAG, "[onInfo] mp: " + mp + ",arg1:" + arg1 + ",arg2:"+arg2);
-            if (mp != null && mMediaInfo != null) {
-                boolean needShow= mMediaInfo.needShowOnUI(arg1);
-                //LOGI(TAG, "[onInfo] needShow: " + needShow);
+            LOGI(TAG, "[onInfo] mp: " + mp + ",arg1:" + arg1 + ",arg2:"+arg2);
+            if (mp != null) {
+                boolean needShow= MediaInfo.needShowOnUI(arg1);
+                LOGI(TAG, "[onInfo] needShow: " + needShow);
                 if(needShow == true) {
-                    String infoStr = mMediaInfo.getInfo(arg1);
-                    //LOGI(TAG, "[onInfo] infoStr: " + infoStr);
-                    Toast toast =Toast.makeText(VideoPlayer.this, "Media Info:"+infoStr,Toast.LENGTH_SHORT );
+                    String infoStr = MediaInfo.getInfo(arg1, VideoPlayer.this);
+                    LOGI(TAG, "[onInfo] infoStr: " + infoStr);
+                    Toast toast =Toast.makeText(VideoPlayer.this, /*"Media Info:"+*/infoStr,Toast.LENGTH_SHORT );
                     toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
                     toast.setDuration(0x00000001);
                     toast.show();
