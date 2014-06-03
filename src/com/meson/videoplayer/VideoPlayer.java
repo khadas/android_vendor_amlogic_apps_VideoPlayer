@@ -1760,6 +1760,7 @@ public class VideoPlayer extends Activity {
             stopFWFB();
             stop();
             mBookmark.set(mPlayList.getcur(), curtime);
+            mStateBac = STATE_STOP;
             playFile(mPlayList.moveprev());
         }
         else {
@@ -1774,6 +1775,7 @@ public class VideoPlayer extends Activity {
              stopFWFB();
              stop();
             mBookmark.set(mPlayList.getcur(), curtime);
+            mStateBac = STATE_STOP;
             playFile(mPlayList.movenext());
         }
         else {
@@ -1789,6 +1791,7 @@ public class VideoPlayer extends Activity {
         curtime = 0;
         totaltime = 0;
         mBookmark.set(mPlayList.getcur(), curtime);
+        mStateBac = STATE_STOP;
         playFile(mPlayList.getcur());
     }
 
