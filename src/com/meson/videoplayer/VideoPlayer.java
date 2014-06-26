@@ -242,7 +242,8 @@ public class VideoPlayer extends Activity {
                             else {
                                 //browserBack();
                                 initPlayer();
-                                playFile(path);
+                                mPath = path;
+                                sendPlayFileMsg();
                             }
                         }
                         else {
@@ -309,6 +310,8 @@ public class VideoPlayer extends Activity {
 
         if(mHandler != null) {
             mHandler.removeMessages(MSG_UPDATE_PROGRESS);
+            mHandler.removeMessages(MSG_PLAY);
+            mHandler.removeMessages(MSG_STOP);
             mHandler.removeMessages(MSG_RETRY_PLAY);
             mHandler.removeMessages(MSG_RETRY_END);
         }
@@ -330,7 +333,7 @@ public class VideoPlayer extends Activity {
                         mResumePlay.set(mPlayList.getcur(), curtime);
                         LOGI(TAG,"[onPause]mStateBac:"+mState);
                         mStateBac = mState;
-                        stop();
+                        sendStopMsg();
                     }
                 }
                 else {
@@ -344,8 +347,10 @@ public class VideoPlayer extends Activity {
     //@@--------this part for message handle---------------------------------------------------------------------
     private static final long MSG_SEND_DELAY = 0; //1000;//1s
     private static final int MSG_UPDATE_PROGRESS = 0xF1;//random value
-    private static final int MSG_RETRY_PLAY = 0xF2;
-    private static final int MSG_RETRY_END = 0xF3;
+    private static final int MSG_PLAY = 0xF2;
+    private static final int MSG_STOP = 0xF3;
+    private static final int MSG_RETRY_PLAY = 0xF4;
+    private static final int MSG_RETRY_END = 0xF5;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -363,6 +368,27 @@ public class VideoPlayer extends Activity {
                         sendMessageDelayed(msg, 1000 - (pos % 1000));
                     }
                     break;
+                case MSG_PLAY:
+                    LOGI(TAG,"[handleMessage]resume mode:"+mOption.getResumeMode()+",mPath:"+mPath);
+                    if(mOption != null && mPath != null) {
+                        resetVariate();
+                        showOsdView();
+                        if(mResumePlay.getEnable() == true) {
+                            setVideoPath(mPath);
+                        }
+                        else {
+                            if(mOption.getResumeMode() == true) {
+                                bmPlay(mPath);
+                            }
+                            else {
+                                setVideoPath(mPath);
+                            }
+                        }
+                    }
+                    break;
+                case MSG_STOP:
+                    stop();
+                    break;
                 case MSG_RETRY_PLAY:
                     LOGI(TAG,"[handleMessage]MSG_RETRY_PLAY");
                     String path = mResumePlay.getFilepath();
@@ -373,7 +399,8 @@ public class VideoPlayer extends Activity {
                         else {
                             //browserBack();
                             initPlayer();
-                            playFile(path);
+                            mPath = path;
+                            sendPlayFileMsg();
                         }
                     }
                     else {
@@ -932,7 +959,8 @@ public class VideoPlayer extends Activity {
                         path = mPlayList.getcur();
                         LOGI(TAG,"[surfaceCreated]mResumePlay prepare path:"+path);
                         if(path != null) {
-                            playFile(path);
+                            mPath = path;
+                            sendPlayFileMsg();
                         }
                         else {
                             browserBack();
@@ -944,12 +972,14 @@ public class VideoPlayer extends Activity {
                 }
                 else {
                     LOGI(TAG,"[surfaceCreated]0path:"+mPlayList.getcur());
-                    playFile(mPlayList.getcur());
+                    mPath = mPlayList.getcur();
+                    sendPlayFileMsg();
                 }
             }
             else {
                 LOGI(TAG,"[surfaceCreated]1path:"+mPlayList.getcur());
-                playFile(mPlayList.getcur());
+                mPath = mPlayList.getcur();
+                sendPlayFileMsg();
             }
         }
 
@@ -1586,6 +1616,7 @@ public class VideoPlayer extends Activity {
     private static int mRetryStep = 1000; //1000ms
     private boolean mRetrying = false;
     private Timer retryTimer = new Timer();
+    private String mPath;
 
     private void updateIconResource() {
         if((progressBar == null) || (fastforwordBtn == null) || (fastreverseBtn == null) || (playBtn == null)) {
@@ -1648,6 +1679,15 @@ public class VideoPlayer extends Activity {
         mRetrying = false;
         mRetryTimes = mRetryTimesMax;
     }
+
+    private void sendPlayFileMsg() {
+        showOsdView();
+        if(mHandler != null) {
+            Message msg = mHandler.obtainMessage(MSG_PLAY);
+            mHandler.sendMessageDelayed(msg, MSG_SEND_DELAY);
+            LOGI(TAG,"[sendPlayFileMsg]sendMessageDelayed MSG_PLAY");
+        }
+    }
     
     private void playFile(String path) {
         LOGI(TAG,"[playFile]resume mode:"+mOption.getResumeMode()+",path:"+path);
@@ -1696,7 +1736,7 @@ public class VideoPlayer extends Activity {
                     if(mHandler != null) {
                         Message msg = mHandler.obtainMessage(MSG_RETRY_PLAY);
                         mHandler.sendMessageDelayed(msg, MSG_SEND_DELAY);
-                        LOGI(TAG,"[retryPlay]sendMessageDelayed MSG_SEND_DELAY");
+                        LOGI(TAG,"[retryPlay]sendMessageDelayed MSG_RETRY_PLAY");
                     }
                 }
                 else {
@@ -1739,7 +1779,7 @@ public class VideoPlayer extends Activity {
         //close 3D
         close3D();
         
-        stop();
+        sendStopMsg();
         finish();
     }
 
@@ -1765,10 +1805,11 @@ public class VideoPlayer extends Activity {
         if(mState != STATE_PREPARING) { // avoid status error for preparing
             close3D();
             stopFWFB();
-            stop();
+            sendStopMsg();
             mBookmark.set(mPlayList.getcur(), curtime);
             mStateBac = STATE_STOP;
-            playFile(mPlayList.moveprev());
+            mPath = mPlayList.moveprev();
+            sendPlayFileMsg();
         }
         else {
             LOGI(TAG,"[playPrev]mState=STATE_PREPARING, error status do nothing only waitting");
@@ -1781,10 +1822,11 @@ public class VideoPlayer extends Activity {
          if(mState != STATE_PREPARING) { // avoid status error for preparing
             close3D();
             stopFWFB();
-            stop();
+            sendStopMsg();
             mBookmark.set(mPlayList.getcur(), curtime);
             mStateBac = STATE_STOP;
-            playFile(mPlayList.movenext());
+            mPath = mPlayList.movenext();
+            sendPlayFileMsg();
         }
         else {
             LOGI(TAG,"[playNext]mState=STATE_PREPARING, error status do nothing only waitting");
@@ -1795,12 +1837,13 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[playCur]");
         stopOsdTimeout();
         stopFWFB();
-        stop();
+        sendStopMsg();
         curtime = 0;
         totaltime = 0;
         mBookmark.set(mPlayList.getcur(), curtime);
         mStateBac = STATE_STOP;
-        playFile(mPlayList.getcur());
+        mPath = mPlayList.getcur();
+        sendPlayFileMsg();
     }
 
     private void fastForward() {
@@ -2007,6 +2050,14 @@ public class VideoPlayer extends Activity {
     
     //@@private int mCurrentState = STATE_IDLE;
     //@@private int mTargetState  = STATE_IDLE;
+
+    private void sendStopMsg() {
+        if(mHandler != null) {
+            Message msg = mHandler.obtainMessage(MSG_STOP);
+            mHandler.sendMessageDelayed(msg, MSG_SEND_DELAY);
+            LOGI(TAG,"[sendStopMsg]sendMessageDelayed MSG_STOP");
+        }
+    }
 
     private void start() {
         LOGI(TAG,"[start]mMediaPlayer:"+mMediaPlayer);
