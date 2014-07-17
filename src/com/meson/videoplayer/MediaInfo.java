@@ -353,6 +353,15 @@ public class MediaInfo{
         return type;
     }
 
+    //@@--------this part for DTS Asset check -------------------------------------------------------------
+    public boolean checkAudioisDTS(int aFormat) {
+        boolean ret = false;
+        if(aFormat == AFORMAT_DTS) {
+            ret = true;
+        }
+        return ret;
+    }
+
     //@@--------this part for certification check-------------------------------------------------------------
     public static final int CERTIFI_Dolby  = 1;
     public static final int CERTIFI_Dolby_Plus  = 2;
@@ -389,7 +398,10 @@ public class MediaInfo{
     public static final int MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT=MEDIA_INFO_AMLOGIC_BASE+1;
     public static final int MEDIA_INFO_AMLOGIC_AUDIO_NOT_SUPPORT = MEDIA_INFO_AMLOGIC_BASE+2;
     public static final int MEDIA_INFO_AMLOGIC_NO_VIDEO = MEDIA_INFO_AMLOGIC_BASE+3;
-    public static final int MEDIA_INFO_AMLOGIC_NO_AUDIO = MEDIA_INFO_AMLOGIC_BASE+4;	
+    public static final int MEDIA_INFO_AMLOGIC_NO_AUDIO = MEDIA_INFO_AMLOGIC_BASE+4;
+    public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_ASSET = MEDIA_INFO_AMLOGIC_BASE+5;
+    public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_EXPRESS = MEDIA_INFO_AMLOGIC_BASE+6;
+    public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_HD_MASTER_AUDIO = MEDIA_INFO_AMLOGIC_BASE+7;
     
     public static boolean needShowOnUI(int info) {
         boolean ret = false;

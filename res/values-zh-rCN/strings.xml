@@ -18,6 +18,7 @@
     <string name="setting_audiooption">声音设置</string>
     <string name="setting_soundtrack">声道</string>
     <string name="setting_audiotrack">音轨</string>
+    <string name="setting_audiodtsasset">Audio DTS Asset</string>
     <string name="setting_soundtrack_stereo">立体声</string>
     <string name="setting_soundtrack_lmono">左声道</string>
     <string name="setting_soundtrack_rmono">右声道</string>

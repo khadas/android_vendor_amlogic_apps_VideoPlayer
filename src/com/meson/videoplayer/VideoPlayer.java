@@ -126,6 +126,8 @@ public class VideoPlayer extends Activity {
     private ImageView certificationDoblyView = null;
     private ImageView certificationDoblyPlusView = null;
     private ImageView certificationDTSView = null;
+    private ImageView certificationDTSExpressView = null;
+    private ImageView certificationDTSHDMasterAudioView = null;
 
     //store index of file postion for back to file list
     private int item_position_selected; // for back to file list view
@@ -511,6 +513,7 @@ public class VideoPlayer extends Activity {
                 audio_init_list_idx = audio_total_num-1;
             }
             mOption.setAudioTrack(audio_init_list_idx);
+            mOption.setAudioDtsAsset(0); //dts test // default 0, should get current asset from player core 20140717
         }
     }
 
@@ -532,9 +535,13 @@ public class VideoPlayer extends Activity {
         certificationDoblyView = (ImageView)findViewById(R.id.CertificationDobly);
         certificationDoblyPlusView = (ImageView)findViewById(R.id.CertificationDoblyPlus);
         certificationDTSView = (ImageView)findViewById(R.id.CertificationDTS);
+        certificationDTSExpressView = (ImageView)findViewById(R.id.CertificationDTSExpress);
+        certificationDTSHDMasterAudioView = (ImageView)findViewById(R.id.CertificationDTSHDMasterAudio);
         certificationDoblyView.setVisibility(View.GONE);
         certificationDoblyPlusView.setVisibility(View.GONE);
         certificationDTSView.setVisibility(View.GONE);
+        certificationDTSExpressView.setVisibility(View.GONE);
+        certificationDTSHDMasterAudioView.setVisibility(View.GONE);
 
         ctlbar = (LinearLayout)findViewById(R.id.infobarLayout);
         optbar = (LinearLayout)findViewById(R.id.morebarLayout);
@@ -1194,9 +1201,17 @@ public class VideoPlayer extends Activity {
         listView.setAdapter(audioarray);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                boolean ret = mMediaInfo.checkAudioisDTS(mMediaInfo.getAudioFormat(position));
+                if(ret) {
+                    showDtsAseetFromInfoLis = false;
+                    audioDtsAseetSelect();
+                }
+                else {
+                    exitOtherWidget(audiooptionBtn);
+                }
                 mOption.setAudioTrack(position);
                 audioTrackImpl(position);
-                exitOtherWidget(audiooptionBtn);
+                mDtsType = DTS_NOR;
                 showCertification(); //update certification status and icon
             }	
         });
@@ -1216,6 +1231,29 @@ public class VideoPlayer extends Activity {
             }	
         });
         showOtherWidget(R.string.setting_soundtrack);
+    }
+
+    private void audioDtsAseetSelect() {
+        SimpleAdapter audiodtsAssetarray = getMorebarListAdapter(AUDIO_DTS_ASSET, mOption.getAudioDtsAsset());
+        ListView listView = (ListView)findViewById(R.id.ListView);
+        listView.setAdapter(audiodtsAssetarray);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {	
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mOption.setAudioDtsAsset(position);
+                audioDtsAseetImpl(position);
+                exitOtherWidget(audiooptionBtn);
+                showCertification(); //update certification status and icon
+            }	
+        });
+        showOtherWidget(R.string.setting_audiodtsasset);
+
+        if(getDtsAssetTotalNum() == 0) { // dts test
+            exitOtherWidget(audiooptionBtn);
+        }
+
+        if(showDtsAseetFromInfoLis) {
+            startOsdTimeout();
+        }
     }
 
     private void play3DSelect() {
@@ -1530,6 +1568,24 @@ public class VideoPlayer extends Activity {
         }
     }
 
+    private void audioDtsAseetImpl(int idx) {
+        if (mMediaPlayer != null && mMediaInfo != null) {
+            String str = Integer.toString(idx);
+            StringBuilder builder = new StringBuilder();
+            builder.append("dtsAsset:"+str);
+            LOGI(TAG,"[audioDtsAseetImpl]"+builder.toString());
+            mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DTS_ASSET, builder.toString());
+        }
+    }
+
+    private int getDtsAssetTotalNum() {
+        int num = 0;
+        if (mMediaPlayer != null ) {
+            num = mMediaPlayer.getIntParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
+        }
+        LOGI(TAG,"[getDtsAssetTotalNum] num:"+num);
+        return num;
+    }
     private void play3DImpl(int idx) {
         LOGI(TAG,"[play3DSelect]idx:"+idx);
         boolean ret = false;
@@ -1674,6 +1730,7 @@ public class VideoPlayer extends Activity {
     }
 
     private void resetVariate() {
+        showDtsAseetFromInfoLis = false;
         progressBarSeekFlag = false;
         haveTried = false;
         mRetrying = false;
@@ -2371,6 +2428,7 @@ public class VideoPlayer extends Activity {
     private boolean mCanSeek;
     private boolean mCanSeekBack;
     private boolean mCanSeekForward;
+    private boolean showDtsAseetFromInfoLis;
     MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
         new MediaPlayer.OnVideoSizeChangedListener() {
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
@@ -2410,6 +2468,16 @@ public class VideoPlayer extends Activity {
             }
 
             data.recycleParcel();
+
+            /*
+            MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
+            if(trackInfo != null) {
+                LOGI(TAG,"[mPreparedListener]trackInfo.length:"+trackInfo.length);
+                for(int i = 0; i < trackInfo.length; i++) {
+                    int trackType = trackInfo[i].getTrackType();
+                    LOGI(TAG,"[mPreparedListener]trackInfo["+i+"].trackType:"+trackType);
+                }
+            }*/
 
             if(mStateBac != STATE_PAUSED) {
                 start();
@@ -2517,6 +2585,10 @@ public class VideoPlayer extends Activity {
         }
     };
 
+    private final int DTS_NOR = 0;
+    private final int DTS_EXPRESS = 1;
+    private final int DTS_HD_MASTER_AUDIO = 2;
+    private int mDtsType = DTS_NOR;
     private MediaPlayer.OnInfoListener mInfoListener =
         new MediaPlayer.OnInfoListener() {
         public  boolean onInfo(MediaPlayer mp, int arg1, int arg2) {
@@ -2531,6 +2603,21 @@ public class VideoPlayer extends Activity {
                     toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
                     toast.setDuration(0x00000001);
                     toast.show();
+                }
+
+                if(arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_ASSET) {
+                    if(getDtsAssetTotalNum() > 0) {
+                        showDtsAseetFromInfoLis = true;
+                        audioDtsAseetSelect();
+                    }
+                }
+                else if(arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_EXPRESS) {
+                    mDtsType = DTS_EXPRESS;
+                    showCertification();
+                }
+                else if(arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_HD_MASTER_AUDIO) {
+                    mDtsType = DTS_HD_MASTER_AUDIO;
+                    showCertification();
                 }
             }
             return true;
@@ -2633,9 +2720,10 @@ public class VideoPlayer extends Activity {
     private final int AUDIO_OPTION = 2;
     private final int AUDIO_TRACK = 3;
     private final int SOUND_TRACK = 4;
-    private final int DISPLAY_MODE = 5;
-    private final int BRIGHTNESS = 6;
-    private final int PLAY3D = 7;
+    private final int AUDIO_DTS_ASSET = 5;
+    private final int DISPLAY_MODE = 6;
+    private final int BRIGHTNESS = 7;
+    private final int PLAY3D = 8;
     private int otherwidgetStatus = 0;
 	
     protected void startOsdTimeout() {
@@ -2914,7 +3002,7 @@ public class VideoPlayer extends Activity {
 
     //@@--------this part for showing certification of Dolby and DTS----------------------------------------------------
     private void showCertification() {
-        if(certificationDoblyView == null &&  certificationDoblyPlusView == null && certificationDTSView == null)
+        if(certificationDoblyView == null && certificationDoblyPlusView == null && certificationDTSView == null && certificationDTSExpressView == null && certificationDTSHDMasterAudioView == null)
             return;
         if(mMediaInfo == null) 
             return;
@@ -2940,6 +3028,8 @@ public class VideoPlayer extends Activity {
                 certificationDoblyView.setVisibility(View.VISIBLE);
                 certificationDoblyPlusView.setVisibility(View.GONE);
                 certificationDTSView.setVisibility(View.GONE);
+                certificationDTSExpressView.setVisibility(View.GONE);
+                certificationDTSHDMasterAudioView.setVisibility(View.GONE);
             }
         }
         else if(ret == mMediaInfo.CERTIFI_Dolby_Plus) {
@@ -2947,24 +3037,42 @@ public class VideoPlayer extends Activity {
                 certificationDoblyView.setVisibility(View.GONE);
                 certificationDoblyPlusView.setVisibility(View.VISIBLE);
                 certificationDTSView.setVisibility(View.GONE);
+                certificationDTSExpressView.setVisibility(View.GONE);
+                certificationDTSHDMasterAudioView.setVisibility(View.GONE);
             }
         }
         else if(ret == mMediaInfo.CERTIFI_DTS) {
             if(sw.getPropertyBoolean("ro.platform.support.dts",false)) {
                 certificationDoblyView.setVisibility(View.GONE);
                 certificationDoblyPlusView.setVisibility(View.GONE);
-                certificationDTSView.setVisibility(View.VISIBLE);
+                if(mDtsType == DTS_NOR) {
+                    certificationDTSView.setVisibility(View.VISIBLE);
+                    certificationDTSExpressView.setVisibility(View.GONE);
+                    certificationDTSHDMasterAudioView.setVisibility(View.GONE);
+                }
+                else if(mDtsType == DTS_EXPRESS) {
+                    certificationDTSView.setVisibility(View.GONE);
+                    certificationDTSExpressView.setVisibility(View.VISIBLE);
+                    certificationDTSHDMasterAudioView.setVisibility(View.GONE);
+                }
+                else if(mDtsType == DTS_HD_MASTER_AUDIO) {
+                    certificationDTSView.setVisibility(View.GONE);
+                    certificationDTSExpressView.setVisibility(View.GONE);
+                    certificationDTSHDMasterAudioView.setVisibility(View.VISIBLE);
+                }
             }
         }
         else {
             certificationDoblyView.setVisibility(View.GONE);
             certificationDoblyPlusView.setVisibility(View.GONE);
             certificationDTSView.setVisibility(View.GONE);
+            certificationDTSExpressView.setVisibility(View.GONE);
+            certificationDTSHDMasterAudioView.setVisibility(View.GONE);
         }
     }
 
     private void closeCertification() {
-        if(certificationDoblyView != null && certificationDoblyPlusView != null && certificationDTSView != null) {
+        if(certificationDoblyView != null && certificationDoblyPlusView != null && certificationDTSView != null && certificationDTSExpressView != null && certificationDTSHDMasterAudioView != null) {
             if(certificationDoblyView.getVisibility() == View.VISIBLE) {
                 certificationDoblyView.setVisibility(View.GONE);
             }
@@ -2973,6 +3081,12 @@ public class VideoPlayer extends Activity {
             }
             if(certificationDTSView.getVisibility() == View.VISIBLE) {
                 certificationDTSView.setVisibility(View.GONE);
+            }
+            if(certificationDTSExpressView.getVisibility() == View.VISIBLE) {
+                certificationDTSExpressView.setVisibility(View.GONE);
+            }
+            if(certificationDTSHDMasterAudioView.getVisibility() == View.VISIBLE) {
+                certificationDTSHDMasterAudioView.setVisibility(View.GONE);
             }
         }
     }
@@ -3101,6 +3215,11 @@ public class VideoPlayer extends Activity {
                         case R.string.setting_audiotrack:
                         case R.string.setting_soundtrack:
                             audioOption();
+                        break;
+                        case R.string.setting_audiodtsasset:
+                            if(!showDtsAseetFromInfoLis) {
+                                audiotrackSelect();
+                            }
                         break;
                         case R.string.setting_subtitle:
                             subtitleSwitchBtn.requestFocusFromTouch();
@@ -3774,6 +3893,22 @@ public class VideoPlayer extends Activity {
                 }
             break;
 
+            case AUDIO_DTS_ASSET:
+                if (mMediaInfo != null) {
+                    int dts_asset_total_num = getDtsAssetTotalNum(); //dts test 
+                    for (int i = 0; i < dts_asset_total_num; i++) {
+                        map = new HashMap<String, Object>();
+                        map.put("item_name", "Apresentation"+Integer.toString(i));
+                        map.put("item_sel", R.drawable.item_img_unsel);
+                        list.add(map);
+                    }
+                    LOGI(TAG,"list.size():"+list.size()+",pos:"+pos+",dts_asset_total_num:"+dts_asset_total_num);
+                    if(pos < 0) {
+                        pos = 0;
+                    }
+                    //list.get(pos).put("item_sel", R.drawable.item_img_sel);
+                }
+                break;
             case DISPLAY_MODE:
                 map = new HashMap<String, Object>();
                 map.put("item_name", getResources().getString(R.string.setting_displaymode_normal));
@@ -3849,6 +3984,7 @@ class Option {
     private int repeat = 0;
     private int audiotrack = -1;
     private int soundtrack = -1;
+    private int audiodtsasset = -1;
     private int display = 0;
     private int _3dmode = 0;
     
@@ -3862,6 +3998,7 @@ class Option {
     private String REPEAT_MODE = "RepeatMode";
     private String AUDIO_TRACK = "AudioTrack";
     private String SOUND_TRACK = "SoundTrack";
+    private String AUDIO_DTS_ASSET = "AudioDtsAsset";
     private String DISPLAY_MODE = "DisplayMode";
 
     public Option(Activity act) {
@@ -3891,6 +4028,12 @@ class Option {
         if(sp != null)
             soundtrack = sp.getInt(SOUND_TRACK, 0);
         return soundtrack;
+    }
+
+    public int getAudioDtsAsset() {
+        if(sp != null)
+            audiodtsasset = sp.getInt(AUDIO_DTS_ASSET, 0);
+        return audiodtsasset;
     }
 
     public int getDisplayMode() {
@@ -3931,6 +4074,14 @@ class Option {
         if(sp != null) {
             sp.edit()
                 .putInt(SOUND_TRACK, para)
+                .commit();
+        }
+    }
+
+    public void setAudioDtsAsset(int para) {
+        if(sp != null) {
+            sp.edit()
+                .putInt(AUDIO_DTS_ASSET, para)
                 .commit();
         }
     }
