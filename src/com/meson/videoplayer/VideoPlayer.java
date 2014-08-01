@@ -19,6 +19,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
 import android.media.Metadata;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -168,6 +169,9 @@ public class VideoPlayer extends Activity {
     private boolean mHasPaused = false;
     private boolean intouch_flag = false;
     private boolean set_3d_flag = false;
+
+    private AudioManager mAudioManager;
+    private boolean mAudioFocused = false;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -178,6 +182,7 @@ public class VideoPlayer extends Activity {
         setContentView(R.layout.control_bar);
         setTitle(null);
 
+        mAudioManager = (AudioManager)this.getSystemService(Context.AUDIO_SERVICE);
         mScreenLock = ((PowerManager)this.getSystemService(Context.POWER_SERVICE)).newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK |PowerManager.ON_AFTER_RELEASE,TAG);
         
@@ -2117,6 +2122,30 @@ public class VideoPlayer extends Activity {
     
     //@@private int mCurrentState = STATE_IDLE;
     //@@private int mTargetState  = STATE_IDLE;
+    
+    private OnAudioFocusChangeListener mAudioFocusListener = new OnAudioFocusChangeListener() {
+        public void onAudioFocusChange(int focusChange) {
+            Log.d(TAG, "onAudioFocusChange, focusChange: " + focusChange);
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    if (mMediaPlayer != null) {
+                        Log.d(TAG, "onAudioFocusChange, setVolume 0");
+                        mMediaPlayer.setVolume(0.0f);
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    if (mMediaPlayer != null) {
+                        Log.d(TAG, "onAudioFocusChange, setVolume 1");
+                        mMediaPlayer.setVolume(1.0f);
+                    }
+                    break;
+            }
+        }
+    };
 
     private void sendStopMsg() {
         if(mHandler != null) {
@@ -2129,6 +2158,12 @@ public class VideoPlayer extends Activity {
     private void start() {
         LOGI(TAG,"[start]mMediaPlayer:"+mMediaPlayer);
         if(mMediaPlayer != null) {
+            if (!mAudioFocused) {
+                mAudioFocused = true;
+                Log.d(TAG, "start, requestAudioFocus");
+                mAudioManager.requestAudioFocus(mAudioFocusListener, AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN);
+            }
             mMediaPlayer.start();
             mState = STATE_PLAYING;
             updateIconResource();
@@ -2169,6 +2204,11 @@ public class VideoPlayer extends Activity {
             mState = STATE_STOP;
             //mStateBac = STATE_STOP; //shield for resume play while is in pause status
             mSeekState = SEEK_END;
+            if (mAudioFocused) {
+                Log.d(TAG, "release, abandonAudioFocus");
+                mAudioManager.abandonAudioFocus(mAudioFocusListener);
+                mAudioFocused = false;
+            }
         }
     }
 
