@@ -229,6 +229,10 @@ public class VideoPlayer extends Activity {
         intent.putExtra("command", "pause");
         mContext.sendBroadcast(intent);
 
+        //init time store
+        mErrorTime = java.lang.System.currentTimeMillis();
+        mErrorTimeBac= java.lang.System.currentTimeMillis();
+
         if(mResumePlay != null && mPlayList != null) {
             if(true == mResumePlay.getEnable()) {
                 if(isHdmiPlugged == true) {
@@ -287,6 +291,9 @@ public class VideoPlayer extends Activity {
     public void onPause() {
         super.onPause();
         LOGI(TAG,"[onPause] curtime:"+curtime);
+
+        mErrorTime = 0;
+        mErrorTimeBac = 0;
 
         if(randomSeekEnable()) { // random seek for test
             randomSeekTestFlag = true;
@@ -2478,11 +2485,13 @@ public class VideoPlayer extends Activity {
     }
 
     //@@--------this part for listener----------------------------------------------------------------------------------------------
-    private boolean mCanPause;
-    private boolean mCanSeek;
-    private boolean mCanSeekBack;
-    private boolean mCanSeekForward;
-    private boolean showDtsAseetFromInfoLis;
+		private boolean mCanPause;
+		private boolean mCanSeek;
+		private boolean mCanSeekBack;
+		private boolean mCanSeekForward;
+		private boolean showDtsAseetFromInfoLis;
+		private long mErrorTime = 0;
+		private long mErrorTimeBac = 0;
     MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
         new MediaPlayer.OnVideoSizeChangedListener() {
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
@@ -2629,12 +2638,25 @@ public class VideoPlayer extends Activity {
         new MediaPlayer.OnErrorListener() {
         public boolean onError(MediaPlayer mp, int what, int extra) {
             Log.e(TAG, "Error: " + what + "," + extra);
-            mState = STATE_ERROR;
-            String infoStr = mErrorInfo.getErrorInfo(what, mPlayList.getcur());
-            Toast toast =Toast.makeText(VideoPlayer.this, "Status Error:"+infoStr,Toast.LENGTH_SHORT );
-            toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
-            toast.setDuration(0x00000001);
-            toast.show();
+            mErrorTime = java.lang.System.currentTimeMillis();
+            int offset = (int)(mErrorTime - mErrorTimeBac);
+            //Log.e(TAG, "[onError]mErrorTime:" + mErrorTime + ",mErrorTimeBac:" + mErrorTimeBac + ", offset:" + offset);
+            if(offset > 300) {
+                mState = STATE_ERROR;
+                mErrorTimeBac = mErrorTime;
+                String infoStr = mErrorInfo.getErrorInfo(what, mPlayList.getcur());
+                Toast toast =Toast.makeText(VideoPlayer.this, "Status Error:"+infoStr,Toast.LENGTH_SHORT );
+                toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                toast.setDuration(0x00000001);
+                toast.show();
+
+                if(mOption.getRepeatMode() == mOption.REPEATLIST) {
+                    playNext();
+                }
+                else {
+                    browserBack();
+                }
+            }
             return true;
         }
     };
