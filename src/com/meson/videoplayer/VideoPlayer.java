@@ -167,6 +167,7 @@ public class VideoPlayer extends Activity {
     private int mVideoPosition = 0;
     private boolean mHasPaused = false;
     private boolean intouch_flag = false;
+    private boolean set_3d_flag = false;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1592,11 +1593,18 @@ public class VideoPlayer extends Activity {
         if (mMediaPlayer != null) {
             // TODO: should open after 3d function debug ok
             ret = mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+            if(idx > 0) {
+                set_3d_flag = true;
+            }
+            else {
+                set_3d_flag = false;
+            }
             LOGI(TAG,"[play3DSelect]ret:"+ret);
             if(!ret) {
                 if(mOption != null) {
                     mOption.set3DMode(0);
                 }
+                set_3d_flag = false;
                 Toast toast =Toast.makeText(VideoPlayer.this, getResources().getString(R.string.not_support_3d),Toast.LENGTH_SHORT );
                 toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
                 toast.setDuration(0x00000001);
@@ -1609,8 +1617,10 @@ public class VideoPlayer extends Activity {
     private void close3D() {
         LOGI(TAG,"[close3D]mMediaPlayer:"+mMediaPlayer+",mOption:"+mOption);
         if (mMediaPlayer != null && mOption != null) {
-            mOption.set3DMode(0);
-            mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+            if(set_3d_flag) {
+                mOption.set3DMode(0);
+                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+            }
         }
     }
 
