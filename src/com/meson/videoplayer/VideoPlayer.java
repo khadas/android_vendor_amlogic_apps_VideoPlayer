@@ -2600,6 +2600,10 @@ public class VideoPlayer extends Activity {
         public void onSeekComplete(MediaPlayer mp) {
             LOGI(TAG,"[onSeekComplete] progressBarSeekFlag:"+progressBarSeekFlag+",mStateBac:"+mStateBac);
 
+            if(mMediaPlayer != null) {
+                mMediaPlayer.subtitleResetForSeek();
+            }
+
             if(progressBarSeekFlag == false) { //onStopTrackingTouch
                 stopFWFB(); //reset fw/fb status
                 if(mStateBac == STATE_PLAYING) {
@@ -3464,7 +3468,7 @@ public class VideoPlayer extends Activity {
     private void setSubtitleView() {
         LOGI(TAG,"[setSubtitleView]mMediaPlayer:"+mMediaPlayer);
         if(mMediaPlayer != null) {
-            mMediaPlayer.subtitleClear();
+            //mMediaPlayer.subtitleClear();
             mMediaPlayer.subtitleSetGravity(Gravity.CENTER);
             mMediaPlayer.subtitleSetTextColor(sub_para.color);
             mMediaPlayer.subtitleSetTextSize(sub_para.font);
