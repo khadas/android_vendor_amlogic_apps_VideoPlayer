@@ -2098,6 +2098,10 @@ public class VideoPlayer extends Activity {
         if(pos>=totaltime)
             pos = totaltime;
 
+        if(dest <= 1) {
+            pos = 0;
+        }
+
         LOGI(TAG,"[seekByProgressBar]seekTo:"+pos);
         seekTo(pos);
         stopOsdTimeout();
