@@ -1847,7 +1847,7 @@ public class VideoPlayer extends Activity {
                 startActivity(selectFileIntent);
             }
         }
-        
+        showNoOsdView(); 
         //close 3D
         close3D();
         
@@ -3176,7 +3176,7 @@ public class VideoPlayer extends Activity {
         /*if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
             startOsdTimeout();
         }*/
-        if((ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE))
+        if(!browserBackDoing && ((ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE)))
             startOsdTimeout();
         return false;
     }
