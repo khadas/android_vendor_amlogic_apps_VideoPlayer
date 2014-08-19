@@ -105,7 +105,8 @@ public class ErrorInfo{
                 errStr = mContext.getResources().getString(R.string.seek_out_of_range);//"Seek out of range";
                 break;
             default:
-                errStr = mContext.getResources().getString(R.string.unknow_error);//"Unknow Error";
+                //errStr = mContext.getResources().getString(R.string.unknow_error);//"Unknow Error";
+                errStr = mContext.getResources().getString(R.string.unsupport_media);
                 break;
             }
         return errStr;

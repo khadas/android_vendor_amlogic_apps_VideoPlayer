@@ -210,10 +210,11 @@ public class MediaInfo{
     public static final int AFORMAT_PCM_WIFIDISPLAY = 22;
     public static final int AFORMAT_DRA = 23;
     public static final int AFORMAT_SIPR = 24; 
-    public static final int AFORMAT_MPEG1 = 25;
-    public static final int AFORMAT_MPEG2 = 26; 
-    public static final int AFORMAT_UNSUPPORT = 27;
-    public static final int AFORMAT_MAX = 28; 
+    public static final int AFORMAT_TRUEHD = 25;
+    public static final int AFORMAT_MPEG1 = 26;
+    public static final int AFORMAT_MPEG2 = 27; 
+    public static final int AFORMAT_UNSUPPORT = 28;
+    public static final int AFORMAT_MAX = 29; 
 
     public int getCurAudioIdx() {
         int ret = -1;
@@ -333,6 +334,9 @@ public class MediaInfo{
                 break;
             case AFORMAT_SIPR:
                 type = "SIPR";
+                break;
+            case AFORMAT_TRUEHD:
+                type = "TRUEHD";
                 break;
             case AFORMAT_MPEG1:
                 type = "MP1";
