@@ -5,13 +5,56 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import java.io.File;
 
-
 public class MediaInfo{
     private static final String TAG = "MediaInfo";
     private static final boolean DEBUG = false;
     private static Context mContext = null;
     private MediaPlayer mp = null;
-    private MediaPlayer.MediaInfo mInfo = null;
+    ///@@private MediaPlayer.MediaInfo mInfo = null;
+
+    class VideoInfo{
+        public int index;
+        public int id;
+        public String vformat;
+        public int width;
+        public int height;
+    }
+    
+    class AudioInfo{
+        public int index;
+        public int id; //id is useless for application
+        public int aformat;
+        public int channel;
+        public int sample_rate;
+    }
+
+    class SubtitleInfo{
+        public int index;
+        public int id;
+        public int sub_type;
+        public String sub_language;
+    }
+
+    class mMediaInfo{
+        public String filename;
+        public int duration;
+        public String file_size;
+        public int bitrate;
+        public int type;
+        public int cur_video_index;
+        public int cur_audio_index;
+        public int cur_sub_index;
+
+        public int total_video_num;
+        public VideoInfo[] videoInfo;
+
+        public int total_audio_num;
+        public AudioInfo[] audioInfo;
+
+        public int total_sub_num;
+        public SubtitleInfo[] subtitleInfo;
+    }
+    private mMediaInfo mInfo = null;
     
     public MediaInfo(MediaPlayer mediaPlayer, Context context) {
         mp = mediaPlayer;
@@ -20,7 +63,7 @@ public class MediaInfo{
     
     public void initMediaInfo() {
         if(mp != null) {
-            mInfo = mp.getMediaInfo();
+            ///@@mInfo = mp.getMediaInfo();
         }
         if(DEBUG) printMediaInfo();
     }
@@ -60,62 +103,64 @@ public class MediaInfo{
 
     public String getFileType() {
         String str_type = "UNKNOWN";
-        switch(mInfo.type) {
-            case 0:
-                break;
-            case 1:
-                str_type = "AVI";
-                break;
-            case 2:
-                str_type = "MPEG";
-                break;
-            case 3:
-                str_type = "WAV";
-                break;
-            case 4:
-                str_type = "MP3";
-                break;
-            case 5:
-                str_type = "AAC";
-                break;
-            case 6:
-                str_type = "AC3";
-                break;
-            case 7:
-                str_type = "RM";
-                break;
-            case 8:
-                str_type = "DTS";
-                break;
-            case 9:
-                str_type = "MKV";
-                break;
-            case 10:
-                str_type = "MOV";
-                break;
-            case 11:
-                str_type = "MP4";
-                break;
-            case 12:
-                str_type = "FLAC";
-                break;
-            case 13:
-                str_type = "H264";
-                break;
-            case 14:
-                str_type = "M2V";
-                break;
-            case 15:
-                str_type = "FLV";
-                break;
-            case 16:
-                str_type = "P2P";
-                break;
-            case 17:
-                str_type = "ASF";
-                break;
-            default:
-                break;
+        if(mInfo != null) {
+            switch(mInfo.type) {
+                case 0:
+                    break;
+                case 1:
+                    str_type = "AVI";
+                    break;
+                case 2:
+                    str_type = "MPEG";
+                    break;
+                case 3:
+                    str_type = "WAV";
+                    break;
+                case 4:
+                    str_type = "MP3";
+                    break;
+                case 5:
+                    str_type = "AAC";
+                    break;
+                case 6:
+                    str_type = "AC3";
+                    break;
+                case 7:
+                    str_type = "RM";
+                    break;
+                case 8:
+                    str_type = "DTS";
+                    break;
+                case 9:
+                    str_type = "MKV";
+                    break;
+                case 10:
+                    str_type = "MOV";
+                    break;
+                case 11:
+                    str_type = "MP4";
+                    break;
+                case 12:
+                    str_type = "FLAC";
+                    break;
+                case 13:
+                    str_type = "H264";
+                    break;
+                case 14:
+                    str_type = "M2V";
+                    break;
+                case 15:
+                    str_type = "FLV";
+                    break;
+                case 16:
+                    str_type = "P2P";
+                    break;
+                case 17:
+                    str_type = "ASF";
+                    break;
+                default:
+                    break;
+            }
         }
         return str_type;
     }

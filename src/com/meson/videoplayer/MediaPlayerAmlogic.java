@@ -47,13 +47,14 @@ public class MediaPlayerAmlogic extends MediaPlayer {
     public  void fastForward(int step) {
         Log.i(LOGTAG, "fastForward:"+step);
         synchronized (this){
-            String playerTypeStr = getStringParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TYPE_STR);
+            ///@@String playerTypeStr = getStringParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TYPE_STR);
+            String playerTypeStr = null;
             if((playerTypeStr != null) && (playerTypeStr.equals("AMLOGIC_PLAYER"))) {
                 String str = Integer.toString(step);
                 StringBuilder builder = new StringBuilder();
                 builder.append("forward:"+str);
                 Log.i(LOGTAG,"[HW]"+builder.toString());
-                setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_FORWARD,builder.toString());
+                ///@@setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_FORWARD,builder.toString());
                 return;
             }
             mStep = step;
@@ -75,13 +76,14 @@ public class MediaPlayerAmlogic extends MediaPlayer {
     public  void fastBackward(int step) {
         Log.i(LOGTAG, "fastBackward:"+step);
         synchronized (this){
-            String playerTypeStr = getStringParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TYPE_STR);
+            ///@@String playerTypeStr = getStringParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TYPE_STR);
+            String playerTypeStr = null;
             if((playerTypeStr != null) && (playerTypeStr.equals("AMLOGIC_PLAYER"))) {
                 String str = Integer.toString(step);
                 StringBuilder builder = new StringBuilder();
                 builder.append("backward:"+str);
                 Log.i(LOGTAG,"[HW]"+builder.toString());
-                setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_BACKWARD,builder.toString());
+                ///@@setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_BACKWARD,builder.toString());
                 return;
             }
             mStep = step;
