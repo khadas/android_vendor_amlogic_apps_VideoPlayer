@@ -43,7 +43,6 @@ import android.os.Handler;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.os.Message;
-import android.app.SystemWriteManager; 
 
 public class FileList extends ListActivity {
 	private static final String ROOT_PATH = "/storage";
@@ -81,7 +80,6 @@ public class FileList extends ListActivity {
 	private int pathLevel = 0;
 	private final String iso_mount_dir = "/storage/external_storage/VIRTUAL_CDROM";
 	private Uri uri;
-	private SystemWriteManager sw;
 	
 	 private final StorageEventListener mListener = new StorageEventListener() {
 	        public void onUsbMassStorageConnectionChanged(boolean connected)
@@ -262,8 +260,7 @@ public class FileList extends ListActivity {
 	    setContentView(R.layout.file_list);
          PlayList.setContext(this);
 
-		sw = (SystemWriteManager) getSystemService("system_write"); 
-		listAllFiles = sw.getPropertyBoolean("vplayer.listall.enable", false);
+		listAllFiles = SystemProperties.getBoolean("vplayer.listall.enable", false);
 
 		currentlist = new ArrayList<String>();
 

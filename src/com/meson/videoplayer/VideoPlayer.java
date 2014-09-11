@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.SystemWriteManager; 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContentResolver;
@@ -25,7 +24,7 @@ import android.media.Metadata;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
-import android.media.MediaPlayerAmlogic;
+//import android.media.MediaPlayerAmlogic;
 import android.net.Uri;
 //import android.os.Bundle;
 //import android.os.Handler;
@@ -86,7 +85,6 @@ public class VideoPlayer extends Activity {
     private boolean DEBUG = false;
     private Context mContext;
     
-    private static SystemWriteManager sw; 
     PowerManager.WakeLock mScreenLock = null;
 
     private boolean backToOtherAPK = true;
@@ -176,7 +174,6 @@ public class VideoPlayer extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sw = (SystemWriteManager) getSystemService("system_write"); 
         
         LOGI(TAG,"[onCreate]");
         setContentView(R.layout.control_bar);
@@ -459,11 +456,15 @@ public class VideoPlayer extends Activity {
         }
     }
 
+    private boolean isDemoVersion = true;
+    private boolean isDemoVersion() {
+        boolean ret = SystemProperties.getBoolean("sys.videoplayer.demon",false);
+        ret = (ret ||isDemoVersion);
+        return ret;
+    }
+
     private boolean getDebugEnable() {
-        if(sw == null) {
-            sw = (SystemWriteManager) getSystemService("system_write"); 
-        }
-        boolean ret = sw.getPropertyBoolean("sys.videoplayer.debug",false);
+        boolean ret = SystemProperties.getBoolean("sys.videoplayer.debug",false);
         return ret;
     }
 
@@ -1490,11 +1491,11 @@ public class VideoPlayer extends Activity {
             videoHeight = mMediaPlayer.getVideoHeight();
             LOGI(TAG,"[displayModeImpl]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
             if(mOption.getDisplayMode() == 0) { // normal
-                if ( videoWidth * dispHeight  < dispWidth * videoHeight ) {
+                if ( videoWidth * dispHeight < dispWidth * videoHeight ) {
                     //image too wide
                     width = dispHeight * videoWidth / videoHeight;
                     height = dispHeight;
-                } else if ( videoWidth * dispHeight  > dispWidth * videoHeight ) {
+                } else if ( videoWidth * dispHeight > dispWidth * videoHeight ) {
                     //image too tall
                     width = dispWidth;
                     height = dispWidth * videoHeight / videoWidth;
@@ -1510,11 +1511,11 @@ public class VideoPlayer extends Activity {
             }
             else if(mOption.getDisplayMode() == 2) { // 4:3
                 videoWidth = 4*videoHeight /3;
-                if ( videoWidth * dispHeight  < dispWidth * videoHeight ) {
+                if ( videoWidth * dispHeight < dispWidth * videoHeight ) {
                     //image too wide
                     width = dispHeight * videoWidth / videoHeight;
                     height = dispHeight;
-                } else if ( videoWidth * dispHeight  > dispWidth * videoHeight ) {
+                } else if ( videoWidth * dispHeight > dispWidth * videoHeight ) {
                     //image too tall
                     width = dispWidth;
                     height = dispWidth * videoHeight / videoWidth;
@@ -1526,11 +1527,11 @@ public class VideoPlayer extends Activity {
             }
             else if(mOption.getDisplayMode() == 3) { // 16:9
                videoWidth = 16*videoHeight /9;
-               if ( videoWidth * dispHeight  < dispWidth * videoHeight ) {
+               if ( videoWidth * dispHeight < dispWidth * videoHeight ) {
                     //image too wide
                     width = dispHeight * videoWidth / videoHeight;
                     height = dispHeight;
-                } else if ( videoWidth * dispHeight  > dispWidth * videoHeight ) {
+                } else if ( videoWidth * dispHeight > dispWidth * videoHeight ) {
                     //image too tall
                     width = dispWidth;
                     height = dispWidth * videoHeight / videoWidth;
@@ -1640,10 +1641,7 @@ public class VideoPlayer extends Activity {
     private boolean randomSeekTestFlag = false;
     private Random r = new Random(99);  
     private boolean randomSeekEnable() {
-        if(sw == null) {
-            sw = (SystemWriteManager) getSystemService("system_write"); 
-        }
-        boolean ret = sw.getPropertyBoolean("sys.vprandomseek.enable",false);
+        boolean ret = SystemProperties.getBoolean("sys.vprandomseek.enable",false);
         return ret;
     }
     private void randomSeekTest() {
@@ -2052,6 +2050,14 @@ public class VideoPlayer extends Activity {
     }
 
     private void FFimpl(int para) {
+        if(isDemoVersion()) {
+            Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened for demo version",Toast.LENGTH_SHORT );
+            toast.setGravity(Gravity.BOTTOM,0,0);
+            toast.setDuration(0x00000001);
+            toast.show();
+            return;
+        }
+
         if (mMediaPlayer != null) {
             LOGI(TAG,"[FFimpl]para:"+para);
             if(para > 0) {
@@ -2061,18 +2067,26 @@ public class VideoPlayer extends Activity {
                 mState = STATE_PLAYING;
             }
             updateIconResource();
- /*           
+/*           
             String str = Integer.toString(para);
             StringBuilder builder = new StringBuilder();
             builder.append("forward:"+str);
             LOGI(TAG,"[FFimpl]"+builder.toString());
             mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_FORWARD,builder.toString());
 */
-	    mMediaPlayer.fastForward(para);
+	        mMediaPlayer.fastForward(para);
         }
     }
 
     private void FBimpl(int para) {
+        if(isDemoVersion()) {
+            Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened for demo version",Toast.LENGTH_SHORT );
+            toast.setGravity(Gravity.BOTTOM,0,0);
+            toast.setDuration(0x00000001);
+            toast.show();
+            return;
+        }
+       
         if (mMediaPlayer != null) {
             LOGI(TAG,"[FBimpl]para:"+para);
             if(para > 0) {
@@ -2083,14 +2097,14 @@ public class VideoPlayer extends Activity {
                 mState = STATE_PLAYING;
             }
             updateIconResource();
-/*            
+/*           
             String str = Integer.toString(para);
             StringBuilder builder = new StringBuilder();
             builder.append("backward:"+str);
             LOGI(TAG,"[FBimpl]"+builder.toString());
             mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_BACKWARD,builder.toString());
-*/           
-	     mMediaPlayer.fastBackward(para);
+*/          
+	        mMediaPlayer.fastBackward(para);
         }
     }
 
@@ -2484,14 +2498,14 @@ public class VideoPlayer extends Activity {
         mMediaPlayer.setDisplay(mSurfaceHolder);
     }
 
-    //@@--------this part for listener----------------------------------------------------------------------------------------------
-		private boolean mCanPause;
-		private boolean mCanSeek;
-		private boolean mCanSeekBack;
-		private boolean mCanSeekForward;
-		private boolean showDtsAseetFromInfoLis;
-		private long mErrorTime = 0;
-		private long mErrorTimeBac = 0;
+//@@--------this part for listener----------------------------------------------------------------------------------------------
+	private boolean mCanPause;
+	private boolean mCanSeek;
+	private boolean mCanSeekBack;
+	private boolean mCanSeekForward;
+	private boolean showDtsAseetFromInfoLis;
+	private long mErrorTime = 0;
+	private long mErrorTimeBac = 0;
     MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
         new MediaPlayer.OnVideoSizeChangedListener() {
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
@@ -2530,7 +2544,7 @@ public class VideoPlayer extends Activity {
                 mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
             }
 
-            data.recycleParcel();
+            ///data.recycleParcel();
 
             /*
             MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
@@ -2545,8 +2559,11 @@ public class VideoPlayer extends Activity {
             if(mStateBac != STATE_PAUSED) {
                 start();
             }
-            initSubtitle();
-            initMediaInfo();
+
+            if(!isDemoVersion()) {
+                initSubtitle();
+                initMediaInfo();
+            }
             displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
             showCertification(); // show certification 
             
@@ -2600,8 +2617,10 @@ public class VideoPlayer extends Activity {
         public void onSeekComplete(MediaPlayer mp) {
             LOGI(TAG,"[onSeekComplete] progressBarSeekFlag:"+progressBarSeekFlag+",mStateBac:"+mStateBac);
 
-            if(mMediaPlayer != null) {
-                mMediaPlayer.subtitleResetForSeek();
+            if(!isDemoVersion()) {
+                if(mMediaPlayer != null) {
+                    mMediaPlayer.subtitleResetForSeek();
+                }
             }
 
             if(progressBarSeekFlag == false) { //onStopTrackingTouch
@@ -3023,6 +3042,13 @@ public class VideoPlayer extends Activity {
             return;
         if(null==optbar)
             return;
+        if(isDemoVersion()) {
+            Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened for demo version",Toast.LENGTH_SHORT );
+            toast.setGravity(Gravity.BOTTOM,0,0);
+            toast.setDuration(0x00000001);
+            toast.show();
+            return;
+        }
 
         int flag = getCurOsdViewFlag();
         switch(flag) {
@@ -3104,7 +3130,7 @@ public class VideoPlayer extends Activity {
         int ret = mMediaInfo.checkAudioCertification(mMediaInfo.getAudioFormat(track/*mMediaInfo.getCurAudioIdx()*/));
         LOGI(TAG,"[showCertification]ret:"+ret);
         if(ret == mMediaInfo.CERTIFI_Dolby) {
-            if(sw.getPropertyBoolean("ro.platform.support.dolby",false)) {
+            if(SystemProperties.getBoolean("ro.platform.support.dolby",false)) {
                 certificationDoblyView.setVisibility(View.VISIBLE);
                 certificationDoblyPlusView.setVisibility(View.GONE);
                 certificationDTSView.setVisibility(View.GONE);
@@ -3113,7 +3139,7 @@ public class VideoPlayer extends Activity {
             }
         }
         else if(ret == mMediaInfo.CERTIFI_Dolby_Plus) {
-            if(sw.getPropertyBoolean("ro.platform.support.dolby",false)) {
+            if(SystemProperties.getBoolean("ro.platform.support.dolby",false)) {
                 certificationDoblyView.setVisibility(View.GONE);
                 certificationDoblyPlusView.setVisibility(View.VISIBLE);
                 certificationDTSView.setVisibility(View.GONE);
@@ -3122,7 +3148,7 @@ public class VideoPlayer extends Activity {
             }
         }
         else if(ret == mMediaInfo.CERTIFI_DTS) {
-            if(sw.getPropertyBoolean("ro.platform.support.dts",false)) {
+            if(SystemProperties.getBoolean("ro.platform.support.dts",false)) {
                 certificationDoblyView.setVisibility(View.GONE);
                 certificationDoblyPlusView.setVisibility(View.GONE);
                 if(mDtsType == DTS_NOR) {
@@ -4008,7 +4034,7 @@ public class VideoPlayer extends Activity {
                 list.add(map);
                 // TODO: 3D
                 /*
-                if(sw.getPropertyBoolean("3D_setting.enable", false)){ 
+                if(SystemProperties.getBoolean("3D_setting.enable", false)){ 
                     if(is3DVideoDisplayFlag){//judge is 3D                		
                         map = new HashMap<String, Object>();
                         map.put("item_name", getResources().getString(R.string.setting_displaymode_normal_noscaleup));
