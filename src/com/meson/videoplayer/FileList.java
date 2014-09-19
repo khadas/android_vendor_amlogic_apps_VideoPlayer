@@ -89,7 +89,7 @@ public class FileList extends ListActivity {
 	        }
 	        public void onStorageStateChanged(String path, String oldState, String newState)
 	        {
-                Log.d(TAG, "onStorageStateChanged: "+path + " oldState=" + oldState + " newState=" + newState);
+                Log.d(TAG, "onStorageStateChanged: "+path + " oldState=" + oldState + " newState=" + newState+", PlayList.getinstance().rootPath:"+ PlayList.getinstance().rootPath);
 	        	if (newState == null || path == null) 
 	        		return;
 	        	
@@ -103,7 +103,8 @@ public class FileList extends ListActivity {
 	        			|| newState.compareTo("removed") == 0)
 	        	{
 					if(PlayList.getinstance().rootPath.startsWith(path)
-	        		|| PlayList.getinstance().rootPath.equals(root_path))
+	        		|| PlayList.getinstance().rootPath.equals(root_path)
+	        		|| (PlayList.getinstance().rootPath.startsWith(SD_PATH) && path.equals("/storage/sdcard1")))
 	        			BrowserFile(root_path);
 	        	}
 	        	
@@ -471,6 +472,7 @@ public class FileList extends ListActivity {
 				}
 			}
 		}
+        listFiles.clear();
 		searchFile(file);
 		if(listFiles.isEmpty()) {
 			Toast.makeText(FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
@@ -482,9 +484,11 @@ public class FileList extends ListActivity {
 		Log.d(TAG, "BrowserFile():"+filePath);
 		PlayList.getinstance().rootPath =filePath;
 
+        //Log.d(TAG, "BrowserFile() listFiles.size():"+listFiles.size());
 		File [] fs = new File[listFiles.size()];
 		for(i=0;i<listFiles.size();i++) {
 			fs[i] = listFiles.get(i);
+            //Log.d(TAG, "BrowserFile() fs[i]:"+fs[i]);
 		}
 		if (!filePath.equals(ROOT_PATH)) {
                 //System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
@@ -498,6 +502,7 @@ public class FileList extends ListActivity {
 		{
 			File tempF = fs[i];
 			String tmppath = tempF.getName();
+            //Log.d(TAG, "BrowserFile() tmppath:"+tmppath);
 
 			//change device name;	
 			if(filePath.equals(ROOT_PATH))
@@ -526,12 +531,14 @@ public class FileList extends ListActivity {
 					&&(!tpath.equals("/mnt/shell")))
 				{
 					String path=changeDevName(tmppath);
+                    //Log.d(TAG, "BrowserFile() items.add path:"+path);
 					items.add(path);
 					paths.add(tempF.getPath());
 				}
 			}
 			else
 			{
+			    //Log.d(TAG, "BrowserFile() items.add tmppath:"+tmppath);
 				items.add(tmppath);
 				paths.add(tempF.getPath());
 			}
@@ -598,6 +605,7 @@ public class FileList extends ListActivity {
     
 	public void searchFile(File file)
 	{
+	    File filetmp;
 	    File[] the_Files;
 	    the_Files = file.listFiles(new MyFilter(extensions));
 	
@@ -611,12 +619,20 @@ public class FileList extends ListActivity {
 		if(curPath.equals(root_path)) {
 			File dir = new File(NAND_PATH);
 			if (dir.exists() && dir.isDirectory()) {
-				listFiles.add(dir);
+                filetmp = new File(NAND_PATH);
+                if(filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+				    listFiles.add(dir);
+                }
 			}
 
 			dir = new File(SD_PATH);
 			if (dir.exists() && dir.isDirectory()) {
-				listFiles.add(dir);
+                filetmp = new File(SD_PATH);
+                //Log.i(TAG,"[searchFile]filetmp.listFiles():"+filetmp.listFiles());
+                //Log.i(TAG,"[searchFile]================");
+                if(filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+				    listFiles.add(dir);
+                }
 			}
 
 			dir = new File(USB_PATH);
@@ -626,7 +642,10 @@ public class FileList extends ListActivity {
 						if (pfile.isDirectory()) {
 							String path = pfile.getAbsolutePath();
 							if ((path.startsWith(USB_PATH+"/sd")||path.startsWith(USB_PATH+"/sr"))&&!path.equals(SD_PATH)) {
-								listFiles.add(pfile);
+                                filetmp = new File(path);
+                                if(filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+								    listFiles.add(pfile);
+                                }
 							}
 						}
 					}
@@ -640,7 +659,10 @@ public class FileList extends ListActivity {
 						if (qfile.isDirectory()) {
 							String path = qfile.getAbsolutePath();
 							if (path.startsWith(ROOT_PATH+"/udisk")) {
-								listFiles.add(qfile);
+                                filetmp = new File(path);
+                                if(filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+								    listFiles.add(qfile);
+                                }
 							}
 						}
 					}
