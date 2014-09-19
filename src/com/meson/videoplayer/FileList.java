@@ -70,7 +70,7 @@ public class FileList extends ListActivity {
 	private boolean isQuerying=false;
 	private int scanCnt=0;
 	private File file;
-	private static String TAG = "player_FileList";
+	private static String TAG = "FileList";
 	Timer timer = new Timer();
 	Timer timerScan = new Timer();
 	
@@ -508,7 +508,7 @@ public class FileList extends ListActivity {
 					tmppath = "sdcard";
 				else if (tpath.equals(SD_PATH))
 					tmppath = "external_sdcard";
-				else if((!tpath.equals(SD_PATH))&&tpath.startsWith(USB_PATH+"/sd")) {
+				else if(((!tpath.equals(SD_PATH))&&tpath.startsWith(USB_PATH+"/sd")) || tpath.startsWith(ROOT_PATH+"/udisk")) {
 					dev_usb_count++;
 					char data = (char) ('A' +dev_usb_count-1);
 					tmppath =  getText(R.string.usb_device_str) +"(" +data + ":)" ;
@@ -624,10 +624,23 @@ public class FileList extends ListActivity {
 				if (dir.listFiles() != null) {
 					for (File pfile : dir.listFiles()) {
 						if (pfile.isDirectory()) {
-							String devname = null;
 							String path = pfile.getAbsolutePath();
 							if ((path.startsWith(USB_PATH+"/sd")||path.startsWith(USB_PATH+"/sr"))&&!path.equals(SD_PATH)) {
 								listFiles.add(pfile);
+							}
+						}
+					}
+				}
+			}
+            
+            dir = new File(ROOT_PATH);
+			if (dir.exists() && dir.isDirectory()) { 
+				if (dir.listFiles() != null) {
+					for (File qfile : dir.listFiles()) {
+						if (qfile.isDirectory()) {
+							String path = qfile.getAbsolutePath();
+							if (path.startsWith(ROOT_PATH+"/udisk")) {
+								listFiles.add(qfile);
 							}
 						}
 					}
