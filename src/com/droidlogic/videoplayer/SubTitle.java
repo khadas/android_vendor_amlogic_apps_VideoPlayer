@@ -18,7 +18,7 @@ import java.lang.Integer;
 import java.lang.Thread;
 import java.io.IOException;
 
-import com.amlogic.SubTitleService.ISubTitleService;
+import com.droidlogic.SubTitleService.ISubTitleService;
 
 public class SubTitle{
     private String TAG = "SubTitle";
