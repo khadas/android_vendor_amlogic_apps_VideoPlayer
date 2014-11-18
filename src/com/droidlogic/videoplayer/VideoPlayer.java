@@ -170,6 +170,8 @@ public class VideoPlayer extends Activity {
 
     private AudioManager mAudioManager;
     private boolean mAudioFocused = false;
+
+    private SubTitle mSubTitle;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -2195,6 +2197,7 @@ public class VideoPlayer extends Activity {
                         AudioManager.AUDIOFOCUS_GAIN);
             }
             mMediaPlayer.start();
+            mSubTitle.start();
             mState = STATE_PLAYING;
             updateIconResource();
             
@@ -2221,6 +2224,7 @@ public class VideoPlayer extends Activity {
         if(mMediaPlayer != null && mState != STATE_STOP) {
             mMediaPlayer.stop();
             mMediaPlayer.reset();
+            mSubTitle.close();
             mState = STATE_STOP;
         }
     }
@@ -2231,6 +2235,8 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.reset();
             mMediaPlayer.release();
             mMediaPlayer = null;
+            mSubTitle.release();
+            mSubTitle = null;
             mState = STATE_STOP;
             //mStateBac = STATE_STOP; //shield for resume play while is in pause status
             mSeekState = SEEK_END;
@@ -2384,6 +2390,7 @@ public class VideoPlayer extends Activity {
         mHeaders = headers;
         try{
             mMediaPlayer.setDataSource(mContext, mUri, mHeaders);
+            mSubTitle.setSource(mContext, mUri);
             mState = STATE_PREPARING;
             mMediaPlayer.prepare();
         } catch (IOException ex) {
@@ -2472,6 +2479,7 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[trySetVideoPathAgain]path:"+path);
         try{
             mMediaPlayer.setDataSource(path);
+            mSubTitle.setSource(path);
             mState = STATE_PREPARING;
             mMediaPlayer.prepare();
         } catch (IOException ex) {
@@ -2494,6 +2502,7 @@ public class VideoPlayer extends Activity {
         
         release();
         mMediaPlayer = new MediaPlayerAmlogic();
+        mSubTitle = new SubTitle(mMediaPlayer);
         mMediaPlayer.setOnPreparedListener(mPreparedListener);
         mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
         mMediaPlayer.setOnCompletionListener(mCompletionListener);
@@ -3492,7 +3501,7 @@ public class VideoPlayer extends Activity {
 
     private void subtitle_prepare() {
         if(mMediaPlayer != null) {
-            ///@@sub_para.totalnum = mMediaPlayer.subtitleTotal();
+            sub_para.totalnum = mSubTitle.total();
         }
     }
 
@@ -3500,11 +3509,11 @@ public class VideoPlayer extends Activity {
         LOGI(TAG,"[setSubtitleView]mMediaPlayer:"+mMediaPlayer);
         if(mMediaPlayer != null) {
             //mMediaPlayer.subtitleClear();
-            ///@@mMediaPlayer.subtitleSetGravity(Gravity.CENTER);
-            ///@@mMediaPlayer.subtitleSetTextColor(sub_para.color);
-            ///@@mMediaPlayer.subtitleSetTextSize(sub_para.font);
-            ///@@mMediaPlayer.subtitleSetTextStyle(Typeface.BOLD);
-            ///@@mMediaPlayer.subtitleSetPosHeight(getWindowManager().getDefaultDisplay().getHeight()*sub_para.position_v/20+10);
+            mSubTitle.setGravity(Gravity.CENTER);
+            mSubTitle.setTextColor(sub_para.color);
+            mSubTitle.setTextSize(sub_para.font);
+            mSubTitle.setTextStyle(Typeface.BOLD);
+            mSubTitle.setPosHeight(getWindowManager().getDefaultDisplay().getHeight()*sub_para.position_v/20+10);
         }
     }
 
@@ -3541,15 +3550,15 @@ public class VideoPlayer extends Activity {
                 LOGI(TAG,"[subtitle_control]sub_para.curid:"+sub_para.curid+",sub_para.curidbac:"+sub_para.curidbac);
                 if(mMediaPlayer != null) {
                     if(sub_para.curid==sub_para.totalnum) {
-                        ///@@mMediaPlayer.subtitleHide();
+                        mSubTitle.hide();
                     }
                     else {
                         if(sub_para.curidbac != sub_para.curid) {
-                            ///@@mMediaPlayer.subtitleOpenIdx(sub_para.curid);
+                            mSubTitle.openIdx(sub_para.curid);
                             sub_para.curidbac = sub_para.curid;
                         }
                         else {
-                            ///@@mMediaPlayer.subtitleDisplay();
+                            mSubTitle.display();
                         }
                     }
                 }
@@ -3577,8 +3586,7 @@ public class VideoPlayer extends Activity {
                     else {
                         initSubSetOptions(color_text);
                     }*/
-                    ///@@String subNameStr = mMediaPlayer.subtitleGetCurName();
-                    String subNameStr = null;
+                    String subNameStr = mSubTitle.getCurName();
                     if(subNameStr != null) {
                         if(subNameStr.equals("INSUB") || subNameStr.endsWith(".idx")) {
                             disableSubSetOptions();
@@ -3703,8 +3711,7 @@ public class VideoPlayer extends Activity {
             else {
                 initSubSetOptions(color_text);
             }*/
-            ///@@String subNameStr = mMediaPlayer.subtitleGetCurName();
-            String subNameStr = null;
+            String subNameStr = mSubTitle.getCurName();
             if(subNameStr != null) {
                 if(subNameStr.equals("INSUB") || subNameStr.endsWith(".idx")) {
                     disableSubSetOptions();
