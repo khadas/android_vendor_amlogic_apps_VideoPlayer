@@ -15,14 +15,13 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src) \
-	../SubTitle/src/com/droidlogic/SubTitleService/ISubTitleService.aidl
-
-#LOCAL_SDK_VERSION := current
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := VideoPlayer
 LOCAL_CERTIFICATE := platform
-#LOCAL_STATIC_JAVA_LIBRARIES := amlogic.subtitle
+
+LOCAL_JAVA_LIBRARIES := droidlogic
+#LOCAL_SDK_VERSION := current
 
 #LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
 
