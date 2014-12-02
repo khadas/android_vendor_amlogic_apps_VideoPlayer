@@ -445,7 +445,7 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        private boolean isDemoVersion = true;
+        private boolean isDemoVersion = false;
         private boolean isDemoVersion() {
             boolean ret = SystemProperties.getBoolean ("sys.videoplayer.demon", false);
             ret = (ret || isDemoVersion);
@@ -507,6 +507,7 @@ public class VideoPlayer extends Activity {
         }
 
         private void initMediaInfo() {
+            LOGI (TAG, "[initMediaInfo] mMediaPlayer:"+mMediaPlayer);
             mMediaInfo = new MediaInfo (mMediaPlayer, VideoPlayer.this);
             mMediaInfo.initMediaInfo();
             //prepare for audio track
@@ -1520,7 +1521,7 @@ public class VideoPlayer extends Activity {
                 StringBuilder builder = new StringBuilder();
                 builder.append ("aid:" + str);
                 LOGI (TAG, "[audioTrackImpl]" + builder.toString());
-                ///@@mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK,builder.toString());
+                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK,builder.toString());
             }
         }
 
@@ -1541,7 +1542,7 @@ public class VideoPlayer extends Activity {
                     soundTrackStr = "lrmix";
                 }
                 LOGI (TAG, "[soundTrackImpl]soundTrackStr:" + soundTrackStr);
-                ///@@mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
+                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
             }
         }
 
@@ -1551,14 +1552,14 @@ public class VideoPlayer extends Activity {
                 StringBuilder builder = new StringBuilder();
                 builder.append ("dtsAsset:" + str);
                 LOGI (TAG, "[audioDtsAseetImpl]" + builder.toString());
-                ///@@mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DTS_ASSET, builder.toString());
+                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DTS_ASSET, builder.toString());
             }
         }
 
         private int getDtsAssetTotalNum() {
             int num = 0;
             if (mMediaPlayer != null) {
-                ///@@num = mMediaPlayer.getIntParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
+                num = mMediaPlayer.getIntParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
             }
             LOGI (TAG, "[getDtsAssetTotalNum] num:" + num);
             return num;
@@ -1568,7 +1569,7 @@ public class VideoPlayer extends Activity {
             boolean ret = false;
             if (mMediaPlayer != null) {
                 // TODO: should open after 3d function debug ok
-                ///@@ret = mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+                ret = mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
                 if (idx > 0) {
                     set_3d_flag = true;
                 }
@@ -1595,7 +1596,7 @@ public class VideoPlayer extends Activity {
             if (mMediaPlayer != null && mOption != null) {
                 if (set_3d_flag) {
                     mOption.set3DMode (0);
-                    ///@@mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+                    mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
                 }
             }
         }
@@ -2550,8 +2551,8 @@ public class VideoPlayer extends Activity {
             public void onSeekComplete (MediaPlayer mp) {
                 LOGI (TAG, "[onSeekComplete] progressBarSeekFlag:" + progressBarSeekFlag + ",mStateBac:" + mStateBac);
                 if (!isDemoVersion()) {
-                    if (mMediaPlayer != null) {
-                        ///@@mMediaPlayer.subtitleResetForSeek();
+                    if (mSubtitleManager != null) {
+                        mSubtitleManager.resetForSeek();
                     }
                 }
                 if (progressBarSeekFlag == false) { //onStopTrackingTouch
@@ -3401,6 +3402,7 @@ public class VideoPlayer extends Activity {
         private TextView t_subsposition_v = null;
 
         private void initSubtitle() {
+            LOGI (TAG, "[initSubtitle]");
             SharedPreferences subSp = getSharedPreferences (subSettingStr, 0);
             sub_para = new subview_set();
             sub_para.totalnum = 0;

@@ -10,9 +10,9 @@ public class MediaInfo {
         private static final boolean DEBUG = false;
         private static Context mContext = null;
         private MediaPlayer mp = null;
-        ///@@private MediaPlayer.MediaInfo mInfo = null;
+        private MediaPlayer.MediaInfo mInfo = null;
 
-        class VideoInfo {
+        /*class VideoInfo {
                 public int index;
                 public int id;
                 public String vformat;
@@ -54,7 +54,7 @@ public class MediaInfo {
                 public int total_sub_num;
                 public SubtitleInfo[] subtitleInfo;
         }
-        private mMediaInfo mInfo = null;
+        private mMediaInfo mInfo = null;*/
 
         public MediaInfo (MediaPlayer mediaPlayer, Context context) {
             mp = mediaPlayer;
@@ -63,7 +63,7 @@ public class MediaInfo {
 
         public void initMediaInfo() {
             if (mp != null) {
-                ///@@mInfo = mp.getMediaInfo();
+                mInfo = mp.getMediaInfo();
             }
             if (DEBUG) { printMediaInfo(); }
         }

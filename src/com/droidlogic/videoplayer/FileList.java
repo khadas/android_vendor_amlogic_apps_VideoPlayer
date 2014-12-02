@@ -600,8 +600,10 @@ public class FileList extends ListActivity {
                             if (qfile.isDirectory()) {
                                 String path = qfile.getAbsolutePath();
                                 if (path.startsWith (ROOT_PATH + "/udisk")) {
-                                    filetmp = new File (path);
-                                    if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+                                    //filetmp = new File (path);
+                                    //if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+                                    String stateStr = Environment.getStorageState(new File(path));
+                                    if (stateStr.equals(Environment.MEDIA_MOUNTED)) {
                                         listFiles.add (qfile);
                                     }
                                 }
