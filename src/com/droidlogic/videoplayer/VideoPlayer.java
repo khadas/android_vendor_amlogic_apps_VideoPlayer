@@ -67,6 +67,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.droidlogic.app.SubtitleManager;
+import com.droidlogic.app.SystemControlManager;
 
 import java.io.File;
 import java.io.FileReader;
@@ -174,6 +175,7 @@ public class VideoPlayer extends Activity {
         private boolean mAudioFocused = false;
 
         private SubtitleManager mSubtitleManager;
+        private SystemControlManager mSystemControl;
 
         @Override
         public void onCreate (Bundle savedInstanceState) {
@@ -181,6 +183,7 @@ public class VideoPlayer extends Activity {
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
             setTitle (null);
+            mSystemControl = new SystemControlManager(this);
             mAudioManager = (AudioManager) this.getSystemService (Context.AUDIO_SERVICE);
             mScreenLock = ( (PowerManager) this.getSystemService (Context.POWER_SERVICE)).newWakeLock (
                               PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, TAG);
@@ -325,7 +328,10 @@ public class VideoPlayer extends Activity {
             }*/
             if (mResumePlay != null) {
                 if (mContext != null) {
-                    boolean resumeEnable = mContext.getResources().getBoolean (R.bool.config_resume_play_enable);
+                    boolean resumeEnable = true;
+                    if (mSystemControl.getPropertyBoolean("ro.platform.has.mbxuimode", false)) {
+                        resumeEnable = mContext.getResources().getBoolean (R.bool.config_resume_play_enable);
+                    }
                     LOGI (TAG, "[onPause] resumeEnable:" + resumeEnable);
                     if (resumeEnable == true) {
                         mResumePlay.setEnable (true); //resume play function ON/OFF
@@ -579,6 +585,14 @@ public class VideoPlayer extends Activity {
             fileinfoBtn = (ImageButton) findViewById (R.id.InfoBtn);
             play3dBtn = (ImageButton) findViewById (R.id.Play3DBtn);
             otherwidgetTitleTx = (TextView) findViewById (R.id.more_title);
+
+            if (mSystemControl.getPropertyBoolean("ro.platform.has.mbxuimode", false)) {
+                brigtnessBtn.setVisibility (View.GONE);
+            }
+            else {
+                play3dBtn.setVisibility (View.GONE);
+            }
+
             //layer 1
             progressBar.setOnSeekBarChangeListener (new SeekBar.OnSeekBarChangeListener() {
                 public void onStopTrackingTouch (SeekBar seekBar) {
