@@ -43,6 +43,7 @@ import android.os.Handler;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.os.Message;
+import com.droidlogic.app.SystemControlManager;
 
 public class FileList extends ListActivity {
         private static final String ROOT_PATH = "/storage";
@@ -78,8 +79,9 @@ public class FileList extends ListActivity {
         private ArrayList<Integer> fileDirectory_position_selected;
         private ArrayList<Integer> fileDirectory_position_piexl;
         private int pathLevel = 0;
-        private final String iso_mount_dir = "/storage/external_storage/VIRTUAL_CDROM";
+        private final String iso_mount_dir = "/storage/loop";
         private Uri uri;
+        private SystemControlManager mSystemControl;
 
         private final StorageEventListener mListener = new StorageEventListener() {
             public void onUsbMassStorageConnectionChanged (boolean connected) {
@@ -107,6 +109,29 @@ public class FileList extends ListActivity {
                 }
             }
         };
+
+        private void waitForBrowserIsoFile() {
+            final Handler handler = new Handler() {
+                public void handleMessage (Message msg) {
+                    switch (msg.what) {
+                        case 0x4c:
+                            BrowserFile (iso_mount_dir);
+                            break;
+                    }
+                    super.handleMessage (msg);
+                }
+            };
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    Message message = Message.obtain();
+                    message.what = 0x4c;
+                    handler.sendMessage (message);
+                }
+            };
+            timer.cancel();
+            timer = new Timer();
+            timer.schedule (task, 100);//add 100ms delay to wait fuse finish
+        }
 
         private void waitForRescan() {
             final Handler handler = new Handler() {
@@ -250,6 +275,7 @@ public class FileList extends ListActivity {
             extensions = getResources().getString (R.string.support_video_extensions);
             requestWindowFeature (Window.FEATURE_NO_TITLE);
             setContentView (R.layout.file_list);
+            mSystemControl = new SystemControlManager(this);
             PlayList.setContext (this);
             listAllFiles = SystemProperties.getBoolean ("vplayer.listall.enable", false);
             currentlist = new ArrayList<String>();
@@ -307,7 +333,6 @@ public class FileList extends ListActivity {
                         file = new File (paths.get (0).toString());
                         if (file.getParent().compareTo (iso_mount_dir) == 0 && ISOpath != null) {
                             file = new File (ISOpath + "/VIRTUAL_CDROM");
-                            Log.i (TAG, "[exit button]file:" + file);
                             ISOpath = null;
                         }
                         currenturl = file.getParentFile().getParent();
@@ -427,14 +452,7 @@ public class FileList extends ListActivity {
             items = new ArrayList<String>();
             paths = new ArrayList<String>();
             String[] files = file.list();
-            if (files != null) {
-                for (i = 0; i < files.length; i++) {
-                    if (files[i].equals ("VIRTUAL_CDROM")) {
-                        execCmd ("vdc loop unmount");
-                        break;
-                    }
-                }
-            }
+
             listFiles.clear();
             searchFile (file);
             if (listFiles.isEmpty()) {
@@ -444,7 +462,7 @@ public class FileList extends ListActivity {
                 paths.addAll (currentlist);
                 return;
             }
-            Log.d (TAG, "BrowserFile():" + filePath);
+
             PlayList.getinstance().rootPath = filePath;
             //Log.d(TAG, "BrowserFile() listFiles.size():"+listFiles.size());
             File [] fs = new File[listFiles.size()];
@@ -703,12 +721,11 @@ public class FileList extends ListActivity {
                 }
             }
             else if (isISOFile (file)) {
-                execCmd ("vdc loop unmount");
                 ISOpath = file.getPath();
-                String cm = "vdc loop mount " + "\"" + ISOpath + "\"";
-                Log.d (TAG, "ISO path:" + ISOpath);
-                execCmd (cm);
-                BrowserFile (iso_mount_dir);
+                Log.i(TAG, "file.getPath():" + file.getPath()+", ISOpath:"+ISOpath);
+                mSystemControl.loopMountUnmount(false, null);
+                mSystemControl.loopMountUnmount(true, ISOpath);
+                waitForBrowserIsoFile();
                 fileDirectory_position_selected.add (item_position_selected);
                 fileDirectory_position_piexl.add (fromtop_piexl);
                 pathLevel++;
@@ -753,8 +770,7 @@ public class FileList extends ListActivity {
                     }
                     file = new File (paths.get (0).toString());
                     if (file.getParent().compareTo (iso_mount_dir) == 0 && ISOpath != null) {
-                        file = new File (ISOpath + "/VIRTUAL_CDROM");
-                        Log.i (TAG, "[onKeyDown]file:" + file);
+                        file = new File (ISOpath + "/VIRTUAL_CDROM");//"/VIRTUAL_CDROM" random add for path level reduce
                         ISOpath = null;
                     }
                     currenturl = file.getParentFile().getParent();
