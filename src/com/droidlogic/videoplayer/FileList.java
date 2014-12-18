@@ -470,14 +470,13 @@ public class FileList extends ListActivity {
                 fs[i] = listFiles.get (i);
                 //Log.d(TAG, "BrowserFile() fs[i]:"+fs[i]);
             }
-            if (!filePath.equals (ROOT_PATH)) {
-                //System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
-                try {
-                    Arrays.sort (fs, new MyComparator (MyComparator.NAME_ASCEND));
-                }
-                catch (IllegalArgumentException ex) {
-                }
+
+            try {
+                Arrays.sort (fs, new MyComparator (MyComparator.NAME_ASCEND));
             }
+            catch (IllegalArgumentException ex) {
+            }
+
             for (i = 0; i < fs.length; i++) {
                 File tempF = fs[i];
                 String tmppath = tempF.getName();
