@@ -66,6 +66,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.droidlogic.app.OutputModeManager;
 import com.droidlogic.app.SubtitleManager;
 import com.droidlogic.app.SystemControlManager;
 
@@ -176,14 +177,19 @@ public class VideoPlayer extends Activity {
 
         private SubtitleManager mSubtitleManager;
         private SystemControlManager mSystemControl;
+        private OutputModeManager mOutputMode;
+
+        private final String mDisplayMode = "/sys/class/display/mode";
+        private final String mDisplayModePanel = "panel";
 
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
+            mSystemControl = new SystemControlManager(this);
+            mOutputMode = new OutputModeManager(this);
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
             setTitle (null);
-            mSystemControl = new SystemControlManager(this);
             mAudioManager = (AudioManager) this.getSystemService (Context.AUDIO_SERVICE);
             mScreenLock = ( (PowerManager) this.getSystemService (Context.POWER_SERVICE)).newWakeLock (
                               PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, TAG);
@@ -453,13 +459,18 @@ public class VideoPlayer extends Activity {
 
         private boolean isDemoVersion = false;
         private boolean isDemoVersion() {
-            boolean ret = SystemProperties.getBoolean ("sys.videoplayer.demon", false);
+            boolean ret = mSystemControl.getPropertyBoolean("sys.videoplayer.demon", false);
             ret = (ret || isDemoVersion);
             return ret;
         }
 
+        private boolean getImgSubRatioEnable() {
+            boolean ret = mSystemControl.getPropertyBoolean("sys.imgsubratio.enable", true);
+            return ret;
+        }
+
         private boolean getDebugEnable() {
-            boolean ret = SystemProperties.getBoolean ("sys.videoplayer.debug", false);
+            boolean ret = mSystemControl.getPropertyBoolean("sys.videoplayer.debug", false);
             return ret;
         }
 
@@ -1433,31 +1444,42 @@ public class VideoPlayer extends Activity {
         }
 
         private void displayModeImpl () {
-            /*if (mMediaPlayer != null && mOption != null) {
-                LOGI(TAG,"[displayModeImpl]mode:"+mOption.getDisplayMode());
-                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_FORCE_SCREEN_MODE,mOption.getDisplayMode());
-            }*/
             int videoNum = -1;
             int videoWidth = -1;
             int videoHeight = -1;
             int dispWidth = -1;
             int dispHeight = -1;
+            int frameWidth = -1;
+            int frameHeight = -1;
             int width = -1;
             int height = -1;
-            int ratio = 0;
+
             DisplayMetrics dm = new DisplayMetrics();
             this.getWindowManager().getDefaultDisplay().getRealMetrics (dm);
-            dispWidth = dm.widthPixels;
-            dispHeight = dm.heightPixels;
+            frameWidth = dm.widthPixels;
+            frameHeight = dm.heightPixels;
+            String displayMode = getCurrentDisplayMode();
+            if (displayMode.equals(mDisplayModePanel)) {
+                dispWidth = frameWidth;
+                dispHeight = frameHeight;
+            }
+            else {
+                dispWidth = getOutputWidth(displayMode);
+                dispHeight = getOutputHeight(displayMode);
+            }
+
+            //skip image subtitle ratio set for display width and height, use framebuffer size to calculate video rect
+            if (!getImgSubRatioEnable()) {
+                dispWidth = frameWidth;
+                dispHeight = frameHeight;
+            }
             LOGI (TAG, "[displayModeImpl]dispWidth:" + dispWidth + ",dispHeight:" + dispHeight);
+
             if (mMediaInfo != null) {
                 videoNum = mMediaInfo.getVideoTotalNum();
                 if (videoNum <= 0) {
                     return;
                 }
-                //videoWidth = mMediaInfo.getVideoWidth();
-                //videoHeight = mMediaInfo.getVideoHeight();
-                //LOGI(TAG,"[displayModeImpl]videoWidth:"+videoWidth+",videoHeight:"+videoHeight);
             }
             if (mMediaPlayer != null && mOption != null && mVideoView != null) {
                 LOGI (TAG, "[displayModeImpl]mode:" + mOption.getDisplayMode());
@@ -1519,7 +1541,28 @@ public class VideoPlayer extends Activity {
                         height = dispHeight;
                     }
                 }
+
                 LOGI (TAG, "[displayModeImpl]width:" + width + ",height:" + height);
+                if (getImgSubRatioEnable()) {
+                    width = width * frameWidth / dispWidth;
+                    height = height * frameHeight / dispHeight;
+                    float ratioW = 1.000f;
+                    float ratioH = 1.000f;
+                    float ratioMax = 2.000f;
+                    int maxW = dispWidth;
+                    int maxH = dispHeight;
+                    if (videoWidth != 0 & videoHeight != 0) {
+                        ratioW = ((float)width) / videoWidth;
+                        ratioH = ((float)height) / videoHeight;
+                        if (ratioW > ratioMax || ratioH > ratioMax) {
+                            ratioW = ratioMax;
+                            ratioH = ratioMax;
+                        }
+                        mSubtitleManager.setImgSubRatio(ratioW, ratioH, maxW, maxH);
+                    }
+                    LOGI(TAG,"[displayModeImpl]after change width:" + width + ",height:" + height + ", ratioW:" + ratioW + ",ratioH:" + ratioH +", maxW:" + maxW + ",maxH:" + maxH);
+                }
+
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams (width, height);
                 lp.addRule (RelativeLayout.CENTER_IN_PARENT);
                 mVideoViewRoot.setLayoutParams (lp);
@@ -1615,11 +1658,79 @@ public class VideoPlayer extends Activity {
             }
         }
 
+        private int getOutputWidth(String mode) {
+            int w = 0;
+            if (mode == null) {
+                return w;
+            }
+
+            if (mode.contains("480")) {
+                w = Integer.parseInt(mOutputMode.FULL_WIDTH_480);
+            }
+            else if (mode.contains("576")) {
+                w = Integer.parseInt(mOutputMode.FULL_WIDTH_576);
+            }
+            else if (mode.contains("720")) {
+                w = Integer.parseInt(mOutputMode.FULL_WIDTH_720);
+            }
+            else if (mode.contains("1080")) {
+                w = Integer.parseInt(mOutputMode.FULL_WIDTH_1080);
+            }
+            else if (mode.contains("4k2k")) {
+                if (mode.equals("4k2ksmpte")) {
+                    w = Integer.parseInt(mOutputMode.FULL_WIDTH_4K2KSMPTE);
+                }
+                else {
+                    w = Integer.parseInt(mOutputMode.FULL_WIDTH_4K2K);
+                }
+            }
+
+            return w;
+        }
+
+        private int getOutputHeight(String mode) {
+            int h = 0;
+            if (mode == null) {
+                return h;
+            }
+
+            if (mode.contains("480")) {
+                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_480);
+            }
+            else if (mode.contains("576")) {
+                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_576);
+            }
+            else if (mode.contains("720")) {
+                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_720);
+            }
+            else if (mode.contains("1080")) {
+                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_1080);
+            }
+            else if (mode.contains("4k2k")) {
+                if (mode.equals("4k2ksmpte")) {
+                    h = Integer.parseInt(mOutputMode.FULL_HEIGHT_4K2KSMPTE);
+                }
+                else {
+                    h = Integer.parseInt(mOutputMode.FULL_HEIGHT_4K2K);
+                }
+            }
+
+            return h;
+        }
+
+        private String getCurrentDisplayMode() {
+            String mode = mSystemControl.readSysFs(mDisplayMode).replaceAll("\n","");
+            if (mode == null) {
+                mode = mDisplayModePanel;
+            }
+            return mode;
+        }
+
         //@@--------random seek function-------------------------------------------------------------------------------------------
         private boolean randomSeekTestFlag = false;
         private Random r = new Random (99);
         private boolean randomSeekEnable() {
-            boolean ret = SystemProperties.getBoolean ("sys.vprandomseek.enable", false);
+            boolean ret = mSystemControl.getPropertyBoolean("sys.vprandomseek.enable", false);
             return ret;
         }
         private void randomSeekTest() {
@@ -3079,7 +3190,7 @@ public class VideoPlayer extends Activity {
             int ret = mMediaInfo.checkAudioCertification (mMediaInfo.getAudioFormat (track/*mMediaInfo.getCurAudioIdx()*/));
             LOGI (TAG, "[showCertification]ret:" + ret);
             if (ret == mMediaInfo.CERTIFI_Dolby) {
-                if (SystemProperties.getBoolean ("ro.platform.support.dolby", false)) {
+                if (mSystemControl.getPropertyBoolean("ro.platform.support.dolby", false)) {
                     certificationDoblyView.setVisibility (View.VISIBLE);
                     certificationDoblyPlusView.setVisibility (View.GONE);
                     certificationDTSView.setVisibility (View.GONE);
@@ -3088,7 +3199,7 @@ public class VideoPlayer extends Activity {
                 }
             }
             else if (ret == mMediaInfo.CERTIFI_Dolby_Plus) {
-                if (SystemProperties.getBoolean ("ro.platform.support.dolby", false)) {
+                if (mSystemControl.getPropertyBoolean("ro.platform.support.dolby", false)) {
                     certificationDoblyView.setVisibility (View.GONE);
                     certificationDoblyPlusView.setVisibility (View.VISIBLE);
                     certificationDTSView.setVisibility (View.GONE);
@@ -3097,7 +3208,7 @@ public class VideoPlayer extends Activity {
                 }
             }
             else if (ret == mMediaInfo.CERTIFI_DTS) {
-                if (SystemProperties.getBoolean ("ro.platform.support.dts", false)) {
+                if (mSystemControl.getPropertyBoolean("ro.platform.support.dts", false)) {
                     certificationDoblyView.setVisibility (View.GONE);
                     certificationDoblyPlusView.setVisibility (View.GONE);
                     if (mDtsType == DTS_NOR) {
@@ -3953,7 +4064,7 @@ public class VideoPlayer extends Activity {
                     list.add (map);
                     // TODO: 3D
                     /*
-                    if (SystemProperties.getBoolean("3D_setting.enable", false)) {
+                    if (mSystemControl.getPropertyBoolean("3D_setting.enable", false)) {
                         if (is3DVideoDisplayFlag) {//judge is 3D
                             map = new HashMap<String, Object>();
                             map.put("item_name", getResources().getString(R.string.setting_displaymode_normal_noscaleup));

@@ -46,11 +46,16 @@ import android.os.Message;
 import com.droidlogic.app.SystemControlManager;
 
 public class FileList extends ListActivity {
-        private static final String ROOT_PATH = "/storage";
-        private static final String SHEILD_EXT_STOR = "/storage/sdcard0/external_storage";
-        private static final String NAND_PATH = "/storage/sdcard0";
-        private static final String SD_PATH = "/storage/external_storage/sdcard1";
-        private static final String USB_PATH = "/storage/external_storage";
+        private static final String ROOT_PATH           = "/storage";
+        private static final String SHEILD_EXT_STOR     = "/storage/sdcard0/external_storage";
+        private static final String NAND_PATH           = "/storage/sdcard0";
+        private static final String SD_PATH             = "/storage/external_storage/sdcard1";
+        private static final String USB_PATH            = "/storage/external_storage";
+        private static final String ASEC_PATH           = "/mnt/asec";
+        private static final String SECURE_PATH         = "/mnt/secure";
+        private static final String OBB_PATH            = "/mnt/obb";
+        private static final String USB_DRIVE_PATH      = "/mnt/usbdrive";
+        private static final String SHELL_PATH          = "/mnt/shell";
 
         private boolean listAllFiles = true;
         private List<File> listFiles = null;
@@ -277,7 +282,7 @@ public class FileList extends ListActivity {
             setContentView (R.layout.file_list);
             mSystemControl = new SystemControlManager(this);
             PlayList.setContext (this);
-            listAllFiles = SystemProperties.getBoolean ("vplayer.listall.enable", false);
+            listAllFiles = mSystemControl.getPropertyBoolean("vplayer.listall.enable", false);
             currentlist = new ArrayList<String>();
             if (!listAllFiles) {
                 try {
@@ -502,13 +507,16 @@ public class FileList extends ListActivity {
                         tmppath =  getText (R.string.cdrom_device_str) + "(" + data + ":)" ;
                     }
                     //delete used folder
-                    if ( (!tpath.equals ("/mnt/asec")) && (!tpath.equals ("/mnt/secure")) &&
-                            (!tpath.equals ("/mnt/obb")) && (!tpath.equals ("/mnt/usbdrive"))
-                            && (!tpath.equals ("/mnt/shell"))) {
+                    if ( (!tpath.equals (ASEC_PATH)) && (!tpath.equals (SECURE_PATH)) &&
+                            (!tpath.equals (OBB_PATH)) && (!tpath.equals (USB_DRIVE_PATH))
+                            && (!tpath.equals (SHELL_PATH))) {
                         String path = changeDevName (tmppath);
                         //Log.d(TAG, "BrowserFile() items.add path:"+path);
-                        items.add (path);
-                        paths.add (tempF.getPath());
+                        //String stateStr = Environment.getStorageState(new File(path));
+                        //if (stateStr.equals(Environment.MEDIA_MOUNTED)) {
+                            items.add (path);
+                            paths.add (tempF.getPath());
+                        //}
                     }
                 }
                 else {
