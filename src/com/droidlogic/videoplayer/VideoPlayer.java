@@ -467,6 +467,11 @@ public class VideoPlayer extends Activity {
             return ret;
         }
 
+        private boolean getPlayIgnoreHdmiEnable() {
+            boolean ret = mSystemControl.getPropertyBoolean("sys.ignorehdmi.enable", false);
+            return ret;
+        }
+
         private boolean getImgSubRatioEnable() {
             boolean ret = mSystemControl.getPropertyBoolean("sys.imgsubratio.enable", true);
             return ret;
@@ -1026,9 +1031,11 @@ public class VideoPlayer extends Activity {
                 isHdmiPlugged = intent.getBooleanExtra (WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false);
                 if ( (isHdmiPluggedbac != isHdmiPlugged) && (isHdmiPlugged == false)) {
                     if (mState == STATE_PLAYING) {
-                        pause();
-                        //close 3D
-                        close3D();
+                        if (!getPlayIgnoreHdmiEnable()) {
+                            pause();
+                            //close 3D
+                            close3D();
+                        }
                     }
                     startOsdTimeout();
                 }
