@@ -214,15 +214,17 @@ public class VideoPlayer extends Activity {
             super.onResume();
             LOGI (TAG, "[onResume]mResumePlay.getEnable():" + mResumePlay.getEnable() + ",isHdmiPlugged:" + isHdmiPlugged);
             //close transition animation
-            // shield for google tv 20140929
-            /*mTransitionAnimationScale = Settings.System.getFloat(mContext.getContentResolver(),
+            // shield for google tv 20140929 , opened for bug 101311 20141224
+            mTransitionAnimationScale = Settings.System.getFloat(mContext.getContentResolver(),
                 Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
             IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
             try {
                 iWindowManager.setAnimationScale(1, 0.0f);
             }
-                catch (RemoteException e) {
-            }*/
+            catch (RemoteException e) {
+                LOGE(TAG, "[onResume]RemoteException e:" + e);
+            }
+
             browserBackDoing = false;
             browserBackInvokeFromOnPause = false;
             //WakeLock acquire
@@ -324,14 +326,15 @@ public class VideoPlayer extends Activity {
                 mHandler.removeMessages (MSG_RETRY_PLAY);
                 mHandler.removeMessages (MSG_RETRY_END);
             }
-            // shield for google tv 20140929
-            /*
+            // shield for google tv 20140929, opened for bug 101311 20141224
             IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
             try {
-            iWindowManager.setAnimationScale(1, mTransitionAnimationScale);
+                iWindowManager.setAnimationScale(1, mTransitionAnimationScale);
             }
             catch (RemoteException e) {
-            }*/
+                LOGE(TAG, "[onPause]RemoteException e:" + e);
+            }
+
             if (mResumePlay != null) {
                 if (mContext != null) {
                     boolean resumeEnable = true;
