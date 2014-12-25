@@ -468,7 +468,7 @@ public class VideoPlayer extends Activity {
         }
 
         private boolean getPlayIgnoreHdmiEnable() {
-            boolean ret = mSystemControl.getPropertyBoolean("sys.ignorehdmi.enable", false);
+            boolean ret = mSystemControl.getPropertyBoolean("ro.videoignorehdmi.enable", true);
             return ret;
         }
 
