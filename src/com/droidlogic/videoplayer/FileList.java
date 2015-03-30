@@ -598,7 +598,9 @@ public class FileList extends ListActivity {
                     filetmp = new File (SD_PATH);
                     //Log.i(TAG,"[searchFile]filetmp.listFiles():"+filetmp.listFiles());
                     //Log.i(TAG,"[searchFile]================");
-                    if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+                    //if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+                    String stateStr = Environment.getStorageState(filetmp);
+                    if (stateStr.equals(Environment.MEDIA_MOUNTED)) {
                         listFiles.add (dir);
                     }
                 }
