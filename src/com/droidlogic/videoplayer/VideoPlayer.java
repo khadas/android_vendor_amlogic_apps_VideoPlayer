@@ -3031,8 +3031,8 @@ public class VideoPlayer extends Activity {
                 //optBtn.requestFocus();
                 //optBtn.requestFocusFromTouch();
                 setCurOsdViewFlag (OSD_CTL_BAR);
-                startOsdTimeout();
             }
+            startOsdTimeout();
             updateProgressbar();
         }
 
@@ -3057,8 +3057,8 @@ public class VideoPlayer extends Activity {
                 //ctlBtn.requestFocus();
                 //ctlBtn.requestFocusFromTouch();
                 setCurOsdViewFlag (OSD_OPT_BAR);
-                startOsdTimeout();
             }
+            startOsdTimeout();
         }
 
         private void showNoOsdView() {
