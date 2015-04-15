@@ -1663,6 +1663,7 @@ public class VideoPlayer extends Activity {
             if (mMediaPlayer != null && mOption != null) {
                 if (set_3d_flag) {
                     mOption.set3DMode (0);
+                    set_3d_flag = false;
                     mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
                 }
             }
@@ -1941,8 +1942,6 @@ public class VideoPlayer extends Activity {
                 }
             }
             showNoOsdView();
-            //close 3D
-            close3D();
             sendStopMsg();
             finish();
         }
@@ -2288,6 +2287,9 @@ public class VideoPlayer extends Activity {
         private void stop() {
             LOGI (TAG, "[stop]mMediaPlayer:" + mMediaPlayer + ",mState:" + mState);
             if (mMediaPlayer != null && mState != STATE_STOP) {
+                //close 3D
+                close3D();
+
                 mMediaPlayer.stop();
                 mMediaPlayer.reset();
                 mSubtitleManager.close();
