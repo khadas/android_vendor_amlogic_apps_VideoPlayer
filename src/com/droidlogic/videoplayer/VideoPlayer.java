@@ -2620,7 +2620,8 @@ public class VideoPlayer extends Activity {
                 else {
                     mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
                 }
-                ///data.recycleParcel();
+
+                data.recycleParcel();
                 /*
                 MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
                 if (trackInfo != null) {
