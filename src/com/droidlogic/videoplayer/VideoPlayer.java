@@ -179,9 +179,6 @@ public class VideoPlayer extends Activity {
         private SystemControlManager mSystemControl;
         private OutputModeManager mOutputMode;
 
-        private final String mDisplayMode = "/sys/class/display/mode";
-        private final String mDisplayModePanel = "panel";
-
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
@@ -1468,20 +1465,16 @@ public class VideoPlayer extends Activity {
             this.getWindowManager().getDefaultDisplay().getRealMetrics (dm);
             frameWidth = dm.widthPixels;
             frameHeight = dm.heightPixels;
-            String displayMode = getCurrentDisplayMode();
-            if (displayMode.equals(mDisplayModePanel)) {
-                dispWidth = frameWidth;
-                dispHeight = frameHeight;
-            }
-            else {
-                dispWidth = getOutputWidth(displayMode);
-                dispHeight = getOutputHeight(displayMode);
-            }
+            dispWidth = frameWidth;
+            dispHeight = frameHeight;
 
             //skip image subtitle ratio set for display width and height, use framebuffer size to calculate video rect
-            if (!getImgSubRatioEnable()) {
-                dispWidth = frameWidth;
-                dispHeight = frameHeight;
+            if (getImgSubRatioEnable()) {
+                int axis[] = mOutputMode.getPosition(mOutputMode.getCurrentOutputMode());
+                if (axis != null && axis.length >= 4) {
+                    dispWidth = axis[2];
+                    dispHeight = axis[3];
+                }
             }
             LOGI (TAG, "[displayModeImpl]dispWidth:" + dispWidth + ",dispHeight:" + dispHeight);
 
@@ -1553,7 +1546,7 @@ public class VideoPlayer extends Activity {
                 }
 
                 LOGI (TAG, "[displayModeImpl]width:" + width + ",height:" + height);
-                if (getImgSubRatioEnable()) {
+                if (getImgSubRatioEnable() && dispWidth != 0 && dispHeight != 0) {
                     width = width * frameWidth / dispWidth;
                     height = height * frameHeight / dispHeight;
                     float ratioW = 1.000f;
@@ -1667,74 +1660,6 @@ public class VideoPlayer extends Activity {
                     mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
                 }
             }
-        }
-
-        private int getOutputWidth(String mode) {
-            int w = 0;
-            if (mode == null) {
-                return w;
-            }
-
-            if (mode.contains("480")) {
-                w = Integer.parseInt(mOutputMode.FULL_WIDTH_480);
-            }
-            else if (mode.contains("576")) {
-                w = Integer.parseInt(mOutputMode.FULL_WIDTH_576);
-            }
-            else if (mode.contains("720")) {
-                w = Integer.parseInt(mOutputMode.FULL_WIDTH_720);
-            }
-            else if (mode.contains("1080")) {
-                w = Integer.parseInt(mOutputMode.FULL_WIDTH_1080);
-            }
-            else if (mode.contains("4k2k")) {
-                if (mode.equals("4k2ksmpte")) {
-                    w = Integer.parseInt(mOutputMode.FULL_WIDTH_4K2KSMPTE);
-                }
-                else {
-                    w = Integer.parseInt(mOutputMode.FULL_WIDTH_4K2K);
-                }
-            }
-
-            return w;
-        }
-
-        private int getOutputHeight(String mode) {
-            int h = 0;
-            if (mode == null) {
-                return h;
-            }
-
-            if (mode.contains("480")) {
-                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_480);
-            }
-            else if (mode.contains("576")) {
-                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_576);
-            }
-            else if (mode.contains("720")) {
-                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_720);
-            }
-            else if (mode.contains("1080")) {
-                h = Integer.parseInt(mOutputMode.FULL_HEIGHT_1080);
-            }
-            else if (mode.contains("4k2k")) {
-                if (mode.equals("4k2ksmpte")) {
-                    h = Integer.parseInt(mOutputMode.FULL_HEIGHT_4K2KSMPTE);
-                }
-                else {
-                    h = Integer.parseInt(mOutputMode.FULL_HEIGHT_4K2K);
-                }
-            }
-
-            return h;
-        }
-
-        private String getCurrentDisplayMode() {
-            String mode = mSystemControl.readSysFs(mDisplayMode).replaceAll("\n","");
-            if (mode == null) {
-                mode = mDisplayModePanel;
-            }
-            return mode;
         }
 
         //@@--------random seek function-------------------------------------------------------------------------------------------
