@@ -228,7 +228,7 @@ public class FileList extends ListActivity {
                 if ( (file != null) && file.exists()) {
                     File[] the_Files;
                     the_Files = file.listFiles (new MyFilter (extensions));
-                    if (the_Files == null) {
+                    if (the_Files == null || the_Files.length <= 0) {
                         PlayList.getinstance().rootPath = root_path;
                     }
                     BrowserFile (PlayList.getinstance().rootPath);
