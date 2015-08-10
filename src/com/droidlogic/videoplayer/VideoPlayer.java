@@ -2589,6 +2589,8 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[onCompletion] mOption.getRepeatMode():" + mOption.getRepeatMode());
                 mState = STATE_PLAY_COMPLETED;
                 curtime = 0; // reset current time
+                curTimeTx.setText (secToTime (curtime / 1000));
+                progressBar.setProgress (0);
                 if (mOption.getRepeatMode() == mOption.REPEATONE) {
                     playCur();
                 }
