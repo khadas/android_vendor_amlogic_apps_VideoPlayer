@@ -2578,7 +2578,9 @@ public class VideoPlayer extends Activity {
                     return;
                 }
                 if (mOption.getResumeMode() == true) {
-                    seekTo (bmPos);
+                    if (bmPos > 0) {
+                        seekTo (bmPos);
+                    }
                 }
             }
         };
