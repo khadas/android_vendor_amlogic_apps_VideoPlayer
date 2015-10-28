@@ -47,8 +47,8 @@ import com.droidlogic.app.SystemControlManager;
 
 public class FileList extends ListActivity {
         private static final String ROOT_PATH           = "/storage";
-        private static final String SHEILD_EXT_STOR     = "/storage/sdcard0/external_storage";
-        private static final String NAND_PATH           = "/storage/sdcard0";
+        private static final String SHEILD_EXT_STOR     = Environment.getExternalStorageDirectory().getPath() + "/external_storage";//"/storage/sdcard0/external_storage";
+        private static final String NAND_PATH           = Environment.getExternalStorageDirectory().getPath();//"/storage/sdcard0";
         private static final String SD_PATH             = "/storage/external_storage/sdcard1";
         private static final String USB_PATH            = "/storage/external_storage";
         private static final String ASEC_PATH           = "/mnt/asec";
@@ -331,9 +331,10 @@ public class FileList extends ListActivity {
                         PlayList.getinstance().rootPath = null;
                     }
                     else {
-                        if (paths.isEmpty()) {
+                        if (paths.isEmpty() || paths.get (0) == null) {
                             FileList.this.finish();
                             PlayList.getinstance().rootPath = null;
+                            return;
                         }
                         file = new File (paths.get (0).toString());
                         if (file.getParent().compareTo (iso_mount_dir) == 0 && ISOpath != null) {
@@ -773,9 +774,10 @@ public class FileList extends ListActivity {
                     PlayList.getinstance().rootPath = null;
                 }
                 else {
-                    if (paths.isEmpty()) {
+                    if (paths.isEmpty() || paths.get (0) == null) {
                         FileList.this.finish();
                         PlayList.getinstance().rootPath = null;
+                        return true;
                     }
                     file = new File (paths.get (0).toString());
                     if (file.getParent().compareTo (iso_mount_dir) == 0 && ISOpath != null) {
