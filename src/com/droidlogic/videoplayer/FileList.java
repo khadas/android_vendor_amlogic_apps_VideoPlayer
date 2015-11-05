@@ -40,6 +40,7 @@ import android.widget.ProgressBar;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.os.Handler;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.os.Message;
@@ -87,6 +88,7 @@ public class FileList extends ListActivity {
         private final String iso_mount_dir = "/storage/loop";
         private Uri uri;
         private SystemControlManager mSystemControl;
+        private StorageManager mStorageManager;
 
         private final StorageEventListener mListener = new StorageEventListener() {
             public void onUsbMassStorageConnectionChanged (boolean connected) {
@@ -281,6 +283,7 @@ public class FileList extends ListActivity {
             requestWindowFeature (Window.FEATURE_NO_TITLE);
             setContentView (R.layout.file_list);
             mSystemControl = new SystemControlManager(this);
+            mStorageManager = (StorageManager)getSystemService(Context.STORAGE_SERVICE);
             PlayList.setContext (this);
             listAllFiles = mSystemControl.getPropertyBoolean("vplayer.listall.enable", false);
             currentlist = new ArrayList<String>();
@@ -303,7 +306,7 @@ public class FileList extends ListActivity {
                 if (PlayList.getinstance().rootPath == null) {
                     PlayList.getinstance().rootPath = root_path;
                 }
-                BrowserFile (PlayList.getinstance().rootPath);
+                //BrowserFile (PlayList.getinstance().rootPath);
             }
             Button home = (Button) findViewById (R.id.Button_home);
             home.setOnClickListener (new View.OnClickListener() {
@@ -478,7 +481,7 @@ public class FileList extends ListActivity {
             }
 
             try {
-                Arrays.sort (fs, new MyComparator (MyComparator.NAME_ASCEND));
+                Arrays.sort (fs, new MyComparator (MyComparator.NAME_DESCEND));
             }
             catch (IllegalArgumentException ex) {
             }
@@ -486,10 +489,11 @@ public class FileList extends ListActivity {
             for (i = 0; i < fs.length; i++) {
                 File tempF = fs[i];
                 String tmppath = tempF.getName();
-                //Log.d(TAG, "BrowserFile() tmppath:"+tmppath);
+                //Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", filePath:" + filePath + ", ROOT_PATH:" + ROOT_PATH);
                 //change device name;
                 if (filePath.equals (ROOT_PATH)) {
-                    String tpath = tempF.getAbsolutePath();
+                    //shield for android 6.0 support
+                    /*String tpath = tempF.getAbsolutePath();
                     if (tpath.equals (NAND_PATH)) {
                         tmppath = "sdcard";
                     }
@@ -518,10 +522,24 @@ public class FileList extends ListActivity {
                             items.add (path);
                             paths.add (tempF.getPath());
                         //}
+                    }*/
+
+                    //change Device name for android 6.0
+                    final List<VolumeInfo> volumes = mStorageManager.getVolumes();
+                    Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
+                    for (VolumeInfo vol : volumes) {
+                        if (vol.isMountedReadable()) {
+                            File path = vol.getPath();
+                            Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
+                            if (tmppath.equals(path.getName())) {
+                                items.add (mStorageManager.getBestVolumeDescription(vol));
+                                paths.add (path.getPath());
+                            }
+                        }
                     }
                 }
                 else {
-                    //Log.d(TAG, "BrowserFile() items.add tmppath:"+tmppath);
+                    //Log.d(TAG, "BrowserFile() 1 items.add tmppath:"+tmppath);
                     items.add (tmppath);
                     paths.add (tempF.getPath());
                 }
@@ -587,7 +605,17 @@ public class FileList extends ListActivity {
             }
             String curPath = file.getPath();
             if (curPath.equals (root_path)) {
-                File dir = new File (NAND_PATH);
+                final List<VolumeInfo> volumes = mStorageManager.getVolumes();
+                Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
+                for (VolumeInfo vol : volumes) {
+                    if (vol.isMountedReadable()) {
+                        File path = vol.getPath();
+                        listFiles.add (path);
+                    }
+                }
+
+                //shield for android 6.0 support
+                /*File dir = new File (NAND_PATH);
                 if (dir.exists() && dir.isDirectory()) {
                     filetmp = new File (NAND_PATH);
                     if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
@@ -638,7 +666,7 @@ public class FileList extends ListActivity {
                             }
                         }
                     }
-                }
+                }*/
                 return;
             }
             for (int i = 0; i < the_Files.length; i++) {
