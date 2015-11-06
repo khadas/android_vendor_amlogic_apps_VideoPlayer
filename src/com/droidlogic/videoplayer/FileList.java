@@ -525,12 +525,20 @@ public class FileList extends ListActivity {
                     }*/
 
                     //change Device name for android 6.0
+                    //internal storage
+                    String tpath = tempF.getAbsolutePath();
+                    if (tpath.equals (NAND_PATH)) {
+                        items.add (getString(R.string.sdcard_device_str));
+                        paths.add (tempF.getPath());
+                    }
+
+                    //external storage
                     final List<VolumeInfo> volumes = mStorageManager.getVolumes();
                     Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
                     for (VolumeInfo vol : volumes) {
-                        if (vol.isMountedReadable()) {
+                        if (vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
                             File path = vol.getPath();
-                            Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
+                            //Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
                             if (tmppath.equals(path.getName())) {
                                 items.add (mStorageManager.getBestVolumeDescription(vol));
                                 paths.add (path.getPath());
@@ -605,10 +613,20 @@ public class FileList extends ListActivity {
             }
             String curPath = file.getPath();
             if (curPath.equals (root_path)) {
+                //internal storage
+                File dir = new File (NAND_PATH);
+                if (dir.exists() && dir.isDirectory()) {
+                    filetmp = new File (NAND_PATH);
+                    if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
+                        listFiles.add (dir);
+                    }
+                }
+
+                //external storage
                 final List<VolumeInfo> volumes = mStorageManager.getVolumes();
                 Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
                 for (VolumeInfo vol : volumes) {
-                    if (vol.isMountedReadable()) {
+                    if (vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
                         File path = vol.getPath();
                         listFiles.add (path);
                     }
