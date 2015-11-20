@@ -481,7 +481,7 @@ public class FileList extends ListActivity {
             }
 
             try {
-                Arrays.sort (fs, new MyComparator (MyComparator.NAME_DESCEND));
+                Arrays.sort (fs, new MyComparator (MyComparator.NAME_ASCEND));
             }
             catch (IllegalArgumentException ex) {
             }
