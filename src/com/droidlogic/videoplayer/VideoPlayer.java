@@ -24,7 +24,7 @@ import android.media.Metadata;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
-//import android.media.MediaPlayerAmlogic;
+//import android.media.MediaPlayerDroidlogic;
 import android.net.Uri;
 //import android.os.Bundle;
 //import android.os.Handler;
@@ -66,6 +66,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.droidlogic.app.MediaPlayerDroidlogic;
 import com.droidlogic.app.OutputModeManager;
 import com.droidlogic.app.SubtitleManager;
 import com.droidlogic.app.SystemControlManager;
@@ -1581,7 +1582,7 @@ public class VideoPlayer extends Activity {
                 StringBuilder builder = new StringBuilder();
                 builder.append ("aid:" + str);
                 LOGI (TAG, "[audioTrackImpl]" + builder.toString());
-                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK,builder.toString());
+                mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK,builder.toString());
             }
         }
 
@@ -1602,7 +1603,7 @@ public class VideoPlayer extends Activity {
                     soundTrackStr = "lrmix";
                 }
                 LOGI (TAG, "[soundTrackImpl]soundTrackStr:" + soundTrackStr);
-                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
+                mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
             }
         }
 
@@ -1612,14 +1613,14 @@ public class VideoPlayer extends Activity {
                 StringBuilder builder = new StringBuilder();
                 builder.append ("dtsAsset:" + str);
                 LOGI (TAG, "[audioDtsAseetImpl]" + builder.toString());
-                mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DTS_ASSET, builder.toString());
+                mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DTS_ASSET, builder.toString());
             }
         }
 
         private int getDtsAssetTotalNum() {
             int num = 0;
             if (mMediaPlayer != null) {
-                num = mMediaPlayer.getIntParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
+                num = mMediaPlayer.getIntParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
             }
             LOGI (TAG, "[getDtsAssetTotalNum] num:" + num);
             return num;
@@ -1629,7 +1630,7 @@ public class VideoPlayer extends Activity {
             boolean ret = false;
             if (mMediaPlayer != null) {
                 // TODO: should open after 3d function debug ok
-                ret = mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+                ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
                 if (idx > 0) {
                     set_3d_flag = true;
                 }
@@ -1657,7 +1658,7 @@ public class VideoPlayer extends Activity {
                 if (set_3d_flag) {
                     mOption.set3DMode (0);
                     set_3d_flag = false;
-                    mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+                    mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
                 }
             }
         }
@@ -2072,7 +2073,7 @@ public class VideoPlayer extends Activity {
                             StringBuilder builder = new StringBuilder();
                             builder.append("forward:"+str);
                             LOGI(TAG,"[FFimpl]"+builder.toString());
-                            mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_FORWARD,builder.toString());
+                            mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_FORWARD,builder.toString());
                 */
                 mMediaPlayer.fastForward (para);
             }
@@ -2101,7 +2102,7 @@ public class VideoPlayer extends Activity {
                             StringBuilder builder = new StringBuilder();
                             builder.append("backward:"+str);
                             LOGI(TAG,"[FBimpl]"+builder.toString());
-                            mMediaPlayer.setParameter(MediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_BACKWARD,builder.toString());
+                            mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_TRICKPLAY_BACKWARD,builder.toString());
                 */
                 mMediaPlayer.fastBackward (para);
             }
@@ -2128,7 +2129,7 @@ public class VideoPlayer extends Activity {
         }
 
         //@@--------this part for play control------------------------------------------------------------------------------------------
-        private MediaPlayerAmlogic mMediaPlayer = null;
+        private MediaPlayerDroidlogic mMediaPlayer = null;
         private static final int STATE_ERROR = -1;
         private static final int STATE_STOP = 0;
         private static final int STATE_PREPARING = 1;
@@ -2488,7 +2489,7 @@ public class VideoPlayer extends Activity {
                 return;
             }
             release();
-            mMediaPlayer = new MediaPlayerAmlogic();
+            mMediaPlayer = new MediaPlayerDroidlogic();
             mSubtitleManager = new SubtitleManager (mMediaPlayer);
             ///mMediaPlayer.setIgnoreSubtitle(true); //should sync with MediaPlayer.java
             mMediaPlayer.setOnPreparedListener (mPreparedListener);
@@ -2546,7 +2547,7 @@ public class VideoPlayer extends Activity {
                     mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
                 }
 
-                data.recycleParcel();
+                //data.recycleParcel();
                 /*
                 MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
                 if (trackInfo != null) {
