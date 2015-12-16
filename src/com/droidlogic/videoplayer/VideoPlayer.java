@@ -67,7 +67,6 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.droidlogic.app.MediaPlayerDroidlogic;
-import com.droidlogic.app.OutputModeManager;
 import com.droidlogic.app.SubtitleManager;
 import com.droidlogic.app.SystemControlManager;
 
@@ -178,13 +177,11 @@ public class VideoPlayer extends Activity {
 
         private SubtitleManager mSubtitleManager;
         private SystemControlManager mSystemControl;
-        private OutputModeManager mOutputMode;
 
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
             mSystemControl = new SystemControlManager(this);
-            mOutputMode = new OutputModeManager(this);
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
             setTitle (null);
@@ -1469,14 +1466,6 @@ public class VideoPlayer extends Activity {
             dispWidth = frameWidth;
             dispHeight = frameHeight;
 
-            //skip image subtitle ratio set for display width and height, use framebuffer size to calculate video rect
-            if (getImgSubRatioEnable()) {
-                int axis[] = mOutputMode.getPosition(mOutputMode.getCurrentOutputMode());
-                if (axis != null && axis.length >= 4) {
-                    dispWidth = axis[2];
-                    dispHeight = axis[3];
-                }
-            }
             LOGI (TAG, "[displayModeImpl]dispWidth:" + dispWidth + ",dispHeight:" + dispHeight);
 
             if (mMediaInfo != null) {
