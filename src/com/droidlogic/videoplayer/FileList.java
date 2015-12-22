@@ -85,7 +85,7 @@ public class FileList extends ListActivity {
         private ArrayList<Integer> fileDirectory_position_selected;
         private ArrayList<Integer> fileDirectory_position_piexl;
         private int pathLevel = 0;
-        private final String iso_mount_dir = "/storage/loop";
+        private final String iso_mount_dir = "/mnt/loop";
         private Uri uri;
         private SystemControlManager mSystemControl;
         private StorageManager mStorageManager;
