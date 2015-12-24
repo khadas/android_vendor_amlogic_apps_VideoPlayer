@@ -75,6 +75,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -2536,7 +2537,19 @@ public class VideoPlayer extends Activity {
                     mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
                 }
 
-                //data.recycleParcel();
+                try {
+                    Field parcelField = Metadata.class.getDeclaredField("mParcel");
+                    parcelField.setAccessible(true);
+                    Parcel p = (Parcel)parcelField.get(data);
+                    p.recycle();
+                }
+                catch (NoSuchFieldException ex) {
+                    LOGE(TAG, "[mPreparedListener]NoSuchFieldException ex:" + ex);
+                }
+                catch (IllegalAccessException ex) {
+                    LOGE(TAG, "[mPreparedListener]IllegalAccessException ex:" + ex);
+                }
+
                 /*
                 MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
                 if (trackInfo != null) {
