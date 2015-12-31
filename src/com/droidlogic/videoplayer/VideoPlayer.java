@@ -293,6 +293,10 @@ public class VideoPlayer extends Activity {
             if (randomSeekEnable()) { // random seek for test
                 randomSeekTestFlag = true;
             }
+
+            //stop switch timer
+            stopSwitchTimeout();
+
             //close certification
             closeCertification();
             //set book mark
@@ -1879,6 +1883,8 @@ public class VideoPlayer extends Activity {
 
         private void playPrev() {
             LOGI (TAG, "[playPrev]mState:" + mState);
+            if (!getSwitchEnable()) return;
+            startSwitchTimeout();
             stopOsdTimeout();
             if (mState != STATE_PREPARING) { // avoid status error for preparing
                 close3D();
@@ -1896,6 +1902,8 @@ public class VideoPlayer extends Activity {
 
         private void playNext() {
             LOGI (TAG, "[playNext]mState:" + mState);
+            if (!getSwitchEnable()) return;
+            startSwitchTimeout();
             stopOsdTimeout();
             if (mState != STATE_PREPARING) { // avoid status error for preparing
                 close3D();
@@ -1913,6 +1921,8 @@ public class VideoPlayer extends Activity {
 
         private void playCur() {
             LOGI (TAG, "[playCur]");
+            if (!getSwitchEnable()) return;
+            startSwitchTimeout();
             stopOsdTimeout();
             stopFWFB();
             sendStopMsg();
@@ -2799,6 +2809,57 @@ public class VideoPlayer extends Activity {
                         resumeSecond = resumeSecondMax;
                     }
                 }
+        }
+
+        //@@--------this part for slow down switching next or previous file frequency--------------------------------------------------------
+        private Timer switchtimer = new Timer();
+        private static final int MSG_SWITCH_TIME_OUT = 0xc1;
+        private final int SWITCH_WAIT_TIME = 500; // switch file timeout
+        private boolean mSwitchEnable = true;
+        protected void startSwitchTimeout() {
+            final Handler handler = new Handler() {
+                public void handleMessage(Message msg) {
+                    switch (msg.what) {
+                        case MSG_SWITCH_TIME_OUT:
+                            setSwitchEnable(true);
+                            break;
+                        }
+                    super.handleMessage(msg);
+                }
+            };
+
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    Message message = Message.obtain();
+                    message.what = MSG_SWITCH_TIME_OUT;
+                    handler.sendMessage(message);
+                }
+            };
+
+            stopSwitchTimeout();
+            setSwitchEnable(false);
+            if (switchtimer == null) {
+                switchtimer = new Timer();
+            }
+            if (switchtimer != null) {
+                switchtimer.schedule(task, SWITCH_WAIT_TIME);
+            }
+        }
+
+        private void stopSwitchTimeout() {
+            if (switchtimer != null) {
+                switchtimer.cancel();
+                switchtimer = null;
+                setSwitchEnable(true);
+            }
+        }
+
+        private void setSwitchEnable(boolean enable) {
+            mSwitchEnable = enable;
+        }
+
+        private boolean getSwitchEnable() {
+            return mSwitchEnable;
         }
 
         //@@--------this part for control bar, option bar, other widget, sub widget and info widget showing or not--------------------------------
