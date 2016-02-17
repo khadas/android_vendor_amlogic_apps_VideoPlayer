@@ -5,14 +5,14 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import java.io.File;
 
-import com.droidlogic.app.MediaPlayerDroidlogic;
+import com.droidlogic.app.MediaPlayerExt;
 
 public class MediaInfo {
         private static final String TAG = "MediaInfo";
         private static final boolean DEBUG = false;
         private static Context mContext = null;
-        private MediaPlayerDroidlogic mp = null;
-        private MediaPlayerDroidlogic.MediaInfo mInfo = null;
+        private MediaPlayerExt mp = null;
+        private MediaPlayerExt.MediaInfo mInfo = null;
 
         /*class VideoInfo {
                 public int index;
@@ -58,7 +58,7 @@ public class MediaInfo {
         }
         private mMediaInfo mInfo = null;*/
 
-        public MediaInfo (MediaPlayerDroidlogic mediaPlayer, Context context) {
+        public MediaInfo (MediaPlayerExt mediaPlayer, Context context) {
             mp = mediaPlayer;
             mContext = context;
         }

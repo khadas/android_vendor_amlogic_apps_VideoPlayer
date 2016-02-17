@@ -24,7 +24,6 @@ import android.media.Metadata;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
-//import android.media.MediaPlayerDroidlogic;
 import android.net.Uri;
 //import android.os.Bundle;
 //import android.os.Handler;
@@ -66,7 +65,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.droidlogic.app.MediaPlayerDroidlogic;
+import com.droidlogic.app.MediaPlayerExt;
 import com.droidlogic.app.SubtitleManager;
 import com.droidlogic.app.SystemControlManager;
 
@@ -2129,7 +2128,7 @@ public class VideoPlayer extends Activity {
         }
 
         //@@--------this part for play control------------------------------------------------------------------------------------------
-        private MediaPlayerDroidlogic mMediaPlayer = null;
+        private MediaPlayerExt mMediaPlayer = null;
         private static final int STATE_ERROR = -1;
         private static final int STATE_STOP = 0;
         private static final int STATE_PREPARING = 1;
@@ -2489,7 +2488,7 @@ public class VideoPlayer extends Activity {
                 return;
             }
             release();
-            mMediaPlayer = new MediaPlayerDroidlogic();
+            mMediaPlayer = new MediaPlayerExt();
             mSubtitleManager = new SubtitleManager (mMediaPlayer);
             ///mMediaPlayer.setIgnoreSubtitle(true); //should sync with MediaPlayer.java
             mMediaPlayer.setOnPreparedListener (mPreparedListener);
