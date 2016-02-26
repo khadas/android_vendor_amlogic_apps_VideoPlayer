@@ -14,50 +14,6 @@ public class MediaInfo {
         private MediaPlayerExt mp = null;
         private MediaPlayerExt.MediaInfo mInfo = null;
 
-        /*class VideoInfo {
-                public int index;
-                public int id;
-                public String vformat;
-                public int width;
-                public int height;
-        }
-
-        class AudioInfo {
-                public int index;
-                public int id; //id is useless for application
-                public int aformat;
-                public int channel;
-                public int sample_rate;
-        }
-
-        class SubtitleInfo {
-                public int index;
-                public int id;
-                public int sub_type;
-                public String sub_language;
-        }
-
-        class mMediaInfo {
-                public String filename;
-                public int duration;
-                public String file_size;
-                public int bitrate;
-                public int type;
-                public int cur_video_index;
-                public int cur_audio_index;
-                public int cur_sub_index;
-
-                public int total_video_num;
-                public VideoInfo[] videoInfo;
-
-                public int total_audio_num;
-                public AudioInfo[] audioInfo;
-
-                public int total_sub_num;
-                public SubtitleInfo[] subtitleInfo;
-        }
-        private mMediaInfo mInfo = null;*/
-
         public MediaInfo (MediaPlayerExt mediaPlayer, Context context) {
             mp = mediaPlayer;
             mContext = context;
@@ -71,6 +27,21 @@ public class MediaInfo {
         }
 
         //@@--------this part for video info-------------------------------------------------------
+        public static final int VFORMAT_UNKNOWN = -1;
+        public static final int VFORMAT_MPEG12 = 0;
+        public static final int VFORMAT_MPEG4 = 1;
+        public static final int VFORMAT_H264 = 2;
+        public static final int VFORMAT_MJPEG =3;
+        public static final int VFORMAT_REAL = 4;
+        public static final int VFORMAT_JPEG = 5;
+        public static final int VFORMAT_VC1 = 6;
+        public static final int VFORMAT_AVS = 7;
+        public static final int VFORMAT_SW = 8;
+        public static final int VFORMAT_H264MVC = 9;
+        public static final int VFORMAT_H264_4K2K = 10;
+        public static final int VFORMAT_HEVC = 11;
+        public static final int VFORMAT_UNSUPPORT = 12;
+        public static final int VFORMAT_MAX = 13;
         public String getFileName (String path) {
             String filename = null;
             if (path != null && path.startsWith ("content")) {
@@ -205,6 +176,109 @@ public class MediaInfo {
             return num;
         }
 
+        public int getCurVideoIdx() {
+            if (mInfo != null && mInfo.total_video_num > 0) {
+                for (int i = 0; i < mInfo.total_video_num; i++) {
+                    if (mInfo.cur_video_index == mInfo.videoInfo[i].index) {// current video track index, should tranfer to list index
+                        return i; // current list index
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        public int getVideoIdx(int listIdx) {
+            if (mInfo != null && mInfo.total_video_num > 0) {
+                return mInfo.videoInfo[listIdx].index;
+            }
+
+            return -1;
+        }
+
+        public String getVideoFormat(int i) {
+            if (mInfo != null && mInfo.total_video_num > 0) {
+                return mInfo.videoInfo[i].vformat;
+            }
+
+            return null;
+        }
+
+        public int getTsTotalNum() {
+            if (mInfo != null) {
+                return mInfo.total_ts_num;
+            }
+
+            return 0;
+        }
+
+        public String getTsTitle(int i) {
+            if (mInfo != null && mInfo.total_ts_num > 0) {
+                for (int m = 0; m < mInfo.total_ts_num; m++) {
+                    if (mInfo.videoInfo[i].id == mInfo.tsprogrameInfo[m].v_pid) {
+                        return mInfo.tsprogrameInfo[m].title;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public String geVideoFormatStr(int vFormat) {
+            String type = null;
+            switch (vFormat) {
+                case VFORMAT_UNKNOWN:
+                    type = "UNKNOWN";
+                    break;
+                case VFORMAT_MPEG12:
+                    type = "MPEG12";
+                    break;
+                case VFORMAT_MPEG4:
+                    type = "MPEG4";
+                    break;
+                case VFORMAT_H264:
+                    type = "H264";
+                    break;
+                case VFORMAT_MJPEG:
+                    type = "MJPEG";
+                    break;
+                case VFORMAT_REAL:
+                    type = "REAL";
+                    break;
+                case VFORMAT_JPEG:
+                    type = "JPEG";
+                    break;
+                case VFORMAT_VC1:
+                    type = "VC1";
+                    break;
+                case VFORMAT_AVS:
+                    type = "AVS";
+                    break;
+                case VFORMAT_SW:
+                    type = "SW";
+                    break;
+                case VFORMAT_H264MVC:
+                    type = "H264MVC";
+                    break;
+                case VFORMAT_H264_4K2K:
+                    type = "H264_4K2K";
+                    break;
+                case VFORMAT_HEVC:
+                    type = "HEVC";
+                    break;
+                case AFORMAT_UNSUPPORT:
+                    type = "UNSUPPORT";
+                    break;
+                case AFORMAT_MAX:
+                    type = "MAX";
+                    break;
+                default:
+                    type = "UNKNOWN";
+                    break;
+            }
+            return type;
+            }
+
         public int getVideoWidth() {
             int width = -1;
             if (mInfo != null && getVideoTotalNum() > 0) {
@@ -260,8 +334,9 @@ public class MediaInfo {
         public static final int AFORMAT_TRUEHD = 25;
         public static final int AFORMAT_MPEG1 = 26;
         public static final int AFORMAT_MPEG2 = 27;
-        public static final int AFORMAT_UNSUPPORT = 28;
-        public static final int AFORMAT_MAX = 29;
+        public static final int AFORMAT_WMAVOI = 28;
+        public static final int AFORMAT_UNSUPPORT = 29;
+        public static final int AFORMAT_MAX = 30;
 
         public int getCurAudioIdx() {
             int ret = -1;
@@ -391,6 +466,9 @@ public class MediaInfo {
                 case AFORMAT_MPEG2:
                     type = "MP2";
                     break;
+                case AFORMAT_WMAVOI:
+                    type = "WMAVOI";
+                    break;
                 case AFORMAT_UNSUPPORT:
                     type = "UNSUPPORT";
                     break;
@@ -453,6 +531,9 @@ public class MediaInfo {
         public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_ASSET = MEDIA_INFO_AMLOGIC_BASE + 5;
         public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_EXPRESS = MEDIA_INFO_AMLOGIC_BASE + 6;
         public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_HD_MASTER_AUDIO = MEDIA_INFO_AMLOGIC_BASE + 7;
+        public static final int MEDIA_INFO_AMLOGIC_SHOW_AUDIO_LIMITED = MEDIA_INFO_AMLOGIC_BASE+8;
+        public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_MULASSETHINT = MEDIA_INFO_AMLOGIC_BASE+9;
+        public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_HPS_NOTSUPPORT = MEDIA_INFO_AMLOGIC_BASE+10;
 
         public static boolean needShowOnUI (int info) {
             boolean ret = false;

@@ -538,11 +538,20 @@ public class VideoPlayer extends Activity {
             if (mMediaInfo != null) {
                 int audio_init_list_idx = mMediaInfo.getCurAudioIdx();
                 int audio_total_num = mMediaInfo.getAudioTotalNum();
-                if ( (mMediaInfo != null) && (audio_init_list_idx >= audio_total_num)) {
+                if (audio_init_list_idx >= audio_total_num) {
                     audio_init_list_idx = audio_total_num - 1;
                 }
                 mOption.setAudioTrack (audio_init_list_idx);
                 mOption.setAudioDtsAsset (0); //dts test // default 0, should get current asset from player core 20140717
+
+                int video_init_list_idx = mMediaInfo.getCurVideoIdx();
+                int video_total_num = mMediaInfo.getVideoTotalNum();
+                if (video_init_list_idx >= video_total_num) {
+                    video_init_list_idx = video_total_num -1;
+                }
+                if (video_init_list_idx <= mMediaInfo.getTsTotalNum()) {
+                    mOption.setVideoTrack(video_init_list_idx);
+                }
             }
         }
 
@@ -1203,6 +1212,9 @@ public class VideoPlayer extends Activity {
                     else if (position == 1) {
                         soundtrackSelect();
                     }
+                    else if (position == 2) {
+                        videotrackSelect();
+                    }
                 }
             });
             showOtherWidget (R.string.setting_audiooption);
@@ -1247,6 +1259,20 @@ public class VideoPlayer extends Activity {
             showOtherWidget (R.string.setting_soundtrack);
         }
 
+    private void videotrackSelect() {
+        LOGI(TAG,"[videotrackSelect]");
+        SimpleAdapter videoarray = getMorebarListAdapter(VIDEO_TRACK, mOption.getVideoTrack());
+        ListView listView = (ListView)findViewById(R.id.ListView);
+        listView.setAdapter(videoarray);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mOption.setVideoTrack(position);
+                videoTrackImpl(position);
+                exitOtherWidget(audiooptionBtn);
+            }
+        });
+        showOtherWidget(R.string.setting_videotrack);
+    }
         private void audioDtsAseetSelect() {
             SimpleAdapter audiodtsAssetarray = getMorebarListAdapter (AUDIO_DTS_ASSET, mOption.getAudioDtsAsset());
             ListView listView = (ListView) findViewById (R.id.ListView);
@@ -1576,6 +1602,17 @@ public class VideoPlayer extends Activity {
                 builder.append ("aid:" + str);
                 LOGI (TAG, "[audioTrackImpl]" + builder.toString());
                 mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK,builder.toString());
+            }
+        }
+
+        private void videoTrackImpl(int idx) {
+            if (mMediaPlayer != null && mMediaInfo != null) {
+                int id = mMediaInfo.getVideoIdx(idx);
+                String str = Integer.toString(id);
+                StringBuilder builder = new StringBuilder();
+                builder.append("vid:"+str);
+                LOGI(TAG,"[videoTrackImpl]"+builder.toString());
+                mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_VIDEO_TRACK,builder.toString());
             }
         }
 
@@ -2878,6 +2915,7 @@ public class VideoPlayer extends Activity {
         private final int DISPLAY_MODE = 6;
         private final int BRIGHTNESS = 7;
         private final int PLAY3D = 8;
+        private final int VIDEO_TRACK = 9;
         private int otherwidgetStatus = 0;
 
         protected void startOsdTimeout() {
@@ -3382,6 +3420,7 @@ public class VideoPlayer extends Activity {
                                 break;
                             case R.string.setting_audiotrack:
                             case R.string.setting_soundtrack:
+                            case R.string.setting_videotrack:
                                 audioOption();
                                 break;
                             case R.string.setting_audiodtsasset:
@@ -3998,6 +4037,10 @@ public class VideoPlayer extends Activity {
                     map.put ("item_name", getResources().getString (R.string.setting_soundtrack));
                     map.put ("item_sel", R.drawable.item_img_unsel);
                     list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put("item_name", getResources().getString(R.string.setting_videotrack));
+                    map.put("item_sel", R.drawable.item_img_unsel);
+                    list.add(map);
                     break;
                 case SOUND_TRACK:
                     map = new HashMap<String, Object>();
@@ -4034,6 +4077,33 @@ public class VideoPlayer extends Activity {
                         list.get (pos).put ("item_sel", R.drawable.item_img_sel);
                     }
                     break;
+
+                case VIDEO_TRACK:
+                    if (mMediaInfo != null) {
+                        int ts_total_num = mMediaInfo.getTsTotalNum();
+                        for (int i = 0; i < ts_total_num; i++) {
+                            map = new HashMap<String, Object>();
+                            map.put("item_name", mMediaInfo.getTsTitle(i));
+                            map.put("item_sel", R.drawable.item_img_unsel);
+                            list.add(map);
+                        }
+                        LOGI(TAG,"list.size():" + list.size() + ",pos:" + pos + ",ts_total_num:" + ts_total_num);
+                        if (ts_total_num == 0) {
+                            int video_total_num = mMediaInfo.getVideoTotalNum();
+                            for (int i = 0; i < video_total_num; i++) {
+                                map = new HashMap<String, Object>();
+                                map.put("item_name", mMediaInfo.getVideoFormat(i));
+                                map.put("item_sel", R.drawable.item_img_unsel);
+                                list.add(map);
+                            }
+                        }
+                        if (pos < 0) {
+                            pos = 0;
+                        }
+                        list.get(pos).put("item_sel", R.drawable.item_img_sel);
+                    }
+                break;
+
                 case AUDIO_DTS_ASSET:
                     if (mMediaInfo != null) {
                         int dts_asset_total_num = getDtsAssetTotalNum(); //dts test
@@ -4120,6 +4190,7 @@ class Option {
         private int repeat = 0;
         private int audiotrack = -1;
         private int soundtrack = -1;
+        private int videotrack = -1;
         private int audiodtsasset = -1;
         private int display = 0;
         private int _3dmode = 0;
@@ -4134,6 +4205,7 @@ class Option {
         private String REPEAT_MODE = "RepeatMode";
         private String AUDIO_TRACK = "AudioTrack";
         private String SOUND_TRACK = "SoundTrack";
+        private String VIDEO_TRACK = "VideoTrack";
         private String AUDIO_DTS_ASSET = "AudioDtsAsset";
         private String DISPLAY_MODE = "DisplayMode";
 
@@ -4168,6 +4240,12 @@ class Option {
                 soundtrack = sp.getInt (SOUND_TRACK, 0);
             }
             return soundtrack;
+        }
+
+        public int getVideoTrack() {
+            if (sp != null)
+                videotrack = sp.getInt(VIDEO_TRACK, 0);
+            return videotrack;
         }
 
         public int getAudioDtsAsset() {
@@ -4216,6 +4294,14 @@ class Option {
             if (sp != null) {
                 sp.edit()
                 .putInt (SOUND_TRACK, para)
+                .commit();
+            }
+        }
+
+        public void setVideoTrack(int para) {
+            if (sp != null) {
+                sp.edit()
+                .putInt(VIDEO_TRACK, para)
                 .commit();
             }
         }
