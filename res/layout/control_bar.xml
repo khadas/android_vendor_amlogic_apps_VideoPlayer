@@ -6,16 +6,39 @@
     android:background="@color/background">
 
     <RelativeLayout
-        android:id="@+id/VideoViewRoot"
+        android:id="@+id/SurfaceViewRoot"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_centerInParent="true">
-        <VideoView
-            android:id="@+id/VideoView"
+        <SurfaceView
+            android:id="@+id/SurfaceView"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:layout_centerInParent="true">
-        </VideoView>
+        </SurfaceView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+        <TextView
+            android:id="@+id/SubtitleTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@drawable/white"
+            android:textSize="20dip">
+        </TextView>
+
+        <ImageView
+            android:id="@+id/SubtitleIV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dip">
+        </ImageView>
     </RelativeLayout>
 
     <RelativeLayout
@@ -174,6 +197,17 @@
                     android:background="@drawable/btn_button"
                     android:gravity="center">
                 </ImageButton>
+
+                <ImageButton
+                    android:id="@+id/Play3DBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:src="@drawable/play_3d"
+                    android:background="@drawable/btn_button"
+                    android:gravity="center">
+                </ImageButton>
+
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

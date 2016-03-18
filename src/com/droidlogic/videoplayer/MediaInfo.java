@@ -25,7 +25,6 @@ public class MediaInfo {
             }
             if (DEBUG) { printMediaInfo(); }
         }
-
         //@@--------this part for video info-------------------------------------------------------
         public static final int VFORMAT_UNKNOWN = -1;
         public static final int VFORMAT_MPEG12 = 0;
@@ -303,6 +302,45 @@ public class MediaInfo {
             return ret;
         }
 
+        public String getVFormat() {
+            String vformatStr = "UNKNOWN";
+            if (mInfo != null) {
+                if (mInfo.total_video_num > 0) {
+                    vformatStr = mInfo.videoInfo[0].vformat;
+                }
+            }
+            return vformatStr;
+        }
+
+        public int getBitrate() {
+            int bitrate = -1;
+            if (mInfo != null) {
+                bitrate = mInfo.bitrate;
+            }
+            return bitrate;
+        }
+
+        public int getFps() {
+            int fps = -1;
+            if (mInfo != null) {
+                //fps = mInfo.fps;//wxl shield 20150925 need MediaPlayer.java code merge
+            }
+            return fps;
+        }
+
+        public String getSFormat(int i) {
+            String sformat = "";
+            if (mInfo != null/* && mSubtitleManager != null*/) {
+                //sformat = mSubtitleManager.subtitleGetSubTypeStr(); //wxl shield 20150925 need MediaPlayer.java code merge, no api
+                if (sformat.equals("INSUB")) {
+                    if (i < mInfo.total_sub_num) {
+                        sformat = "INSUB"; // TODO: //mInfo.subtitleInfo[i].sub_type; // insub + external sub
+                    }
+                }
+            }
+            return sformat;
+        }
+
         //@@--------this part for audio info-------------------------------------------------------
         //audio format
         public static final int AFORMAT_UNKNOWN = -1;
@@ -364,6 +402,14 @@ public class MediaInfo {
             int ret = -1;
             if (mInfo != null && getAudioTotalNum() > 0) {
                 ret = mInfo.audioInfo[listIdx].index;
+            }
+            return ret;
+        }
+
+        public int getAudioSampleRate(int i) {
+            int ret = -1;
+            if (mInfo != null && getAudioTotalNum() > 0) {
+                ret = mInfo.audioInfo[i].sample_rate;
             }
             return ret;
         }

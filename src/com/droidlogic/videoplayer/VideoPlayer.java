@@ -16,6 +16,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
@@ -63,18 +65,23 @@ import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
+//import android.widget.VideoView;
+import android.text.TextUtils;
 
 import com.droidlogic.app.MediaPlayerExt;
 import com.droidlogic.app.SubtitleManager;
 import com.droidlogic.app.SystemControlManager;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
+import java.lang.Process;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +90,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import java.util.Random;
+import android.media.TimedText;
+import android.media.SubtitleData;
+import java.util.Locale;
 
 public class VideoPlayer extends Activity {
         private static String TAG = "VideoPlayer";
@@ -125,6 +135,9 @@ public class VideoPlayer extends Activity {
         private TextView otherwidgetTitleTx = null;
         private boolean progressBarSeekFlag = false;
 
+        //for subtitle
+        private TextView subtitleTV = null;
+        private ImageView subtitleIV = null;
         //certification view
         private ImageView certificationDoblyView = null;
         private ImageView certificationDoblyPlusView = null;
@@ -142,8 +155,9 @@ public class VideoPlayer extends Activity {
         private ArrayList<Integer> fileDirectory_position_piexl = new ArrayList<Integer>();
 
         // All the stuff we need for playing and showing a video
-        private VideoView mVideoView;
-        private View mVideoViewRoot;
+        //private VideoView mVideoView;
+        private SurfaceView mSurfaceView;
+        private View mSurfaceViewRoot;
         private SurfaceHolder mSurfaceHolder = null;
         private boolean surfaceDestroyedFlag = true;
         private int totaltime = 0;
@@ -160,6 +174,7 @@ public class VideoPlayer extends Activity {
         PlayList mPlayList = null;
         MediaInfo mMediaInfo = null;
         ErrorInfo mErrorInfo = null;
+        MediaPlayer.TrackInfo[] mTrackInfo;
 
         private boolean browserBackDoing = false;
         private boolean browserBackInvokeFromOnPause = false; //browserBack invoked by back keyevent and browserBack button as usually, if invoked from OnPause suppose to meaning HOME key pressed
@@ -365,6 +380,7 @@ public class VideoPlayer extends Activity {
         private static final int MSG_STOP = 0xF3;
         private static final int MSG_RETRY_PLAY = 0xF4;
         private static final int MSG_RETRY_END = 0xF5;
+        private static final int MSG_SUB_OPTION_UPDATE = 0xF6;
         private Handler mHandler = new Handler() {
             @Override
             public void handleMessage (Message msg) {
@@ -375,7 +391,7 @@ public class VideoPlayer extends Activity {
                         //LOGI(TAG,"[handleMessage]MSG_UPDATE_PROGRESS mState:"+mState+",mSeekState:"+mSeekState);
                         if ( (mState == STATE_PLAYING
                                 || mState == STATE_PAUSED
-                        || mState == STATE_SEARCHING)  && (mSeekState == SEEK_END) /*&& osdisshowing*/) {
+                                || mState == STATE_SEARCHING)  && (mSeekState == SEEK_END) /*&& osdisshowing*/) {
                             pos = getCurrentPosition();
                             updateProgressbar();
                             msg = obtainMessage (MSG_UPDATE_PROGRESS);
@@ -429,6 +445,14 @@ public class VideoPlayer extends Activity {
                         }
                         browserBack();
                         break;
+                    case MSG_SUB_OPTION_UPDATE:
+                        if (isShowImgSubtitle) {
+                            disableSubSetOptions();
+                        }
+                        else {
+                            initSubSetOptions(mcolor_text);
+                        }
+                        break;
                 }
             }
         };
@@ -450,24 +474,28 @@ public class VideoPlayer extends Activity {
                         curTimeTx.setText (secToTime (curtime / 1000));
                         totalTimeTx.setText (secToTime (totaltime / 1000));
                         if (totaltime != 0) {
-                            //curtime = curtime/1000;
-                            //totaltime = totaltime/1000;
-                            progressBar.setProgress (curtime * 100 / totaltime);
+                            int curtimetmp = curtime / 1000;
+                            int totaltimetmp = totaltime / 1000;
+                            if (totaltimetmp != 0) {
+                                int step = curtimetmp*100/totaltimetmp;
+                                progressBar.setProgress(step/*curtime*100/totaltime*/);
+                            }
+                        }
+                        else {
+                            progressBar.setProgress(0);
                         }
                     }
                 }
             }
         }
 
-        private boolean isDemoVersion = false;
-        private boolean isDemoVersion() {
-            boolean ret = mSystemControl.getPropertyBoolean("sys.videoplayer.demon", false);
-            ret = (ret || isDemoVersion);
+        private boolean getPlayIgnoreHdmiEnable() {
+            boolean ret = mSystemControl.getPropertyBoolean("ro.videoignorehdmi.enable", true);
             return ret;
         }
 
-        private boolean getPlayIgnoreHdmiEnable() {
-            boolean ret = mSystemControl.getPropertyBoolean("ro.videoignorehdmi.enable", true);
+        private boolean isTimedTextDisable() {
+            boolean ret = mSystemControl.getPropertyBoolean("sys.timedtext.disable", true);
             return ret;
         }
 
@@ -567,6 +595,11 @@ public class VideoPlayer extends Activity {
             ff_fb = Toast.makeText (VideoPlayer.this, "", Toast.LENGTH_SHORT);
             ff_fb.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
             ff_fb.setDuration (0x00000001);
+
+            //subtitle
+            subtitleTV = (TextView)findViewById(R.id.SubtitleTV);
+            subtitleIV = (ImageView)findViewById(R.id.SubtitleIV);
+            subtitleShow();
             //certification image
             certificationDoblyView = (ImageView) findViewById (R.id.CertificationDobly);
             certificationDoblyPlusView = (ImageView) findViewById (R.id.CertificationDoblyPlus);
@@ -760,18 +793,18 @@ public class VideoPlayer extends Activity {
 
         private void initVideoView() {
             LOGI (TAG, "[initVideoView]");
-            mVideoViewRoot = findViewById (R.id.VideoViewRoot);
-            mVideoView = (VideoView) mVideoViewRoot.findViewById (R.id.VideoView);
+            mSurfaceViewRoot = findViewById (R.id.SurfaceViewRoot);
+            mSurfaceView = (SurfaceView) mSurfaceViewRoot.findViewById (R.id.SurfaceView);
             setOnSystemUiVisibilityChangeListener(); // TODO:ATTENTION: this is very import to keep osd bar show or hide synchronize with touch event, bug86905
             //showSystemUi(false);
             //getHolder().setFormat(PixelFormat.VIDEO_HOLE_REAL);
-            if (mVideoView != null) {
-                mVideoView.getHolder().addCallback (mSHCallback);
-                mVideoView.getHolder().setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-                //@@mVideoView.addOnLayoutChangeListener(this);
-                mVideoView.setFocusable (true);
-                mVideoView.setFocusableInTouchMode (true);
-                mVideoView.requestFocus();
+            if (mSurfaceView != null) {
+                mSurfaceView.getHolder().addCallback (mSHCallback);
+                mSurfaceView.getHolder().setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+                //@@mSurfaceView.addOnLayoutChangeListener(this);
+                mSurfaceView.setFocusable (true);
+                mSurfaceView.setFocusableInTouchMode (true);
+                mSurfaceView.requestFocus();
                 //@@mVideoWidth = 0;
                 //@@mVideoHeight = 0;
                 //@@mCurrentState = STATE_IDLE;
@@ -945,22 +978,9 @@ public class VideoPlayer extends Activity {
         SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
             public void surfaceChanged (SurfaceHolder holder, int format, int w, int h) {
                 LOGI (TAG, "[surfaceChanged]format:" + format + ",w:" + w + ",h:" + h);
-                if (mVideoView != null) {
+                if (mSurfaceView != null) {
                     displayModeImpl();
-                    //mVideoView.requestLayout();
-                    //mVideoView.invalidate();
                 }
-                //@@
-                /*mSurfaceWidth = w;
-                mSurfaceHeight = h;
-                boolean isValidState =  (mTargetState == STATE_PLAYING);
-                boolean hasValidSize = (mVideoWidth == w && mVideoHeight == h);
-                if (mMediaPlayer != null && isValidState && hasValidSize) {
-                    if (mSeekWhenPrepared != 0) {
-                        seekTo(mSeekWhenPrepared);
-                    }
-                    start();
-                }*/
             }
             public void surfaceCreated (SurfaceHolder holder) {
                 LOGI (TAG, "[surfaceCreated]");
@@ -1013,7 +1033,7 @@ public class VideoPlayer extends Activity {
             public void surfaceDestroyed (SurfaceHolder holder) {
                 LOGI (TAG, "[surfaceDestroyed]");
                 mSurfaceHolder = null;
-                mVideoView = null;
+                mSurfaceView = null;
                 release();
                 surfaceDestroyedFlag = true;
                 LOGI (TAG, "[surfaceDestroyed]surfaceDestroyedFlag:" + surfaceDestroyedFlag);
@@ -1022,10 +1042,10 @@ public class VideoPlayer extends Activity {
 
         public void onConfigurationChanged (Configuration config) {
             super.onConfigurationChanged (config);
-            if (mVideoView != null) {
+            if (mSurfaceView != null) {
                 displayModeImpl();
-                mVideoView.requestLayout();
-                mVideoView.invalidate();
+                mSurfaceView.requestLayout();
+                mSurfaceView.invalidate();
             }
         }
         //@@--------this part for broadcast receiver-------------------------------------------------------------------------------------
@@ -1147,6 +1167,9 @@ public class VideoPlayer extends Activity {
         }
 
         //@@--------this part for option function implement------------------------------------------------------------------------------
+        private final int apresentationMax = 32;
+        private int[] assetsArrayNum = new int[apresentationMax];
+        private int mApresentIdx = -1;
         private void resumeSelect() {
             LOGI (TAG, "[resumeSelect]");
             ListView listView = (ListView) findViewById (R.id.ListView);
@@ -1230,7 +1253,7 @@ public class VideoPlayer extends Activity {
                     boolean ret = mMediaInfo.checkAudioisDTS (mMediaInfo.getAudioFormat (position));
                     if (ret) {
                         showDtsAseetFromInfoLis = false;
-                        audioDtsAseetSelect();
+                        audioDtsApresentSelect();
                     }
                     else {
                         exitOtherWidget (audiooptionBtn);
@@ -1259,20 +1282,46 @@ public class VideoPlayer extends Activity {
             showOtherWidget (R.string.setting_soundtrack);
         }
 
-    private void videotrackSelect() {
-        LOGI(TAG,"[videotrackSelect]");
-        SimpleAdapter videoarray = getMorebarListAdapter(VIDEO_TRACK, mOption.getVideoTrack());
-        ListView listView = (ListView)findViewById(R.id.ListView);
-        listView.setAdapter(videoarray);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mOption.setVideoTrack(position);
-                videoTrackImpl(position);
+        private void videotrackSelect() {
+            LOGI(TAG,"[videotrackSelect]");
+            SimpleAdapter videoarray = getMorebarListAdapter(VIDEO_TRACK, mOption.getVideoTrack());
+            ListView listView = (ListView)findViewById(R.id.ListView);
+            listView.setAdapter(videoarray);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mOption.setVideoTrack(position);
+                    videoTrackImpl(position);
+                    exitOtherWidget(audiooptionBtn);
+                }
+            });
+            showOtherWidget(R.string.setting_videotrack);
+        }
+
+        private void audioDtsApresentSelect() {
+            SimpleAdapter audiodtsApresentarray = getMorebarListAdapter(AUDIO_DTS_APRESENT, mOption.getAudioDtsApresent());
+            ListView listView = (ListView)findViewById(R.id.ListView);
+            listView.setAdapter(audiodtsApresentarray);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mApresentIdx = position;
+                    mOption.setAudioDtsApresent(position);
+                    audioDtsAseetSelect();
+                    ///audioDtsAseetImpl(position);
+                    ///exitOtherWidget(audiooptionBtn);
+                    ///showCertification(); //update certification status and icon
+                }
+            });
+            showOtherWidget(R.string.setting_audiodtsapresent);
+
+            if (getDtsApresentTotalNum() == 0) { // dts test
                 exitOtherWidget(audiooptionBtn);
             }
-        });
-        showOtherWidget(R.string.setting_videotrack);
-    }
+
+            if (showDtsAseetFromInfoLis) {
+                startOsdTimeout();
+            }
+        }
+
         private void audioDtsAseetSelect() {
             SimpleAdapter audiodtsAssetarray = getMorebarListAdapter (AUDIO_DTS_ASSET, mOption.getAudioDtsAsset());
             ListView listView = (ListView) findViewById (R.id.ListView);
@@ -1280,13 +1329,13 @@ public class VideoPlayer extends Activity {
             listView.setOnItemClickListener (new AdapterView.OnItemClickListener() {
                 public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
                     mOption.setAudioDtsAsset (position);
-                    audioDtsAseetImpl (position);
+                    audioDtsAseetImpl(mApresentIdx, position);
                     exitOtherWidget (audiooptionBtn);
                     showCertification(); //update certification status and icon
                 }
             });
             showOtherWidget (R.string.setting_audiodtsasset);
-            if (getDtsAssetTotalNum() == 0) { // dts test
+            if (getDtsApresentTotalNum() == 0) { // dts test
                 exitOtherWidget (audiooptionBtn);
             }
             if (showDtsAseetFromInfoLis) {
@@ -1303,7 +1352,15 @@ public class VideoPlayer extends Activity {
                 public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
                     mOption.set3DMode (position);
                     play3DImpl (position);
-                    exitOtherWidget (play3dBtn);
+                    //exitOtherWidget(play3dBtn);
+                    if ((null != otherwidget) && (View.VISIBLE == otherwidget.getVisibility())) {
+                        otherwidget.setVisibility(View.GONE);
+                        if ((null != ctlbar) && (View.GONE == ctlbar.getVisibility()))
+                            ctlbar.setVisibility(View.VISIBLE);
+                        play3dBtn.requestFocus();
+                        play3dBtn.requestFocusFromTouch();
+                        startOsdTimeout();
+                    }
                 }
             });
             showOtherWidget (R.string.setting_3d_mode);
@@ -1504,7 +1561,7 @@ public class VideoPlayer extends Activity {
                     return;
                 }
             }
-            if (mMediaPlayer != null && mOption != null && mVideoView != null) {
+            if (mMediaPlayer != null && mOption != null && mSurfaceView != null) {
                 LOGI (TAG, "[displayModeImpl]mode:" + mOption.getDisplayMode());
                 //ViewGroup.LayoutParams lp = mVideoView.getLayoutParams();
                 videoWidth = mMediaPlayer.getVideoWidth();
@@ -1572,6 +1629,7 @@ public class VideoPlayer extends Activity {
                     float ratioW = 1.000f;
                     float ratioH = 1.000f;
                     float ratioMax = 2.000f;
+                    float ratioMin = 1.250f;
                     int maxW = dispWidth;
                     int maxH = dispHeight;
                     if (videoWidth != 0 & videoHeight != 0) {
@@ -1581,27 +1639,49 @@ public class VideoPlayer extends Activity {
                             ratioW = ratioMax;
                             ratioH = ratioMax;
                         }
+                        else if (ratioW < ratioMin || ratioH < ratioMin) {
+                            ratioW = ratioMin;
+                            ratioH = ratioMin;
+                        }
                         mSubtitleManager.setImgSubRatio(ratioW, ratioH, maxW, maxH);
                     }
                     LOGI(TAG,"[displayModeImpl]after change width:" + width + ",height:" + height + ", ratioW:" + ratioW + ",ratioH:" + ratioH +", maxW:" + maxW + ",maxH:" + maxH);
                 }
 
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams (width, height);
-                lp.addRule (RelativeLayout.CENTER_IN_PARENT);
-                mVideoViewRoot.setLayoutParams (lp);
-                //mVideoViewRoot.requestLayout();
+                if (width > 0 && height > 0) {
+                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams (width, height);
+                    lp.addRule (RelativeLayout.CENTER_IN_PARENT);
+                    mSurfaceViewRoot.setLayoutParams (lp);
+                    //mSurfaceViewRoot.requestLayout();
+                }
             }
         }
 
         private void audioTrackImpl (int idx) {
             if (mMediaPlayer != null && mMediaInfo != null) {
                 LOGI (TAG, "[audioTrackImpl]idx:" + idx);
-                int id = mMediaInfo.getAudioIdx (idx);
-                String str = Integer.toString (id);
-                StringBuilder builder = new StringBuilder();
-                builder.append ("aid:" + str);
-                LOGI (TAG, "[audioTrackImpl]" + builder.toString());
-                mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK,builder.toString());
+
+                int audioTrack = -1;
+                if (mTrackInfo != null) {
+                    for (int i = 0; i < mTrackInfo.length; i++) {
+                        int trackType = mTrackInfo[i].getTrackType();
+                        if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO) {
+                            audioTrack ++;
+                            if (audioTrack == idx) {
+                                LOGI(TAG,"[audioTrackImpl]selectTrack track num:"+i);
+                                mMediaPlayer.selectTrack(i);
+                            }
+                        }
+                    }
+                }
+                else {
+                    int id = mMediaInfo.getAudioIdx (idx);
+                    String str = Integer.toString (id);
+                    StringBuilder builder = new StringBuilder();
+                    builder.append ("aid:" + str);
+                    LOGI (TAG, "[audioTrackImpl]" + builder.toString());
+                    mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK,builder.toString());
+                }
             }
         }
 
@@ -1637,30 +1717,67 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        private void audioDtsAseetImpl (int idx) {
+        private void audioDtsAseetImpl(int apre, int asset) {
             if (mMediaPlayer != null && mMediaInfo != null) {
-                String str = Integer.toString (idx);
+                String aprestr = Integer.toString(apre);
+                String assetstr = Integer.toString(asset);
                 StringBuilder builder = new StringBuilder();
-                builder.append ("dtsAsset:" + str);
-                LOGI (TAG, "[audioDtsAseetImpl]" + builder.toString());
+                builder.append("dtsApre:"+aprestr);
+                builder.append("dtsAsset:"+assetstr);
+                LOGI(TAG,"[audioDtsAseetImpl]"+builder.toString());
                 mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DTS_ASSET, builder.toString());
             }
         }
 
-        private int getDtsAssetTotalNum() {
+        private int getDtsApresentTotalNum() {
             int num = 0;
-            if (mMediaPlayer != null) {
-                num = mMediaPlayer.getIntParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
+            Parcel p = Parcel.obtain();
+            if (mMediaPlayer != null ) {
+                p = mMediaPlayer.getParcelParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
+                num = p.readInt();
+                p.readIntArray(assetsArrayNum);
             }
-            LOGI (TAG, "[getDtsAssetTotalNum] num:" + num);
+            p.recycle();
+
+            LOGI(TAG,"[getDtsApresentTotalNum] num:"+num);
+            for (int i = 0; i < num; i++) {
+                LOGI(TAG,"[getDtsApresentTotalNum] assetsArrayNum["+i+"]:"+assetsArrayNum[i]);
+            }
             return num;
         }
+
+        private int getDtsAssetTotalNum(int apre) {
+            int num = 0;
+            if (apre < getDtsApresentTotalNum()) {
+                if (assetsArrayNum != null) {
+                    num = assetsArrayNum[apre];
+                    LOGI(TAG,"[getDtsAssetTotalNum] assetsArrayNum["+apre+"]:"+assetsArrayNum[apre]);
+                }
+            }
+            return num;
+        }
+
         private void play3DImpl (int idx) {
             LOGI (TAG, "[play3DSelect]idx:" + idx);
-            boolean ret = false;
+            int ret = -1;
             if (mMediaPlayer != null) {
                 // TODO: should open after 3d function debug ok
-                ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+                //ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,idx);
+                String mode3d = "3doff";
+                switch (idx) {
+                    case 0:
+                        mode3d = "3doff";
+                        break;
+                    case 1:
+                        mode3d = "3dlr";
+                        break;
+                    case 2:
+                        mode3d = "3dtb";
+                        break;
+                    default:
+                        break;
+                }
+                ret = mSystemControl.set3DMode(mode3d);
                 if (idx > 0) {
                     set_3d_flag = true;
                 }
@@ -1668,7 +1785,7 @@ public class VideoPlayer extends Activity {
                     set_3d_flag = false;
                 }
                 LOGI (TAG, "[play3DSelect]ret:" + ret);
-                if (!ret) {
+                if (-1 == ret) {
                     if (mOption != null) {
                         mOption.set3DMode (0);
                     }
@@ -1688,7 +1805,8 @@ public class VideoPlayer extends Activity {
                 if (set_3d_flag) {
                     mOption.set3DMode (0);
                     set_3d_flag = false;
-                    mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+                    //mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SET_DISPLAY_MODE,0);
+                    mSystemControl.set3DMode("3doff");
                 }
             }
         }
@@ -1806,6 +1924,9 @@ public class VideoPlayer extends Activity {
             haveTried = false;
             mRetrying = false;
             mRetryTimes = mRetryTimesMax;
+            mSubNum = 0;
+            mSubOffset = -1;
+            isShowImgSubtitle = false;
         }
 
         private void sendPlayFileMsg() {
@@ -2088,13 +2209,6 @@ public class VideoPlayer extends Activity {
         }
 
         private void FFimpl (int para) {
-            if (isDemoVersion()) {
-                Toast toast = Toast.makeText (VideoPlayer.this, "this function is not opened for demo version", Toast.LENGTH_SHORT);
-                toast.setGravity (Gravity.BOTTOM, 0, 0);
-                toast.setDuration (0x00000001);
-                toast.show();
-                return;
-            }
             if (mMediaPlayer != null) {
                 LOGI (TAG, "[FFimpl]para:" + para);
                 if (para > 0) {
@@ -2116,13 +2230,6 @@ public class VideoPlayer extends Activity {
         }
 
         private void FBimpl (int para) {
-            if (isDemoVersion()) {
-                Toast toast = Toast.makeText (VideoPlayer.this, "this function is not opened for demo version", Toast.LENGTH_SHORT);
-                toast.setGravity (Gravity.BOTTOM, 0, 0);
-                toast.setDuration (0x00000001);
-                toast.show();
-                return;
-            }
             if (mMediaPlayer != null) {
                 LOGI (TAG, "[FBimpl]para:" + para);
                 if (para > 0) {
@@ -2404,6 +2511,9 @@ public class VideoPlayer extends Activity {
             }*/
             LOGI (TAG, "[setVideoPath]Uri.parse(path):" + Uri.parse (path));
             setVideoURI (Uri.parse (path), path); //add path to resolve special character for uri, such as  ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |"$" | ","
+            if (!isTimedTextDisable()) {
+                searchExternalSubtitle(path);
+            }
         }
 
         private void setVideoURI (Uri uri, String path) {
@@ -2471,7 +2581,12 @@ public class VideoPlayer extends Activity {
                 int idIdx = cursor.getColumnIndexOrThrow (MediaStore.Video.Media._ID);
                 for (int i = 0; i < len; i++) {
                     LOGI (TAG, "[trySetVideoURIAgain]cursor.getString(dataIdx):" + cursor.getString (dataIdx));
-                    if ( (cursor.getString (dataIdx)).startsWith (path)) {
+                    String dataIdxStr = cursor.getString(dataIdx);
+                    if (dataIdxStr == null) {
+                        cursor.close();
+                        return;
+                    }
+                    if ( (dataIdxStr).startsWith (path)) {
                         destIdx = cursor.getInt (idIdx);
                         LOGI (TAG, "[trySetVideoURIAgain]destIdx:" + destIdx);
                         break;
@@ -2535,6 +2650,8 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.setOnErrorListener (mErrorListener);
             mMediaPlayer.setOnInfoListener (mInfoListener);
             mMediaPlayer.setDisplay (mSurfaceHolder);
+            mMediaPlayer.setOnTimedTextListener(mTimedTextListener);
+            mMediaPlayer.setOnSubtitleDataListener(mSubtitleDataListener);
         }
 
         //@@--------this part for listener----------------------------------------------------------------------------------------------
@@ -2550,15 +2667,15 @@ public class VideoPlayer extends Activity {
             public void onVideoSizeChanged (MediaPlayer mp, int width, int height) {
                 LOGI (TAG, "[onVideoSizeChanged]");
                 displayModeImpl();
-                if (mMediaPlayer != null && mVideoView != null) {
+                if (mMediaPlayer != null && mSurfaceView != null) {
                     int videoWidth = mMediaPlayer.getVideoWidth();
                     int videoHeight = mMediaPlayer.getVideoHeight();
                     LOGI (TAG, "[onVideoSizeChanged]videoWidth:" + videoWidth + ",videoHeight:" + videoHeight);
                     if (videoWidth != 0 && videoHeight != 0) {
                         displayModeImpl();
-                        mVideoView.requestLayout();
-                        /*mVideoView.getHolder().setFixedSize(videoWidth, videoHeight);
-                        mVideoView.requestLayout();*/
+                        mSurfaceView.requestLayout();
+                        /*mSurfaceView.getHolder().setFixedSize(videoWidth, videoHeight);
+                        mSurfaceView.requestLayout();*/
                     }
                 }
             }
@@ -2596,6 +2713,30 @@ public class VideoPlayer extends Activity {
                     LOGE(TAG, "[mPreparedListener]IllegalAccessException ex:" + ex);
                 }
 
+                //TODO: some error should debug 20150525
+                if (!isTimedTextDisable()) {
+                    mTrackInfo = mp.getTrackInfo();
+                    if (mTrackInfo != null) {
+                        LOGI(TAG,"[mPreparedListener]mTrackInfo.length:"+mTrackInfo.length);
+                        for (int i = 0; i < mTrackInfo.length; i++) {
+                            int trackType = mTrackInfo[i].getTrackType();
+                            LOGI(TAG,"[mPreparedListener]trackInfo["+i+"].trackType:"+trackType);
+
+                            if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
+                                mSubNum ++;
+                                if (mSubOffset == -1) {
+                                    mSubOffset = i;
+                                }
+                            }
+                        }
+                    }
+
+                    LOGI(TAG,"[mPreparedListener]mSubOffset:"+mSubOffset);
+                    if (mSubOffset >= 0) {
+                        mMediaPlayer.selectTrack(mSubOffset);
+                    }
+                }
+
                 /*
                 MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
                 if (trackInfo != null) {
@@ -2608,10 +2749,8 @@ public class VideoPlayer extends Activity {
                 if (mStateBac != STATE_PAUSED) {
                     start();
                 }
-                if (!isDemoVersion()) {
-                    initSubtitle();
-                    initMediaInfo();
-                }
+                initSubtitle();
+                initMediaInfo();
                 displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
                 showCertification(); // show certification
                 if (mResumePlay.getEnable() == true) {
@@ -2666,7 +2805,8 @@ public class VideoPlayer extends Activity {
         new MediaPlayer.OnSeekCompleteListener() {
             public void onSeekComplete (MediaPlayer mp) {
                 LOGI (TAG, "[onSeekComplete] progressBarSeekFlag:" + progressBarSeekFlag + ",mStateBac:" + mStateBac);
-                if (!isDemoVersion()) {
+
+                if (isTimedTextDisable()) {
                     if (mSubtitleManager != null) {
                         mSubtitleManager.resetForSeek();
                     }
@@ -2748,9 +2888,9 @@ public class VideoPlayer extends Activity {
                         toast.show();
                     }
                     if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_ASSET) {
-                        if (getDtsAssetTotalNum() > 0) {
+                        if (getDtsApresentTotalNum() > 0) {
                             showDtsAseetFromInfoLis = true;
-                            audioDtsAseetSelect();
+                            audioDtsApresentSelect();
                         }
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_EXPRESS) {
@@ -2761,8 +2901,71 @@ public class VideoPlayer extends Activity {
                         mDtsType = DTS_HD_MASTER_AUDIO;
                         showCertification();
                     }
+                    else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_AUDIO_LIMITED) {
+                        String ainfoStr = getResources().getString(R.string.audio_dec_enable);
+                        Toast toast =Toast.makeText(VideoPlayer.this, ainfoStr, Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                        toast.setDuration(0x00000001);
+                        toast.show();
+                    }
+                    else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_MULASSETHINT) {
+                        Toast toast =Toast.makeText(VideoPlayer.this, "MulAssetAudio",Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                        toast.setDuration(0x00000001);
+                        toast.show();
+                    }
+                    else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_HPS_NOTSUPPORT) {
+                        String dtshpsUnsupportStr = getResources().getString(R.string.dts_hps_unsupport);
+                        Toast toast =Toast.makeText(VideoPlayer.this, dtshpsUnsupportStr, Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.BOTTOM,/*110*/0,110);
+                        toast.setDuration(0x00000001);
+                        toast.show();
+                    }
                 }
                 return true;
+            }
+        };
+
+        private MediaPlayer.OnTimedTextListener mTimedTextListener =
+            new MediaPlayer.OnTimedTextListener() {
+            public void onTimedText(MediaPlayer mp, TimedText text) {
+                LOGI(TAG, "[onTimedText]text:"+text);
+                if (text != null) {
+                    LOGE(TAG, "[onTimedText]text:"+text+", text.getText():"+text.getText());
+                    isShowImgSubtitle = false;
+                    subtitleTV.setText(text.getText());
+                    //@@//subtitleTV.setTextColor(0xFF990066);
+                    //@@//subtitleTV.setTypeface(null,Typeface.BOLD);
+                }
+                else {
+                    LOGE(TAG, "[onTimedText]text:"+text);
+                    subtitleTV.setText("");
+                }
+            }
+        };
+
+        private MediaPlayer.OnSubtitleDataListener mSubtitleDataListener =
+            new MediaPlayer.OnSubtitleDataListener() {
+            public void onSubtitleData(MediaPlayer mp, SubtitleData data) {
+                LOGI(TAG, "[onSubtitleData]data:"+data);
+                if (null == subtitleIV) {
+                    return;
+                }
+                if (data != null) {
+                    if (View.INVISIBLE == subtitleIV.getVisibility()) {
+                        subtitleIV.setVisibility(View.VISIBLE);
+                    }
+                    isShowImgSubtitle = true;
+                    //@@Bitmap bm = data.getBitmap();
+                    //@@subtitleIV.setImageBitmap(bm);//wxl shield 20150925 need MediaPlayer.java code merge
+                }
+                else {
+                    LOGE(TAG, "[onSubtitleData]data:"+data);
+                    //subtitleTV.setText("");
+                    if (View.GONE != subtitleIV.getVisibility()) {
+                        subtitleIV.setVisibility(View.INVISIBLE);
+                    }
+                }
             }
         };
 
@@ -2911,11 +3114,12 @@ public class VideoPlayer extends Activity {
         private final int AUDIO_OPTION = 2;
         private final int AUDIO_TRACK = 3;
         private final int SOUND_TRACK = 4;
-        private final int AUDIO_DTS_ASSET = 5;
-        private final int DISPLAY_MODE = 6;
-        private final int BRIGHTNESS = 7;
-        private final int PLAY3D = 8;
-        private final int VIDEO_TRACK = 9;
+        private final int AUDIO_DTS_APRESENT = 5;
+        private final int AUDIO_DTS_ASSET = 6;
+        private final int DISPLAY_MODE = 7;
+        private final int BRIGHTNESS = 8;
+        private final int PLAY3D = 9;
+        private final int VIDEO_TRACK = 10;
         private int otherwidgetStatus = 0;
 
         protected void startOsdTimeout() {
@@ -2967,9 +3171,10 @@ public class VideoPlayer extends Activity {
             if (null != otherwidget) {
                 if (View.GONE == otherwidget.getVisibility()) {
                     otherwidget.setVisibility (View.VISIBLE);
-                    if ( (null != optbar) && (View.VISIBLE == optbar.getVisibility())) {
+                    if ( (null != optbar) && (View.VISIBLE == optbar.getVisibility()))
                         optbar.setVisibility (View.GONE);
-                    }
+                    if ((null != ctlbar) && (View.VISIBLE == ctlbar.getVisibility()))
+                        ctlbar.setVisibility(View.GONE);
                 }
                 otherwidgetTitleTx.setText (StrId);
                 otherwidget.requestFocus();
@@ -3148,13 +3353,6 @@ public class VideoPlayer extends Activity {
             if (null == optbar) {
                 return;
             }
-            if (isDemoVersion()) {
-                Toast toast = Toast.makeText (VideoPlayer.this, "this function is not opened for demo version", Toast.LENGTH_SHORT);
-                toast.setGravity (Gravity.BOTTOM, 0, 0);
-                toast.setDuration (0x00000001);
-                toast.show();
-                return;
-            }
             int flag = getCurOsdViewFlag();
             switch (flag) {
                 case OSD_CTL_BAR:
@@ -3173,8 +3371,8 @@ public class VideoPlayer extends Activity {
         @SuppressWarnings ("deprecation")
         @TargetApi (Build.VERSION_CODES.JELLY_BEAN)
         private void showSystemUi (boolean visible) {
-            LOGI (TAG, "[showSystemUi]visible:" + visible + ",mVideoView:" + mVideoView);
-            if (mVideoView == null) {
+            LOGI (TAG, "[showSystemUi]visible:" + visible + ",mSurfaceView:" + mSurfaceView);
+            if (mSurfaceView == null) {
                 return;
             }
             int flag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -3185,14 +3383,14 @@ public class VideoPlayer extends Activity {
                 flag |= View.STATUS_BAR_HIDDEN | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
             }
-            mVideoView.setSystemUiVisibility (flag);
+            mSurfaceView.setSystemUiVisibility (flag);
         }
 
         private int mLastSystemUiVis = 0;
         @TargetApi (Build.VERSION_CODES.JELLY_BEAN)
         private void setOnSystemUiVisibilityChangeListener() {
             //if (!ApiHelper.HAS_VIEW_SYSTEM_UI_FLAG_HIDE_NAVIGATION) return;
-            mVideoView.setOnSystemUiVisibilityChangeListener (
+            mSurfaceView.setOnSystemUiVisibilityChangeListener (
             new View.OnSystemUiVisibilityChangeListener() {
                 @Override
                 public void onSystemUiVisibilityChange (int visibility) {
@@ -3423,9 +3621,14 @@ public class VideoPlayer extends Activity {
                             case R.string.setting_videotrack:
                                 audioOption();
                                 break;
-                            case R.string.setting_audiodtsasset:
+                            case R.string.setting_audiodtsapresent:
                                 if (!showDtsAseetFromInfoLis) {
                                     audiotrackSelect();
+                                }
+                                break;
+                            case R.string.setting_audiodtsasset:
+                                if (!showDtsAseetFromInfoLis) {
+                                    audioDtsApresentSelect();
                                 }
                                 break;
                             case R.string.setting_subtitle:
@@ -3454,7 +3657,15 @@ public class VideoPlayer extends Activity {
                     }
                 }
                 else if (OSD_CTL_BAR == flag) {
-                    browserBack();
+                    if ((null != otherwidget) &&(otherwidget.getVisibility() == View.VISIBLE) && (otherwidgetStatus == R.string.setting_3d_mode)) {
+                        otherwidget.setVisibility(View.GONE);
+                        showOsdView();
+                        play3dBtn.requestFocusFromTouch();
+                        play3dBtn.requestFocus();
+                    }
+                    else {
+                        browserBack();
+                    }
                 }
             }
             else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
@@ -3566,10 +3777,162 @@ public class VideoPlayer extends Activity {
         private int sub_color_state = 0;
         private int sub_position_v_state = 0;
         private TextView t_subswitch = null ;
+        private TextView t_subinfo = null ;
         private TextView t_subsfont = null ;
         private TextView t_subscolor = null ;
         private TextView t_subsposition_v = null;
+        private int mSubNum = 0;
+        private int mSubOffset = -1;
+        private boolean isShowImgSubtitle = false;
+        private String mcolor_text[];
 
+        private static final String[] extensions = {
+            "idx",
+            "aqt",
+            "ass",
+            "lrc",
+            "smi",
+            "sami",
+            "txt",
+            "srt",
+            "ssa",
+            "xml",
+            "jss",
+            "js",
+            "mpl",
+            "rt",
+            "sub",
+            /* "may be need add new types--------------" */};
+
+        private int getSubtitleTotal() {
+            return mSubNum;
+        }
+
+        private boolean idxFileAdded = false;
+        private boolean subtitleSkipedSubForIdx(String file, File DirFile) {
+            LOGI(TAG,"[subtitleSkipedSubForIdx]idxFileAdded:"+idxFileAdded);
+            String fileLow = file.toLowerCase();
+            if (fileLow.endsWith("idx")) {
+                idxFileAdded = true;
+                return false;
+            }
+
+            if (fileLow.endsWith("sub")) {
+                if (idxFileAdded) {
+                    return true;
+                }
+                else {
+                    if (DirFile.isDirectory()) {
+                        for (String filetmp : DirFile.list()) {
+                            String filetmpLow = filetmp.toLowerCase();
+                            if (filetmpLow.endsWith("idx")) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void searchExternalSubtitle(String path) {
+            LOGI(TAG,"[searchExternalSubtitle]path:"+path);
+            if (path != null) {
+                idxFileAdded = false;
+                File playFile = new File(path);
+                String playName=playFile.getName();
+                String prefix = playName.substring(0, playName.lastIndexOf('.'));
+                File DirFile= playFile.getParentFile();
+                String parentPath = DirFile.getPath() + "/";
+                if (DirFile.isDirectory()) {
+                    for (String file : DirFile.list()) {
+                        String fileLow = file.toLowerCase();
+                        String prefixLow = prefix.toLowerCase();
+                        if (fileLow.startsWith(prefixLow)) {
+                            for (String ext : extensions) {
+                                if (fileLow.endsWith(ext)) {
+                                    //wxl shield 20150925 need MediaPlayer.java code merge
+                                    /*try {
+                                        LOGI(TAG,"[searchExternalSubtitle]file:"+(parentPath + file));
+                                        if (!subtitleSkipedSubForIdx(file, DirFile)) {
+                                            LOGI(TAG,"[searchExternalSubtitle]addTimedTextSource file:"+file);
+                                            @@mMediaPlayer.addTimedTextSource(mContext, Uri.parse(parentPath + file), mMediaPlayer.MEDIA_MIMETYPE_TEXT_SUBOTHER);
+                                        }
+                                        break;
+                                    } catch (IOException ex) {
+                                        LOGE(TAG, "[searchExternalSubtitle]IOException ex:"+ex);
+                                    } catch (IllegalArgumentException ex) {
+                                       LOGE(TAG, "[searchExternalSubtitle]IllegalArgumentException ex:"+ex);
+                                    }*/
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void subtitleHide() {
+            if ((null != subtitleIV) && (View.VISIBLE == subtitleIV.getVisibility())) {
+                subtitleIV.setVisibility(View.GONE);
+            }
+            if ((null != subtitleTV) && (View.VISIBLE == subtitleTV.getVisibility())) {
+                subtitleTV.setVisibility(View.GONE);
+            }
+        }
+
+        private void subtitleShow() {
+            if ((null != subtitleIV) && (View.GONE == subtitleIV.getVisibility())) {
+                subtitleIV.setVisibility(View.VISIBLE);
+            }
+            if ((null != subtitleTV) && (View.GONE == subtitleTV.getVisibility())) {
+                subtitleTV.setVisibility(View.VISIBLE);
+            }
+        }
+
+        private void subtitleSetFont(int size) {
+            if (!isShowImgSubtitle) {
+                if ((null != subtitleTV) && (View.VISIBLE == subtitleTV.getVisibility())) {
+                    subtitleTV.setTextSize(size);
+                }
+            }
+        }
+
+        private void subtitleSetColor(int color) {
+            if (!isShowImgSubtitle) {
+                if ((null != subtitleTV) && (View.VISIBLE == subtitleTV.getVisibility())) {
+                    subtitleTV.setTextColor(color);
+                }
+            }
+        }
+
+        private void subtitleSetStyle(int style) {
+            if (!isShowImgSubtitle) {
+                if ((null != subtitleTV) && (View.VISIBLE == subtitleTV.getVisibility())) {
+                    subtitleTV.setTypeface(null, style);
+                }
+            }
+        }
+
+        private void subtitleSetPosHeight(int height) {
+            if (!isShowImgSubtitle) {
+                if ((null != subtitleTV) && (View.VISIBLE == subtitleTV.getVisibility())) {
+                    subtitleTV.setPadding(
+                        subtitleTV.getPaddingLeft(),
+                        subtitleTV.getPaddingTop(),
+                        subtitleTV.getPaddingRight(),height);
+                }
+            }
+        }
+
+        private void sendSubOptionUpdateMsg() {
+            if (mHandler != null) {
+                Message msg = mHandler.obtainMessage(MSG_SUB_OPTION_UPDATE);
+                mHandler.sendMessageDelayed(msg, MSG_SEND_DELAY);
+                LOGI(TAG,"[sendSubOptionUpdateMsg]sendMessageDelayed MSG_SUB_OPTION_UPDATE");
+            }
+        }
         private void initSubtitle() {
             LOGI (TAG, "[initSubtitle]");
             SharedPreferences subSp = getSharedPreferences (subSettingStr, 0);
@@ -3587,20 +3950,33 @@ public class VideoPlayer extends Activity {
         }
 
         private void subtitle_prepare() {
-            if (mMediaPlayer != null) {
-                sub_para.totalnum = mSubtitleManager.total();
+            if (!isTimedTextDisable()) {
+                sub_para.totalnum = getSubtitleTotal();
+            }
+            else {
+                if (mMediaPlayer != null) {
+                    sub_para.totalnum = mSubtitleManager.total();
+                }
             }
         }
 
         private void setSubtitleView() {
             LOGI (TAG, "[setSubtitleView]mMediaPlayer:" + mMediaPlayer);
-            if (mMediaPlayer != null) {
-                //mMediaPlayer.subtitleClear();
-                mSubtitleManager.setGravity (Gravity.CENTER);
-                mSubtitleManager.setTextColor (sub_para.color);
-                mSubtitleManager.setTextSize (sub_para.font);
-                mSubtitleManager.setTextStyle (Typeface.BOLD);
-                mSubtitleManager.setPosHeight (getWindowManager().getDefaultDisplay().getHeight() *sub_para.position_v / 20 + 10);
+            if (!isTimedTextDisable()) {
+                subtitleSetFont(sub_para.font);
+                subtitleSetColor(sub_para.color);
+                subtitleSetStyle(Typeface.BOLD);
+                subtitleSetPosHeight(getWindowManager().getDefaultDisplay().getHeight()*sub_para.position_v/20+10);
+            }
+            else {
+                if (mMediaPlayer != null) {
+                    //mMediaPlayer.subtitleClear();
+                    mSubtitleManager.setGravity (Gravity.CENTER);
+                    mSubtitleManager.setTextColor (sub_para.color);
+                    mSubtitleManager.setTextSize (sub_para.font);
+                    mSubtitleManager.setTextStyle (Typeface.BOLD);
+                    mSubtitleManager.setPosHeight (getWindowManager().getDefaultDisplay().getHeight() *sub_para.position_v / 20 + 10);
+                }
             }
         }
 
@@ -3611,6 +3987,7 @@ public class VideoPlayer extends Activity {
                 VideoPlayer.this.getResources().getString (R.string.color_yellow),
                 VideoPlayer.this.getResources().getString (R.string.color_blue)
             };
+            mcolor_text = color_text;
             Button ok = (Button) findViewById (R.id.button_ok);
             Button cancel = (Button) findViewById (R.id.button_canncel);
             ImageButton Bswitch_l = (ImageButton) findViewById (R.id.switch_l);
@@ -3633,12 +4010,41 @@ public class VideoPlayer extends Activity {
                     LOGI (TAG, "[subtitle_control]sub_para.curid:" + sub_para.curid + ",sub_para.curidbac:" + sub_para.curidbac);
                     if (mMediaPlayer != null) {
                         if (sub_para.curid == sub_para.totalnum) {
-                            mSubtitleManager.hide();
+                            if (!isTimedTextDisable()) {
+                                subtitleHide();
+                            }
+                            else {
+                                mSubtitleManager.hide();
+                            }
                         }
                         else {
                             if (sub_para.curidbac != sub_para.curid) {
+                            LOGI(TAG,"[subtitle_control]selectTrack :"+(sub_para.curid + mSubOffset));
+                            //mMediaPlayer.selectTrack(sub_para.curid + mSubOffset);
+                            if (!isTimedTextDisable()) {
+                                int subTrack = -1;
+                                if (mTrackInfo != null) {
+                                    for (int i = 0; i < mTrackInfo.length; i++) {
+                                        int trackType = mTrackInfo[i].getTrackType();
+                                        if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
+                                            subTrack ++;
+                                            if (subTrack == sub_para.curid) {
+                                                LOGI(TAG,"[subtitle_control]selectTrack track num:"+i);
+                                                mMediaPlayer.selectTrack(i);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else {
                                 mSubtitleManager.openIdx (sub_para.curid);
-                                sub_para.curidbac = sub_para.curid;
+                            }
+
+                            sub_para.curidbac = sub_para.curid;
+                        }
+                        //else {
+                            if (!isTimedTextDisable()) {
+                                subtitleShow();
                             }
                             else {
                                 mSubtitleManager.display();
@@ -3660,8 +4066,9 @@ public class VideoPlayer extends Activity {
                     editor.putInt ("font", sub_para.font);
                     editor.putInt ("position_v", sub_para.position_v);
                     editor.commit();
+                    sendSubOptionUpdateMsg();
                     setSubtitleView();
-                    if (mMediaPlayer != null) {
+                    if (isTimedTextDisable()) {
                         //still have error with new method
                         /*if(mMediaPlayer.subtitleGetSubType() == 1) { //bitmap
                             disableSubSetOptions();
@@ -3681,9 +4088,6 @@ public class VideoPlayer extends Activity {
                         else {
                             initSubSetOptions (color_text);
                         }
-                    }
-                    else {
-                        initSubSetOptions (color_text);
                     }
                     exitSubWidget (subtitleSwitchBtn);
                 }
@@ -3792,7 +4196,9 @@ public class VideoPlayer extends Activity {
                     t_subsposition_v.setText (String.valueOf (sub_position_v_state));
                 }
             });
-            if (mMediaPlayer != null) {
+
+            sendSubOptionUpdateMsg();
+            if (isTimedTextDisable()) {
                 //still have error with new method
                 /*if(mMediaPlayer.subtitleGetSubType() == 1) { //bitmap
                     disableSubSetOptions();
@@ -3812,9 +4218,6 @@ public class VideoPlayer extends Activity {
                 else {
                     initSubSetOptions (color_text);
                 }
-            }
-            else {
-                initSubSetOptions (color_text);
             }
         }
 
@@ -4103,21 +4506,31 @@ public class VideoPlayer extends Activity {
                         list.get(pos).put("item_sel", R.drawable.item_img_sel);
                     }
                 break;
-
+                case AUDIO_DTS_APRESENT:
+                    int dts_apresent_total_num = getDtsApresentTotalNum(); //dts test
+                    for (int i = 0; i < dts_apresent_total_num; i++) {
+                        map = new HashMap<String, Object>();
+                        map.put("item_name", "Apresentation"+Integer.toString(i));
+                        map.put("item_sel", R.drawable.item_img_unsel);
+                        list.add(map);
+                    }
+                    LOGI(TAG,"list.size():"+list.size()+",pos:"+pos+",dts_apresent_total_num:"+dts_apresent_total_num);
+                    if (pos < 0) {
+                        pos = 0;
+                    }
+                    //list.get(pos).put("item_sel", R.drawable.item_img_sel);
+                    break;
                 case AUDIO_DTS_ASSET:
-                    if (mMediaInfo != null) {
-                        int dts_asset_total_num = getDtsAssetTotalNum(); //dts test
-                        for (int i = 0; i < dts_asset_total_num; i++) {
-                            map = new HashMap<String, Object>();
-                            map.put ("item_name", "Apresentation" + Integer.toString (i));
-                            map.put ("item_sel", R.drawable.item_img_unsel);
-                            list.add (map);
-                        }
-                        LOGI (TAG, "list.size():" + list.size() + ",pos:" + pos + ",dts_asset_total_num:" + dts_asset_total_num);
-                        if (pos < 0) {
-                            pos = 0;
-                        }
-                        //list.get(pos).put("item_sel", R.drawable.item_img_sel);
+                    int dts_asset_total_num = getDtsAssetTotalNum(mApresentIdx); //dts test
+                    for (int i = 0; i < dts_asset_total_num; i++) {
+                        map = new HashMap<String, Object>();
+                        map.put("item_name", "Asset"+Integer.toString(i));
+                        map.put("item_sel", R.drawable.item_img_unsel);
+                        list.add(map);
+                    }
+                    LOGI(TAG,"list.size():"+list.size()+",pos:"+pos+",dts_asset_total_num:"+dts_asset_total_num);
+                    if (pos < 0) {
+                        pos = 0;
                     }
                     break;
                 case DISPLAY_MODE:
@@ -4192,6 +4605,7 @@ class Option {
         private int soundtrack = -1;
         private int videotrack = -1;
         private int audiodtsasset = -1;
+        private int audiodtsapresent = -1;
         private int display = 0;
         private int _3dmode = 0;
 
@@ -4206,6 +4620,7 @@ class Option {
         private String AUDIO_TRACK = "AudioTrack";
         private String SOUND_TRACK = "SoundTrack";
         private String VIDEO_TRACK = "VideoTrack";
+        private String AUDIO_DTS_APRESENT = "AudioDtsApresent";
         private String AUDIO_DTS_ASSET = "AudioDtsAsset";
         private String DISPLAY_MODE = "DisplayMode";
 
@@ -4246,6 +4661,12 @@ class Option {
             if (sp != null)
                 videotrack = sp.getInt(VIDEO_TRACK, 0);
             return videotrack;
+        }
+
+        public int getAudioDtsApresent() {
+            if (sp != null)
+                audiodtsapresent = sp.getInt(AUDIO_DTS_APRESENT, 0);
+            return audiodtsapresent;
         }
 
         public int getAudioDtsAsset() {
@@ -4302,6 +4723,14 @@ class Option {
             if (sp != null) {
                 sp.edit()
                 .putInt(VIDEO_TRACK, para)
+                .commit();
+            }
+        }
+
+        public void setAudioDtsApresent(int para) {
+            if (sp != null) {
+                sp.edit()
+                .putInt(AUDIO_DTS_APRESENT, para)
                 .commit();
             }
         }

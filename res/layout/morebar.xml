@@ -92,6 +92,7 @@
         android:layout_weight="1"
         android:src="@drawable/play_3d"
         android:background="@drawable/btn_button"
-        android:gravity="center">
+        android:gravity="center"
+        android:visibility="gone">
     </ImageButton>
 </LinearLayout>
