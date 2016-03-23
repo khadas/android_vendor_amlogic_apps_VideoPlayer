@@ -2,6 +2,7 @@ package com.droidlogic.videoplayer;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.media.Metadata;
 import android.util.Log;
 import java.io.File;
 
@@ -14,6 +15,11 @@ public class MediaInfo {
         private MediaPlayerExt mp = null;
         private MediaPlayerExt.MediaInfo mInfo = null;
 
+        private int mAudioTotal = 0;
+        private int mVideoTotal = 0;
+        private int mVideoWidth = 0;
+        private int mVideoHeight = 0;
+
         public MediaInfo (MediaPlayerExt mediaPlayer, Context context) {
             mp = mediaPlayer;
             mContext = context;
@@ -25,6 +31,28 @@ public class MediaInfo {
             }
             if (DEBUG) { printMediaInfo(); }
         }
+
+        public void setDefaultData(Metadata data, MediaPlayer.TrackInfo[] trackInfo) {
+            //prepare audio and video total number
+            for (int i = 0; i < trackInfo.length; i++) {
+                int trackType = trackInfo[i].getTrackType();
+                if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO) {
+                    mAudioTotal++;
+                }
+                else if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO) {
+                    mVideoTotal++;
+                }
+            }
+
+            //prepare video width and height
+            if (data.has(Metadata.VIDEO_WIDTH)) {
+                mVideoWidth = data.getInt(Metadata.VIDEO_WIDTH);
+            }
+            if (data.has(Metadata.VIDEO_HEIGHT)) {
+                mVideoHeight = data.getInt(Metadata.VIDEO_HEIGHT);
+            }
+        }
+
         //@@--------this part for video info-------------------------------------------------------
         public static final int VFORMAT_UNKNOWN = -1;
         public static final int VFORMAT_MPEG12 = 0;
@@ -155,22 +183,53 @@ public class MediaInfo {
             return str_size;
         }*/
 
-        public String getFileSize() {
-            return mInfo.file_size;
+        public static final long SIZE_GB = 1024 * 1024 * 1024;
+        public static final long SIZE_MB = 1024 * 1024;
+        public static final long SIZE_KB = 1024;
+        public String getFileSizeStr(long length) {
+            int sub_index = 0;
+            String sizeStr = "";
+            if (length >= SIZE_GB) {
+                sub_index = (String.valueOf((float)length / SIZE_GB)).indexOf(".");
+                sizeStr = ((float)length / SIZE_GB + "000").substring(0, sub_index + 3) + " GB";
+            }
+            else if (length >= SIZE_MB) {
+                sub_index = (String.valueOf((float)length / SIZE_MB)).indexOf(".");
+                sizeStr =((float)length / SIZE_MB + "000").substring(0, sub_index + 3) + " MB";
+            }
+            else if (length >= SIZE_KB) {
+                sub_index = (String.valueOf((float)length / SIZE_KB)).indexOf(".");
+                sizeStr = ((float)length/SIZE_KB + "000").substring(0, sub_index + 3) + " KB";
+            }
+            else if (length < SIZE_KB) {
+                sizeStr = String.valueOf(length) + " B";
+            }
+            return sizeStr;
+        }
+
+        public String getFileSize(String path) {
+            String sizeStr = "";
+            if (mInfo.file_size == null || mInfo.file_size.equals("null") || mInfo.file_size.equals("NULL")) {
+                File file = new File (path);
+                sizeStr = getFileSizeStr(file.length());
+            }
+            else {
+                sizeStr = mInfo.file_size;
+            }
+            return sizeStr;
         }
 
         public String getResolution() {
-            String str = null;
-            if (mInfo != null && getVideoTotalNum() > 0) {
-                str = mInfo.videoInfo[0].width + "*" + mInfo.videoInfo[0].height;
-            }
-            return str;
+            return getVideoWidth() + "*" + getVideoHeight();
         }
 
         public int getVideoTotalNum() {
-            int num = 0;
+            int num = -1;
             if (mInfo != null) {
                 num = mInfo.total_video_num;
+                if (num <= 0) {
+                    num = mVideoTotal;
+                }
             }
             return num;
         }
@@ -280,16 +339,22 @@ public class MediaInfo {
 
         public int getVideoWidth() {
             int width = -1;
-            if (mInfo != null && getVideoTotalNum() > 0) {
+            if (mInfo != null && mInfo.total_video_num > 0) {
                 width = mInfo.videoInfo[0].width;
+            }
+            if (width <= 0) {
+                width = mVideoWidth;
             }
             return width;
         }
 
         public int getVideoHeight() {
             int height = -1;
-            if (mInfo != null && getVideoTotalNum() > 0) {
+            if (mInfo != null && mInfo.total_video_num > 0) {
                 height = mInfo.videoInfo[0].height;
+            }
+            if (height <= 0) {
+                height = mVideoHeight;
             }
             return height;
         }
@@ -379,7 +444,7 @@ public class MediaInfo {
         public int getCurAudioIdx() {
             int ret = -1;
             int aIdx = -1;
-            if (mInfo != null && getAudioTotalNum() > 0) {
+            if (mInfo != null && mInfo.total_audio_num > 0) {
                 aIdx = mInfo.cur_audio_index;// current audio track index, should tranfer to list index
                 for (int i = 0; i < mInfo.total_audio_num; i++) {
                     if (mInfo.cur_audio_index == mInfo.audioInfo[i].index) {
@@ -394,13 +459,16 @@ public class MediaInfo {
             int ret = -1;
             if (mInfo != null) {
                 ret = mInfo.total_audio_num;
+                if (ret <= 0) {
+                    ret = mAudioTotal;
+                }
             }
             return ret;
         }
 
         public int getAudioIdx (int listIdx) {
             int ret = -1;
-            if (mInfo != null && getAudioTotalNum() > 0) {
+            if (mInfo != null && mInfo.total_audio_num > 0) {
                 ret = mInfo.audioInfo[listIdx].index;
             }
             return ret;
@@ -408,7 +476,7 @@ public class MediaInfo {
 
         public int getAudioSampleRate(int i) {
             int ret = -1;
-            if (mInfo != null && getAudioTotalNum() > 0) {
+            if (mInfo != null && mInfo.total_audio_num > 0) {
                 ret = mInfo.audioInfo[i].sample_rate;
             }
             return ret;
@@ -416,7 +484,7 @@ public class MediaInfo {
 
         public int getAudioFormat (int i) {
             int ret = -1;
-            if (mInfo != null && getAudioTotalNum() > 0) {
+            if (mInfo != null && mInfo.total_audio_num > 0) {
                 ret = mInfo.audioInfo[i].aformat;
             }
             return ret;
