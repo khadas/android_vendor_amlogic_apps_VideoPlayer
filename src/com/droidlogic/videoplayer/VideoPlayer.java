@@ -2846,13 +2846,16 @@ public class VideoPlayer extends Activity {
         new MediaPlayer.OnErrorListener() {
             public boolean onError (MediaPlayer mp, int what, int extra) {
                 Log.e (TAG, "Error: " + what + "," + extra);
+                if (what == 1 && extra == 0) {
+                    return true;
+                }
                 mErrorTime = java.lang.System.currentTimeMillis();
                 int offset = (int) (mErrorTime - mErrorTimeBac);
                 //Log.e(TAG, "[onError]mErrorTime:" + mErrorTime + ",mErrorTimeBac:" + mErrorTimeBac + ", offset:" + offset);
                 if (offset > 300) {
                     mState = STATE_ERROR;
                     mErrorTimeBac = mErrorTime;
-                    String infoStr = mErrorInfo.getErrorInfo (what, mPlayList.getcur());
+                    String infoStr = mErrorInfo.getErrorInfo (what, extra, mPlayList.getcur());
                     Toast toast = Toast.makeText (VideoPlayer.this, "Status Error:" + infoStr, Toast.LENGTH_SHORT);
                     toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
                     toast.setDuration (0x00000001);

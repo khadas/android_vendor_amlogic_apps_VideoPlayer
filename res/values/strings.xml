@@ -105,4 +105,5 @@
     <string name="wait_for_scan">Media scanning, please try again a few time later.</string>
     <string name="audio_dec_enable">Invalid License,audio can not decode to output.</string>
     <string name="dts_hps_unsupport">DTSHD_Headphone_Stream Unssport,Unless Insert Headphone.</string>
+    <string name="unsupport_video_size">Unsupport Bitate</string>
 </resources>

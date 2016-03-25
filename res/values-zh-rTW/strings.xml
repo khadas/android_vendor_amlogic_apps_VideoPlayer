@@ -104,4 +104,5 @@
     <string name="wait_for_scan">媒體文件蒐索中，請稍後再試。</string>
     <string name="audio_dec_enable">無效許可證，音頻無法解碼輸出.</string>
     <string name="dts_hps_unsupport">DTSHD_Headpnhone_stream 不支持，需插入耳機.</string>
+    <string name="unsupport_video_size">不支持該碼率視頻</string>
 </resources>
