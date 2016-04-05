@@ -339,6 +339,7 @@ public class VideoPlayer extends Activity {
                 mHandler.removeMessages (MSG_STOP);
                 mHandler.removeMessages (MSG_RETRY_PLAY);
                 mHandler.removeMessages (MSG_RETRY_END);
+                mHandler.removeMessages (MSG_SEEK_BY_BAR);
             }
             // shield for google tv 20140929, opened for bug 101311 20141224
             IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
@@ -375,12 +376,15 @@ public class VideoPlayer extends Activity {
 
         //@@--------this part for message handle---------------------------------------------------------------------
         private static final long MSG_SEND_DELAY = 0; //1000;//1s
+        private static final long MSG_SEEK_SEND_DELAY = 500; //500ms
         private static final int MSG_UPDATE_PROGRESS = 0xF1;//random value
         private static final int MSG_PLAY = 0xF2;
         private static final int MSG_STOP = 0xF3;
         private static final int MSG_RETRY_PLAY = 0xF4;
         private static final int MSG_RETRY_END = 0xF5;
         private static final int MSG_SUB_OPTION_UPDATE = 0xF6;
+        private static final int MSG_SEEK_BY_BAR = 0xF7;
+        private boolean ignoreUpdateProgressbar = false;
         private Handler mHandler = new Handler() {
             @Override
             public void handleMessage (Message msg) {
@@ -391,7 +395,7 @@ public class VideoPlayer extends Activity {
                         //LOGI(TAG,"[handleMessage]MSG_UPDATE_PROGRESS mState:"+mState+",mSeekState:"+mSeekState);
                         if ( (mState == STATE_PLAYING
                                 || mState == STATE_PAUSED
-                                || mState == STATE_SEARCHING)  && (mSeekState == SEEK_END) /*&& osdisshowing*/) {
+                                || mState == STATE_SEARCHING)  && (mSeekState == SEEK_END) /*&& osdisshowing*/ && !ignoreUpdateProgressbar) {
                             pos = getCurrentPosition();
                             updateProgressbar();
                             msg = obtainMessage (MSG_UPDATE_PROGRESS);
@@ -452,6 +456,9 @@ public class VideoPlayer extends Activity {
                         else {
                             initSubSetOptions(mcolor_text);
                         }
+                        break;
+                    case MSG_SEEK_BY_BAR:
+                        seekByProgressBar();
                         break;
                 }
             }
@@ -668,8 +675,11 @@ public class VideoPlayer extends Activity {
                         return;
                     }
                     if (fromUser == true) {
+                        ignoreUpdateProgressbar = true;
+                        startOsdTimeout();
+                        mHandler.removeMessages (MSG_SEEK_BY_BAR);
                         progressBarSeekFlag = true;
-                        seekByProgressBar();
+                        sendSeekByProgressBarMsg();
                     }
                 }
             });
@@ -2251,6 +2261,14 @@ public class VideoPlayer extends Activity {
             }
         }
 
+        private void sendSeekByProgressBarMsg() {
+            if (mHandler != null) {
+                Message msg = mHandler.obtainMessage (MSG_SEEK_BY_BAR);
+                mHandler.sendMessageDelayed (msg, MSG_SEEK_SEND_DELAY);
+                LOGI (TAG, "[sendSeekByProgressBarMsg]sendMessageDelayed MSG_SEEK_BY_BAR");
+            }
+        }
+
         private void seekByProgressBar() {
             int dest = progressBar.getProgress();
             int pos = totaltime * (dest + 1) / 100;
@@ -2805,6 +2823,7 @@ public class VideoPlayer extends Activity {
         new MediaPlayer.OnSeekCompleteListener() {
             public void onSeekComplete (MediaPlayer mp) {
                 LOGI (TAG, "[onSeekComplete] progressBarSeekFlag:" + progressBarSeekFlag + ",mStateBac:" + mStateBac);
+                ignoreUpdateProgressbar = false;
 
                 if (isTimedTextDisable()) {
                     if (mSubtitleManager != null) {
