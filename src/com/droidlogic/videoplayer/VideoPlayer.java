@@ -4420,10 +4420,10 @@ public class VideoPlayer extends Activity {
 
         private SimpleAdapter getMorebarListAdapter (int id, int pos) {
             return new SimpleAdapter (this, getMorebarListData (id, pos),
-                                      R.layout.list_row,
-                                      new String[] {"item_name", "item_sel"},
-                                      new int[] {R.id.Text01, R.id.imageview}
-                                     );
+                R.layout.list_row,
+                new String[] {"item_img", "item_name", "item_sel"},
+                new int[] {R.id.item_img, R.id.Text01, R.id.item_sel}
+            );
         }
 
         private List <? extends Map < String, ? >> getMorebarListData (int id, int pos) {
@@ -4493,6 +4493,14 @@ public class VideoPlayer extends Activity {
                             map = new HashMap<String, Object>();
                             map.put ("item_name", mMediaInfo.getAudioFormatStr (mMediaInfo.getAudioFormat (i)));
                             map.put ("item_sel", R.drawable.item_img_unsel);
+                            if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_AC3) {
+                                map.put ("item_name", null);
+                                map.put ("item_img", R.drawable.certifi_dobly);
+                            }
+                            else if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_EAC3) {
+                                map.put ("item_name", null);
+                                map.put ("item_img", R.drawable.certifi_dobly_plus);
+                            }
                             list.add (map);
                         }
                         LOGI (TAG, "list.size():" + list.size() + ",pos:" + pos + ",audio_total_num:" + audio_total_num);
