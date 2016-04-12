@@ -3686,7 +3686,12 @@ public class VideoPlayer extends Activity {
                         play3dBtn.requestFocus();
                     }
                     else {
-                        browserBack();
+                        if ((null != ctlbar) && (View.VISIBLE == ctlbar.getVisibility())) {
+                            showNoOsdView();
+                        }
+                        else {
+                            browserBack();
+                        }
                     }
                 }
             }
