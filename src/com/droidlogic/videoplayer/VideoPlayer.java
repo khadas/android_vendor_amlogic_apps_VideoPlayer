@@ -565,10 +565,11 @@ public class VideoPlayer extends Activity {
             mPlayList = PlayList.getinstance();
         }
 
-        private void initMediaInfo() {
+        private void initMediaInfo(Metadata data, MediaPlayer.TrackInfo[] trackInfo) {
             LOGI (TAG, "[initMediaInfo] mMediaPlayer:"+mMediaPlayer);
             mMediaInfo = new MediaInfo (mMediaPlayer, VideoPlayer.this);
             mMediaInfo.initMediaInfo();
+            mMediaInfo.setDefaultData(data, trackInfo);
             //prepare for audio track
             if (mMediaInfo != null) {
                 int audio_init_list_idx = mMediaInfo.getCurAudioIdx();
@@ -1526,15 +1527,19 @@ public class VideoPlayer extends Activity {
             filetype.setText (fileinf);
             TextView filesize = (TextView) findViewById (R.id.filesize);
             fileinf = VideoPlayer.this.getResources().getString (R.string.str_file_size)
-                      + "\t: " + mMediaInfo.getFileSize();
+                      + "\t: " + mMediaInfo.getFileSize (mPlayList.getcur());
             filesize.setText (fileinf);
             TextView resolution = (TextView) findViewById (R.id.resolution);
             fileinf = VideoPlayer.this.getResources().getString (R.string.str_file_resolution)
                       + "\t: " + mMediaInfo.getResolution();
             resolution.setText (fileinf);
             TextView duration = (TextView) findViewById (R.id.duration);
+            int time = mMediaInfo.getDuration();
+            if (time == 0) {
+                time = totaltime / 1000;
+            }
             fileinf = VideoPlayer.this.getResources().getString (R.string.str_file_duration)
-                      + "\t: " + secToTime (mMediaInfo.getDuration());
+                      + "\t: " + secToTime (time);
             duration.setText (fileinf);
             Button ok = (Button) findViewById (R.id.info_ok);
             ok.setText ("OK");
@@ -2703,8 +2708,9 @@ public class VideoPlayer extends Activity {
             public void onPrepared (MediaPlayer mp) {
                 LOGI (TAG, "[mPreparedListener]onPrepared mp:" + mp);
                 mState = STATE_PREPARED;
+                MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
                 Metadata data = mp.getMetadata (MediaPlayer.METADATA_ALL, MediaPlayer.BYPASS_METADATA_FILTER);
-                if (data != null) {
+                if (data != null && trackInfo != null) {
                     mCanPause = !data.has (Metadata.PAUSE_AVAILABLE)
                                 || data.getBoolean (Metadata.PAUSE_AVAILABLE);
                     mCanSeekBack = !data.has (Metadata.SEEK_BACKWARD_AVAILABLE)
@@ -2718,18 +2724,6 @@ public class VideoPlayer extends Activity {
                     mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
                 }
 
-                try {
-                    Field parcelField = Metadata.class.getDeclaredField("mParcel");
-                    parcelField.setAccessible(true);
-                    Parcel p = (Parcel)parcelField.get(data);
-                    p.recycle();
-                }
-                catch (NoSuchFieldException ex) {
-                    LOGE(TAG, "[mPreparedListener]NoSuchFieldException ex:" + ex);
-                }
-                catch (IllegalAccessException ex) {
-                    LOGE(TAG, "[mPreparedListener]IllegalAccessException ex:" + ex);
-                }
 
                 //TODO: some error should debug 20150525
                 if (!isTimedTextDisable()) {
@@ -2768,9 +2762,23 @@ public class VideoPlayer extends Activity {
                     start();
                 }
                 initSubtitle();
-                initMediaInfo();
+                initMediaInfo(data, trackInfo);
                 displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
                 showCertification(); // show certification
+
+                try {
+                    Field parcelField = Metadata.class.getDeclaredField("mParcel");
+                    parcelField.setAccessible(true);
+                    Parcel p = (Parcel)parcelField.get(data);
+                    p.recycle();
+                }
+                catch (NoSuchFieldException ex) {
+                    LOGE(TAG, "[mPreparedListener]NoSuchFieldException ex:" + ex);
+                }
+                catch (IllegalAccessException ex) {
+                    LOGE(TAG, "[mPreparedListener]IllegalAccessException ex:" + ex);
+                }
+
                 if (mResumePlay.getEnable() == true) {
                     mResumePlay.setEnable (false);
                     int targetState = mStateBac; //get mStateBac first for seekTo will change mStateBac
