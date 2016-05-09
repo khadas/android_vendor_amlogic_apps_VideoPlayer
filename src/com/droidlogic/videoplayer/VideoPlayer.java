@@ -22,7 +22,6 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
-import android.media.Metadata;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
@@ -43,12 +42,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.IWindowManager;
+//import android.view.IWindowManager;
 import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.WindowManagerPolicy;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
@@ -81,6 +79,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.Process;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,7 +90,7 @@ import java.util.TimerTask;
 
 import java.util.Random;
 import android.media.TimedText;
-import android.media.SubtitleData;
+//import android.media.SubtitleData;
 import java.util.Locale;
 
 public class VideoPlayer extends Activity {
@@ -225,7 +224,7 @@ public class VideoPlayer extends Activity {
             LOGI (TAG, "[onResume]mResumePlay.getEnable():" + mResumePlay.getEnable() + ",isHdmiPlugged:" + isHdmiPlugged);
             //close transition animation
             // shield for google tv 20140929 , opened for bug 101311 20141224
-            mTransitionAnimationScale = Settings.System.getFloat(mContext.getContentResolver(),
+            /*mTransitionAnimationScale = Settings.System.getFloat(mContext.getContentResolver(),
                 Settings.System.TRANSITION_ANIMATION_SCALE, mTransitionAnimationScale);
             IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
             try {
@@ -233,7 +232,7 @@ public class VideoPlayer extends Activity {
             }
             catch (RemoteException e) {
                 LOGE(TAG, "[onResume]RemoteException e:" + e);
-            }
+            }*/
 
             browserBackDoing = false;
             browserBackInvokeFromOnPause = false;
@@ -342,13 +341,13 @@ public class VideoPlayer extends Activity {
                 mHandler.removeMessages (MSG_SEEK_BY_BAR);
             }
             // shield for google tv 20140929, opened for bug 101311 20141224
-            IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
+            /*IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
             try {
                 iWindowManager.setAnimationScale(1, mTransitionAnimationScale);
             }
             catch (RemoteException e) {
                 LOGE(TAG, "[onPause]RemoteException e:" + e);
-            }
+            }*/
 
             if (mResumePlay != null) {
                 if (mContext != null) {
@@ -565,11 +564,11 @@ public class VideoPlayer extends Activity {
             mPlayList = PlayList.getinstance();
         }
 
-        private void initMediaInfo(Metadata data, MediaPlayer.TrackInfo[] trackInfo) {
+        private void initMediaInfo(MediaPlayer.TrackInfo[] trackInfo) {
             LOGI (TAG, "[initMediaInfo] mMediaPlayer:"+mMediaPlayer);
             mMediaInfo = new MediaInfo (mMediaPlayer, VideoPlayer.this);
             mMediaInfo.initMediaInfo();
-            mMediaInfo.setDefaultData(data, trackInfo);
+            mMediaInfo.setDefaultData(trackInfo);
             //prepare for audio track
             if (mMediaInfo != null) {
                 int audio_init_list_idx = mMediaInfo.getCurAudioIdx();
@@ -775,7 +774,7 @@ public class VideoPlayer extends Activity {
             brigtnessBtn.setOnClickListener (new View.OnClickListener() {
                 public void onClick (View v) {
                     LOGI (TAG, "brigtnessBtn onClick");
-                    brightnessSelect();
+                    //brightnessSelect();
                 }
             });
             fileinfoBtn.setOnClickListener (new View.OnClickListener() {
@@ -1061,13 +1060,15 @@ public class VideoPlayer extends Activity {
         }
         //@@--------this part for broadcast receiver-------------------------------------------------------------------------------------
         private final String POWER_KEY_SUSPEND_ACTION = "com.amlogic.vplayer.powerkey";
+        private final static String ACTION_HDMI_PLUGGED = "android.intent.action.HDMI_PLUGGED";
+        private final static String EXTRA_HDMI_PLUGGED_STATE = "state";
         private boolean isEjectOrUnmoutProcessed = false;
         private boolean isHdmiPluggedbac = false;
         private boolean isHdmiPlugged = false;
 
         private BroadcastReceiver mHdmiReceiver = new BroadcastReceiver() {
             public void onReceive (Context context, Intent intent) {
-                isHdmiPlugged = intent.getBooleanExtra (WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false);
+                isHdmiPlugged = intent.getBooleanExtra (EXTRA_HDMI_PLUGGED_STATE, false);
                 if ( (isHdmiPluggedbac != isHdmiPlugged) && (isHdmiPlugged == false)) {
                     if (mState == STATE_PLAYING) {
                         if (!getPlayIgnoreHdmiEnable()) {
@@ -1129,10 +1130,10 @@ public class VideoPlayer extends Activity {
         };
 
         private void registerHdmiReceiver() {
-            IntentFilter intentFilter = new IntentFilter (WindowManagerPolicy.ACTION_HDMI_PLUGGED);
+            IntentFilter intentFilter = new IntentFilter (ACTION_HDMI_PLUGGED);
             Intent intent = registerReceiver (mHdmiReceiver, intentFilter);
             if (intent != null) {
-                mHdmiPlugged = intent.getBooleanExtra (WindowManagerPolicy.EXTRA_HDMI_PLUGGED_STATE, false);
+                mHdmiPlugged = intent.getBooleanExtra (EXTRA_HDMI_PLUGGED_STATE, false);
             }
             LOGI (TAG, "[registerHdmiReceiver]mHdmiReceiver:" + mHdmiReceiver);
         }
@@ -1439,7 +1440,7 @@ public class VideoPlayer extends Activity {
             showOtherWidget (R.string.setting_displaymode);
         }
 
-        private void brightnessSelect() {
+        /*private void brightnessSelect() {
             LOGI (TAG, "[brightnessSelect]");
             ListView listView = (ListView) findViewById (R.id.ListView);
             int mBrightness = 0;
@@ -1450,7 +1451,7 @@ public class VideoPlayer extends Activity {
                 e.printStackTrace();
             }
             int item;
-            if (mBrightness <= (/*android.os.PowerManager.BRIGHTNESS_OFF*/20 + 10)) {
+            if (mBrightness <= (20 + 10)) {
                 item = 0;
             }
             else if (mBrightness <= (android.os.PowerManager.BRIGHTNESS_ON * 0.2f)) {
@@ -1474,7 +1475,7 @@ public class VideoPlayer extends Activity {
                     int brightness;
                     switch (position) {
                         case 0:
-                            brightness = /*android.os.PowerManager.BRIGHTNESS_OFF*/20 + 10;
+                            brightness = 20 + 10;
                             break;
                         case 1:
                             brightness = (int) (android.os.PowerManager.BRIGHTNESS_ON * 0.2f);
@@ -1492,7 +1493,7 @@ public class VideoPlayer extends Activity {
                             brightness = android.os.PowerManager.BRIGHTNESS_ON;
                             break;
                         default:
-                            brightness = /*android.os.PowerManager.BRIGHTNESS_OFF*/20 + 30;
+                            brightness = 20 + 30;
                             break;
                     }
                     try {
@@ -1509,7 +1510,7 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget (R.string.setting_brightness);
-        }
+        }*/
 
 
         private void fileinfoShow() {
@@ -2315,12 +2316,24 @@ public class VideoPlayer extends Activity {
 
         private OnAudioFocusChangeListener mAudioFocusListener = new OnAudioFocusChangeListener() {
             public void onAudioFocusChange (int focusChange) {
+                Class<?> mediaPlayerClazz = null;
+                Method setVolume = null;
+                try {
+                    mediaPlayerClazz = Class.forName("android.media.MediaPlayer");
+                    setVolume = mediaPlayerClazz.getMethod("setVolume", Float.TYPE);
+                }catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 Log.d (TAG, "onAudioFocusChange, focusChange: " + focusChange);
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_LOSS:
                         if (mMediaPlayer != null) {
                             Log.d (TAG, "onAudioFocusChange, setVolume 0");
-                            mMediaPlayer.setVolume (0.0f);
+                            try {
+                                setVolume.invoke(mMediaPlayer, 0.0f);
+                            }catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -2330,7 +2343,11 @@ public class VideoPlayer extends Activity {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         if (mMediaPlayer != null) {
                             Log.d (TAG, "onAudioFocusChange, setVolume 1");
-                            mMediaPlayer.setVolume (1.0f);
+                            try {
+                                setVolume.invoke(mMediaPlayer, 1.0f);
+                            }catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         break;
                 }
@@ -2674,7 +2691,7 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.setOnInfoListener (mInfoListener);
             mMediaPlayer.setDisplay (mSurfaceHolder);
             mMediaPlayer.setOnTimedTextListener(mTimedTextListener);
-            mMediaPlayer.setOnSubtitleDataListener(mSubtitleDataListener);
+            //@@mMediaPlayer.setOnSubtitleDataListener(mSubtitleDataListener);
         }
 
         //@@--------this part for listener----------------------------------------------------------------------------------------------
@@ -2709,7 +2726,7 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[mPreparedListener]onPrepared mp:" + mp);
                 mState = STATE_PREPARED;
                 MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
-                Metadata data = mp.getMetadata (MediaPlayer.METADATA_ALL, MediaPlayer.BYPASS_METADATA_FILTER);
+                /*Metadata data = mp.getMetadata (MediaPlayer.METADATA_ALL, MediaPlayer.BYPASS_METADATA_FILTER);
                 if (data != null && trackInfo != null) {
                     mCanPause = !data.has (Metadata.PAUSE_AVAILABLE)
                                 || data.getBoolean (Metadata.PAUSE_AVAILABLE);
@@ -2722,8 +2739,61 @@ public class VideoPlayer extends Activity {
                 }
                 else {
                     mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
-                }
+                }*/
+                Class<?> metadataClazz = null;
+                Class<?> mediaPlayerClazz = null;
+                Object metadataInstance = null;
+                Method getMetadata = null;
+                Method has = null;
+                Method getBoolean = null;
+                Field parcelField = null;
+                Field keyField = null;
+                int key = -1;
+                boolean hasKey = false;
+                boolean isKey = false;
+                try {
+                    metadataClazz = Class.forName("android.media.Metadata");
+                    mediaPlayerClazz = Class.forName("android.media.MediaPlayer");
+                    getMetadata = mediaPlayerClazz.getMethod("getMetadata", Boolean.TYPE, Boolean.TYPE);
+                    has = metadataClazz.getMethod("has", Integer.TYPE);
+                    getBoolean = metadataClazz.getMethod("getBoolean", Integer.TYPE);
+                    metadataInstance = getMetadata.invoke(mp, false, false);
+                    if (metadataInstance != null && trackInfo != null) {
+                        keyField = metadataClazz.getDeclaredField("PAUSE_AVAILABLE");
+                        keyField.setAccessible(true);
+                        key = (int)keyField.get(metadataInstance);
+                        hasKey = !(boolean)has.invoke(metadataInstance, key);
+                        isKey = (boolean)getBoolean.invoke(metadataInstance, key);
+                        mCanPause = hasKey || isKey;
 
+                        keyField = metadataClazz.getDeclaredField("SEEK_BACKWARD_AVAILABLE");
+                        keyField.setAccessible(true);
+                        key = (int)keyField.get(metadataInstance);
+                        hasKey = !(boolean)has.invoke(metadataInstance, key);
+                        isKey = (boolean)getBoolean.invoke(metadataInstance, key);
+                        mCanSeekBack = hasKey || isKey;
+
+                        keyField = metadataClazz.getDeclaredField("SEEK_FORWARD_AVAILABLE");
+                        keyField.setAccessible(true);
+                        key = (int)keyField.get(metadataInstance);
+                        hasKey = !(boolean)has.invoke(metadataInstance, key);
+                        isKey = (boolean)getBoolean.invoke(metadataInstance, key);
+                        mCanSeekForward = hasKey || isKey;
+
+                        mCanSeek = mCanSeekBack && mCanSeekForward;
+                        LOGI (TAG, "[mPreparedListener]mCanSeek:" + mCanSeek);
+                    }
+                    else {
+                        mCanPause = mCanSeek = mCanSeekBack = mCanSeekForward = true;
+                    }
+
+                    parcelField = metadataClazz.getDeclaredField("mParcel");
+                    parcelField.setAccessible(true);
+                    Parcel p = (Parcel)parcelField.get(metadataInstance);
+                    p.recycle();
+                }catch (Exception ex) {
+                    ex.printStackTrace();
+                }
 
                 //TODO: some error should debug 20150525
                 if (!isTimedTextDisable()) {
@@ -2762,22 +2832,9 @@ public class VideoPlayer extends Activity {
                     start();
                 }
                 initSubtitle();
-                initMediaInfo(data, trackInfo);
+                initMediaInfo(trackInfo);
                 displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
                 showCertification(); // show certification
-
-                try {
-                    Field parcelField = Metadata.class.getDeclaredField("mParcel");
-                    parcelField.setAccessible(true);
-                    Parcel p = (Parcel)parcelField.get(data);
-                    p.recycle();
-                }
-                catch (NoSuchFieldException ex) {
-                    LOGE(TAG, "[mPreparedListener]NoSuchFieldException ex:" + ex);
-                }
-                catch (IllegalAccessException ex) {
-                    LOGE(TAG, "[mPreparedListener]IllegalAccessException ex:" + ex);
-                }
 
                 if (mResumePlay.getEnable() == true) {
                     mResumePlay.setEnable (false);
@@ -2974,7 +3031,7 @@ public class VideoPlayer extends Activity {
             }
         };
 
-        private MediaPlayer.OnSubtitleDataListener mSubtitleDataListener =
+        /*//@@private MediaPlayer.OnSubtitleDataListener mSubtitleDataListener =
             new MediaPlayer.OnSubtitleDataListener() {
             public void onSubtitleData(MediaPlayer mp, SubtitleData data) {
                 LOGI(TAG, "[onSubtitleData]data:"+data);
@@ -2997,7 +3054,7 @@ public class VideoPlayer extends Activity {
                     }
                 }
             }
-        };
+        };*/
 
         //@@--------this part for book mark play-------------------------------------------------------------------
         private AlertDialog confirm_dialog = null;

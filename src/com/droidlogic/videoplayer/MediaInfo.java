@@ -2,9 +2,10 @@ package com.droidlogic.videoplayer;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.media.Metadata;
 import android.util.Log;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import com.droidlogic.app.MediaPlayerExt;
 
@@ -32,7 +33,7 @@ public class MediaInfo {
             if (DEBUG) { printMediaInfo(); }
         }
 
-        public void setDefaultData(Metadata data, MediaPlayer.TrackInfo[] trackInfo) {
+        public void setDefaultData(MediaPlayer.TrackInfo[] trackInfo) {
             //prepare audio and video total number
             for (int i = 0; i < trackInfo.length; i++) {
                 int trackType = trackInfo[i].getTrackType();
@@ -45,11 +46,37 @@ public class MediaInfo {
             }
 
             //prepare video width and height
-            if (data.has(Metadata.VIDEO_WIDTH)) {
-                mVideoWidth = data.getInt(Metadata.VIDEO_WIDTH);
-            }
-            if (data.has(Metadata.VIDEO_HEIGHT)) {
-                mVideoHeight = data.getInt(Metadata.VIDEO_HEIGHT);
+            Class<?> metadataClazz = null;
+            Class<?> mediaPlayerClazz = null;
+            Object metadataInstance = null;
+            Method has = null;
+            Method getInt = null;
+            Method getMetadata = null;
+            Field keyField = null;
+            int key = -1;
+            try {
+                mediaPlayerClazz = Class.forName("android.media.MediaPlayer");
+                metadataClazz = Class.forName("android.media.Metadata");
+                has = metadataClazz.getMethod("has", Integer.TYPE);
+                getInt = metadataClazz.getMethod("getInt", Integer.TYPE);
+                getMetadata = mediaPlayerClazz.getMethod("getMetadata", Boolean.TYPE, Boolean.TYPE);
+                metadataInstance = getMetadata.invoke(mp, false, false);
+
+                keyField = metadataClazz.getDeclaredField("VIDEO_WIDTH");
+                keyField.setAccessible(true);
+                key = (int)keyField.get(metadataInstance);
+                if ((boolean)has.invoke(metadataInstance, key)) {
+                    mVideoWidth = (int)getInt.invoke(metadataInstance, key);
+                }
+
+                keyField = metadataClazz.getDeclaredField("VIDEO_HEIGHT");
+                keyField.setAccessible(true);
+                key = (int)keyField.get(metadataInstance);
+                if ((boolean)has.invoke(metadataInstance, key)) {
+                    mVideoHeight = (int)getInt.invoke(metadataInstance, key);
+                }
+            }catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
 

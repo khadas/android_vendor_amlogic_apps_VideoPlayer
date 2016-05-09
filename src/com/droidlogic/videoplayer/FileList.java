@@ -30,9 +30,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.os.SystemProperties;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.lang.System;
 import android.database.Cursor;
 import android.provider.MediaStore;
@@ -41,6 +41,7 @@ import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.os.Handler;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.os.Message;
@@ -89,33 +90,6 @@ public class FileList extends ListActivity {
         private Uri uri;
         private SystemControlManager mSystemControl;
         private StorageManager mStorageManager;
-
-        private final StorageEventListener mListener = new StorageEventListener() {
-            public void onUsbMassStorageConnectionChanged (boolean connected) {
-                //this is the action when connect to pc
-                return ;
-            }
-            public void onStorageStateChanged (String path, String oldState, String newState) {
-                Log.d (TAG, "onStorageStateChanged: " + path + " oldState=" + oldState + " newState=" + newState + ", PlayList.getinstance().rootPath:" + PlayList.getinstance().rootPath);
-                if (newState == null || path == null) {
-                    return;
-                }
-                if (newState.compareTo ("mounted") == 0) {
-                    if (PlayList.getinstance().rootPath == null
-                    || PlayList.getinstance().rootPath.equals (root_path)) {
-                        BrowserFile (root_path);
-                    }
-                }
-                else if (newState.compareTo ("unmounted") == 0
-                || newState.compareTo ("removed") == 0) {
-                    if (PlayList.getinstance().rootPath.startsWith (path)
-                            || PlayList.getinstance().rootPath.equals (root_path)
-                    || (PlayList.getinstance().rootPath.startsWith (SD_PATH) && path.equals ("/storage/sdcard1"))) {
-                        BrowserFile (root_path);
-                    }
-                }
-            }
-        };
 
         private void waitForBrowserIsoFile() {
             final Handler handler = new Handler() {
@@ -190,14 +164,37 @@ public class FileList extends ListActivity {
             timerScan.schedule (task, 20000);
         }
 
-        private BroadcastReceiver mScanListener = new BroadcastReceiver() {
+        private BroadcastReceiver mListener = new BroadcastReceiver() {
             @Override
             public void onReceive (Context context, Intent intent) {
                 String action = intent.getAction();
-                if (Intent.ACTION_MEDIA_UNMOUNTED.equals (action)) {
-                    prepareFileForList();
+                Uri uri = intent.getData();
+                String path = uri.getPath();
+
+                if (action == null || path == null) {
+                    return;
                 }
-                else if (Intent.ACTION_MEDIA_SCANNER_STARTED.equals (action)) {
+
+                if (action.equals(Intent.ACTION_MEDIA_EJECT)
+                    || action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+                    if (listAllFiles) {
+                        prepareFileForList();
+                    }
+                    else {
+                        if (PlayList.getinstance().rootPath.startsWith (path)
+                            || PlayList.getinstance().rootPath.equals (root_path)
+                            || (PlayList.getinstance().rootPath.startsWith (SD_PATH) && path.equals ("/storage/sdcard1"))) {
+                            BrowserFile(root_path);
+                        }
+                    }
+                }
+                else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
+                    if (PlayList.getinstance().rootPath == null
+                        || PlayList.getinstance().rootPath.equals(root_path)) {
+                        BrowserFile (root_path);
+                    }
+                }
+                else if (action.equals(Intent.ACTION_MEDIA_SCANNER_STARTED)) {
                     if (!isScanning) {
                         isScanning = true;
                         setListAdapter (null);
@@ -206,22 +203,24 @@ public class FileList extends ListActivity {
                         waitForScanFinish();
                     }
                 }
-                else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals (action)) {
-                    if ( (isScanning) && (scanCnt == 1)) {
+                else if (action.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)) {
+                    if (isScanning && (scanCnt == 1)) {
                         scanCnt--;
                         waitForRescan();
                     }
                 }
-                /*else if(Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
-                }
-                else if(Intent.ACTION_MEDIA_EJECT.equals(action)) {
-                }*/
             }
         };
 
         @Override
         public void onResume() {
             super.onResume();
+            IntentFilter f = new IntentFilter();
+            f.addAction (Intent.ACTION_MEDIA_EJECT);
+            f.addAction (Intent.ACTION_MEDIA_MOUNTED);
+            f.addAction (Intent.ACTION_MEDIA_UNMOUNTED);
+            f.addDataScheme ("file");
+
             if (!listAllFiles) {
                 File file = null;
                 if (PlayList.getinstance().rootPath != null) {
@@ -240,19 +239,13 @@ public class FileList extends ListActivity {
                     BrowserFile (PlayList.getinstance().rootPath);
                 }
                 getListView().setSelectionFromTop (item_position_selected, fromtop_piexl);
-                StorageManager m_storagemgr = (StorageManager) getSystemService (Context.STORAGE_SERVICE);
-                m_storagemgr.registerListener (mListener);
             }
             else {
-                IntentFilter f = new IntentFilter();
-                f.addAction (Intent.ACTION_MEDIA_EJECT);
-                f.addAction (Intent.ACTION_MEDIA_MOUNTED);
-                f.addAction (Intent.ACTION_MEDIA_UNMOUNTED);
                 f.addAction (Intent.ACTION_MEDIA_SCANNER_STARTED);
                 f.addAction (Intent.ACTION_MEDIA_SCANNER_FINISHED);
-                f.addDataScheme ("file");
-                registerReceiver (mScanListener, f);
             }
+
+            registerReceiver(mListener, f);
         }
 
         public void onDestroy() {
@@ -262,18 +255,14 @@ public class FileList extends ListActivity {
         @Override
         public void onPause() {
             super.onPause();
-            if (!listAllFiles) {
-                StorageManager m_storagemgr = (StorageManager) getSystemService (Context.STORAGE_SERVICE);
-                m_storagemgr.unregisterListener (mListener);
-            }
-            else {
+            if (listAllFiles) {
                 isScanning = false;
                 isQuerying = false;
                 scanCnt = 0;
                 timer.cancel();
                 timerScan.cancel();
-                unregisterReceiver (mScanListener);
             }
+            unregisterReceiver(mListener);
         }
 
         @Override
@@ -533,17 +522,36 @@ public class FileList extends ListActivity {
                     }
 
                     //external storage
-                    final List<VolumeInfo> volumes = mStorageManager.getVolumes();
-                    Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
-                    for (VolumeInfo vol : volumes) {
-                        if (vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
-                            File path = vol.getPath();
-                            //Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
-                            if (tmppath.equals(path.getName())) {
-                                items.add (mStorageManager.getBestVolumeDescription(vol));
-                                paths.add (path.getPath());
+                    Class<?> volumeInfoClazz = null;
+                    Method getDescriptionComparator = null;
+                    Method getBestVolumeDescription = null;
+                    Method getVolumes = null;
+                    Method isMountedReadable = null;
+                    Method getType = null;
+                    Method getPath = null;
+                    List<?> volumes = null;
+                    try {
+                        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo");
+                        getDescriptionComparator = volumeInfoClazz.getMethod("getDescriptionComparator");
+                        getBestVolumeDescription = StorageManager.class.getMethod("getBestVolumeDescription", volumeInfoClazz);
+                        getVolumes = StorageManager.class.getMethod("getVolumes");
+                        isMountedReadable = volumeInfoClazz.getMethod("isMountedReadable");
+                        getType = volumeInfoClazz.getMethod("getType");
+                        getPath = volumeInfoClazz.getMethod("getPath");
+                        volumes = (List<?>)getVolumes.invoke(mStorageManager);
+
+                        for (Object vol : volumes) {
+                            if (vol != null && (boolean)isMountedReadable.invoke(vol) && (int)getType.invoke(vol) == 0) {
+                                File path = (File)getPath.invoke(vol);
+                                //Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
+                                if (tmppath.equals(path.getName())) {
+                                    items.add((String)getBestVolumeDescription.invoke(mStorageManager, vol));
+                                    paths.add(path.getPath());
+                                }
                             }
                         }
+                    }catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
                 else {
@@ -623,13 +631,32 @@ public class FileList extends ListActivity {
                 }
 
                 //external storage
-                final List<VolumeInfo> volumes = mStorageManager.getVolumes();
-                Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
-                for (VolumeInfo vol : volumes) {
-                    if (vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
-                        File path = vol.getPath();
-                        listFiles.add (path);
+                Class<?> volumeInfoClazz = null;
+                Method getDescriptionComparator = null;
+                Method getBestVolumeDescription = null;
+                Method getVolumes = null;
+                Method isMountedReadable = null;
+                Method getType = null;
+                Method getPath = null;
+                List<?> volumes = null;
+                try {
+                    volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo");
+                    getDescriptionComparator = volumeInfoClazz.getMethod("getDescriptionComparator");
+                    getBestVolumeDescription = StorageManager.class.getMethod("getBestVolumeDescription", volumeInfoClazz);
+                    getVolumes = StorageManager.class.getMethod("getVolumes");
+                    isMountedReadable = volumeInfoClazz.getMethod("isMountedReadable");
+                    getType = volumeInfoClazz.getMethod("getType");
+                    getPath = volumeInfoClazz.getMethod("getPath");
+                    volumes = (List<?>)getVolumes.invoke(mStorageManager);
+
+                    for (Object vol : volumes) {
+                        if (vol != null && (boolean)isMountedReadable.invoke(vol) && (int)getType.invoke(vol) == 0) {
+                            File path = (File)getPath.invoke(vol);
+                            listFiles.add(path);
+                        }
                     }
+                }catch (Exception ex) {
+                    ex.printStackTrace();
                 }
 
                 //shield for android 6.0 support

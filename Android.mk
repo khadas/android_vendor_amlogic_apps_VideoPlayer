@@ -21,7 +21,7 @@ LOCAL_PACKAGE_NAME := VideoPlayer
 LOCAL_CERTIFICATE := platform
 
 LOCAL_JAVA_LIBRARIES := droidlogic
-#LOCAL_SDK_VERSION := current
+LOCAL_SDK_VERSION := current
 
 #LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
 
