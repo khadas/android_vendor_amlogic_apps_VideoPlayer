@@ -988,7 +988,7 @@ public class VideoPlayer extends Activity {
         SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
             public void surfaceChanged (SurfaceHolder holder, int format, int w, int h) {
                 LOGI (TAG, "[surfaceChanged]format:" + format + ",w:" + w + ",h:" + h);
-                if (mSurfaceView != null) {
+                if (mSurfaceView != null && mMediaPlayer != null && mMediaPlayer.isPlaying()) {
                     displayModeImpl();
                 }
             }
@@ -1069,6 +1069,9 @@ public class VideoPlayer extends Activity {
         private BroadcastReceiver mHdmiReceiver = new BroadcastReceiver() {
             public void onReceive (Context context, Intent intent) {
                 isHdmiPlugged = intent.getBooleanExtra (EXTRA_HDMI_PLUGGED_STATE, false);
+                if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                    displayModeImpl();
+                }
                 if ( (isHdmiPluggedbac != isHdmiPlugged) && (isHdmiPlugged == false)) {
                     if (mState == STATE_PLAYING) {
                         if (!getPlayIgnoreHdmiEnable()) {
@@ -1182,6 +1185,7 @@ public class VideoPlayer extends Activity {
         private final int apresentationMax = 32;
         private int[] assetsArrayNum = new int[apresentationMax];
         private int mApresentIdx = -1;
+        private static final String DISPLAY_MODE_SYSFS = "/sys/class/display/mode";
         private void resumeSelect() {
             LOGI (TAG, "[resumeSelect]");
             ListView listView = (ListView) findViewById (R.id.ListView);
@@ -1430,6 +1434,9 @@ public class VideoPlayer extends Activity {
                         case 3://mOption.DISP_MODE_RATIO16_9:
                             mOption.setDisplayMode (mOption.DISP_MODE_RATIO16_9);
                             break;
+                        case 4://mOption.DISP_MODE_ORIGINAL
+                            mOption.setDisplayMode (mOption.DISP_MODE_ORIGINAL);
+                            break;
                         default:
                             break;
                     }
@@ -1561,13 +1568,20 @@ public class VideoPlayer extends Activity {
             int frameHeight = -1;
             int width = -1;
             int height = -1;
+            boolean skipImgSubRatio = false;
 
+            String mode = mSystemControl.readSysFs(DISPLAY_MODE_SYSFS).replaceAll("\n","");
+            int[] curPosition = mSystemControl.getPosition(mode);
+            dispWidth = curPosition[2];
+            dispHeight = curPosition[3];
             DisplayMetrics dm = new DisplayMetrics();
             this.getWindowManager().getDefaultDisplay().getRealMetrics (dm);
             frameWidth = dm.widthPixels;
             frameHeight = dm.heightPixels;
-            dispWidth = frameWidth;
-            dispHeight = frameHeight;
+            if (dispWidth == 0 || dispHeight == 0) {
+                dispWidth = frameWidth;
+                dispHeight = frameHeight;
+            }
 
             LOGI (TAG, "[displayModeImpl]dispWidth:" + dispWidth + ",dispHeight:" + dispHeight);
 
@@ -1583,7 +1597,7 @@ public class VideoPlayer extends Activity {
                 videoWidth = mMediaPlayer.getVideoWidth();
                 videoHeight = mMediaPlayer.getVideoHeight();
                 LOGI (TAG, "[displayModeImpl]videoWidth:" + videoWidth + ",videoHeight:" + videoHeight);
-                if (mOption.getDisplayMode() == 0) { // normal
+                if (mOption.getDisplayMode() == mOption.DISP_MODE_NORMAL) { // normal
                     if (videoWidth * dispHeight < dispWidth * videoHeight) {
                         //image too wide
                         width = dispHeight * videoWidth / videoHeight;
@@ -1599,11 +1613,11 @@ public class VideoPlayer extends Activity {
                         height = dispHeight;
                     }
                 }
-                else if (mOption.getDisplayMode() == 1) { // full screen
+                else if (mOption.getDisplayMode() == mOption.DISP_MODE_FULLSTRETCH) { // full screen
                     width = dispWidth;
                     height = dispHeight;
                 }
-                else if (mOption.getDisplayMode() == 2) { // 4:3
+                else if (mOption.getDisplayMode() == mOption.DISP_MODE_RATIO4_3) { // 4:3
                     videoWidth = 4 * videoHeight / 3;
                     if (videoWidth * dispHeight < dispWidth * videoHeight) {
                         //image too wide
@@ -1620,7 +1634,7 @@ public class VideoPlayer extends Activity {
                         height = dispHeight;
                     }
                 }
-                else if (mOption.getDisplayMode() == 3) { // 16:9
+                else if (mOption.getDisplayMode() == mOption.DISP_MODE_RATIO16_9) { // 16:9
                     videoWidth = 16 * videoHeight / 9;
                     if (videoWidth * dispHeight < dispWidth * videoHeight) {
                         //image too wide
@@ -1637,9 +1651,23 @@ public class VideoPlayer extends Activity {
                         height = dispHeight;
                     }
                 }
+                else if (mOption.getDisplayMode() == mOption.DISP_MODE_ORIGINAL) { // original
+                    videoWidth = mMediaInfo.getVideoWidth();
+                    videoHeight = mMediaInfo.getVideoHeight();
+                    float fbratio_div_outputratio = ((float)frameWidth / frameHeight) / ((float)dispWidth / dispHeight);
+                    if (videoWidth * fbratio_div_outputratio * frameHeight > videoHeight * frameWidth) {
+                        width = frameWidth;
+                        height = (int)((float)(frameWidth * videoHeight) / ((float)videoWidth * fbratio_div_outputratio));
+                    }
+                    else {
+                        width = (int)((float)(videoWidth * fbratio_div_outputratio * frameHeight) / (float)videoHeight);
+                        height = frameHeight;
+                    }
+                    skipImgSubRatio = true;
+                }
 
                 LOGI (TAG, "[displayModeImpl]width:" + width + ",height:" + height);
-                if (getImgSubRatioEnable() && dispWidth != 0 && dispHeight != 0) {
+                if (getImgSubRatioEnable() && dispWidth != 0 && dispHeight != 0 && !skipImgSubRatio) {
                     width = width * frameWidth / dispWidth;
                     height = height * frameHeight / dispHeight;
                     float ratioW = 1.000f;
@@ -2706,13 +2734,15 @@ public class VideoPlayer extends Activity {
         new MediaPlayer.OnVideoSizeChangedListener() {
             public void onVideoSizeChanged (MediaPlayer mp, int width, int height) {
                 LOGI (TAG, "[onVideoSizeChanged]");
-                displayModeImpl();
+                if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                    displayModeImpl();
+                }
                 if (mMediaPlayer != null && mSurfaceView != null) {
                     int videoWidth = mMediaPlayer.getVideoWidth();
                     int videoHeight = mMediaPlayer.getVideoHeight();
                     LOGI (TAG, "[onVideoSizeChanged]videoWidth:" + videoWidth + ",videoHeight:" + videoHeight);
                     if (videoWidth != 0 && videoHeight != 0) {
-                        displayModeImpl();
+                        ////displayModeImpl();
                         mSurfaceView.requestLayout();
                         /*mSurfaceView.getHolder().setFixedSize(videoWidth, videoHeight);
                         mSurfaceView.requestLayout();*/
@@ -4650,6 +4680,10 @@ public class VideoPlayer extends Activity {
                     map.put ("item_name", "16:9");
                     map.put ("item_sel", R.drawable.item_img_unsel);
                     list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getString (R.string.setting_displaymode_original));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
                     // TODO: 3D
                     /*
                     if (mSystemControl.getPropertyBoolean("3D_setting.enable", false)) {
@@ -4715,6 +4749,7 @@ class Option {
         public static final int DISP_MODE_FULLSTRETCH = 1;
         public static final int DISP_MODE_RATIO4_3 = 2;
         public static final int DISP_MODE_RATIO16_9 = 3;
+        public static final int DISP_MODE_ORIGINAL = 4;
         private String RESUME_MODE = "ResumeMode";
         private String REPEAT_MODE = "RepeatMode";
         private String AUDIO_TRACK = "AudioTrack";

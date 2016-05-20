@@ -30,6 +30,7 @@
     <string name="setting_displaymode_normal">Normal</string>
     <string name="setting_displaymode_normal_noscaleup">No Scale Up</string>
     <string name="setting_displaymode_fullscreen">Full Screen</string>
+    <string name="setting_displaymode_original">Original</string>
     <string name="setting_brightness">Brightness</string>
     <string name="setting_3d_mode">Play 3D Mode</string>
     <string name="setting_3d_diable">OFF</string>
