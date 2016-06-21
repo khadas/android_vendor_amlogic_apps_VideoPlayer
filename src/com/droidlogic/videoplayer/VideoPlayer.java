@@ -339,6 +339,7 @@ public class VideoPlayer extends Activity {
                 mHandler.removeMessages (MSG_RETRY_PLAY);
                 mHandler.removeMessages (MSG_RETRY_END);
                 mHandler.removeMessages (MSG_SEEK_BY_BAR);
+                mHandler.removeMessages (MSG_UPDATE_DISPLAY_MODE);
             }
             // shield for google tv 20140929, opened for bug 101311 20141224
             /*IWindowManager iWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
@@ -375,7 +376,7 @@ public class VideoPlayer extends Activity {
 
         //@@--------this part for message handle---------------------------------------------------------------------
         private static final long MSG_SEND_DELAY = 0; //1000;//1s
-        private static final long MSG_SEEK_SEND_DELAY = 500; //500ms
+        private static final long MSG_SEND_DELAY_500MS = 500; //500ms
         private static final int MSG_UPDATE_PROGRESS = 0xF1;//random value
         private static final int MSG_PLAY = 0xF2;
         private static final int MSG_STOP = 0xF3;
@@ -383,6 +384,7 @@ public class VideoPlayer extends Activity {
         private static final int MSG_RETRY_END = 0xF5;
         private static final int MSG_SUB_OPTION_UPDATE = 0xF6;
         private static final int MSG_SEEK_BY_BAR = 0xF7;
+        private static final int MSG_UPDATE_DISPLAY_MODE = 0xF8;
         private boolean ignoreUpdateProgressbar = false;
         private Handler mHandler = new Handler() {
             @Override
@@ -458,6 +460,9 @@ public class VideoPlayer extends Activity {
                         break;
                     case MSG_SEEK_BY_BAR:
                         seekByProgressBar();
+                        break;
+                    case MSG_UPDATE_DISPLAY_MODE:
+                        displayModeImpl();
                         break;
                 }
             }
@@ -1070,7 +1075,7 @@ public class VideoPlayer extends Activity {
             public void onReceive (Context context, Intent intent) {
                 isHdmiPlugged = intent.getBooleanExtra (EXTRA_HDMI_PLUGGED_STATE, false);
                 if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-                    displayModeImpl();
+                    sendUpdateDisplayModeMsg();
                 }
                 if ( (isHdmiPluggedbac != isHdmiPlugged) && (isHdmiPlugged == false)) {
                     if (mState == STATE_PLAYING) {
@@ -1855,6 +1860,14 @@ public class VideoPlayer extends Activity {
             }
         }
 
+        private void sendUpdateDisplayModeMsg() {
+            if (mHandler != null) {
+                Message msg = mHandler.obtainMessage (MSG_UPDATE_DISPLAY_MODE);
+                mHandler.sendMessageDelayed (msg, MSG_SEND_DELAY_500MS);
+                LOGI (TAG, "[sendUpdateDisplayModeMsg]sendMessageDelayed MSG_UPDATE_DISPLAY_MODE");
+            }
+        }
+
         //@@--------random seek function-------------------------------------------------------------------------------------------
         private boolean randomSeekTestFlag = false;
         private Random r = new Random (99);
@@ -2298,7 +2311,7 @@ public class VideoPlayer extends Activity {
         private void sendSeekByProgressBarMsg() {
             if (mHandler != null) {
                 Message msg = mHandler.obtainMessage (MSG_SEEK_BY_BAR);
-                mHandler.sendMessageDelayed (msg, MSG_SEEK_SEND_DELAY);
+                mHandler.sendMessageDelayed (msg, MSG_SEND_DELAY_500MS);
                 LOGI (TAG, "[sendSeekByProgressBarMsg]sendMessageDelayed MSG_SEEK_BY_BAR");
             }
         }
