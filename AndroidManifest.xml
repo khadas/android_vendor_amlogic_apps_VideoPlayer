@@ -6,7 +6,7 @@
 
     <original-package android:name="com.droidlogic.videoplayer" />
     <supports-screens android:largeScreens="true" android:anyDensity="true"/>
-    <uses-sdk android:minSdkVersion="14"  android:targetSdkVersion="14"/>
+    <uses-sdk android:minSdkVersion="14"  android:targetSdkVersion="23"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
