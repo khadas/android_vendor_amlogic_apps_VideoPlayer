@@ -4201,7 +4201,6 @@ public class VideoPlayer extends Activity {
                     editor.putInt ("font", sub_para.font);
                     editor.putInt ("position_v", sub_para.position_v);
                     editor.commit();
-                    sendSubOptionUpdateMsg();
                     setSubtitleView();
                     if (isTimedTextDisable()) {
                         //still have error with new method
@@ -4212,17 +4211,15 @@ public class VideoPlayer extends Activity {
                             initSubSetOptions(color_text);
                         }*/
                         String subNameStr = mSubtitleManager.getCurName();
-                        if (subNameStr != null) {
-                            if (subNameStr.equals ("INSUB") || subNameStr.endsWith (".idx")) {
-                                disableSubSetOptions();
-                            }
-                            else {
-                                initSubSetOptions (color_text);
-                            }
+                        if (subNameStr != null && (subNameStr.equals ("INSUB") || subNameStr.endsWith (".idx"))) {
+                            disableSubSetOptions();
                         }
                         else {
                             initSubSetOptions (color_text);
                         }
+                    }
+                    else {
+                        sendSubOptionUpdateMsg();
                     }
                     exitSubWidget (subtitleSwitchBtn);
                 }
@@ -4332,7 +4329,6 @@ public class VideoPlayer extends Activity {
                 }
             });
 
-            sendSubOptionUpdateMsg();
             if (isTimedTextDisable()) {
                 //still have error with new method
                 /*if(mMediaPlayer.subtitleGetSubType() == 1) { //bitmap
@@ -4342,17 +4338,15 @@ public class VideoPlayer extends Activity {
                     initSubSetOptions(color_text);
                 }*/
                 String subNameStr = mSubtitleManager.getCurName();
-                if (subNameStr != null) {
-                    if (subNameStr.equals ("INSUB") || subNameStr.endsWith (".idx")) {
-                        disableSubSetOptions();
-                    }
-                    else {
-                        initSubSetOptions (color_text);
-                    }
+                if (subNameStr != null && (subNameStr.equals ("INSUB") || subNameStr.endsWith (".idx"))) {
+                    disableSubSetOptions();
                 }
                 else {
                     initSubSetOptions (color_text);
                 }
+            }
+            else {
+                sendSubOptionUpdateMsg();
             }
         }
 
