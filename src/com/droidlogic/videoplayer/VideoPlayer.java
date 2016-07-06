@@ -2332,7 +2332,7 @@ public class VideoPlayer extends Activity {
             }
             LOGI (TAG, "[seekByProgressBar]seekTo:" + pos);
             seekTo (pos);
-            stopOsdTimeout();
+            //stopOsdTimeout();
             //curtime=pos;
         }
 
