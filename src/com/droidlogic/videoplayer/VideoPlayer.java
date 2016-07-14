@@ -2878,6 +2878,7 @@ public class VideoPlayer extends Activity {
                 initMediaInfo(trackInfo);
                 displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
                 showCertification(); // show certification
+                startCertificationTimeout();
 
                 if (mResumePlay.getEnable() == true) {
                     mResumePlay.setEnable (false);
@@ -3237,7 +3238,7 @@ public class VideoPlayer extends Activity {
         private static final int OSD_CTL_BAR = 0;
         private static final int OSD_OPT_BAR = 1;
         private int curOsdViewFlag = -1;
-        private final int OSD_FADE_TIME = 5000; // osd showing timeout
+        private final int FADE_TIME_5S = 5000; // osd showing timeout
 
         private final int RESUME_MODE = 0;
         private final int REPEAT_MODE = 1;
@@ -3277,7 +3278,7 @@ public class VideoPlayer extends Activity {
                 timer = new Timer();
             }
             if (timer != null) {
-                timer.schedule (task, OSD_FADE_TIME);
+                timer.schedule (task, FADE_TIME_5S);
             }
         }
 
@@ -3286,6 +3287,7 @@ public class VideoPlayer extends Activity {
                 timer.cancel();
             }
             timer = null;
+            stopCertificationTimeout();
         }
 
         private int getCurOsdViewFlag() {
@@ -3431,6 +3433,7 @@ public class VideoPlayer extends Activity {
 
         private void showNoOsdView() {
             stopOsdTimeout();
+            closeCertification();
             if ( (null != ctlbar) && (View.VISIBLE == ctlbar.getVisibility())) {
                 ctlbar.setVisibility (View.GONE);
             }
@@ -3459,6 +3462,7 @@ public class VideoPlayer extends Activity {
             if (null == optbar) {
                 return;
             }
+            showCertification();
             int flag = getCurOsdViewFlag();
             LOGI (TAG, "[showOsdView]flag:" + flag);
             switch (flag) {
@@ -3537,6 +3541,42 @@ public class VideoPlayer extends Activity {
         }
 
         //@@--------this part for showing certification of Dolby and DTS----------------------------------------------------
+        private Timer timerCertification = new Timer();
+        private static final int MSG_CERTIF_TIME_OUT = 0xe1;
+        protected void startCertificationTimeout() {
+            final Handler handler = new Handler() {
+                public void handleMessage (Message msg) {
+                    switch (msg.what) {
+                        case MSG_CERTIF_TIME_OUT:
+                            closeCertification();
+                            break;
+                    }
+                    super.handleMessage (msg);
+                }
+            };
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    Message message = Message.obtain();
+                    message.what = MSG_CERTIF_TIME_OUT;
+                    handler.sendMessage (message);
+                }
+            };
+            stopCertificationTimeout();
+            if (timerCertification == null) {
+                timerCertification = new Timer();
+            }
+            if (timerCertification != null) {
+                timerCertification.schedule (task, FADE_TIME_5S);
+            }
+        }
+
+        private void stopCertificationTimeout() {
+            if (timerCertification != null) {
+                timerCertification.cancel();
+            }
+            timerCertification = null;
+        }
+
         private void showCertification() {
             if (certificationDoblyView == null && certificationDoblyPlusView == null && certificationDTSView == null && certificationDTSExpressView == null && certificationDTSHDMasterAudioView == null) {
                 return;
@@ -4600,13 +4640,9 @@ public class VideoPlayer extends Activity {
                             map = new HashMap<String, Object>();
                             map.put ("item_name", mMediaInfo.getAudioFormatStr (mMediaInfo.getAudioFormat (i)));
                             map.put ("item_sel", R.drawable.item_img_unsel);
-                            if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_AC3) {
+                            if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_AC3 || mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_EAC3) {
                                 map.put ("item_name", null);
-                                map.put ("item_img", R.drawable.certifi_dobly);
-                            }
-                            else if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_EAC3) {
-                                map.put ("item_name", null);
-                                map.put ("item_img", R.drawable.certifi_dobly_plus);
+                                map.put ("item_img", R.drawable.certifi_dobly_black);
                             }
                             list.add (map);
                         }
