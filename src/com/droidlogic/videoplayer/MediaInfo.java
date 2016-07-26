@@ -675,6 +675,11 @@ public class MediaInfo {
         public static final int MEDIA_INFO_AMLOGIC_SHOW_AUDIO_LIMITED = MEDIA_INFO_AMLOGIC_BASE+8;
         public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_MULASSETHINT = MEDIA_INFO_AMLOGIC_BASE+9;
         public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_HPS_NOTSUPPORT = MEDIA_INFO_AMLOGIC_BASE+10;
+        public static final int MEDIA_INFO_AMLOGIC_BLURAY_STREAM_PATH = MEDIA_INFO_AMLOGIC_BASE + 11;
+
+        public static final int BLURAY_STREAM_TYPE_VIDEO = 'V';
+        public static final int BLURAY_STREAM_TYPE_AUDIO = 'A';
+        public static final int BLURAY_STREAM_TYPE_SUB = 'S';
 
         public static boolean needShowOnUI (int info) {
             boolean ret = false;
