@@ -292,6 +292,25 @@
                 </ImageButton>
             </LinearLayout>
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/subtitle_info"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="60dp"
+                android:layout_marginRight="60dp">
+                <TextView
+                    android:id="@+id/sub_info"
+                    android:gravity="left|center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:textSize="24sp"
+                    android:layout_marginLeft="6dp"
+                    android:textColor="@drawable/black"
+                    android:visibility="gone">
+                </TextView>
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/sub_font"

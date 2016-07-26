@@ -58,6 +58,16 @@
         android:gravity="center">
     </ImageButton>
     <ImageButton
+        android:id="@+id/ChapterBtn"
+        android:src="@drawable/doc"
+        android:background="@drawable/btn_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:visibility="gone">
+    </ImageButton>
+	<ImageButton
         android:id="@+id/DisplayBtn"
         android:src="@drawable/diplay"
         android:background="@drawable/btn_button"

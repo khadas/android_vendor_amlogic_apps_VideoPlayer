@@ -737,7 +737,7 @@ public class FileList extends ListActivity {
             }
         }
 
-        public boolean isISOFile (File file) {
+        public static boolean isISOFile (File file) {
             String fname = file.getName();
             String sname = ".iso";
             if (fname == "") {
@@ -747,10 +747,25 @@ public class FileList extends ListActivity {
             if (fname.toLowerCase().endsWith (sname)) {
                 return true;
             }
+            if (file.isDirectory()) {
+                File[] rootFiles = file.listFiles();
+                if (rootFiles != null && rootFiles.length == 1 && rootFiles[0].getName().equals("BDMV")) {
+                    String[] files = rootFiles[0].list();
+                    ArrayList<String> names = new ArrayList<String>();
+                    for (int i = 0; i < files.length; i++)
+                        names.add(files[i]);
+                    if (names.contains("index.bdmv") && names.contains("MovieObject.bdmv")
+                            && names.contains("PLAYLIST") && names.contains("CLIPINF")
+                            && names.contains("STREAM") && names.contains("AUXDATA")
+                            && names.contains("BACKUP"))
+                        return true;
+                }
+            }
+
             return false;
         }
 
-        public void execCmd (String cmd) {
+        public static void execCmd (String cmd) {
             int ch;
             Process p = null;
             Log.d (TAG, "exec command: " + cmd);
@@ -789,7 +804,7 @@ public class FileList extends ListActivity {
             if (fileDirectory_position_piexl == null) {
                 fileDirectory_position_piexl = new ArrayList<Integer>();
             }
-            if (file.isDirectory()) {
+            if (file.isDirectory() && !isISOFile(file)) {
                 item_position_selected = getListView().getSelectedItemPosition();
                 item_position_first = getListView().getFirstVisiblePosition();
                 View cv = getListView().getChildAt (item_position_selected - item_position_first);
@@ -803,7 +818,7 @@ public class FileList extends ListActivity {
                     pathLevel++;
                 }
             }
-            else if (isISOFile (file)) {
+            /* else if (isISOFile (file)) {
                 ISOpath = file.getPath();
                 Log.i(TAG, "file.getPath():" + file.getPath()+", ISOpath:"+ISOpath);
                 mSystemControl.loopMountUnmount(false, null);
@@ -812,7 +827,7 @@ public class FileList extends ListActivity {
                 fileDirectory_position_selected.add (item_position_selected);
                 fileDirectory_position_piexl.add (fromtop_piexl);
                 pathLevel++;
-            }
+            } */
             else {
                 if (!listAllFiles) {
                     int pos = filterDir (file);
@@ -916,7 +931,7 @@ public class FileList extends ListActivity {
             listVideos = new ArrayList<File>();
             for (int i = 0; i < the_Files.length; i++) {
                 File tempF = the_Files[i];
-                if (tempF.isFile()) {
+                if (tempF.isFile() || (tempF.isDirectory() && isISOFile(tempF))) {
                     listVideos.add (tempF);
                 }
             }

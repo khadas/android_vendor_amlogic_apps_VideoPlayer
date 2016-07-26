@@ -69,6 +69,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 //import android.widget.VideoView;
 import android.text.TextUtils;
+import com.android.internal.app.LocalePicker;
 
 import com.droidlogic.app.MediaPlayerExt;
 import com.droidlogic.app.SubtitleManager;
@@ -91,7 +92,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import java.util.Random;
 import android.media.TimedText;
 //import android.media.SubtitleData;
@@ -131,6 +131,7 @@ public class VideoPlayer extends Activity {
         private ImageButton repeatModeBtn = null;
         private ImageButton audiooptionBtn = null;
         private ImageButton subtitleSwitchBtn = null;
+        private ImageButton chapterBtn = null;
         private ImageButton displayModeBtn = null;
         private ImageButton brigtnessBtn = null;
         private ImageButton fileinfoBtn = null;
@@ -199,10 +200,23 @@ public class VideoPlayer extends Activity {
         //request code for permission check
         private boolean mPermissionGranted = false;
         private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
+        private boolean mIsBluray = false;
+        private ArrayList<String> mBlurayVideoLang = null;
+        private ArrayList<String> mBlurayAudioLang = null;
+        private ArrayList<String> mBluraySubLang = null;
+        private static List<LocalePicker.LocaleInfo> LOCALES;
+        private int mSubIndex = 0;
+        private static final int SUBTITLE_PGS = 2;
+        private static final int SUBTITLE_DVB = 6;
+        private static final int SUBTITLE_TMD_TXT = 7;
+        private ArrayList<ChapterInfo> mBlurayChapter = null;
+        private int mListViewHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
+        private static final String LOOP_DIR = "/mnt/loop";
 
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
+            LOCALES = LocalePicker.getAllAssetLocales(this, false);
             mSystemControl = new SystemControlManager(this);
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
@@ -626,6 +640,12 @@ public class VideoPlayer extends Activity {
                 if (audio_init_list_idx >= audio_total_num) {
                     audio_init_list_idx = audio_total_num - 1;
                 }
+                Locale loc = Locale.getDefault();
+                if (loc != null && mIsBluray) {
+                    int index = getLanguageIndex(MediaInfo.BLURAY_STREAM_TYPE_AUDIO, loc.getISO3Language());
+                    if (index >= 0)
+                        audio_init_list_idx = index;
+                }
                 mOption.setAudioTrack (audio_init_list_idx);
                 mOption.setAudioDtsAsset (0); //dts test // default 0, should get current asset from player core 20140717
 
@@ -697,6 +717,7 @@ public class VideoPlayer extends Activity {
             repeatModeBtn = (ImageButton) findViewById (R.id.PlaymodeBtn);
             audiooptionBtn = (ImageButton) findViewById (R.id.ChangetrackBtn);
             subtitleSwitchBtn = (ImageButton) findViewById (R.id.SubtitleBtn);
+            chapterBtn = (ImageButton) findViewById (R.id.ChapterBtn);
             displayModeBtn = (ImageButton) findViewById (R.id.DisplayBtn);
             brigtnessBtn = (ImageButton) findViewById (R.id.BrightnessBtn);
             fileinfoBtn = (ImageButton) findViewById (R.id.InfoBtn);
@@ -813,6 +834,12 @@ public class VideoPlayer extends Activity {
                 public void onClick (View v) {
                     LOGI (TAG, "subtitleSwitchBtn onClick");
                     subtitleSelect();
+                }
+            });
+            chapterBtn.setOnClickListener (new View.OnClickListener() {
+                public void onClick (View v) {
+                    LOGI (TAG, "chapterBtn onClick");
+                    chapterSelect();
                 }
             });
             displayModeBtn.setOnClickListener (new View.OnClickListener() {
@@ -1311,7 +1338,11 @@ public class VideoPlayer extends Activity {
 
         private void audiotrackSelect() {
             LOGI (TAG, "[audiotrackSelect]");
-            SimpleAdapter audioarray = getMorebarListAdapter (AUDIO_TRACK, mOption.getAudioTrack());
+            SimpleAdapter audioarray = null;
+            if (mIsBluray)
+                audioarray = getMorebarListAdapter(AUDIO_TRACK, mOption.getAudioTrack());
+            else
+                audioarray = getMorebarListAdapter(AUDIO_TRACK, mOption.getAudioTrack());
             ListView listView = (ListView) findViewById (R.id.ListView);
             listView.setAdapter (audioarray);
             listView.setOnItemClickListener (new AdapterView.OnItemClickListener() {
@@ -1451,6 +1482,32 @@ public class VideoPlayer extends Activity {
             }
             showSubWidget (R.string.setting_subtitle);
             subtitle_control();
+        }
+
+        private void setListViewHeight(int height) {
+            ListView listView = (ListView) findViewById (R.id.ListView);
+            ViewGroup.LayoutParams params = listView.getLayoutParams();
+            if (params instanceof LinearLayout.LayoutParams) {
+                params.height = height;
+                listView.setLayoutParams(params);
+                mListViewHeight = height;
+            }
+        }
+
+        private void chapterSelect() {
+            LOGI (TAG, "[chapterSelect]");
+            ListView listView = (ListView) findViewById (R.id.ListView);
+            setListViewHeight((int)(getWindowManager().getDefaultDisplay().getHeight() * 0.4));
+            listView.setAdapter (getMorebarListAdapter(CHAPTER_MODE, 0));
+            listView.setOnItemClickListener (new AdapterView.OnItemClickListener() {
+                public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
+                    if (mMediaPlayer != null && mMediaInfo != null) {
+                        seekTo(mBlurayChapter.get(position).start * 1000);
+                    }
+                    exitOtherWidget (chapterBtn);
+                }
+            });
+            showOtherWidget (R.string.setting_chapter);
         }
 
         private void displayModeSelect() {
@@ -2458,6 +2515,16 @@ public class VideoPlayer extends Activity {
                                                      AudioManager.AUDIOFOCUS_GAIN);
                 }
                 mMediaPlayer.start();
+                Locale loc = Locale.getDefault();
+                if (loc != null && mIsBluray) {
+                    if (mSubIndex == 0) {
+                        mSubIndex = getLanguageIndex(MediaInfo.BLURAY_STREAM_TYPE_SUB, loc.getISO3Language());
+                        mSubtitleManager.openIdx(mSubIndex);
+                    }
+                } else {
+                    mSubIndex = 0;
+                    mSubtitleManager.openIdx(mSubIndex);
+                }
                 mSubtitleManager.start();
                 mState = STATE_PLAYING;
                 updateIconResource();
@@ -2509,6 +2576,16 @@ public class VideoPlayer extends Activity {
                     mAudioManager.abandonAudioFocus (mAudioFocusListener);
                     mAudioFocused = false;
                 }
+                if (mBlurayVideoLang != null)
+                    mBlurayVideoLang.clear();
+                if (mBlurayAudioLang != null)
+                    mBlurayAudioLang.clear();
+                if (mBluraySubLang != null)
+                    mBluraySubLang.clear();
+                if (mBlurayChapter != null)
+                    mBlurayChapter.clear();
+                mIsBluray = false;
+                mSubIndex = 0;
             }
         }
 
@@ -2636,10 +2713,51 @@ public class VideoPlayer extends Activity {
                 }
             }*/
             LOGI (TAG, "[setVideoPath]Uri.parse(path):" + Uri.parse (path));
+            path = changeForIsoFile(path);
             setVideoURI (Uri.parse (path), path); //add path to resolve special character for uri, such as  ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |"$" | ","
             if (!isTimedTextDisable()) {
                 searchExternalSubtitle(path);
             }
+        }
+
+        private void mount(String path) {
+               mSystemControl.loopMountUnmount(false, null);
+               mSystemControl.loopMountUnmount(true, path);
+        }
+
+        private String changeForIsoFile(String path) {
+            File file = new File(path);
+            String fpath = file.getPath();
+            if (fpath.toLowerCase().endsWith(".iso")) {
+                mount(fpath);
+                File f = new File(LOOP_DIR);
+                //File f = new File("/mnt/sdcard/loop");
+                if (!f.exists() || (f.exists() && !f.isDirectory())) {
+                    Log.e(TAG, "/storage/loop not exists");
+                    mount(fpath);
+                }
+                //fpath = "bluray:/mnt/sdcard/loop";
+                fpath = "bluray:/mnt/loop";
+                mIsBluray = true;
+                mBlurayVideoLang = new ArrayList<String>();
+                mBlurayAudioLang = new ArrayList<String>();
+                mBluraySubLang = new ArrayList<String>();
+                mBlurayChapter = new ArrayList<ChapterInfo>();
+                chapterBtn.setVisibility(View.VISIBLE);
+            } else if (file.isDirectory() && FileList.isISOFile(file)) {
+                fpath = "bluray:" + fpath;
+                mIsBluray = true;
+                mBlurayVideoLang = new ArrayList<String>();
+                mBlurayAudioLang = new ArrayList<String>();
+                mBluraySubLang = new ArrayList<String>();
+                mBlurayChapter = new ArrayList<ChapterInfo>();
+                chapterBtn.setVisibility(View.VISIBLE);
+            } else {
+                mIsBluray = false;
+                chapterBtn.setVisibility(View.GONE);
+            }
+            LOGI(TAG, "[changeForIsoFile]fpath: " + fpath);
+            return fpath;
         }
 
         private void setVideoURI (Uri uri, String path) {
@@ -2775,6 +2893,7 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.setOnSeekCompleteListener (mSeekCompleteListener);
             mMediaPlayer.setOnErrorListener (mErrorListener);
             mMediaPlayer.setOnInfoListener (mInfoListener);
+            mMediaPlayer.setOnBlurayInfoListener(mBlurayListener);
             mMediaPlayer.setDisplay (mSurfaceHolder);
             mMediaPlayer.setOnTimedTextListener(mTimedTextListener);
             //@@mMediaPlayer.setOnSubtitleDataListener(mSubtitleDataListener);
@@ -2953,6 +3072,16 @@ public class VideoPlayer extends Activity {
                 curtime = 0; // reset current time
                 curTimeTx.setText (secToTime (curtime / 1000));
                 progressBar.setProgress (0);
+                if (mBlurayVideoLang != null)
+                    mBlurayVideoLang.clear();
+                if (mBlurayAudioLang != null)
+                    mBlurayAudioLang.clear();
+                if (mBluraySubLang != null)
+                    mBluraySubLang.clear();
+                if (mBlurayChapter != null)
+                    mBlurayChapter.clear();
+                mIsBluray = false;
+                mSubIndex = 0;
                 if (mOption.getRepeatMode() == mOption.REPEATONE) {
                     playCur();
                 }
@@ -3145,6 +3274,58 @@ public class VideoPlayer extends Activity {
             }
         };*/
 
+        private MediaPlayer.OnBlurayListener mBlurayListener = new MediaPlayer.OnBlurayListener() {
+            @Override
+            public void onBlurayInfo(MediaPlayer mp, int arg1, int arg2, Object obj) {
+                LOGI (TAG, "[onBlurayInfo] mp: " + mp + ",arg1:" + arg1 + ",arg2:" + arg2);
+                if (mp == null)
+                    return;
+
+                if (arg1 == MediaInfo.MEDIA_INFO_AMLOGIC_BLURAY_STREAM_PATH) {
+                    if (obj instanceof Parcel) {
+                        Parcel parcel = (Parcel)obj;
+                        String path = parcel.readString();
+                        int streamNum = parcel.readInt();
+                        mBlurayVideoLang.clear();
+                        mBlurayAudioLang.clear();
+                        mBluraySubLang.clear();
+                        for (int i = 0; i < streamNum; i++) {
+                            int type = parcel.readInt();
+                            String lang = parcel.readString();
+                            LOGI(TAG, "[onBlurayInfo]sub[" + i + "] type(" + type + ") lang: " + lang);
+                            switch (type) {
+                                case MediaInfo.BLURAY_STREAM_TYPE_VIDEO:
+                                    mBlurayVideoLang.add(lang);
+                                    break;
+                                case MediaInfo.BLURAY_STREAM_TYPE_AUDIO:
+                                    mBlurayAudioLang.add(lang);
+                                    break;
+                                case MediaInfo.BLURAY_STREAM_TYPE_SUB:
+                                    mBluraySubLang.add(lang);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        int chapterNum = parcel.readInt();
+                        mBlurayChapter.clear();
+                        for (int i = 0; i < chapterNum; i++) {
+                            int start = parcel.readInt();
+                            int duration = parcel.readInt();
+                            Log.d(TAG, "chapter[" + i + "]: start(" + start + ") duration(" + duration + ")");
+                            ChapterInfo info = new ChapterInfo();
+                            info.start = start;
+                            info.duration = duration;
+                            mBlurayChapter.add(info);
+                        }
+                        parcel.recycle();
+                        if (mSubtitleManager != null)
+                            mSubtitleManager.setSource(path);
+                    }
+                }
+            }
+        };
+
         //@@--------this part for book mark play-------------------------------------------------------------------
         private AlertDialog confirm_dialog = null;
         private int bmPos = 0; // book mark postion
@@ -3296,6 +3477,7 @@ public class VideoPlayer extends Activity {
         private final int BRIGHTNESS = 8;
         private final int PLAY3D = 9;
         private final int VIDEO_TRACK = 10;
+        private final int CHAPTER_MODE = 11;
         private int otherwidgetStatus = 0;
 
         protected void startOsdTimeout() {
@@ -3390,6 +3572,9 @@ public class VideoPlayer extends Activity {
         private void exitOtherWidget (ImageButton btn) {
             if ( (null != otherwidget) && (View.VISIBLE == otherwidget.getVisibility())) {
                 otherwidget.setVisibility (View.GONE);
+                if (mIsBluray && (mListViewHeight != ViewGroup.LayoutParams.WRAP_CONTENT)) {
+                    setListViewHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
                 if ( (null != optbar) && (View.GONE == optbar.getVisibility())) {
                     optbar.setVisibility (View.VISIBLE);
                 }
@@ -3436,6 +3621,9 @@ public class VideoPlayer extends Activity {
                 }
                 if ( (null != otherwidget) && (View.VISIBLE == otherwidget.getVisibility())) {
                     otherwidget.setVisibility (View.GONE);
+                    if (mIsBluray && (mListViewHeight != ViewGroup.LayoutParams.WRAP_CONTENT)) {
+                        setListViewHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+                    }
                 }
                 if ( (null != infowidget) && (View.VISIBLE == infowidget.getVisibility())) {
                     infowidget.setVisibility (View.GONE);
@@ -3462,6 +3650,9 @@ public class VideoPlayer extends Activity {
                 }
                 if ( (null != otherwidget) && (View.VISIBLE == otherwidget.getVisibility())) {
                     otherwidget.setVisibility (View.GONE);
+                    if (mIsBluray && (mListViewHeight != ViewGroup.LayoutParams.WRAP_CONTENT)) {
+                        setListViewHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+                    }
                 }
                 if ( (null != infowidget) && (View.VISIBLE == infowidget.getVisibility())) {
                     infowidget.setVisibility (View.GONE);
@@ -3490,6 +3681,9 @@ public class VideoPlayer extends Activity {
             }
             if ( (null != otherwidget) && (View.VISIBLE == otherwidget.getVisibility())) {
                 otherwidget.setVisibility (View.GONE);
+                if (mIsBluray && (mListViewHeight != ViewGroup.LayoutParams.WRAP_CONTENT)) {
+                    setListViewHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
             }
             if ( (null != infowidget) && (View.VISIBLE == infowidget.getVisibility())) {
                 infowidget.setVisibility (View.GONE);
@@ -3850,6 +4044,10 @@ public class VideoPlayer extends Activity {
                                 subtitleSwitchBtn.requestFocusFromTouch();
                                 subtitleSwitchBtn.requestFocus();
                                 break;
+                            case R.string.setting_chapter:
+                                chapterBtn.requestFocusFromTouch();
+                                chapterBtn.requestFocus();
+                                break;
                             case R.string.setting_displaymode:
                                 displayModeBtn.requestFocusFromTouch();
                                 displayModeBtn.requestFocus();
@@ -4153,12 +4351,134 @@ public class VideoPlayer extends Activity {
                 LOGI(TAG,"[sendSubOptionUpdateMsg]sendMessageDelayed MSG_SUB_OPTION_UPDATE");
             }
         }
+
+        private int getLanguageIndex(int type, String lang) {
+            int index = -1;
+
+            switch (type) {
+                case MediaInfo.BLURAY_STREAM_TYPE_VIDEO:
+                    index = mBlurayVideoLang.indexOf(lang);
+                    break;
+                case MediaInfo.BLURAY_STREAM_TYPE_AUDIO:
+                    index = mBlurayAudioLang.indexOf(lang);
+                    break;
+                case MediaInfo.BLURAY_STREAM_TYPE_SUB:
+                    index = mBluraySubLang.indexOf(lang);
+                    break;
+                default:
+                    break;
+            }
+
+            return index;
+        }
+
+        private String getDisplayLanguage(String lang) {
+            if (TextUtils.isEmpty(lang))
+                return null;
+
+            for (LocalePicker.LocaleInfo info : LOCALES) {
+                Locale l = info.getLocale();
+                if (lang.equals(l.getISO3Language()))
+                    return l.getDisplayLanguage();
+            }
+
+            return null;
+        }
+
+        private String getLanguageInfoDisplayString(int type, int index) {
+            LOGI(TAG, "getLanguageInfoDisplayString, type:" + type  + " index:" + index);
+            String str = "";
+            switch (type) {
+                case MediaInfo.BLURAY_STREAM_TYPE_VIDEO: {
+                    break;
+                }
+                case MediaInfo.BLURAY_STREAM_TYPE_AUDIO: {
+                    if (index + 1 < 10)
+                        str += "0" + String.valueOf(index + 1) + "/";
+                    else
+                        str += String.valueOf(index + 1) + "/";
+                    int total = mMediaInfo.getAudioTotalNum();
+                    if (total < 10)
+                        str += "0" + String.valueOf(total) + " ";
+                    else
+                        str += String.valueOf(total) + " ";
+                    str += getDisplayLanguage(mBlurayAudioLang.get(index)) + " ";
+                    str += mMediaInfo.getAudioFormatStr(mMediaInfo.getAudioFormat(index)) + " ";
+                    // TODO: audio channel
+                    str += String.valueOf(mMediaInfo.getAudioSampleRate(index)) + "Hz";
+                    break;
+                }
+                 case MediaInfo.BLURAY_STREAM_TYPE_SUB: {
+                    str += mContext.getResources().getString(R.string.setting_subtitle) + ": ";
+                    String subType = mSubtitleManager.getSubTypeStr();
+                    if (subType.equals("INSUB")) {
+                        str += mContext.getResources().getString(R.string.subtitle_insub) + " ";
+                        int typeDetail = mSubtitleManager.getSubTypeDetial();
+                        switch (typeDetail) {
+                            case SUBTITLE_PGS:
+                                str += "PGS ";
+                                break;
+                            case SUBTITLE_DVB:
+                                str += "DVB ";
+                                break;
+                            case SUBTITLE_TMD_TXT:
+                                str += "TMD TXT ";
+                                break;
+                            default:
+                                break;
+                        }
+                    } else
+                        str += subType;
+                    str += getDisplayLanguage(mBluraySubLang.get(index));
+                    break;
+                }
+                default:
+                    break;
+            }
+            LOGI(TAG, "getLanguageInfoDisplayString, str:" + str);
+            return str;
+        }
+
+        private int getChapterIndex(int current) {
+            int count = mBlurayChapter.size();
+            int index;
+            for (index = 0; index < count; index++) {
+                if (current < mBlurayChapter.get(index).start) {
+                    return index - 1;
+                }
+            }
+            if (index == count) {
+                index--;
+                return index;
+            }
+
+            return -1;
+        }
+
+        private String getChapterInfoDisplayString(int index) {
+            String str = "";
+            if (index + 1 < 10)
+                str += "0" + String.valueOf(index + 1) + "/";
+            else
+                str += String.valueOf(index + 1) + "/";
+            int total = mBlurayChapter.size();
+            if (total < 10)
+                str += "0" + String.valueOf(total) + "    ";
+            else
+                str += String.valueOf(total) + "    ";
+            ChapterInfo info = mBlurayChapter.get(index);
+            str += secToTime(info.start) + " - ";
+            str += secToTime(info.start + info.duration);
+
+            return str;
+        }
+
         private void initSubtitle() {
             LOGI (TAG, "[initSubtitle]");
             SharedPreferences subSp = getSharedPreferences (subSettingStr, 0);
             sub_para = new subview_set();
             sub_para.totalnum = 0;
-            sub_para.curid = 0;
+            sub_para.curid = mSubIndex;
             sub_para.curidbac = 0;
             sub_para.color = android.graphics.Color.WHITE;
             sub_para.font = 20;
@@ -4225,6 +4545,7 @@ public class VideoPlayer extends Activity {
             ok.setOnClickListener (new View.OnClickListener() {
                 public void onClick (View v) {
                     sub_para.curid = sub_switch_state;
+                    mSubIndex = sub_switch_state;
                     sub_para.font = sub_font_state;
                     sub_para.position_v = sub_position_v_state;
                     LOGI (TAG, "[subtitle_control]sub_para.curid:" + sub_para.curid + ",sub_para.curidbac:" + sub_para.curidbac);
@@ -4325,9 +4646,15 @@ public class VideoPlayer extends Activity {
                     }
                     if (sub_switch_state == sub_para.totalnum) {
                         t_subswitch.setText (R.string.str_off);
+                        t_subinfo.setVisibility(View.GONE);
                     }
                     else {
                         t_subswitch.setText (String.valueOf (sub_switch_state + 1) + "/" + String.valueOf (sub_para.totalnum));
+                        if (mIsBluray) {
+                            if (t_subinfo.getVisibility() == View.GONE)
+                                t_subinfo.setVisibility(View.VISIBLE);
+                            t_subinfo.setText(getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_SUB, sub_switch_state));
+                        }
                     }
                 }
             });
@@ -4341,10 +4668,16 @@ public class VideoPlayer extends Activity {
                     }
                     if (sub_switch_state == sub_para.totalnum) {
                         t_subswitch.setText (R.string.str_off);
+                        t_subinfo.setVisibility(View.GONE);
                     }
                     else {
                         t_subswitch.setText (String.valueOf (sub_switch_state + 1) + "/" + String.valueOf (sub_para.totalnum));
-                    };
+                        if (mIsBluray) {
+                            if (t_subinfo.getVisibility() == View.GONE)
+                                t_subinfo.setVisibility(View.VISIBLE);
+                            t_subinfo.setText(getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_SUB, sub_switch_state));
+                        }
+                    }
                 }
             });
             Bfont_l.setOnClickListener (new View.OnClickListener() {
@@ -4437,6 +4770,7 @@ public class VideoPlayer extends Activity {
 
         private void initSubSetOptions (String color_text[]) {
             t_subswitch = (TextView) findViewById (R.id.sub_swith111);
+            t_subinfo = (TextView) findViewById (R.id.sub_info);
             t_subsfont = (TextView) findViewById (R.id.sub_font111);
             t_subscolor = (TextView) findViewById (R.id.sub_color111);
             t_subsposition_v = (TextView) findViewById (R.id.sub_position_v111);
@@ -4454,10 +4788,17 @@ public class VideoPlayer extends Activity {
             }
             if (sub_para.curid == sub_para.totalnum) {
                 sub_para.curid = sub_para.totalnum;
+                mSubIndex = sub_para.totalnum;
                 t_subswitch.setText (R.string.str_off);
+                t_subinfo.setVisibility(View.GONE);
             }
             else {
                 t_subswitch.setText (String.valueOf (sub_para.curid + 1) + "/" + String.valueOf (sub_para.totalnum));
+                if (mIsBluray) {
+                    if (t_subinfo.getVisibility() == View.GONE)
+                        t_subinfo.setVisibility(View.VISIBLE);
+                    t_subinfo.setText(getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_SUB, mSubIndex));
+                }
             }
             t_subsfont.setText (String.valueOf (sub_font_state));
             t_subscolor.setText (color_text[sub_color_state]);
@@ -4618,6 +4959,14 @@ public class VideoPlayer extends Activity {
             );
         }
 
+        /*private SimpleAdapter getLeftAlignMorebarListAdapter (int id, int pos) {
+            return new SimpleAdapter (this, getMorebarListData (id, pos),
+                                      R.layout.list_row,
+                                      new String[] {"item_img", "item_name", "item_sel"},
+                                      new int[] {R.id.item_img, R.id.Text01, R.id.item_sel}
+                                     );
+        }*/
+
         private List <? extends Map < String, ? >> getMorebarListData (int id, int pos) {
             // TODO Auto-generated method stub
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -4681,9 +5030,14 @@ public class VideoPlayer extends Activity {
                 case AUDIO_TRACK:
                     if (mMediaInfo != null) {
                         int audio_total_num = mMediaInfo.getAudioTotalNum();
+                        LOGI(TAG, "audio_total_num:" + audio_total_num);
                         for (int i = 0; i < audio_total_num; i++) {
                             map = new HashMap<String, Object>();
-                            map.put ("item_name", mMediaInfo.getAudioFormatStr (mMediaInfo.getAudioFormat (i)));
+                            LOGI(TAG, "i:" + i + " mMediaInfo.getAudioFormat:" + mMediaInfo.getAudioFormat(i));
+                            if (mIsBluray)
+                                map.put ("item_name", getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_AUDIO, i));
+                            else
+                                map.put ("item_name", mMediaInfo.getAudioFormatStr(mMediaInfo.getAudioFormat(i)));
                             map.put ("item_sel", R.drawable.item_img_unsel);
                             if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_AC3 || mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_EAC3) {
                                 map.put ("item_name", null);
@@ -4698,6 +5052,19 @@ public class VideoPlayer extends Activity {
                         list.get (pos).put ("item_sel", R.drawable.item_img_sel);
                     }
                     break;
+                 case CHAPTER_MODE: {
+                    int count = mBlurayChapter.size();
+                    for (int i = 0; i < count; i++) {
+                        map = new HashMap<String, Object>();
+                        map.put("item_name", getChapterInfoDisplayString(i));
+                        map.put("item_sel", R.drawable.item_img_unsel);
+                        list.add(map);
+                    }
+                    int index = getChapterIndex(getCurrentPosition() / 1000);
+                    if (index >= 0 && index < count)
+                        list.get(index).put("item_sel", R.drawable.item_img_sel);
+                    break;
+                }
 
                 case VIDEO_TRACK:
                     if (mMediaInfo != null) {
@@ -5137,5 +5504,10 @@ class subview_set {
         public int color;
         public int font;
         public int position_v;
+}
+
+class ChapterInfo {
+    public int start;
+    public int duration;
 }
 

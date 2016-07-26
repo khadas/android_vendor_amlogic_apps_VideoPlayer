@@ -69,6 +69,8 @@ public class MyAdapter extends BaseAdapter {
             holder.text.setText (txtf.getName());
             if (f.isDirectory()) {
                 holder.icon.setImageBitmap (iconFolder);
+                if (FileList.isISOFile(f))
+                    holder.icon.setImageBitmap (iconVideo);
             }
             else {
                 holder.icon.setImageBitmap (iconVideo);

@@ -86,7 +86,8 @@
     <string name="no_file">沒有視頻文件！</string>
     <string name="searching">搜索中...</string>
     <string name="all_file">視頻列表</string>
-
+    <string name="setting_chapter">章節</string>
+    <string name="subtitle_insub">內嵌</string>
     <string name="unsupport_media">不支持媒體文件</string>
     <string name="unsupport_video_format">不支持視頻格式</string>
     <string name="unsupport_audio_format">不支持音頻格式</string>

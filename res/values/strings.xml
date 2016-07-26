@@ -26,6 +26,8 @@
     <string name="setting_soundtrack_rmono">Right Mono</string>
     <string name="setting_soundtrack_lrmix">Sound Mixing</string>
     <string name="setting_subtitle">Subtitle</string>
+    <string name="setting_chapter">Chapter</string>
+    <string name="subtitle_insub">INSUB</string>
     <string name="setting_displaymode">Display Mode</string>
     <string name="setting_displaymode_normal">Normal</string>
     <string name="setting_displaymode_normal_noscaleup">No Scale Up</string>
