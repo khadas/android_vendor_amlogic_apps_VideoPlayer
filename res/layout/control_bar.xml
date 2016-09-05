@@ -51,14 +51,14 @@
             android:id="@+id/CertificationDobly"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:src="@drawable/certifi_dobly"
+            android:src="@drawable/certifi_dobly_white"
             android:visibility="gone">
         </ImageView>
         <ImageView
             android:id="@+id/CertificationDoblyPlus"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:src="@drawable/certifi_dobly_plus"
+            android:src="@drawable/certifi_dobly_white"
             android:visibility="gone">
         </ImageView>
         <ImageView
