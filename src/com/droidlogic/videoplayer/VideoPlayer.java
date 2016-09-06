@@ -3274,7 +3274,7 @@ public class VideoPlayer extends Activity {
             }
         };*/
 
-        private MediaPlayer.OnBlurayListener mBlurayListener = new MediaPlayer.OnBlurayListener() {
+        private MediaPlayerExt.OnBlurayListener mBlurayListener = new MediaPlayerExt.OnBlurayListener() {
             @Override
             public void onBlurayInfo(MediaPlayer mp, int arg1, int arg2, Object obj) {
                 LOGI (TAG, "[onBlurayInfo] mp: " + mp + ",arg1:" + arg1 + ",arg2:" + arg2);
