@@ -737,6 +737,14 @@ public class FileList extends ListActivity {
             }
         }
 
+        private static boolean hasBDFile(File[] files, String name) {
+           for (File file : files) {
+               if (name != null && name.equals(file.getName()) && file.isDirectory())
+                   return true;
+           }
+           return false;
+        }
+
         public static boolean isISOFile (File file) {
             String fname = file.getName();
             String sname = ".iso";
@@ -749,8 +757,9 @@ public class FileList extends ListActivity {
             }
             if (file.isDirectory()) {
                 File[] rootFiles = file.listFiles();
-                if (rootFiles != null && rootFiles.length == 1 && rootFiles[0].getName().equals("BDMV")) {
-                    String[] files = rootFiles[0].list();
+                if (rootFiles != null && rootFiles.length >= 1 && hasBDFile(rootFiles, "BDMV")) {
+                    File bdDir = new File(file.getPath(), "BDMV");
+                    String[] files = bdDir.list();
                     ArrayList<String> names = new ArrayList<String>();
                     for (int i = 0; i < files.length; i++)
                         names.add(files[i]);
@@ -761,7 +770,6 @@ public class FileList extends ListActivity {
                         return true;
                 }
             }
-
             return false;
         }
 
