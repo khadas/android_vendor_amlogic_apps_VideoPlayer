@@ -197,7 +197,6 @@ public class VideoPlayer extends Activity {
         private SystemControlManager mSystemControl;
 
         //request code for permission check
-        private boolean mPermissionGranted = false;
         private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
 
         @Override
@@ -223,13 +222,12 @@ public class VideoPlayer extends Activity {
             init();
 
             if (PackageManager.PERMISSION_DENIED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                LOGI (TAG, "[onCreate]requestPermissions");
+                LOGI (TAG, "[onResume]requestPermissions");
                 ActivityCompat.requestPermissions(VideoPlayer.this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
             else {
-                mPermissionGranted = true;
                 if (0 != checkUri()) { return; }
                 storeFilePos();
             }
@@ -240,11 +238,6 @@ public class VideoPlayer extends Activity {
         @Override
         public void onResume() {
             super.onResume();
-
-            if (!mPermissionGranted) {
-                return;
-            }
-
             LOGI (TAG, "[onResume]mResumePlay.getEnable():" + mResumePlay.getEnable() + ",isHdmiPlugged:" + isHdmiPlugged);
             //close transition animation
             // shield for google tv 20140929 , opened for bug 101311 20141224
@@ -324,11 +317,6 @@ public class VideoPlayer extends Activity {
         @Override
         public void onPause() {
             super.onPause();
-
-            if (!mPermissionGranted) {
-                return;
-            }
-
             LOGI (TAG, "[onPause] curtime:" + curtime);
             mErrorTime = 0;
             mErrorTimeBac = 0;
@@ -409,11 +397,9 @@ public class VideoPlayer extends Activity {
                     // If request is cancelled, the result arrays are empty.
                     if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         Log.i(TAG, "user granted the permission!");
-                        mPermissionGranted = true;
                     }
                     else {
                         Log.i(TAG, "user denied the permission!");
-                        mPermissionGranted = false;
                     }
                 return;
             }
@@ -450,7 +436,7 @@ public class VideoPlayer extends Activity {
                         break;
                     case MSG_PLAY:
                         LOGI (TAG, "[handleMessage]resume mode:" + mOption.getResumeMode() + ",mPath:" + mPath);
-                        if (mOption != null && mPath != null && mPermissionGranted) {
+                        if (mOption != null && mPath != null) {
                             resetVariate();
                             showOsdView();
                             if (mResumePlay.getEnable() == true) {
