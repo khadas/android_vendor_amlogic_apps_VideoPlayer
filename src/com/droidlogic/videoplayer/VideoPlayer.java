@@ -3284,6 +3284,7 @@ public class VideoPlayer extends Activity {
                 if (arg1 == MediaInfo.MEDIA_INFO_AMLOGIC_BLURAY_STREAM_PATH) {
                     if (obj instanceof Parcel) {
                         Parcel parcel = (Parcel)obj;
+                        parcel.setDataPosition(0);
                         String path = parcel.readString();
                         int streamNum = parcel.readInt();
                         mBlurayVideoLang.clear();
