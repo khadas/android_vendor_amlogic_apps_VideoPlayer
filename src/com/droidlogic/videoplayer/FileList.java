@@ -60,6 +60,7 @@ public class FileList extends ListActivity {
         private static final String SHELL_PATH          = "/mnt/shell";
 
         private boolean listAllFiles = true;
+        private boolean mFileFlag = false;
         private List<File> listFiles = null;
         private List<File> listVideos = null;
         private List<String> items = null;
@@ -802,6 +803,7 @@ public class FileList extends ListActivity {
 
         @Override
         protected void onListItemClick (ListView l, View v, int position, long id) {
+            mFileFlag = true;
             File file = new File (paths.get (position));
             currentlist.clear();
             currentlist.addAll (paths);
@@ -825,18 +827,38 @@ public class FileList extends ListActivity {
                     fileDirectory_position_piexl.add (fromtop_piexl);
                     pathLevel++;
                 }
+                mFileFlag = false;
             }
-            /* else if (isISOFile (file)) {
+            else if (isISOFile(file)) {
                 ISOpath = file.getPath();
                 Log.i(TAG, "file.getPath():" + file.getPath()+", ISOpath:"+ISOpath);
                 mSystemControl.loopMountUnmount(false, null);
                 mSystemControl.loopMountUnmount(true, ISOpath);
-                waitForBrowserIsoFile();
-                fileDirectory_position_selected.add (item_position_selected);
-                fileDirectory_position_piexl.add (fromtop_piexl);
-                pathLevel++;
-            } */
-            else {
+                File isofile = new File(iso_mount_dir);
+                if (isofile.exists() && isofile.isDirectory()) {
+                    File[] rootFiles = isofile.listFiles();
+                    if (rootFiles != null && rootFiles.length >= 1 && hasBDFile(rootFiles, "BDMV")) {
+                        File bdfiles = new File(iso_mount_dir, "BDMV");
+                        String[] bdmvFiles = bdfiles.list();
+                        ArrayList<String> names = new ArrayList<String>();
+                        for (int i = 0; i < bdmvFiles.length; i++)
+                            names.add(bdmvFiles[i]);
+                        if (names.contains("index.bdmv") && names.contains("MovieObject.bdmv")
+                            && names.contains("PLAYLIST") && names.contains("CLIPINF")
+                            && names.contains("STREAM") && names.contains("AUXDATA")
+                            && names.contains("BACKUP"))
+                            mFileFlag = true;
+                    } else {
+                        waitForBrowserIsoFile();
+                        fileDirectory_position_selected.add (item_position_selected);
+                        fileDirectory_position_piexl.add (fromtop_piexl);
+                        pathLevel++;
+                        mFileFlag = false;
+                    }
+                } else
+                    mFileFlag = false;
+            }
+            if (mFileFlag) {
                 if (!listAllFiles) {
                     int pos = filterDir (file);
                     if (pos < 0) {
