@@ -2519,7 +2519,11 @@ public class VideoPlayer extends Activity {
                 if (loc != null && mIsBluray) {
                     if (mSubIndex == 0) {
                         mSubIndex = getLanguageIndex(MediaInfo.BLURAY_STREAM_TYPE_SUB, loc.getISO3Language());
-                        mSubtitleManager.openIdx(mSubIndex);
+                        if (mSubIndex == -1)
+                            mSubIndex = 0;
+                        if (mSubtitleManager.total() > 0) {
+                            mSubtitleManager.openIdx(mSubIndex);
+                        }
                     }
                 } else {
                     mSubIndex = 0;
@@ -4365,6 +4369,8 @@ public class VideoPlayer extends Activity {
                     break;
                 case MediaInfo.BLURAY_STREAM_TYPE_SUB:
                     index = mBluraySubLang.indexOf(lang);
+                    if (index == -1)
+                        index = mBluraySubLang.indexOf("eng");
                     break;
                 default:
                     break;
@@ -4798,7 +4804,8 @@ public class VideoPlayer extends Activity {
                 if (mIsBluray) {
                     if (t_subinfo.getVisibility() == View.GONE)
                         t_subinfo.setVisibility(View.VISIBLE);
-                    t_subinfo.setText(getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_SUB, mSubIndex));
+                    if (mSubIndex != -1)
+                        t_subinfo.setText(getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_SUB, mSubIndex));
                 }
             }
             t_subsfont.setText (String.valueOf (sub_font_state));
