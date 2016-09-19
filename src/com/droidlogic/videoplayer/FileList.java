@@ -753,7 +753,7 @@ public class FileList extends ListActivity {
                 Log.e (TAG, "NULL file");
                 return false;
             }
-            if (fname.toLowerCase().endsWith (sname)) {
+            if (file.isFile() && fname.toLowerCase().endsWith (sname)) {
                 return true;
             }
             if (file.isDirectory()) {
