@@ -12,10 +12,16 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.Manifest;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -58,6 +64,9 @@ public class FileList extends ListActivity {
         private static final String OBB_PATH            = "/mnt/obb";
         private static final String USB_DRIVE_PATH      = "/mnt/usbdrive";
         private static final String SHELL_PATH          = "/mnt/shell";
+
+        private Context mContext;
+        private ApplicationInfo mAppInfo;
 
         private boolean listAllFiles = true;
         private boolean mFileFlag = false;
@@ -274,6 +283,8 @@ public class FileList extends ListActivity {
             setContentView (R.layout.file_list);
             mSystemControl = new SystemControlManager(this);
             mStorageManager = (StorageManager)getSystemService(Context.STORAGE_SERVICE);
+            mContext = this.getApplicationContext();
+            mAppInfo = mContext.getApplicationInfo();
             PlayList.setContext (this);
             listAllFiles = mSystemControl.getPropertyBoolean("vplayer.listall.enable", false);
             currentlist = new ArrayList<String>();
@@ -945,8 +956,16 @@ public class FileList extends ListActivity {
             /*SettingsVP.setSystemWrite(sw);
             if (SettingsVP.chkEnableOSD2XScale() == true)
                 this.setVisible(false);*/
-            startActivity (intent);
-            FileList.this.finish();
+            if (mAppInfo.targetSdkVersion >= Build.VERSION_CODES.M &&
+                (PackageManager.PERMISSION_DENIED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE))) {
+                ActivityCompat.requestPermissions(FileList.this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    /*MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE*/0);
+            }
+            else {
+                startActivity (intent);
+                FileList.this.finish();
+            }
         }
 
         public int filterDir (File file) {

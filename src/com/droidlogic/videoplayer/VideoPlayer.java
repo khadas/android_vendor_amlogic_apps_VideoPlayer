@@ -26,7 +26,6 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
-import android.Manifest;
 import android.net.Uri;
 //import android.os.Bundle;
 //import android.os.Handler;
@@ -40,8 +39,6 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -197,9 +194,6 @@ public class VideoPlayer extends Activity {
         private SubtitleManager mSubtitleManager;
         private SystemControlManager mSystemControl;
 
-        //request code for permission check
-        private boolean mPermissionGranted = false;
-        private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
         private boolean mIsBluray = false;
         private ArrayList<String> mBlurayVideoLang = null;
         private ArrayList<String> mBlurayAudioLang = null;
@@ -235,18 +229,8 @@ public class VideoPlayer extends Activity {
                 }
             });*/
             init();
-
-            if (PackageManager.PERMISSION_DENIED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                LOGI (TAG, "[onCreate]requestPermissions");
-                ActivityCompat.requestPermissions(VideoPlayer.this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-            }
-            else {
-                mPermissionGranted = true;
-                if (0 != checkUri()) { return; }
-                storeFilePos();
-            }
+            if (0 != checkUri()) { return; }
+            storeFilePos();
 
             ////showCtlBar();
         }
@@ -254,10 +238,6 @@ public class VideoPlayer extends Activity {
         @Override
         public void onResume() {
             super.onResume();
-
-            if (!mPermissionGranted) {
-                return;
-            }
 
             LOGI (TAG, "[onResume]mResumePlay.getEnable():" + mResumePlay.getEnable() + ",isHdmiPlugged:" + isHdmiPlugged);
             //close transition animation
@@ -339,10 +319,6 @@ public class VideoPlayer extends Activity {
         public void onPause() {
             super.onPause();
 
-            if (!mPermissionGranted) {
-                return;
-            }
-
             LOGI (TAG, "[onPause] curtime:" + curtime);
             mErrorTime = 0;
             mErrorTimeBac = 0;
@@ -417,22 +393,6 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-            switch (requestCode) {
-                case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-                    // If request is cancelled, the result arrays are empty.
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        Log.i(TAG, "user granted the permission!");
-                        mPermissionGranted = true;
-                    }
-                    else {
-                        Log.i(TAG, "user denied the permission!");
-                        mPermissionGranted = false;
-                    }
-                return;
-            }
-        }
-
         //@@--------this part for message handle---------------------------------------------------------------------
         private static final long MSG_SEND_DELAY = 0; //1000;//1s
         private static final long MSG_SEND_DELAY_500MS = 500; //500ms
@@ -464,7 +424,7 @@ public class VideoPlayer extends Activity {
                         break;
                     case MSG_PLAY:
                         LOGI (TAG, "[handleMessage]resume mode:" + mOption.getResumeMode() + ",mPath:" + mPath);
-                        if (mOption != null && mPath != null && mPermissionGranted) {
+                        if (mOption != null && mPath != null) {
                             resetVariate();
                             showOsdView();
                             if (mResumePlay.getEnable() == true) {
