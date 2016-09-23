@@ -840,7 +840,7 @@ public class FileList extends ListActivity {
                 }
                 mFileFlag = false;
             }
-            else if (isISOFile(file)) {
+            else if (isISOFile(file) && file.isFile()) {
                 ISOpath = file.getPath();
                 Log.i(TAG, "file.getPath():" + file.getPath()+", ISOpath:"+ISOpath);
                 mSystemControl.loopMountUnmount(false, null);
@@ -868,6 +868,8 @@ public class FileList extends ListActivity {
                     }
                 } else
                     mFileFlag = false;
+            } else if (isISOFile(file) && file.isDirectory()){
+                mFileFlag = true;
             }
             if (mFileFlag) {
                 if (!listAllFiles) {
