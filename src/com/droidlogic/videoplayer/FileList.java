@@ -775,10 +775,8 @@ public class FileList extends ListActivity {
                     ArrayList<String> names = new ArrayList<String>();
                     for (int i = 0; i < files.length; i++)
                         names.add(files[i]);
-                    if (names.contains("index.bdmv") && names.contains("MovieObject.bdmv")
-                            && names.contains("PLAYLIST") && names.contains("CLIPINF")
-                            && names.contains("STREAM") && names.contains("AUXDATA")
-                            && names.contains("BACKUP"))
+                    if (names.contains("index.bdmv") && names.contains("PLAYLIST")
+                        && names.contains("CLIPINF") && names.contains("STREAM"))
                         return true;
                 }
             }
@@ -854,10 +852,8 @@ public class FileList extends ListActivity {
                         ArrayList<String> names = new ArrayList<String>();
                         for (int i = 0; i < bdmvFiles.length; i++)
                             names.add(bdmvFiles[i]);
-                        if (names.contains("index.bdmv") && names.contains("MovieObject.bdmv")
-                            && names.contains("PLAYLIST") && names.contains("CLIPINF")
-                            && names.contains("STREAM") && names.contains("AUXDATA")
-                            && names.contains("BACKUP"))
+                        if (names.contains("index.bdmv") && names.contains("PLAYLIST")
+                            && names.contains("CLIPINF") && names.contains("STREAM"))
                             mFileFlag = true;
                     } else {
                         waitForBrowserIsoFile();
