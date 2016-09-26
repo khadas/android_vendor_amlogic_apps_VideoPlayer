@@ -5008,7 +5008,9 @@ public class VideoPlayer extends Activity {
                                 map.put ("item_name", mMediaInfo.getAudioFormatStr(mMediaInfo.getAudioFormat(i)));
                             map.put ("item_sel", R.drawable.item_img_unsel);
                             if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_AC3 || mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_EAC3) {
-                                map.put ("item_name", null);
+                                if (!mIsBluray) {
+                                    map.put ("item_name", null);
+                                }
                                 map.put ("item_img", R.drawable.certifi_dobly_black);
                             }
                             list.add (map);
