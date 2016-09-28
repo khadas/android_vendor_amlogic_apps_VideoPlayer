@@ -20,6 +20,8 @@ public class MyAdapter extends BaseAdapter {
         private Bitmap iconFolder;
         private Bitmap iconAudio;
         private Bitmap iconVideo;
+        private Bitmap iconBdVideo;
+        private Bitmap iconIsoFile;
         private Bitmap iconImage;
         private Bitmap iconFile;
         private List<String> items;
@@ -32,6 +34,8 @@ public class MyAdapter extends BaseAdapter {
             iconFolder = BitmapFactory.decodeResource (context.getResources(), R.drawable.folder);
             iconAudio = BitmapFactory.decodeResource (context.getResources(), R.drawable.music);
             iconVideo = BitmapFactory.decodeResource (context.getResources(), R.drawable.movie);
+            iconBdVideo = BitmapFactory.decodeResource (context.getResources(), R.drawable.bdmovie);
+            iconIsoFile = BitmapFactory.decodeResource (context.getResources(), R.drawable.isofile);
             iconImage = BitmapFactory.decodeResource (context.getResources(), R.drawable.photo);
             iconFile = BitmapFactory.decodeResource (context.getResources(), R.drawable.doc);
         }
@@ -67,13 +71,15 @@ public class MyAdapter extends BaseAdapter {
             File f = new File (paths.get (position).toString());
             File txtf = new File (items.get (position).toString());
             holder.text.setText (txtf.getName());
-            if (f.isDirectory()) {
-                holder.icon.setImageBitmap (iconFolder);
-                if (FileList.isISOFile(f))
-                    holder.icon.setImageBitmap (iconVideo);
-            }
+            if (FileList.isBDFile(f))
+                holder.icon.setImageBitmap (iconBdVideo);
+            else if (FileList.isISOFile(f))
+                holder.icon.setImageBitmap (iconIsoFile);
             else {
-                holder.icon.setImageBitmap (iconVideo);
+                if (f.isDirectory())
+                    holder.icon.setImageBitmap (iconFolder);
+                else
+                    holder.icon.setImageBitmap (iconVideo);
             }
             return convertView;
         }

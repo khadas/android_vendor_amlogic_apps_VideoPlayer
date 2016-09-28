@@ -97,8 +97,9 @@ public class FileList extends ListActivity {
         private ArrayList<Integer> fileDirectory_position_piexl;
         private int pathLevel = 0;
         private final String iso_mount_dir = "/mnt/loop";
+        private static final String iso_mount_dir_s = "/mnt/loop";
         private Uri uri;
-        private SystemControlManager mSystemControl;
+        private static SystemControlManager mSystemControl;
         private StorageManager mStorageManager;
 
         private void waitForBrowserIsoFile() {
@@ -749,12 +750,9 @@ public class FileList extends ListActivity {
             }
         }
 
-        private static boolean hasBDFile(File[] files, String name) {
-           for (File file : files) {
-               if (name != null && name.equals(file.getName()) && file.isDirectory())
-                   return true;
-           }
-           return false;
+        private static void mount(String path) {
+               mSystemControl.loopMountUnmount(false, null);
+               mSystemControl.loopMountUnmount(true, path);
         }
 
         public static boolean isISOFile (File file) {
@@ -767,9 +765,22 @@ public class FileList extends ListActivity {
             if (file.isFile() && fname.toLowerCase().endsWith (sname)) {
                 return true;
             }
+            return false;
+        }
+
+        private static boolean isHasDir(File[] files, String name) {
+           for (File file : files) {
+               if (name != null && name.equals(file.getName()) && file.isDirectory())
+                   return true;
+           }
+           return false;
+        }
+
+        public static boolean isBDFile(File file)
+        {
             if (file.isDirectory()) {
                 File[] rootFiles = file.listFiles();
-                if (rootFiles != null && rootFiles.length >= 1 && hasBDFile(rootFiles, "BDMV")) {
+                if (rootFiles != null && rootFiles.length >= 1 && isHasDir(rootFiles, "BDMV")) {
                     File bdDir = new File(file.getPath(), "BDMV");
                     String[] files = bdDir.list();
                     ArrayList<String> names = new ArrayList<String>();
@@ -778,6 +789,23 @@ public class FileList extends ListActivity {
                     if (names.contains("index.bdmv") && names.contains("PLAYLIST")
                         && names.contains("CLIPINF") && names.contains("STREAM"))
                         return true;
+                }
+            } else if (isISOFile(file)) {
+                ISOpath = file.getPath();
+                mount(ISOpath);
+                File isofile = new File(iso_mount_dir_s);
+                if (isofile.exists() && isofile.isDirectory()) {
+                    File[] rootFiles = isofile.listFiles();
+                    if (rootFiles != null && rootFiles.length >= 1 && isHasDir(rootFiles, "BDMV")) {
+                        File bdfiles = new File(iso_mount_dir_s, "BDMV");
+                        String[] bdmvFiles = bdfiles.list();
+                        ArrayList<String> names = new ArrayList<String>();
+                        for (int i = 0; i < bdmvFiles.length; i++)
+                            names.add(bdmvFiles[i]);
+                        if (names.contains("index.bdmv") && names.contains("PLAYLIST")
+                            && names.contains("CLIPINF") && names.contains("STREAM"))
+                            return true;
+                    }
                 }
             }
             return false;
@@ -823,49 +851,31 @@ public class FileList extends ListActivity {
             if (fileDirectory_position_piexl == null) {
                 fileDirectory_position_piexl = new ArrayList<Integer>();
             }
-            if (file.isDirectory() && !isISOFile(file)) {
-                item_position_selected = getListView().getSelectedItemPosition();
-                item_position_first = getListView().getFirstVisiblePosition();
-                View cv = getListView().getChildAt (item_position_selected - item_position_first);
-                if (cv != null) {
-                    fromtop_piexl = cv.getTop();
-                }
-                BrowserFile (paths.get (position));
-                if (!listFiles.isEmpty()) {
-                    fileDirectory_position_selected.add (item_position_selected);
-                    fileDirectory_position_piexl.add (fromtop_piexl);
-                    pathLevel++;
-                }
-                mFileFlag = false;
-            }
-            else if (isISOFile(file) && file.isFile()) {
-                ISOpath = file.getPath();
-                Log.i(TAG, "file.getPath():" + file.getPath()+", ISOpath:"+ISOpath);
-                mSystemControl.loopMountUnmount(false, null);
-                mSystemControl.loopMountUnmount(true, ISOpath);
-                File isofile = new File(iso_mount_dir);
-                if (isofile.exists() && isofile.isDirectory()) {
-                    File[] rootFiles = isofile.listFiles();
-                    if (rootFiles != null && rootFiles.length >= 1 && hasBDFile(rootFiles, "BDMV")) {
-                        File bdfiles = new File(iso_mount_dir, "BDMV");
-                        String[] bdmvFiles = bdfiles.list();
-                        ArrayList<String> names = new ArrayList<String>();
-                        for (int i = 0; i < bdmvFiles.length; i++)
-                            names.add(bdmvFiles[i]);
-                        if (names.contains("index.bdmv") && names.contains("PLAYLIST")
-                            && names.contains("CLIPINF") && names.contains("STREAM"))
-                            mFileFlag = true;
-                    } else {
-                        waitForBrowserIsoFile();
+            if (isBDFile(file)) {
+                mFileFlag = true;
+            } else {
+                if (file.isDirectory()) {
+                    item_position_selected = getListView().getSelectedItemPosition();
+                    item_position_first = getListView().getFirstVisiblePosition();
+                    View cv = getListView().getChildAt (item_position_selected - item_position_first);
+                    if (cv != null) {
+                        fromtop_piexl = cv.getTop();
+                    }
+                    BrowserFile (paths.get (position));
+                    if (!listFiles.isEmpty()) {
                         fileDirectory_position_selected.add (item_position_selected);
                         fileDirectory_position_piexl.add (fromtop_piexl);
                         pathLevel++;
-                        mFileFlag = false;
                     }
-                } else
                     mFileFlag = false;
-            } else if (isISOFile(file) && file.isDirectory()){
-                mFileFlag = true;
+                } else if (isISOFile(file)) {
+                    waitForBrowserIsoFile();
+                    fileDirectory_position_selected.add (item_position_selected);
+                    fileDirectory_position_piexl.add (fromtop_piexl);
+                    pathLevel++;
+                    mFileFlag = false;
+                } else
+                    mFileFlag = true;
             }
             if (mFileFlag) {
                 if (!listAllFiles) {
@@ -978,7 +988,7 @@ public class FileList extends ListActivity {
             listVideos = new ArrayList<File>();
             for (int i = 0; i < the_Files.length; i++) {
                 File tempF = the_Files[i];
-                if (tempF.isFile() || (tempF.isDirectory() && isISOFile(tempF))) {
+                if (tempF.isFile() || (tempF.isDirectory() && isBDFile(tempF))) {
                     listVideos.add (tempF);
                 }
             }
