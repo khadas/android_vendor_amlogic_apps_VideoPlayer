@@ -1885,6 +1885,9 @@ public class VideoPlayer extends Activity {
                     case 2:
                         mode3d = "3dtb";
                         break;
+                    case 3:
+                        mode3d = "3dfp";
+                        break;
                     default:
                         break;
                 }
@@ -4900,6 +4903,7 @@ public class VideoPlayer extends Activity {
             R.string.setting_3d_diable,
             R.string.setting_3d_lr,
             R.string.setting_3d_bt,
+            R.string.setting_3d_fp,
             /*R.string.setting_3d_auto,
             R.string.setting_3d_2d_l,
             R.string.setting_3d_2d_r,
@@ -5132,7 +5136,7 @@ public class VideoPlayer extends Activity {
                     list.get (pos).put ("item_sel", R.drawable.item_img_sel);
                     break;
                 case PLAY3D:
-                    int size_3d = 3;
+                    int size_3d = string_3d_id.length;
                     for (int i = 0; i < size_3d; i++) {
                         map = new HashMap<String, Object>();
                         map.put ("item_name", getResources().getString (string_3d_id[i]));
