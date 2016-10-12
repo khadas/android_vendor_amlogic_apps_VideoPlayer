@@ -14,6 +14,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -25,6 +26,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
+import android.Manifest;
 import android.net.Uri;
 //import android.os.Bundle;
 //import android.os.Handler;
@@ -38,6 +40,8 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -192,6 +196,9 @@ public class VideoPlayer extends Activity {
         private SubtitleManager mSubtitleManager;
         private SystemControlManager mSystemControl;
 
+        //request code for permission check
+        private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
+
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
@@ -213,8 +220,18 @@ public class VideoPlayer extends Activity {
                 }
             });*/
             init();
-            if (0 != checkUri()) { return; }
-            storeFilePos();
+
+            if (PackageManager.PERMISSION_DENIED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                LOGI (TAG, "[onResume]requestPermissions");
+                ActivityCompat.requestPermissions(VideoPlayer.this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            }
+            else {
+                if (0 != checkUri()) { return; }
+                storeFilePos();
+            }
+
             ////showCtlBar();
         }
 
@@ -371,6 +388,20 @@ public class VideoPlayer extends Activity {
                         browserBack();
                     }
                 }
+            }
+        }
+
+        public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+            switch (requestCode) {
+                case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                    // If request is cancelled, the result arrays are empty.
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        Log.i(TAG, "user granted the permission!");
+                    }
+                    else {
+                        Log.i(TAG, "user denied the permission!");
+                    }
+                return;
             }
         }
 
