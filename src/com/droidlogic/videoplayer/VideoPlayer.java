@@ -2524,9 +2524,7 @@ public class VideoPlayer extends Activity {
                         mSubIndex = getLanguageIndex(MediaInfo.BLURAY_STREAM_TYPE_SUB, loc.getISO3Language());
                         if (mSubIndex == -1)
                             mSubIndex = 0;
-                        if (mSubtitleManager.total() > 0) {
-                            mSubtitleManager.openIdx(mSubIndex);
-                        }
+                        mSubtitleManager.openIdx(mSubIndex);
                     }
                 } else {
                     mSubIndex = 0;
@@ -3300,7 +3298,6 @@ public class VideoPlayer extends Activity {
                         for (int i = 0; i < streamNum; i++) {
                             int type = parcel.readInt();
                             String lang = parcel.readString();
-                            LOGI(TAG, "[onBlurayInfo]sub[" + i + "] type(" + type + ") lang: " + lang);
                             switch (type) {
                                 case MediaInfo.BLURAY_STREAM_TYPE_VIDEO:
                                     mBlurayVideoLang.add(lang);
@@ -3315,6 +3312,12 @@ public class VideoPlayer extends Activity {
                                     break;
                             }
                         }
+                        for (int i = 0; i < mBlurayVideoLang.size(); i ++)
+                            LOGI(TAG, "[onBlurayInfo] Bluray Video    Track [" + i +"] Language is [" + mBlurayVideoLang.get(i) + "]" );
+                        for (int i = 0; i < mBlurayAudioLang.size(); i ++)
+                            LOGI(TAG, "[onBlurayInfo] Bluray Audio    Track [" + i +"] Language is [" + mBlurayAudioLang.get(i) + "]" );
+                        for (int i = 0; i < mBluraySubLang.size(); i ++)
+                            LOGI(TAG, "[onBlurayInfo] Bluray Subtitle Track [" + i +"] Language is [" + mBluraySubLang.get(i) + "]" );
                         int chapterNum = parcel.readInt();
                         mBlurayChapter.clear();
                         for (int i = 0; i < chapterNum; i++) {
@@ -4369,6 +4372,8 @@ public class VideoPlayer extends Activity {
                     break;
                 case MediaInfo.BLURAY_STREAM_TYPE_AUDIO:
                     index = mBlurayAudioLang.indexOf(lang);
+                    if (index == -1)
+                        index = mBlurayAudioLang.indexOf("eng");
                     break;
                 case MediaInfo.BLURAY_STREAM_TYPE_SUB:
                     index = mBluraySubLang.indexOf(lang);
