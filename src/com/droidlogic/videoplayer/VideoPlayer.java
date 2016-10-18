@@ -2733,24 +2733,11 @@ public class VideoPlayer extends Activity {
         private String changeForIsoFile(String path) {
             File file = new File(path);
             String fpath = file.getPath();
-            if (fpath.toLowerCase().endsWith(".iso")) {
-                mount(fpath);
-                File f = new File(LOOP_DIR);
-                //File f = new File("/mnt/sdcard/loop");
-                if (!f.exists() || (f.exists() && !f.isDirectory())) {
-                    Log.e(TAG, "/storage/loop not exists");
-                    mount(fpath);
-                }
-                //fpath = "bluray:/mnt/sdcard/loop";
-                fpath = "bluray:/mnt/loop";
-                mIsBluray = true;
-                mBlurayVideoLang = new ArrayList<String>();
-                mBlurayAudioLang = new ArrayList<String>();
-                mBluraySubLang = new ArrayList<String>();
-                mBlurayChapter = new ArrayList<ChapterInfo>();
-                chapterBtn.setVisibility(View.VISIBLE);
-            } else if (file.isDirectory() && FileList.isISOFile(file)) {
-                fpath = "bluray:" + fpath;
+            if (FileList.isBDFile(file)) {
+                if (FileList.isISOFile(file))
+                    fpath = "bluray:/mnt/loop";
+                else
+                    fpath = "bluray:" + fpath;
                 mIsBluray = true;
                 mBlurayVideoLang = new ArrayList<String>();
                 mBlurayAudioLang = new ArrayList<String>();
