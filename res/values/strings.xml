@@ -56,6 +56,14 @@
     <string name="setting_3d_full_off">scale2 off</string>
     <string name="setting_3d_lr_full">L/R Half2Full</string>
     <string name="setting_3d_tb_full">T/B Half2Full</string>
+    <string name="setting_moreset">More Setting</string>
+    <string name="setting_switch_codec">Switch Codec</string>
+    <string name="setting_codec_amlogicplayer">Amlogic Player</string>
+    <string name="setting_codec_omx">OMX</string>
+    <string name="setting_more">...</string>
+
+    <string name="confirm_codec_set">Codec Set</string>
+    <string name="codec_set_msg">Some video can not play if codec been changed, confirm to switch codec?</string>
 
     <string name="setting_play_chapters">Play Chapters</string>
     <string name="setting_chapters">Chapters</string>

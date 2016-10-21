@@ -56,6 +56,14 @@
     <string name="setting_3d_full_off">半幅满屏关</string>
     <string name="setting_3d_lr_full">左右满屏</string>
     <string name="setting_3d_tb_full">上下满屏</string>
+    <string name="setting_moreset">更多设置</string>
+    <string name="setting_switch_codec">切换解码器</string>
+    <string name="setting_codec_amlogicplayer">Amlogic Player</string>
+    <string name="setting_codec_omx">OMX</string>
+    <string name="setting_more">...</string>
+
+    <string name="confirm_codec_set">解码器切换</string>
+    <string name="codec_set_msg">解码器切换可能导致部分格式视频无法正常播放，确定切换解码器？</string>
 
     <string name="setting_play_chapters">章节播放</string>
     <string name="setting_chapters">章节</string>

@@ -136,6 +136,7 @@ public class VideoPlayer extends Activity {
         private ImageButton brigtnessBtn = null;
         private ImageButton fileinfoBtn = null;
         private ImageButton play3dBtn = null;
+        private ImageButton moreSetBtn = null;
         private TextView otherwidgetTitleTx = null;
         private boolean progressBarSeekFlag = false;
 
@@ -722,6 +723,7 @@ public class VideoPlayer extends Activity {
             brigtnessBtn = (ImageButton) findViewById (R.id.BrightnessBtn);
             fileinfoBtn = (ImageButton) findViewById (R.id.InfoBtn);
             play3dBtn = (ImageButton) findViewById (R.id.Play3DBtn);
+            moreSetBtn = (ImageButton) findViewById (R.id.MoreSetBtn);
             otherwidgetTitleTx = (TextView) findViewById (R.id.more_title);
 
             if (mSystemControl.getPropertyBoolean("ro.platform.has.mbxuimode", false)) {
@@ -874,6 +876,12 @@ public class VideoPlayer extends Activity {
                     toast.show();
                     startOsdTimeout();*/
                     play3DSelect();
+                }
+            });
+            moreSetBtn.setOnClickListener (new View.OnClickListener() {
+                public void onClick (View v) {
+                    LOGI (TAG, "moreSetBtn onClick");
+                    moreSet();
                 }
             });
         }
@@ -1463,6 +1471,55 @@ public class VideoPlayer extends Activity {
             showOtherWidget (R.string.setting_3d_mode);
         }
 
+        private void moreSet() {
+            SimpleAdapter moreSetArray = getMorebarListAdapter(MORE_SET, 0);
+            ListView listView = (ListView) findViewById (R.id.ListView);
+            listView.setAdapter(moreSetArray);
+            listView.setOnItemClickListener (new AdapterView.OnItemClickListener() {
+                public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
+                    if (position == 0) {
+                        codecSet();
+                    }
+                    // TODO: add more set
+                }
+            });
+            showOtherWidget(R.string.setting_moreset);
+        }
+
+        private void codecSet() {
+            final int curIdx = mOption.getCodecIdx();
+            SimpleAdapter codecarray = getMorebarListAdapter(CODEC_SET, mOption.getCodecIdx());
+            ListView listView = (ListView)findViewById(R.id.ListView);
+            listView.setAdapter(codecarray);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    final int pos = position;
+                    if (position != curIdx) {
+                        //show confirm dialog
+                        confirm_dialog = new AlertDialog.Builder(VideoPlayer.this)
+                        .setTitle (R.string.confirm_codec_set)
+                        .setMessage (R.string.codec_set_msg)
+                        .setPositiveButton (R.string.str_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick (DialogInterface dialog, int whichButton) {
+                                mOption.setCodecIdx(pos);
+                                codecSetImpl(pos);
+                            }
+                        })
+                        .setNegativeButton (R.string.str_cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick (DialogInterface dialog, int whichButton) {
+
+                            }
+                        })
+                        .show();
+                        exitOtherWidget(moreSetBtn);
+                    }
+                }
+            });
+            showOtherWidget(R.string.setting_switch_codec);
+        }
+
         private void subtitleSelect() {
             /*Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
             toast.setGravity(Gravity.BOTTOM,110,0);
@@ -1963,6 +2020,17 @@ public class VideoPlayer extends Activity {
                     mSystemControl.set3DMode("3doff");
                 }
             }
+        }
+
+        private void codecSetImpl(int idx) {
+            if (idx == 0) {
+                mSystemControl.setProperty("media.amplayer.enable", "true");
+            }
+            else if (idx == 1) {
+                mSystemControl.setProperty("media.amplayer.enable", "false");
+            }
+            initPlayer();
+            playCur();
         }
 
         private void sendUpdateDisplayModeMsg() {
@@ -3476,6 +3544,8 @@ public class VideoPlayer extends Activity {
         private final int PLAY3D = 9;
         private final int VIDEO_TRACK = 10;
         private final int CHAPTER_MODE = 11;
+        private final int MORE_SET = 12;
+        private final int CODEC_SET = 13;
         private int otherwidgetStatus = 0;
 
         protected void startOsdTimeout() {
@@ -4057,6 +4127,10 @@ public class VideoPlayer extends Activity {
                             case R.string.str_file_name:
                                 fileinfoBtn.requestFocusFromTouch();
                                 fileinfoBtn.requestFocus();
+                                break;
+                            case R.string.setting_moreset:
+                                moreSetBtn.requestFocusFromTouch();
+                                moreSetBtn.requestFocus();
                                 break;
                             default:
                                 optbar.requestFocus();
@@ -5179,6 +5253,27 @@ public class VideoPlayer extends Activity {
                         list.get (mOption.get3DMode()).put ("item_sel", R.drawable.item_img_sel);
                     }
                     break;
+                case MORE_SET:
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_switch_codec));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_more));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    break;
+                case CODEC_SET:
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_codec_amlogicplayer));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_codec_omx));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    list.get (pos).put ("item_sel", R.drawable.item_img_sel);
+                    break;
                 default:
                     break;
             }
@@ -5203,6 +5298,7 @@ class Option {
         private int audiodtsapresent = -1;
         private int display = 0;
         private int _3dmode = 0;
+        private int codec= 0;
 
         public static final int REPEATLIST = 0;
         public static final int REPEATONE = 1;
@@ -5219,6 +5315,7 @@ class Option {
         private String AUDIO_DTS_APRESENT = "AudioDtsApresent";
         private String AUDIO_DTS_ASSET = "AudioDtsAsset";
         private String DISPLAY_MODE = "DisplayMode";
+        private String CODEC = "Codec";
 
         public Option (Activity act) {
             mAct = act;
@@ -5281,6 +5378,13 @@ class Option {
 
         public int get3DMode() {
             return _3dmode;
+        }
+
+        public int getCodecIdx() {
+            if (sp != null) {
+                codec = sp.getInt(CODEC, 0);
+            }
+            return codec;
         }
 
         public void setResumeMode (boolean para) {
@@ -5349,6 +5453,14 @@ class Option {
 
         public void set3DMode (int para) {
             _3dmode = para;
+        }
+
+        public void setCodecIdx (int para) {
+            if (sp != null) {
+                sp.edit()
+                .putInt (CODEC, para)
+                .commit();
+            }
         }
 }
 

@@ -105,4 +105,13 @@
         android:gravity="center"
         android:visibility="gone">
     </ImageButton>
+    <ImageButton
+        android:id="@+id/MoreSetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/more_set"
+        android:background="@drawable/btn_button"
+        android:gravity="center">
+    </ImageButton>
 </LinearLayout>

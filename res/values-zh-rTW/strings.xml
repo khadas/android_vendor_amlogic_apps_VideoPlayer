@@ -54,6 +54,14 @@
     <string name="setting_3d_full_off">scale2 off</string>
     <string name="setting_3d_lr_full">L/R Half2Full</string>
     <string name="setting_3d_tb_full">T/B Half2Full</string>
+    <string name="setting_moreset">更多設置</string>
+    <string name="setting_switch_codec">切換解碼器</string>
+    <string name="setting_codec_amlogicplayer">Amlogic Player</string>
+    <string name="setting_codec_omx">OMX</string>
+    <string name="setting_more">...</string>
+
+    <string name="confirm_codec_set">解碼器切換</string>
+    <string name="codec_set_msg">解碼器切換可能導致部分格式視頻無法正常播放，確定切換解碼器？</string>
 
     <string name="setting_play_chapters">章節播放</string>
     <string name="setting_chapters">章節</string>
