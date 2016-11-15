@@ -733,6 +733,13 @@ public class VideoPlayer extends Activity {
                 play3dBtn.setVisibility (View.GONE);
             }
 
+            if (mSystemControl.getPropertyBoolean("sys.videoplayer.moresetenable", false)) {
+                moreSetBtn.setVisibility (View.VISIBLE);
+            }
+            else {
+                moreSetBtn.setVisibility (View.GONE);
+            }
+
             //layer 1
             progressBar.setOnSeekBarChangeListener (new SeekBar.OnSeekBarChangeListener() {
                 public void onStopTrackingTouch (SeekBar seekBar) {
