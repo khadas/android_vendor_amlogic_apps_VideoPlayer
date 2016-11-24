@@ -988,7 +988,7 @@ public class FileList extends ListActivity {
             listVideos = new ArrayList<File>();
             for (int i = 0; i < the_Files.length; i++) {
                 File tempF = the_Files[i];
-                if (tempF.isFile() || (tempF.isDirectory() && isBDFile(tempF))) {
+                if (isBDFile(tempF) || (tempF.isFile() && !isISOFile(tempF))) {
                     listVideos.add (tempF);
                 }
             }
