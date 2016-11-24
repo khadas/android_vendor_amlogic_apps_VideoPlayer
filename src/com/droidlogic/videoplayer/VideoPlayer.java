@@ -2595,8 +2595,8 @@ public class VideoPlayer extends Activity {
                         mSubtitleManager.openIdx(mSubIndex);
                     }
                 } else {
-                    mSubIndex = 0;
-                    mSubtitleManager.openIdx(mSubIndex);
+                    //mSubIndex = 0;
+                    //mSubtitleManager.openIdx(mSubIndex);
                 }
                 mSubtitleManager.start();
                 mState = STATE_PLAYING;
