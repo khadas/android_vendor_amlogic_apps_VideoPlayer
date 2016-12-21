@@ -964,16 +964,18 @@ public class FileList extends ListActivity {
             /*SettingsVP.setSystemWrite(sw);
             if (SettingsVP.chkEnableOSD2XScale() == true)
                 this.setVisible(false);*/
-            if (mAppInfo.targetSdkVersion >= Build.VERSION_CODES.M &&
+            /*if (mAppInfo.targetSdkVersion >= Build.VERSION_CODES.M &&
                 (PackageManager.PERMISSION_DENIED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE))) {
                 ActivityCompat.requestPermissions(FileList.this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    /*MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE*/0);
+                    //MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE//0);
             }
             else {
                 startActivity (intent);
                 FileList.this.finish();
-            }
+            }*/
+            startActivity (intent);
+            FileList.this.finish();
         }
 
         public int filterDir (File file) {

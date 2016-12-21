@@ -60,6 +60,12 @@
     <string name="setting_switch_codec">Switch Codec</string>
     <string name="setting_codec_amlogicplayer">Amlogic Player</string>
     <string name="setting_codec_omx">OMX</string>
+    <string name="setting_switch_VR">Switch VR</string>
+    <string name="setting_VR_full">Full</string>
+    <string name="setting_VR_middle">Middle</string>
+    <string name="setting_VR_left">Left</string>
+    <string name="setting_VR_right">Right</string>
+    <string name="setting_VR_montage">Montage(L/R)</string>
     <string name="setting_more">...</string>
 
     <string name="confirm_codec_set">Codec Set</string>

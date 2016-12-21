@@ -322,6 +322,11 @@ public class VideoPlayer extends Activity {
             registerHdmiReceiver();
             registerMountReceiver();
             registerPowerReceiver();
+
+            if (mOption != null) {
+                mOption.setVRIdx(1);
+                VRSetImpl(1);
+            }
         }
 
         @Override
@@ -425,6 +430,9 @@ public class VideoPlayer extends Activity {
                     if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         Log.i(TAG, "user granted the permission!");
                         mPermissionGranted = true;
+                        if (0 != checkUri()) { return; }
+                        storeFilePos();
+                        playCur();
                     }
                     else {
                         Log.i(TAG, "user denied the permission!");
@@ -1484,8 +1492,11 @@ public class VideoPlayer extends Activity {
             listView.setAdapter(moreSetArray);
             listView.setOnItemClickListener (new AdapterView.OnItemClickListener() {
                 public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
-                    if (position == 0) {
+                    if (position == 0) {//codecSet
                         codecSet();
+                    }
+                    else if (position == 1) {//vrSet
+                        VRSet();
                     }
                     // TODO: add more set
                 }
@@ -1525,6 +1536,23 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget(R.string.setting_switch_codec);
+        }
+
+        private void VRSet() {
+            final int curIdx = mOption.getVRIdx();
+            SimpleAdapter vrarray = getMorebarListAdapter(VR_SET, curIdx);
+            ListView listView = (ListView)findViewById(R.id.ListView);
+            listView.setAdapter(vrarray);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (position != curIdx) {
+                        mOption.setVRIdx(position);
+                        VRSetImpl(position);
+                        exitOtherWidget(moreSetBtn);
+                    }
+                }
+            });
+            showOtherWidget(R.string.setting_switch_VR);
         }
 
         private void subtitleSelect() {
@@ -2038,6 +2066,28 @@ public class VideoPlayer extends Activity {
             }
             initPlayer();
             playCur();
+        }
+
+        private void VRSetImpl(int idx) {
+            if (idx == 0) {
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_enable", "0");
+            }
+            else if (idx == 1) {
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_enable", "1");
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_mode", "0");
+            }
+            else if (idx == 2) {
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_enable", "1");
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_mode", "1");
+            }
+            else if (idx == 3) {
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_enable", "1");
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_mode", "2");
+            }
+            else if (idx == 4) {
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_enable", "1");
+                mSystemControl.writeSysFs("/sys/module/ionvideo/parameters/vr_mode", "3");
+            }
         }
 
         private void sendUpdateDisplayModeMsg() {
@@ -3553,6 +3603,7 @@ public class VideoPlayer extends Activity {
         private final int CHAPTER_MODE = 11;
         private final int MORE_SET = 12;
         private final int CODEC_SET = 13;
+        private final int VR_SET = 14;
         private int otherwidgetStatus = 0;
 
         protected void startOsdTimeout() {
@@ -5266,6 +5317,10 @@ public class VideoPlayer extends Activity {
                     map.put ("item_sel", R.drawable.item_img_unsel);
                     list.add (map);
                     map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_switch_VR));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
                     map.put ("item_name", getResources().getString (R.string.setting_more));
                     map.put ("item_sel", R.drawable.item_img_unsel);
                     list.add (map);
@@ -5277,6 +5332,29 @@ public class VideoPlayer extends Activity {
                     list.add (map);
                     map = new HashMap<String, Object>();
                     map.put ("item_name", getResources().getString (R.string.setting_codec_omx));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    list.get (pos).put ("item_sel", R.drawable.item_img_sel);
+                    break;
+                case VR_SET:
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_VR_full));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_VR_middle));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_VR_left));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_VR_right));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_VR_montage));
                     map.put ("item_sel", R.drawable.item_img_unsel);
                     list.add (map);
                     list.get (pos).put ("item_sel", R.drawable.item_img_sel);
@@ -5306,6 +5384,7 @@ class Option {
         private int display = 0;
         private int _3dmode = 0;
         private int codec= 0;
+        private int vr= 0;
 
         public static final int REPEATLIST = 0;
         public static final int REPEATONE = 1;
@@ -5323,6 +5402,7 @@ class Option {
         private String AUDIO_DTS_ASSET = "AudioDtsAsset";
         private String DISPLAY_MODE = "DisplayMode";
         private String CODEC = "Codec";
+        private String VR = "VR";
 
         public Option (Activity act) {
             mAct = act;
@@ -5392,6 +5472,13 @@ class Option {
                 codec = sp.getInt(CODEC, 0);
             }
             return codec;
+        }
+
+        public int getVRIdx() {
+            if (sp != null) {
+                vr = sp.getInt(VR, 0);
+            }
+            return vr;
         }
 
         public void setResumeMode (boolean para) {
@@ -5466,6 +5553,14 @@ class Option {
             if (sp != null) {
                 sp.edit()
                 .putInt (CODEC, para)
+                .commit();
+            }
+        }
+
+        public void setVRIdx (int para) {
+            if (sp != null) {
+                sp.edit()
+                .putInt (VR, para)
                 .commit();
             }
         }
