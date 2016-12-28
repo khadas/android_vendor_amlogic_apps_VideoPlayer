@@ -948,7 +948,7 @@ public class VideoPlayer extends Activity {
                                 ext.equals ("m4v") || ext.equals ("mts") || ext.equals ("tp") || ext.equals ("bit") ||
                                 ext.equals ("webm") || ext.equals ("3g2") || ext.equals ("f4v") || ext.equals ("pmp") ||
                                 ext.equals ("mpeg") || ext.equals ("vob") || ext.equals ("dat") || ext.equals ("m2v") ||
-                                ext.equals ("iso") || ext.equals ("vp9") || ext.equals ("trp") || ext.equals ("hm10")) {
+                                ext.equals ("iso") || ext.equals ("vp9") || ext.equals ("trp") || ext.equals ("bin") || ext.equals ("hm10")) {
                             list.add (pathFull);
                         }
                     }
