@@ -741,7 +741,7 @@ public class VideoPlayer extends Activity {
                 play3dBtn.setVisibility (View.GONE);
             }
 
-            if (mSystemControl.getPropertyBoolean("sys.videoplayer.moresetenable", false)) {
+            if (mSystemControl.getPropertyBoolean("sys.videoplayer.moresetenable", true)) {
                 moreSetBtn.setVisibility (View.VISIBLE);
             }
             else {
