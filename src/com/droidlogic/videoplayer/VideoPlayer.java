@@ -3331,10 +3331,10 @@ public class VideoPlayer extends Activity {
                         toast.show();
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_MULASSETHINT) {
-                        Toast toast =Toast.makeText(VideoPlayer.this, "MulAssetAudio",Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
+                        /*Toast toast =Toast.makeText(VideoPlayer.this, "MulAssetAudio",Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.BOTTOM,0,0);
                         toast.setDuration(0x00000001);
-                        toast.show();
+                        toast.show();*/
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_HPS_NOTSUPPORT) {
                         String dtshpsUnsupportStr = getResources().getString(R.string.dts_hps_unsupport);
