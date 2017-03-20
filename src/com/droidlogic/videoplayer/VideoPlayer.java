@@ -3119,9 +3119,9 @@ public class VideoPlayer extends Activity {
                     ex.printStackTrace();
                 }
 
+                mTrackInfo = mp.getTrackInfo();
                 //TODO: some error should debug 20150525
                 if (!isTimedTextDisable()) {
-                    mTrackInfo = mp.getTrackInfo();
                     if (mTrackInfo != null) {
                         LOGI(TAG,"[mPreparedListener]mTrackInfo.length:"+mTrackInfo.length);
                         for (int i = 0; i < mTrackInfo.length; i++) {
