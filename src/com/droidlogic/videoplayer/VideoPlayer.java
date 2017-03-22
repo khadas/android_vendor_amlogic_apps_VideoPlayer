@@ -666,6 +666,8 @@ public class VideoPlayer extends Activity {
                 if (video_init_list_idx <= mMediaInfo.getTsTotalNum()) {
                     mOption.setVideoTrack(video_init_list_idx);
                 }
+                mOption.setSoundTrack(0);
+
             }
         }
 
@@ -1956,7 +1958,18 @@ public class VideoPlayer extends Activity {
                     soundTrackStr = "lrmix";
                 }
                 LOGI (TAG, "[soundTrackImpl]soundTrackStr:" + soundTrackStr);
-                mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
+                boolean ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
+                LOGI (TAG, "[soundTrackImpl]:mMediaPlayer.setParameter" + ret);
+
+                if (!ret) {
+                    if (idx == 0 || idx == 3) {
+                            mMediaPlayer.setVolume(1.0f, 1.0f);
+                    } else if (idx == 1) {
+                            mMediaPlayer.setVolume(1.0f, 0.0f);
+                    } else if (idx == 2) {
+                            mMediaPlayer.setVolume(0.0f, 1.0f);
+                    }
+                }
             }
         }
 
