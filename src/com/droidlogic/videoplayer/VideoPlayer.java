@@ -1937,7 +1937,22 @@ public class VideoPlayer extends Activity {
                 StringBuilder builder = new StringBuilder();
                 builder.append("vid:"+str);
                 LOGI(TAG,"[videoTrackImpl]"+builder.toString());
-                mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_VIDEO_TRACK,builder.toString());
+                boolean ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_VIDEO_TRACK,builder.toString());
+                LOGI (TAG, "[videoTrackImpl]:mMediaPlayer.setParameter" + ret);
+                if (!ret && mTrackInfo != null) {
+                    int videoTrack = -1;
+                    for (int i = 0; i < mTrackInfo.length; i++) {
+                        int trackType = mTrackInfo[i].getTrackType();
+                        LOGI(TAG,"[videoTrackImpl]==i:" + i + "trackType:" + trackType);
+                        if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO) {
+                            videoTrack ++;
+                            if (videoTrack == idx) {
+                                LOGI(TAG,"[videoTrackImpl]selectTrack track num:" + i);
+                                mMediaPlayer.selectTrack(i);
+                            }
+                        }
+                    }
+                }
             }
         }
 
