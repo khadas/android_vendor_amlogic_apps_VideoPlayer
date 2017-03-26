@@ -3120,6 +3120,16 @@ public class VideoPlayer extends Activity {
                 }
 
                 mTrackInfo = mp.getTrackInfo();
+                if (mTrackInfo != null) {
+                    mSubtitleManager.resetTrackIdx();
+                    for (int j = 0; j < mTrackInfo.length; j++) {
+                        int trackType = mTrackInfo[j].getTrackType();
+                        if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_SUBTITLE || trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
+                            mSubtitleManager.storeTrackIdx(j);
+                        }
+                    }
+                }
+
                 //TODO: some error should debug 20150525
                 if (!isTimedTextDisable()) {
                     if (mTrackInfo != null) {
