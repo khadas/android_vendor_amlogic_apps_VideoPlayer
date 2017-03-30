@@ -64,6 +64,8 @@ public class FileList extends ListActivity {
         private static final String OBB_PATH            = "/mnt/obb";
         private static final String USB_DRIVE_PATH      = "/mnt/usbdrive";
         private static final String SHELL_PATH          = "/mnt/shell";
+        private static final String SURPORT_BIN         = ",bin";
+        private static final String NOT_SURPORT         = "";
 
         private Context mContext;
         private ApplicationInfo mAppInfo;
@@ -283,6 +285,9 @@ public class FileList extends ListActivity {
             requestWindowFeature (Window.FEATURE_NO_TITLE);
             setContentView (R.layout.file_list);
             mSystemControl = new SystemControlManager(this);
+            if (!mSystemControl.getPropertyBoolean("sys.videoplayer.surportbin", false)) {
+                extensions = extensions.replaceAll(SURPORT_BIN, NOT_SURPORT);
+            }
             mStorageManager = (StorageManager)getSystemService(Context.STORAGE_SERVICE);
             mContext = this.getApplicationContext();
             mAppInfo = mContext.getApplicationInfo();
