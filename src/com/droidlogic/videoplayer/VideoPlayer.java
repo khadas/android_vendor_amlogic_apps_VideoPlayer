@@ -2643,6 +2643,7 @@ public class VideoPlayer extends Activity {
                                                      AudioManager.AUDIOFOCUS_GAIN);
                 }
                 mMediaPlayer.start();
+                mSubtitleManager.start();
                 Locale loc = Locale.getDefault();
                 if (loc != null && mIsBluray) {
                     if (mSubIndex == 0) {
@@ -2655,7 +2656,6 @@ public class VideoPlayer extends Activity {
                     //mSubIndex = 0;
                     //mSubtitleManager.openIdx(mSubIndex);
                 }
-                mSubtitleManager.start();
                 mState = STATE_PLAYING;
                 updateIconResource();
                 if (mHandler != null) {
