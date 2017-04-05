@@ -281,6 +281,17 @@ public class VideoPlayer extends Activity {
             Intent intent = new Intent ("com.android.music.musicservicecommand");
             intent.putExtra ("command", "pause");
             mContext.sendBroadcast (intent);
+
+            if (mOption != null) {
+                int idx = mOption.getCodecIdx();
+                if (idx == 0) {
+                    mSystemControl.setProperty("media.amplayer.enable", "true");
+                }
+                else if (idx == 1) {
+                    mSystemControl.setProperty("media.amplayer.enable", "false");
+                }
+            }
+
             //init time store
             mErrorTime = java.lang.System.currentTimeMillis();
             mErrorTimeBac = java.lang.System.currentTimeMillis();
@@ -327,6 +338,7 @@ public class VideoPlayer extends Activity {
                 mOption.setVRIdx(1);
                 VRSetImpl(1);
             }
+
         }
 
         @Override
@@ -3076,6 +3088,7 @@ public class VideoPlayer extends Activity {
         MediaPlayer.OnPreparedListener mPreparedListener = new MediaPlayer.OnPreparedListener() {
             public void onPrepared (MediaPlayer mp) {
                 LOGI (TAG, "[mPreparedListener]onPrepared mp:" + mp);
+
                 mState = STATE_PREPARED;
                 MediaPlayer.TrackInfo[] trackInfo = mp.getTrackInfo();
                 /*Metadata data = mp.getMetadata (MediaPlayer.METADATA_ALL, MediaPlayer.BYPASS_METADATA_FILTER);
@@ -3190,6 +3203,7 @@ public class VideoPlayer extends Activity {
                         LOGI(TAG,"[mPreparedListener]trackInfo["+i+"].trackType:"+trackType);
                     }
                 }*/
+
                 if (mStateBac != STATE_PAUSED) {
                     start();
                 }
