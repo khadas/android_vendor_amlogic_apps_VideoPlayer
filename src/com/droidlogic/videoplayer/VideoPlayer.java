@@ -413,12 +413,9 @@ public class VideoPlayer extends Activity {
 
             if (mResumePlay != null) {
                 if (mContext != null) {
-                    boolean resumeEnable = true;
-                    if (mSystemControl.getPropertyBoolean("ro.platform.has.mbxuimode", false)) {
-                        resumeEnable = mContext.getResources().getBoolean (R.bool.config_resume_play_enable);
-                    }
+                    boolean resumeEnable = false;
                     LOGI (TAG, "[onPause] resumeEnable:" + resumeEnable);
-                    if (resumeEnable == true) {
+                    if (resumeEnable) {
                         mResumePlay.setEnable (true); //resume play function ON/OFF
                         if (true == mResumePlay.getEnable()) {
                             mResumePlay.set (mPlayList.getcur(), curtime);
