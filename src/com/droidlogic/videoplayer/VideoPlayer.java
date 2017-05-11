@@ -3049,7 +3049,7 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.setOnInfoListener (mInfoListener);
             mMediaPlayer.setOnBlurayInfoListener(mBlurayListener);
             mMediaPlayer.setDisplay (mSurfaceHolder);
-            mMediaPlayer.setOnTimedTextListener(mTimedTextListener);
+            //mMediaPlayer.setOnTimedTextListener(mTimedTextListener);
             //@@mMediaPlayer.setOnSubtitleDataListener(mSubtitleDataListener);
         }
 
