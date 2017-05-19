@@ -30,7 +30,7 @@
         </activity>
         <activity android:name="VideoPlayer"
             android:label="@string/main_activity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:theme="@style/player"
             android:configChanges="mnc|mcc|orientation|keyboardHidden|screenSize|screenLayout|keyboard|navigation">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
