@@ -421,7 +421,7 @@ public class VideoPlayer extends Activity {
                             mResumePlay.set (mPlayList.getcur(), curtime);
                             LOGI (TAG, "[onPause]mStateBac:" + mState);
                             mStateBac = mState;
-                            sendStopMsg();
+                            stop();
                         }
                     }
                     else {
@@ -2343,7 +2343,7 @@ public class VideoPlayer extends Activity {
                 }
             }
             showNoOsdView();
-            sendStopMsg();
+            stop();
             finish();
         }
 
@@ -2370,7 +2370,7 @@ public class VideoPlayer extends Activity {
             if (mState != STATE_PREPARING) { // avoid status error for preparing
                 close3D();
                 stopFWFB();
-                sendStopMsg();
+                stop();
                 mBookmark.set (mPlayList.getcur(), curtime);
                 mStateBac = STATE_STOP;
                 mPath = mPlayList.moveprev();
@@ -2389,7 +2389,7 @@ public class VideoPlayer extends Activity {
             if (mState != STATE_PREPARING) { // avoid status error for preparing
                 close3D();
                 stopFWFB();
-                sendStopMsg();
+                stop();
                 mBookmark.set (mPlayList.getcur(), curtime);
                 mStateBac = STATE_STOP;
                 mPath = mPlayList.movenext();
@@ -2406,7 +2406,7 @@ public class VideoPlayer extends Activity {
             startSwitchTimeout();
             stopOsdTimeout();
             stopFWFB();
-            sendStopMsg();
+            stop();
             curtime = 0;
             totaltime = 0;
             mBookmark.set (mPlayList.getcur(), curtime);
