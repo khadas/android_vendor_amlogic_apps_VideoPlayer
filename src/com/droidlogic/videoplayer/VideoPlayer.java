@@ -2418,6 +2418,9 @@ public class VideoPlayer extends Activity {
         private void fastForward() {
             LOGI (TAG, "[fastForward]mState:" + mState + ",FF_FLAG:" + FF_FLAG + ",FF_LEVEL:" + FF_LEVEL + ",FB_FLAG:" + FB_FLAG + ",FB_LEVEL:" + FB_LEVEL);
             progressBarSeekFlag = false;
+            if ( (mState < STATE_PREPARED) || (mState == STATE_PLAY_COMPLETED)) { //avoid error (-38, 0), caused by getDuration before prepared
+                return;
+            }
             if (mState == STATE_SEARCHING) {
                 if (FF_FLAG) {
                     if (FF_LEVEL < FF_MAX) {
