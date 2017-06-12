@@ -1296,6 +1296,7 @@ public class VideoPlayer extends Activity {
         private final int apresentationMax = 32;
         private int[] assetsArrayNum = new int[apresentationMax];
         private int mApresentIdx = -1;
+        private int currAudioIndex;
         private static final String DISPLAY_MODE_SYSFS = "/sys/class/display/mode";
         private void resumeSelect() {
             LOGI (TAG, "[resumeSelect]");
@@ -1373,14 +1374,12 @@ public class VideoPlayer extends Activity {
         private void audiotrackSelect() {
             LOGI (TAG, "[audiotrackSelect]");
             SimpleAdapter audioarray = null;
-            int currAudioIndex;
             if (mIsBluray)
                 audioarray = getMorebarListAdapter(AUDIO_TRACK, mOption.getAudioTrack());
             else
                 audioarray = getMorebarListAdapter(AUDIO_TRACK, mOption.getAudioTrack());
             ListView listView = (ListView) findViewById (R.id.ListView);
             listView.setAdapter (audioarray);
-            currAudioIndex = listView.getSelectedItemPosition();
             listView.setOnItemClickListener (new AdapterView.OnItemClickListener() {
                 public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
                     boolean ret = mMediaInfo.checkAudioisDTS (mMediaInfo.getAudioFormat (position));
@@ -1394,6 +1393,8 @@ public class VideoPlayer extends Activity {
                     if (currAudioIndex != position) {
                         mOption.setAudioTrack (position);
                         audioTrackImpl (position);
+
+                        currAudioIndex = position;
                     }
                     mDtsType = DTS_NOR;
                     showCertification(); //update certification status and icon
