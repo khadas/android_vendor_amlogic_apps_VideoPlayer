@@ -22,6 +22,10 @@ LOCAL_CERTIFICATE := platform
 LOCAL_JAVA_LIBRARIES := droidlogic
 LOCAL_STATIC_JAVA_LIBRARIES := android-support-v4
 
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+endif
+
 #LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
 
 #LOCAL_PROGUARD_ENABLED := disabled
