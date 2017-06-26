@@ -255,7 +255,6 @@ public class VideoPlayer extends Activity {
         @Override
         public void onResume() {
             super.onResume();
-
             if (!mPermissionGranted) {
                 return;
             }
@@ -538,11 +537,11 @@ public class VideoPlayer extends Activity {
                 curtime = getCurrentPosition();
                 totaltime = getDuration();
                 // add for seeking to head
-                /*if(curtime <= 1000) { //current time is equal or smaller than 1S stop fw/fb
+                if (curtime <= 1000) { //current time is equal or smaller than 1S stop fw/fb
                     stopFWFB();
                     mState = STATE_PLAYING;
                     updateIconResource();
-                }*/
+                }
                 LOGI (TAG, "[updateProgressbar]curtime:" + curtime + ",totaltime:" + totaltime + ",progressBar:" + progressBar + ",ctlbar:" + ctlbar + ",ctlbar.getVisibility():" + ctlbar.getVisibility());
                 if (curTimeTx != null && totalTimeTx != null && progressBar != null) {
                     int flag = getCurOsdViewFlag();
@@ -2327,7 +2326,7 @@ public class VideoPlayer extends Activity {
             item_position_selected = item_position_selected_init + mPlayList.getindex();
             browserBackDoing = true;
             if (browserBackInvokeFromOnPause == true) {
-                mPlayList.rootPath = null;
+//                mPlayList.rootPath = null;
             }
             else {
                 if (!backToOtherAPK) {
