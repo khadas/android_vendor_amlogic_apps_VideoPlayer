@@ -316,7 +316,8 @@ public class VideoPlayer extends Activity {
                                     //browserBack();
                                     initPlayer();
                                     mPath = path;
-                                    sendPlayFileMsg();
+                                    //sendPlayFileMsg();
+                                    playFile(path);
                                 }
                             }
                             else {
@@ -482,21 +483,7 @@ public class VideoPlayer extends Activity {
                         break;
                     case MSG_PLAY:
                         LOGI (TAG, "[handleMessage]resume mode:" + mOption.getResumeMode() + ",mPath:" + mPath);
-                        if (mOption != null && mPath != null && mPermissionGranted) {
-                            resetVariate();
-                            showOsdView();
-                            if (mResumePlay.getEnable() == true) {
-                                setVideoPath (mPath);
-                            }
-                            else {
-                                if (mOption.getResumeMode() == true) {
-                                    bmPlay (mPath);
-                                }
-                                else {
-                                    setVideoPath (mPath);
-                                }
-                            }
-                        }
+                        playFile(mPath);
                         break;
                     case MSG_STOP:
                         stop();
@@ -512,7 +499,8 @@ public class VideoPlayer extends Activity {
                                 //browserBack();
                                 initPlayer();
                                 mPath = path;
-                                sendPlayFileMsg();
+                                //sendPlayFileMsg();
+                                playFile(path);
                             }
                         }
                         else {
@@ -1129,7 +1117,8 @@ public class VideoPlayer extends Activity {
                             LOGI (TAG, "[surfaceCreated]mResumePlay prepare path:" + path);
                             if (path != null) {
                                 mPath = path;
-                                sendPlayFileMsg();
+                                //sendPlayFileMsg();
+                                playFile(path);
                             }
                             else {
                                 browserBack();
@@ -1142,13 +1131,15 @@ public class VideoPlayer extends Activity {
                     else {
                         LOGI (TAG, "[surfaceCreated]0path:" + mPlayList.getcur());
                         mPath = mPlayList.getcur();
-                        sendPlayFileMsg();
+                        //sendPlayFileMsg();
+                        playFile(mPlayList.getcur());
                     }
                 }
                 else {
                     LOGI (TAG, "[surfaceCreated]1path:" + mPlayList.getcur());
                     mPath = mPlayList.getcur();
-                    sendPlayFileMsg();
+                    //sendPlayFileMsg();
+                    playFile(mPlayList.getcur());
                 }
             }
             public void surfaceDestroyed (SurfaceHolder holder) {
@@ -2379,7 +2370,8 @@ public class VideoPlayer extends Activity {
                 mBookmark.set (mPlayList.getcur(), curtime);
                 mStateBac = STATE_STOP;
                 mPath = mPlayList.moveprev();
-                sendPlayFileMsg();
+                //sendPlayFileMsg();
+                playFile(mPlayList.moveprev());
             }
             else {
                 LOGI (TAG, "[playPrev]mState=STATE_PREPARING, error status do nothing only waitting");
@@ -2398,7 +2390,8 @@ public class VideoPlayer extends Activity {
                 mBookmark.set (mPlayList.getcur(), curtime);
                 mStateBac = STATE_STOP;
                 mPath = mPlayList.movenext();
-                sendPlayFileMsg();
+                //sendPlayFileMsg();
+                playFile(mPlayList.movenext());
             }
             else {
                 LOGI (TAG, "[playNext]mState=STATE_PREPARING, error status do nothing only waitting");
@@ -2417,7 +2410,8 @@ public class VideoPlayer extends Activity {
             mBookmark.set (mPlayList.getcur(), curtime);
             mStateBac = STATE_STOP;
             mPath = mPlayList.getcur();
-            sendPlayFileMsg();
+            //sendPlayFileMsg();
+            playFile(mPlayList.getcur());
         }
 
         private void fastForward() {
