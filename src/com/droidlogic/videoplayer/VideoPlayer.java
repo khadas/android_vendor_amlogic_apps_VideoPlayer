@@ -2259,10 +2259,11 @@ public class VideoPlayer extends Activity {
         }
 
         private void playFile (String path) {
-            LOGI (TAG, "[playFile]resume mode:" + mOption.getResumeMode() + ",path:" + path);
-            if (mOption == null) {
+            if (mOption == null || path == null || !mPermissionGranted) {
                 return;
             }
+            LOGI(TAG, "[playFile]resume mode:" + mOption.getResumeMode() + ",path:" + path);
+
             resetVariate();
             if (mResumePlay.getEnable() == true) {
                 setVideoPath (path);
@@ -2371,7 +2372,7 @@ public class VideoPlayer extends Activity {
                 mStateBac = STATE_STOP;
                 mPath = mPlayList.moveprev();
                 //sendPlayFileMsg();
-                playFile(mPlayList.moveprev());
+                playFile(mPath);
             }
             else {
                 LOGI (TAG, "[playPrev]mState=STATE_PREPARING, error status do nothing only waitting");
@@ -2391,7 +2392,7 @@ public class VideoPlayer extends Activity {
                 mStateBac = STATE_STOP;
                 mPath = mPlayList.movenext();
                 //sendPlayFileMsg();
-                playFile(mPlayList.movenext());
+                playFile(mPath);
             }
             else {
                 LOGI (TAG, "[playNext]mState=STATE_PREPARING, error status do nothing only waitting");
