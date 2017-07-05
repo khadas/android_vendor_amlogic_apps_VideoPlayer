@@ -980,7 +980,7 @@ public class FileList extends ListActivity {
                 FileList.this.finish();
             }*/
             startActivity (intent);
-            FileList.this.finish();
+//            FileList.this.finish();
         }
 
         public int filterDir (File file) {
