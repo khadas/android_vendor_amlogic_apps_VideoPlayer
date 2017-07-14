@@ -2326,18 +2326,6 @@ public class VideoPlayer extends Activity {
             }
             item_position_selected = item_position_selected_init + mPlayList.getindex();
             browserBackDoing = true;
-            if (browserBackInvokeFromOnPause == true) {
-//                mPlayList.rootPath = null;
-            }
-            else {
-                if (!backToOtherAPK) {
-                    Intent selectFileIntent = new Intent();
-                    Bundle bundle = getFilePos();
-                    selectFileIntent.setClass (VideoPlayer.this, FileList.class);
-                    selectFileIntent.putExtras (bundle);
-                    startActivity (selectFileIntent);
-                }
-            }
             showNoOsdView();
             stop();
             finish();
