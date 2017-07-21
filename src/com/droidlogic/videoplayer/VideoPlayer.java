@@ -446,6 +446,7 @@ public class VideoPlayer extends Activity {
                     else {
                         Log.i(TAG, "user denied the permission!");
                         mPermissionGranted = false;
+                        finish();
                     }
                 return;
             }
