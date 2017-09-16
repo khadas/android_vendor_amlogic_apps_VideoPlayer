@@ -75,6 +75,8 @@ import com.droidlogic.app.MediaPlayerExt;
 import com.droidlogic.app.SubtitleManager;
 import com.droidlogic.app.SystemControlManager;
 
+
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -1200,7 +1202,7 @@ public class VideoPlayer extends Activity {
                 if (mRetrying == true) {
                     return;
                 }
-                if ( (action.equals (Intent.ACTION_MEDIA_EJECT)) || (action.equals (Intent.ACTION_MEDIA_UNMOUNTED))) {
+                if ( (action.equals (Intent.ACTION_MEDIA_EJECT)) || (action.equals (Intent.ACTION_MEDIA_UNMOUNTED)) || (action.equals ("com.droidvold.action.MEDIA_UNMOUNTED")) || (action.equals ("com.droidvold.action.MEDIA_EJECT"))) {
                     if (mPlayList.getcur() != null) {
                         if (mPlayList.getcur().startsWith (path)) {
                             if (isEjectOrUnmoutProcessed) {
@@ -1213,7 +1215,7 @@ public class VideoPlayer extends Activity {
                         }
                     }
                 }
-                else if (action.equals (Intent.ACTION_MEDIA_MOUNTED)) {
+                else if ( (action.equals (Intent.ACTION_MEDIA_MOUNTED)) || (action.equals ("com.droidvold.action.MEDIA_MOUNTED")) ) {
                     isEjectOrUnmoutProcessed = false;
                     // Nothing
                 }
@@ -1245,8 +1247,11 @@ public class VideoPlayer extends Activity {
 
         private void registerMountReceiver() {
             IntentFilter intentFilter = new IntentFilter (Intent.ACTION_MEDIA_MOUNTED);
-            intentFilter.addAction (Intent.ACTION_MEDIA_EJECT);
             intentFilter.addAction (Intent.ACTION_MEDIA_UNMOUNTED);
+            intentFilter.addAction (Intent.ACTION_MEDIA_EJECT);
+            intentFilter.addAction ("com.droidvold.action.MEDIA_UNMOUNTED");
+            intentFilter.addAction ("com.droidvold.action.MEDIA_MOUNTED");
+            intentFilter.addAction ("com.droidvold.action.MEDIA_EJECT");
             intentFilter.addDataScheme ("file");
             registerReceiver (mMountReceiver, intentFilter);
             LOGI (TAG, "[registerMountReceiver]mMountReceiver:" + mMountReceiver);

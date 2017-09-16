@@ -55,6 +55,7 @@ import com.droidlogic.app.SystemControlManager;
 
 public class FileList extends ListActivity {
         private static final String ROOT_PATH           = "/storage";
+        private static final String MEDIA_RW_PATH       = "/mnt/media_rw";
         private static final String SHEILD_EXT_STOR     = Environment.getExternalStorageDirectory().getPath() + "/external_storage";//"/storage/sdcard0/external_storage";
         private static final String NAND_PATH           = Environment.getExternalStorageDirectory().getPath();//"/storage/sdcard0";
         private static final String SD_PATH             = "/storage/external_storage/sdcard1";
@@ -81,6 +82,12 @@ public class FileList extends ListActivity {
         private String root_path = ROOT_PATH;
         private String extensions ;
         private static String ISOpath = null;
+
+        private String ntfsPath = null;
+        private boolean ntfsFlg = false;
+
+        private ArrayList<String>  nfPath = new ArrayList<String> ();
+        private ArrayList<String>  nfPathFileName = new ArrayList<String> ();
 
         private TextView tileText;
         private TextView nofileText;
@@ -183,13 +190,14 @@ public class FileList extends ListActivity {
                 String action = intent.getAction();
                 Uri uri = intent.getData();
                 String path = uri.getPath();
-
+                if (path.startsWith(MEDIA_RW_PATH)) {
+                    ntfsPath = path;
+                }
                 if (action == null || path == null) {
                     return;
                 }
-
                 if (action.equals(Intent.ACTION_MEDIA_EJECT)
-                    || action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+                    || action.equals(Intent.ACTION_MEDIA_UNMOUNTED) ) {
                     if (listAllFiles) {
                         prepareFileForList();
                     }
@@ -201,7 +209,17 @@ public class FileList extends ListActivity {
                         }
                     }
                 }
-                else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
+
+
+                if ((action.equals ("com.droidvold.action.MEDIA_UNMOUNTED")
+                        || action.equals ("com.droidvold.action.MEDIA_EJECT")) && !path.equals("/dev/null")) {
+                    if (PlayList.getinstance().rootPath.startsWith (path)
+                            || PlayList.getinstance().rootPath.equals (root_path)
+                            || (PlayList.getinstance().rootPath.startsWith (SD_PATH) && path.equals ("/storage/sdcard1"))) {
+                            BrowserFile(root_path);
+                        }
+                }
+                else if (action.equals(Intent.ACTION_MEDIA_MOUNTED) || action.equals ("com.droidvold.action.MEDIA_MOUNTED")) {
                     if (PlayList.getinstance().rootPath == null
                         || PlayList.getinstance().rootPath.equals(root_path)) {
                         BrowserFile (root_path);
@@ -232,6 +250,9 @@ public class FileList extends ListActivity {
             f.addAction (Intent.ACTION_MEDIA_EJECT);
             f.addAction (Intent.ACTION_MEDIA_MOUNTED);
             f.addAction (Intent.ACTION_MEDIA_UNMOUNTED);
+            f.addAction ("com.droidvold.action.MEDIA_UNMOUNTED");
+            f.addAction ("com.droidvold.action.MEDIA_MOUNTED");
+            f.addAction ("com.droidvold.action.MEDIA_EJECT");
             f.addDataScheme ("file");
 
             if (!listAllFiles) {
@@ -470,6 +491,8 @@ public class FileList extends ListActivity {
             String[] files = file.list();
 
             listFiles.clear();
+            nfPathFileName.clear();
+            nfPath.clear();
             searchFile (file);
             if (listFiles.isEmpty()) {
                 Toast.makeText (FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
@@ -557,14 +580,22 @@ public class FileList extends ListActivity {
                         getType = volumeInfoClazz.getMethod("getType");
                         getPath = volumeInfoClazz.getMethod("getPath");
                         volumes = (List<?>)getVolumes.invoke(mStorageManager);
-
                         for (Object vol : volumes) {
                             if (vol != null && (boolean)isMountedReadable.invoke(vol) && (int)getType.invoke(vol) == 0) {
                                 File path = (File)getPath.invoke(vol);
-                                //Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
+//                                Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
                                 if (tmppath.equals(path.getName())) {
                                     items.add((String)getBestVolumeDescription.invoke(mStorageManager, vol));
                                     paths.add(path.getPath());
+                                }
+                            }
+                        }
+
+                        for (int k = 0; k < nfPath.size(); k++) {
+                            if (tpath.startsWith(MEDIA_RW_PATH)) {
+                                if (tmppath.equals(nfPathFileName.get(k))) {
+                                    items.add(tmppath);
+                                    paths.add(nfPath.get(k));
                                 }
                             }
                         }
@@ -632,6 +663,26 @@ public class FileList extends ListActivity {
         public void searchFile (File file) {
             File filetmp;
             File[] the_Files;
+            File[] storageFiles;
+            File ntfsFile;
+            File[] nfFiles;
+            String[] storageFileNames;
+            String[] ntfsFileNames;
+            storageFiles = new File(root_path).listFiles();
+            storageFileNames = new File(root_path).list();
+            ntfsFile = new File(MEDIA_RW_PATH);
+            nfFiles = ntfsFile.listFiles();
+            ntfsFileNames = ntfsFile.list();
+
+            if (nfFiles != null) {
+                for (int j = 0; j < nfFiles.length; j++) {
+                    if (!Arrays.asList(storageFileNames).contains(ntfsFileNames[j]) ) {
+                        nfPath.add(nfFiles[j].getAbsolutePath());
+                        nfPathFileName.add(nfFiles[j].getName());
+                    }
+                }
+            }
+
             the_Files = file.listFiles (new MyFilter (extensions));
             if (the_Files == null) {
                 Toast.makeText (FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
@@ -666,11 +717,15 @@ public class FileList extends ListActivity {
                     getType = volumeInfoClazz.getMethod("getType");
                     getPath = volumeInfoClazz.getMethod("getPath");
                     volumes = (List<?>)getVolumes.invoke(mStorageManager);
-
                     for (Object vol : volumes) {
                         if (vol != null && (boolean)isMountedReadable.invoke(vol) && (int)getType.invoke(vol) == 0) {
                             File path = (File)getPath.invoke(vol);
                             listFiles.add(path);
+                        }
+                    }
+                    for (int k = 0; k < nfPath.size(); k++) {
+                        if (new File(nfPath.get(k)).exists()) {
+                            listFiles.add(new File(nfPath.get(k)));
                         }
                     }
                 }catch (Exception ex) {
@@ -935,7 +990,12 @@ public class FileList extends ListActivity {
                             BrowserFile (ROOT_PATH);
                         }
                         else {
-                            BrowserFile (currenturl);
+                            if (pathLevel == 1) {
+                                BrowserFile (ROOT_PATH);
+                            } else {
+                                BrowserFile (currenturl);
+                            }
+//                            BrowserFile (currenturl);
                             pathLevel--;
                             getListView().setSelectionFromTop (fileDirectory_position_selected.get (pathLevel), fileDirectory_position_piexl.get (pathLevel));
                             fileDirectory_position_selected.remove (pathLevel);
