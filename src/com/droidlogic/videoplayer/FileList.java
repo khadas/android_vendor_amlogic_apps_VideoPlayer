@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Iterator;
 
 import com.droidlogic.videoplayer.R;
 
@@ -52,39 +54,37 @@ import java.util.Timer;
 import java.util.TimerTask;
 import android.os.Message;
 import com.droidlogic.app.SystemControlManager;
+import com.droidlogic.app.FileListManager;
+import com.droidlogic.app.FileListManager.MyFilter;
 
 public class FileList extends ListActivity {
-        private static final String ROOT_PATH           = "/storage";
-        private static final String MEDIA_RW_PATH       = "/mnt/media_rw";
-        private static final String SHEILD_EXT_STOR     = Environment.getExternalStorageDirectory().getPath() + "/external_storage";//"/storage/sdcard0/external_storage";
-        private static final String NAND_PATH           = Environment.getExternalStorageDirectory().getPath();//"/storage/sdcard0";
         private static final String SD_PATH             = "/storage/external_storage/sdcard1";
-        private static final String USB_PATH            = "/storage/external_storage";
-        private static final String ASEC_PATH           = "/mnt/asec";
-        private static final String SECURE_PATH         = "/mnt/secure";
-        private static final String OBB_PATH            = "/mnt/obb";
-        private static final String USB_DRIVE_PATH      = "/mnt/usbdrive";
-        private static final String SHELL_PATH          = "/mnt/shell";
         private static final String SURPORT_BIN         = ",bin";
         private static final String NOT_SURPORT         = "";
+
+        public static final String KEY_NAME = "key_name";
+        public static final String KEY_PATH = "key_path";
+        public static final String KEY_TYPE = "key_type";
+        public static final String KEY_DATE = "key_date";
+        public static final String KEY_SIZE = "key_size";
+        public static final String KEY_SELE = "key_sele";
+        public static final String KEY_RDWR = "key_rdwr";
 
         private Context mContext;
         private ApplicationInfo mAppInfo;
 
         private boolean listAllFiles = true;
         private boolean mFileFlag = false;
-        private List<File> listFiles = null;
-        private List<File> listVideos = null;
+        private boolean mClickFlag = false;
+        private List<Map<String, Object>> listFiles = null;
+        private List<Map<String, Object>> listVideos = null;
         private List<String> items = null;
         private List<String> paths = null;
         private List<String> currentlist = null;
         private String currenturl = null;
-        private String root_path = ROOT_PATH;
+        private String root_path = null;
         private String extensions ;
         private static String ISOpath = null;
-
-        private String ntfsPath = null;
-        private boolean ntfsFlg = false;
 
         private ArrayList<String>  nfPath = new ArrayList<String> ();
         private ArrayList<String>  nfPathFileName = new ArrayList<String> ();
@@ -96,6 +96,7 @@ public class FileList extends ListActivity {
         private boolean isScanning = false;
         private boolean isQuerying = false;
         private int scanCnt = 0;
+        private int devCnt = 0;
         private File file;
         private static String TAG = "FileList";
         Timer timer = new Timer();
@@ -109,7 +110,7 @@ public class FileList extends ListActivity {
         private static final String iso_mount_dir_s = "/mnt/loop";
         private Uri uri;
         private static SystemControlManager mSystemControl;
-        private StorageManager mStorageManager;
+        private FileListManager mFileListManager;
 
         private void waitForBrowserIsoFile() {
             final Handler handler = new Handler() {
@@ -190,9 +191,6 @@ public class FileList extends ListActivity {
                 String action = intent.getAction();
                 Uri uri = intent.getData();
                 String path = uri.getPath();
-                if (path.startsWith(MEDIA_RW_PATH)) {
-                    ntfsPath = path;
-                }
                 if (action == null || path == null) {
                     return;
                 }
@@ -203,21 +201,23 @@ public class FileList extends ListActivity {
                     }
                     else {
                         if (PlayList.getinstance().rootPath.startsWith (path)
-                            || PlayList.getinstance().rootPath.equals (root_path)
-                            || (PlayList.getinstance().rootPath.startsWith (SD_PATH) && path.equals ("/storage/sdcard1"))) {
+                            || PlayList.getinstance().rootPath.equals (root_path)) {
                             BrowserFile(root_path);
+                            if (action.equals(Intent.ACTION_MEDIA_EJECT) && mClickFlag) {
+                                pathLevel = 0;
+                            }
                         }
                     }
                 }
-
-
-                if ((action.equals ("com.droidvold.action.MEDIA_UNMOUNTED")
+                else if ((action.equals ("com.droidvold.action.MEDIA_UNMOUNTED")
                         || action.equals ("com.droidvold.action.MEDIA_EJECT")) && !path.equals("/dev/null")) {
                     if (PlayList.getinstance().rootPath.startsWith (path)
-                            || PlayList.getinstance().rootPath.equals (root_path)
-                            || (PlayList.getinstance().rootPath.startsWith (SD_PATH) && path.equals ("/storage/sdcard1"))) {
-                            BrowserFile(root_path);
+                        || PlayList.getinstance().rootPath.equals (root_path)) {
+                        BrowserFile(root_path);
+                        if (action.equals("com.droidvold.action.MEDIA_EJECT") && mClickFlag) {
+                            pathLevel = 0;
                         }
+                    }
                 }
                 else if (action.equals(Intent.ACTION_MEDIA_MOUNTED) || action.equals ("com.droidvold.action.MEDIA_MOUNTED")) {
                     if (PlayList.getinstance().rootPath == null
@@ -261,9 +261,9 @@ public class FileList extends ListActivity {
                     file = new File (PlayList.getinstance().rootPath);
                 }
                 if ( (file != null) && file.exists()) {
-                    File[] the_Files;
-                    the_Files = file.listFiles (new MyFilter (extensions));
-                    if (the_Files == null || the_Files.length <= 0) {
+                    List<Map<String, Object>> the_Files = new ArrayList<Map<String, Object>>();
+                    the_Files = mFileListManager.getDirs(PlayList.getinstance().rootPath, "video");
+                    if (the_Files == null || the_Files.size() <= 0) {
                         PlayList.getinstance().rootPath = root_path;
                     }
                     BrowserFile (PlayList.getinstance().rootPath);
@@ -309,7 +309,8 @@ public class FileList extends ListActivity {
             if (!mSystemControl.getPropertyBoolean("sys.videoplayer.surportbin", false)) {
                 extensions = extensions.replaceAll(SURPORT_BIN, NOT_SURPORT);
             }
-            mStorageManager = (StorageManager)getSystemService(Context.STORAGE_SERVICE);
+            mFileListManager = new FileListManager(this);
+            root_path = FileListManager.STORAGE;
             mContext = this.getApplicationContext();
             mAppInfo = mContext.getApplicationInfo();
             PlayList.setContext (this);
@@ -376,9 +377,9 @@ public class FileList extends ListActivity {
                         if ( (file.getParent().compareToIgnoreCase (root_path) != 0) && (pathLevel > 0)) {
                             String path = file.getParent();
                             String parent_path = file.getParentFile().getParent();
-                            if ( (path.equals (NAND_PATH) || path.equals (SD_PATH) || parent_path.equals (USB_PATH)) && (pathLevel > 0)) {
+                            if ( (path.equals (FileListManager.NAND) || parent_path.equals (FileListManager.MEDIA_RW)) && (pathLevel > 0)) {
                                 pathLevel = 0;
-                                BrowserFile (ROOT_PATH);
+                                BrowserFile (FileListManager.STORAGE);
                             }
                             else {
                                 BrowserFile (currenturl);
@@ -429,7 +430,6 @@ public class FileList extends ListActivity {
             }
         }
 
-
         private void prepareFileForList() {
             if (listAllFiles) {
                 //Intent intent = getIntent();
@@ -458,7 +458,6 @@ public class FileList extends ListActivity {
                 int colidx = cursor.getColumnIndexOrThrow (MediaStore.Video.Media.DATA);
                 for (int i = 0; i < cursor.getCount(); i++) {
                     patht = cursor.getString (colidx);
-                    //Log.e("wxl", "cursor["+colidx+"]:"+patht);
                     int index = patht.lastIndexOf ("/");
                     if (index >= 0) {
                         namet = patht.substring (index);
@@ -485,11 +484,10 @@ public class FileList extends ListActivity {
             int dev_usb_count = 0;
             int dev_cd_count = 0;
             file = new File (filePath);
-            listFiles = new ArrayList<File>();
+            listFiles = new ArrayList<Map<String, Object>>();
             items = new ArrayList<String>();
             paths = new ArrayList<String>();
             String[] files = file.list();
-
             listFiles.clear();
             nfPathFileName.clear();
             nfPath.clear();
@@ -503,110 +501,47 @@ public class FileList extends ListActivity {
             }
 
             PlayList.getinstance().rootPath = filePath;
-            //Log.d(TAG, "BrowserFile() listFiles.size():"+listFiles.size());
-            File [] fs = new File[listFiles.size()];
-            for (i = 0; i < listFiles.size(); i++) {
-                fs[i] = listFiles.get (i);
-                //Log.d(TAG, "BrowserFile() fs[i]:"+fs[i]);
-            }
 
-            try {
-                Arrays.sort (fs, new MyComparator (MyComparator.NAME_ASCEND));
-            }
-            catch (IllegalArgumentException ex) {
-            }
-
-            for (i = 0; i < fs.length; i++) {
-                File tempF = fs[i];
-                String tmppath = tempF.getName();
-                //Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", filePath:" + filePath + ", ROOT_PATH:" + ROOT_PATH);
-                //change device name;
-                if (filePath.equals (ROOT_PATH)) {
-                    //shield for android 6.0 support
-                    /*String tpath = tempF.getAbsolutePath();
-                    if (tpath.equals (NAND_PATH)) {
-                        tmppath = "sdcard";
-                    }
-                    else if (tpath.equals (SD_PATH)) {
-                        tmppath = "external_sdcard";
-                    }
-                    else if ( ( (!tpath.equals (SD_PATH)) && tpath.startsWith (USB_PATH + "/sd")) || tpath.startsWith (ROOT_PATH + "/udisk")) {
-                        dev_usb_count++;
-                        char data = (char) ('A' + dev_usb_count - 1);
-                        tmppath =  getText (R.string.usb_device_str) + "(" + data + ":)" ;
-                        //tmppath = "usb"+" "+tpath.substring(5);//5 is the len of "/mnt/"
-                    }
-                    else if ( (!tpath.equals (SD_PATH)) && tpath.startsWith (USB_PATH + "/sr")) {
-                        dev_cd_count++;
-                        char data = (char) ('A' + dev_cd_count - 1);
-                        tmppath =  getText (R.string.cdrom_device_str) + "(" + data + ":)" ;
-                    }
-                    //delete used folder
-                    if ( (!tpath.equals (ASEC_PATH)) && (!tpath.equals (SECURE_PATH)) &&
-                            (!tpath.equals (OBB_PATH)) && (!tpath.equals (USB_DRIVE_PATH))
-                            && (!tpath.equals (SHELL_PATH))) {
-                        String path = changeDevName (tmppath);
-                        //Log.d(TAG, "BrowserFile() items.add path:"+path);
-                        //String stateStr = Environment.getStorageState(new File(path));
-                        //if (stateStr.equals(Environment.MEDIA_MOUNTED)) {
-                            items.add (path);
-                            paths.add (tempF.getPath());
-                        //}
-                    }*/
-
-                    //change Device name for android 6.0
-                    //internal storage
-                    String tpath = tempF.getAbsolutePath();
-                    if (tpath.equals (NAND_PATH)) {
-                        items.add (getString(R.string.sdcard_device_str));
-                        paths.add (tempF.getPath());
-                    }
-
-                    //external storage
-                    Class<?> volumeInfoClazz = null;
-                    Method getDescriptionComparator = null;
-                    Method getBestVolumeDescription = null;
-                    Method getVolumes = null;
-                    Method isMountedReadable = null;
-                    Method getType = null;
-                    Method getPath = null;
-                    List<?> volumes = null;
-                    try {
-                        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo");
-                        getDescriptionComparator = volumeInfoClazz.getMethod("getDescriptionComparator");
-                        getBestVolumeDescription = StorageManager.class.getMethod("getBestVolumeDescription", volumeInfoClazz);
-                        getVolumes = StorageManager.class.getMethod("getVolumes");
-                        isMountedReadable = volumeInfoClazz.getMethod("isMountedReadable");
-                        getType = volumeInfoClazz.getMethod("getType");
-                        getPath = volumeInfoClazz.getMethod("getPath");
-                        volumes = (List<?>)getVolumes.invoke(mStorageManager);
-                        for (Object vol : volumes) {
-                            if (vol != null && (boolean)isMountedReadable.invoke(vol) && (int)getType.invoke(vol) == 0) {
-                                File path = (File)getPath.invoke(vol);
-//                                Log.d(TAG, "BrowserFile() tmppath:"+tmppath + ", path.getName():" + path.getName() + ", path.getPath():" + path.getPath());
-                                if (tmppath.equals(path.getName())) {
-                                    items.add((String)getBestVolumeDescription.invoke(mStorageManager, vol));
-                                    paths.add(path.getPath());
-                                }
-                            }
-                        }
-
-                        for (int k = 0; k < nfPath.size(); k++) {
-                            if (tpath.startsWith(MEDIA_RW_PATH)) {
-                                if (tmppath.equals(nfPathFileName.get(k))) {
-                                    items.add(tmppath);
-                                    paths.add(nfPath.get(k));
-                                }
-                            }
-                        }
-                    }catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+            //change device name;
+            if (filePath.equals (FileListManager.STORAGE)) {
+                listFiles = mFileListManager.getDevices();
+                devCnt = listFiles.size();
+                for (int j = 0; j < devCnt; j++) {
+                    Map<String, Object> map = listFiles.get(j);
+                    String keyName = (String)map.get(KEY_NAME);
+                    items.add(keyName);
+                    String keyPath = (String)map.get(KEY_PATH);
+                    paths.add(keyPath);
                 }
-                else {
-                    //Log.d(TAG, "BrowserFile() 1 items.add tmppath:"+tmppath);
-                    items.add (tmppath);
-                    paths.add (tempF.getPath());
+            }
+            else {
+                listFiles = mFileListManager.getDirs(filePath, "video");
+                devCnt = listFiles.size();
+                try {
+                    Collections.sort(listFiles, new Comparator<Map<String, Object>>() {
+                        public int compare(Map<String, Object> object1, Map<String, Object> object2) {
+                            File file1 = new File((String) object1.get(KEY_PATH));
+                            File file2 = new File((String) object2.get(KEY_PATH));
+
+                            if (file1.isFile() && file2.isFile() || file1.isDirectory() && file2.isDirectory()) {
+                                int k = ((String) object1.get(KEY_NAME)).toLowerCase()
+                                    .compareTo(((String) object2.get(KEY_NAME)).toLowerCase());
+                                return ((String) object1.get(KEY_NAME)).toLowerCase()
+                                    .compareTo(((String) object2.get(KEY_NAME)).toLowerCase());
+                            } else {
+                                return file1.isFile() ? 1 : -1;
+                            }
+                        }
+                    });
+                }
+                catch (IllegalArgumentException ex) {
+                }
+                for (int j = 0; j < devCnt; j++) {
+                    Map<String, Object> map = listFiles.get(j);
+                    String keyName = (String)map.get(KEY_NAME);
+                    items.add(keyName);
+                    String keyPath = (String)map.get(KEY_PATH);
+                    paths.add(keyPath);
                 }
             }
             tileText = (TextView) findViewById (R.id.TextView_path);
@@ -621,7 +556,6 @@ public class FileList extends ListActivity {
             String usb = getString (R.string.usb_device_str);
             String cdrom = getString (R.string.cdrom_device_str);
             String sdcardExt = getString (R.string.ext_sdcard_device_str);
-            //Log.i("wxl","[changeDevName]tmppath:"+tmppath);
             if (tmppath.equals ("flash")) {
                 path = internal;
             }
@@ -640,7 +574,6 @@ public class FileList extends ListActivity {
             else {
                 path = tmppath;
             }
-            //Log.i("wxl","[changeDevName]path:"+path);
             return path;
         }
 
@@ -661,214 +594,26 @@ public class FileList extends ListActivity {
         }
 
         public void searchFile (File file) {
-            File filetmp;
-            File[] the_Files;
-            File[] storageFiles;
-            File ntfsFile;
-            File[] nfFiles;
-            String[] storageFileNames;
-            String[] ntfsFileNames;
-            storageFiles = new File(root_path).listFiles();
-            storageFileNames = new File(root_path).list();
-            ntfsFile = new File(MEDIA_RW_PATH);
-            nfFiles = ntfsFile.listFiles();
-            ntfsFileNames = ntfsFile.list();
-
-            if (nfFiles != null) {
-                for (int j = 0; j < nfFiles.length; j++) {
-                    if (!Arrays.asList(storageFileNames).contains(ntfsFileNames[j]) ) {
-                        nfPath.add(nfFiles[j].getAbsolutePath());
-                        nfPathFileName.add(nfFiles[j].getName());
-                    }
-                }
+            String curPath = file.getPath();
+            List<Map<String, Object>> the_Files;
+            if (curPath.equals (root_path)) {
+                the_Files = mFileListManager.getDevices();
+            } else {
+                the_Files = mFileListManager.getDirs(curPath, "video");
             }
-
-            the_Files = file.listFiles (new MyFilter (extensions));
             if (the_Files == null) {
                 Toast.makeText (FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
                 return;
             }
-            String curPath = file.getPath();
             if (curPath.equals (root_path)) {
-                //internal storage
-                File dir = new File (NAND_PATH);
-                if (dir.exists() && dir.isDirectory()) {
-                    filetmp = new File (NAND_PATH);
-                    if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
-                        listFiles.add (dir);
-                    }
+                listFiles = mFileListManager.getDevices();
+                if (listFiles == null) {
+                    Toast.makeText (FileList.this, R.string.str_no_file, Toast.LENGTH_SHORT).show();
+                    return;
                 }
-
-                //external storage
-                Class<?> volumeInfoClazz = null;
-                Method getDescriptionComparator = null;
-                Method getBestVolumeDescription = null;
-                Method getVolumes = null;
-                Method isMountedReadable = null;
-                Method getType = null;
-                Method getPath = null;
-                List<?> volumes = null;
-                try {
-                    volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo");
-                    getDescriptionComparator = volumeInfoClazz.getMethod("getDescriptionComparator");
-                    getBestVolumeDescription = StorageManager.class.getMethod("getBestVolumeDescription", volumeInfoClazz);
-                    getVolumes = StorageManager.class.getMethod("getVolumes");
-                    isMountedReadable = volumeInfoClazz.getMethod("isMountedReadable");
-                    getType = volumeInfoClazz.getMethod("getType");
-                    getPath = volumeInfoClazz.getMethod("getPath");
-                    volumes = (List<?>)getVolumes.invoke(mStorageManager);
-                    for (Object vol : volumes) {
-                        if (vol != null && (boolean)isMountedReadable.invoke(vol) && (int)getType.invoke(vol) == 0) {
-                            File path = (File)getPath.invoke(vol);
-                            listFiles.add(path);
-                        }
-                    }
-                    for (int k = 0; k < nfPath.size(); k++) {
-                        if (new File(nfPath.get(k)).exists()) {
-                            listFiles.add(new File(nfPath.get(k)));
-                        }
-                    }
-                }catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-
-                //shield for android 6.0 support
-                /*File dir = new File (NAND_PATH);
-                if (dir.exists() && dir.isDirectory()) {
-                    filetmp = new File (NAND_PATH);
-                    if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
-                        listFiles.add (dir);
-                    }
-                }
-                dir = new File (SD_PATH);
-                if (dir.exists() && dir.isDirectory()) {
-                    filetmp = new File (SD_PATH);
-                    //Log.i(TAG,"[searchFile]filetmp.listFiles():"+filetmp.listFiles());
-                    //Log.i(TAG,"[searchFile]================");
-                    //if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
-                    String stateStr = Environment.getStorageState(filetmp);
-                    if (stateStr.equals(Environment.MEDIA_MOUNTED)) {
-                        listFiles.add (dir);
-                    }
-                }
-                dir = new File (USB_PATH);
-                if (dir.exists() && dir.isDirectory()) {
-                    if (dir.listFiles() != null) {
-                    for (File pfile : dir.listFiles()) {
-                            if (pfile.isDirectory()) {
-                                String path = pfile.getAbsolutePath();
-                                if ( (path.startsWith (USB_PATH + "/sd") || path.startsWith (USB_PATH + "/sr")) && !path.equals (SD_PATH)) {
-                                    filetmp = new File (path);
-                                    if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
-                                        listFiles.add (pfile);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                dir = new File (ROOT_PATH);
-                if (dir.exists() && dir.isDirectory()) {
-                    if (dir.listFiles() != null) {
-                    for (File qfile : dir.listFiles()) {
-                            if (qfile.isDirectory()) {
-                                String path = qfile.getAbsolutePath();
-                                if (path.startsWith (ROOT_PATH + "/udisk")) {
-                                    //filetmp = new File (path);
-                                    //if (filetmp.listFiles() != null && filetmp.listFiles().length > 0) {
-                                    String stateStr = Environment.getStorageState(new File(path));
-                                    if (stateStr.equals(Environment.MEDIA_MOUNTED)) {
-                                        listFiles.add (qfile);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }*/
                 return;
             }
-            for (int i = 0; i < the_Files.length; i++) {
-                File tempF = the_Files[i];
-                if (tempF.isDirectory()) {
-                    if (!tempF.isHidden()) {
-                        listFiles.add (tempF);
-                    }
-                    //shield some path
-                    if ( (tempF.toString()).equals (SHEILD_EXT_STOR)) {
-                        listFiles.remove (tempF);
-                        continue;
-                    }
-                }
-                else {
-                    try {
-                        listFiles.add (tempF);
-                    }
-                    catch (Exception e) {
-                        return;
-                    }
-                }
-            }
-        }
-
-        private static void mount(String path) {
-               mSystemControl.loopMountUnmount(false, null);
-               mSystemControl.loopMountUnmount(true, path);
-        }
-
-        public static boolean isISOFile (File file) {
-            String fname = file.getName();
-            String sname = ".iso";
-            if (fname == "") {
-                Log.e (TAG, "NULL file");
-                return false;
-            }
-            if (file.isFile() && fname.toLowerCase().endsWith (sname)) {
-                return true;
-            }
-            return false;
-        }
-
-        private static boolean isHasDir(File[] files, String name) {
-           for (File file : files) {
-               if (name != null && name.equals(file.getName()) && file.isDirectory())
-                   return true;
-           }
-           return false;
-        }
-
-        public static boolean isBDFile(File file)
-        {
-            if (file.isDirectory()) {
-                File[] rootFiles = file.listFiles();
-                if (rootFiles != null && rootFiles.length >= 1 && isHasDir(rootFiles, "BDMV")) {
-                    File bdDir = new File(file.getPath(), "BDMV");
-                    String[] files = bdDir.list();
-                    ArrayList<String> names = new ArrayList<String>();
-                    for (int i = 0; i < files.length; i++)
-                        names.add(files[i]);
-                    if (names.contains("index.bdmv") && names.contains("PLAYLIST")
-                        && names.contains("CLIPINF") && names.contains("STREAM"))
-                        return true;
-                }
-            } else if (isISOFile(file)) {
-                ISOpath = file.getPath();
-                mount(ISOpath);
-                File isofile = new File(iso_mount_dir_s);
-                if (isofile.exists() && isofile.isDirectory()) {
-                    File[] rootFiles = isofile.listFiles();
-                    if (rootFiles != null && rootFiles.length >= 1 && isHasDir(rootFiles, "BDMV")) {
-                        File bdfiles = new File(iso_mount_dir_s, "BDMV");
-                        String[] bdmvFiles = bdfiles.list();
-                        ArrayList<String> names = new ArrayList<String>();
-                        for (int i = 0; i < bdmvFiles.length; i++)
-                            names.add(bdmvFiles[i]);
-                        if (names.contains("index.bdmv") && names.contains("PLAYLIST")
-                            && names.contains("CLIPINF") && names.contains("STREAM"))
-                            return true;
-                    }
-                }
-            }
-            return false;
+            listFiles = the_Files;
         }
 
         public static void execCmd (String cmd) {
@@ -911,7 +656,7 @@ public class FileList extends ListActivity {
             if (fileDirectory_position_piexl == null) {
                 fileDirectory_position_piexl = new ArrayList<Integer>();
             }
-            if (isBDFile(file)) {
+            if (mFileListManager.isBDFile(file)) {
                 mFileFlag = true;
             } else {
                 if (file.isDirectory()) {
@@ -926,9 +671,10 @@ public class FileList extends ListActivity {
                         fileDirectory_position_selected.add (item_position_selected);
                         fileDirectory_position_piexl.add (fromtop_piexl);
                         pathLevel++;
+                        mClickFlag = true;
                     }
                     mFileFlag = false;
-                } else if (isISOFile(file)) {
+                } else if (mFileListManager.isISOFile(file)) {
                     waitForBrowserIsoFile();
                     fileDirectory_position_selected.add (item_position_selected);
                     fileDirectory_position_piexl.add (fromtop_piexl);
@@ -985,13 +731,13 @@ public class FileList extends ListActivity {
                     if ( (file.getParent().compareToIgnoreCase (root_path) != 0) && (pathLevel > 0)) {
                         String path = file.getParent();
                         String parent_path = file.getParentFile().getParent();
-                        if ( (path.equals (NAND_PATH) || path.equals (SD_PATH) || parent_path.equals (USB_PATH)) && (pathLevel > 0)) {
+                        if ( (path.equals (FileListManager.NAND) || parent_path.equals (FileListManager.MEDIA_RW)) && (pathLevel > 0)) {
                             pathLevel = 0;
-                            BrowserFile (ROOT_PATH);
+                            BrowserFile (FileListManager.STORAGE);
                         }
                         else {
                             if (pathLevel == 1) {
-                                BrowserFile (ROOT_PATH);
+                                BrowserFile (FileListManager.STORAGE);
                             } else {
                                 BrowserFile (currenturl);
                             }
@@ -1045,36 +791,38 @@ public class FileList extends ListActivity {
 
         public int filterDir (File file) {
             int pos = -1;
-            File[] the_Files;
-            File parent = new File (file.getParent());
-            the_Files = parent.listFiles (new MyFilter (extensions));
-            if (the_Files == null) {
+            listVideos = new ArrayList<Map<String, Object>>();
+            listVideos = mFileListManager.getDirs(file.getParent(), "video");
+            if (listVideos == null) {
                 return pos;
             }
             pos = 0;
-            listVideos = new ArrayList<File>();
-            for (int i = 0; i < the_Files.length; i++) {
-                File tempF = the_Files[i];
-                if (isBDFile(tempF) || (tempF.isFile() && !isISOFile(tempF))) {
-                    listVideos.add (tempF);
-                }
-            }
             paths = new ArrayList<String>();
-            File [] fs = new File[listVideos.size()];
-            for (int i = 0; i < listVideos.size(); i++) {
-                fs[i] = listVideos.get (i);
-            }
             try {
-                Arrays.sort (fs, new MyComparator (MyComparator.NAME_ASCEND));
+                Collections.sort(listVideos, new Comparator<Map<String, Object>>() {
+                    public int compare(Map<String, Object> object1,
+                    Map<String, Object> object2) {
+                        File file1 = new File((String) object1.get(KEY_PATH));
+                        File file2 = new File((String) object2.get(KEY_PATH));
+                        if (file1.isFile() && file2.isFile() || file1.isDirectory() && file2.isDirectory()) {
+                            return ((String) object1.get(KEY_NAME)).toLowerCase()
+                                .compareTo(((String) object2.get(KEY_NAME)).toLowerCase());
+                        }
+                        else {
+                            return file1.isFile() ? 1 : -1;
+                        }
+                    }
+                });
             }
             catch (IllegalArgumentException ex) {
             }
-            for (int i = 0; i < fs.length; i++) {
-                File tempF = fs[i];
-                if (tempF.getPath().equals (file.getPath())) {
+            for (int i = 0; i < listVideos.size(); i++) {
+                Map<String, Object> fMap = listVideos.get(i);
+                String tempF = (String)fMap.get(KEY_PATH);
+                if (tempF.equals (file.getPath())) {
                     pos = i;
                 }
-                paths.add (tempF.getPath());
+                paths.add (tempF);
             }
             return pos;
         }
@@ -1105,7 +853,7 @@ public class FileList extends ListActivity {
         }
 
         public void reScanVideoFiles() {
-            Intent intent = new Intent (Intent.ACTION_MEDIA_MOUNTED, Uri.parse ("file://" + ROOT_PATH));
+            Intent intent = new Intent (Intent.ACTION_MEDIA_MOUNTED, Uri.parse ("file://" + mFileListManager.STORAGE));
             this.sendBroadcast (intent);
         }
 

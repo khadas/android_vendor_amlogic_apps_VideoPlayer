@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.droidlogic.app.FileListManager;
 
 public class MyAdapter extends BaseAdapter {
         private LayoutInflater mInflater;
@@ -26,6 +27,7 @@ public class MyAdapter extends BaseAdapter {
         private Bitmap iconFile;
         private List<String> items;
         private List<String> paths;
+        private FileListManager mFileListManager;
 
         public MyAdapter (Context context, List<String> it, List<String> pa) {
             mInflater = LayoutInflater.from (context);
@@ -38,6 +40,8 @@ public class MyAdapter extends BaseAdapter {
             iconIsoFile = BitmapFactory.decodeResource (context.getResources(), R.drawable.isofile);
             iconImage = BitmapFactory.decodeResource (context.getResources(), R.drawable.photo);
             iconFile = BitmapFactory.decodeResource (context.getResources(), R.drawable.doc);
+
+            mFileListManager = new FileListManager(context);
         }
 
 
@@ -71,9 +75,9 @@ public class MyAdapter extends BaseAdapter {
             File f = new File (paths.get (position).toString());
             File txtf = new File (items.get (position).toString());
             holder.text.setText (txtf.getName());
-            if (FileList.isBDFile(f))
+            if (mFileListManager.isBDFile(f))
                 holder.icon.setImageBitmap (iconBdVideo);
-            else if (FileList.isISOFile(f))
+            else if (mFileListManager.isISOFile(f))
                 holder.icon.setImageBitmap (iconIsoFile);
             else {
                 if (f.isDirectory())

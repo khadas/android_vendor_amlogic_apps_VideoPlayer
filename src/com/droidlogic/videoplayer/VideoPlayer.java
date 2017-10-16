@@ -74,8 +74,7 @@ import com.android.internal.app.LocalePicker;
 import com.droidlogic.app.MediaPlayerExt;
 import com.droidlogic.app.SubtitleManager;
 import com.droidlogic.app.SystemControlManager;
-
-
+import com.droidlogic.app.FileListManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -199,6 +198,7 @@ public class VideoPlayer extends Activity {
 
         private SubtitleManager mSubtitleManager;
         private SystemControlManager mSystemControl;
+        private FileListManager mFileListManager;
 
         //request code for permission check
         private boolean mPermissionGranted = false;
@@ -221,6 +221,7 @@ public class VideoPlayer extends Activity {
             super.onCreate (savedInstanceState);
             LOCALES = LocalePicker.getAllAssetLocales(this, false);
             mSystemControl = new SystemControlManager(this);
+            mFileListManager = new FileListManager(this);
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
             setTitle (null);
@@ -2891,8 +2892,8 @@ public class VideoPlayer extends Activity {
         private String changeForIsoFile(String path) {
             File file = new File(path);
             String fpath = file.getPath();
-            if (FileList.isBDFile(file)) {
-                if (FileList.isISOFile(file))
+            if (mFileListManager.isBDFile(file)) {
+                if (mFileListManager.isISOFile(file))
                     fpath = "bluray:/mnt/loop";
                 else
                     fpath = "bluray:" + fpath;
