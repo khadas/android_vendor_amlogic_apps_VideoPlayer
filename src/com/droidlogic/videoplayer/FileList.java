@@ -70,6 +70,8 @@ public class FileList extends ListActivity {
         public static final String KEY_SELE = "key_sele";
         public static final String KEY_RDWR = "key_rdwr";
 
+        private static final int REQUEST_CODE_ASK_PERMISSIONS = 2;
+
         private Context mContext;
         private ApplicationInfo mAppInfo;
 
@@ -404,6 +406,23 @@ public class FileList extends ListActivity {
             }
         }
 
+        @Override
+        public void onRequestPermissionsResult(int requestCode,
+                    String permissions[], int[] grantResults) {
+            switch (requestCode) {
+                case REQUEST_CODE_ASK_PERMISSIONS: {
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        Log.d(TAG, "write external storage permission is granted");
+                    } else {
+                        Log.d(TAG, "write external storage permission permission is denied");
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
+
         private void showSpinner() {
             if (listAllFiles) {
                 if ( (isScanning) || (isQuerying)) {
@@ -483,6 +502,16 @@ public class FileList extends ListActivity {
             int i = 0;
             int dev_usb_count = 0;
             int dev_cd_count = 0;
+
+            Log.d(TAG, "BrowserFile path=" + filePath + "  Check perm");
+
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                return;
+            }
+
             file = new File (filePath);
             listFiles = new ArrayList<Map<String, Object>>();
             items = new ArrayList<String>();
