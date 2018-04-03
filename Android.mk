@@ -31,6 +31,8 @@ endif
 #LOCAL_PROGUARD_ENABLED := disabled
 #LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
+LOCAL_PRIVATE_PLATFORM_APIS := true
+
 include $(BUILD_PACKAGE)
 ##################################################
 
