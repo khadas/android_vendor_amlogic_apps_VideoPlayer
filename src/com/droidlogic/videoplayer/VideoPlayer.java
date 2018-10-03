@@ -69,7 +69,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 //import android.widget.VideoView;
 import android.text.TextUtils;
-import com.android.internal.app.LocalePicker;
+//import com.android.internal.app.LocalePicker;
 
 import com.droidlogic.app.MediaPlayerExt;
 import com.droidlogic.app.SubtitleManager;
@@ -207,7 +207,7 @@ public class VideoPlayer extends Activity {
         private ArrayList<String> mBlurayVideoLang = null;
         private ArrayList<String> mBlurayAudioLang = null;
         private ArrayList<String> mBluraySubLang = null;
-        private static List<LocalePicker.LocaleInfo> LOCALES;
+        //private static List<LocalePicker.LocaleInfo> LOCALES;
         private int mSubIndex = 0;
         private static final int SUBTITLE_PGS = 2;
         private static final int SUBTITLE_DVB = 6;
@@ -219,7 +219,7 @@ public class VideoPlayer extends Activity {
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
-            LOCALES = LocalePicker.getAllAssetLocales(this, false);
+            //LOCALES = LocalePicker.getAllAssetLocales(this, false);
             mSystemControl = new SystemControlManager(this);
             mFileListManager = new FileListManager(this);
             LOGI (TAG, "[onCreate]");
@@ -736,7 +736,7 @@ public class VideoPlayer extends Activity {
             moreSetBtn = (ImageButton) findViewById (R.id.MoreSetBtn);
             otherwidgetTitleTx = (TextView) findViewById (R.id.more_title);
 
-            if (mSystemControl.getPropertyBoolean("ro.platform.has.mbxuimode", false)) {
+            if (mSystemControl.getPropertyBoolean("ro.vendor.platform.has.mbxuimode", false)) {
                 brigtnessBtn.setVisibility (View.GONE);
             }
             else {
@@ -4012,7 +4012,7 @@ public class VideoPlayer extends Activity {
             int ret = mMediaInfo.checkAudioCertification (mMediaInfo.getAudioFormat (track/*mMediaInfo.getCurAudioIdx()*/));
             LOGI (TAG, "[showCertification]ret:" + ret);
             if (ret == mMediaInfo.CERTIFI_Dolby) {
-                if (mSystemControl.getPropertyBoolean("ro.platform.support.dolby", false)) {
+                if (mSystemControl.getPropertyBoolean("ro.vendor.platform.support.dolby", false)) {
                     certificationDoblyView.setVisibility (View.VISIBLE);
                     certificationDoblyPlusView.setVisibility (View.GONE);
                     certificationDTSView.setVisibility (View.GONE);
@@ -4021,7 +4021,7 @@ public class VideoPlayer extends Activity {
                 }
             }
             else if (ret == mMediaInfo.CERTIFI_Dolby_Plus) {
-                if (mSystemControl.getPropertyBoolean("ro.platform.support.dolby", false)) {
+                if (mSystemControl.getPropertyBoolean("ro.vendor.platform.support.dolby", false)) {
                     certificationDoblyView.setVisibility (View.GONE);
                     certificationDoblyPlusView.setVisibility (View.VISIBLE);
                     certificationDTSView.setVisibility (View.GONE);
@@ -4030,7 +4030,7 @@ public class VideoPlayer extends Activity {
                 }
             }
             else if (ret == mMediaInfo.CERTIFI_DTS) {
-                if (mSystemControl.getPropertyBoolean("ro.platform.support.dts", false)) {
+                if (mSystemControl.getPropertyBoolean("ro.vendor.platform.support.dts", false)) {
                     certificationDoblyView.setVisibility (View.GONE);
                     certificationDoblyPlusView.setVisibility (View.GONE);
                     if (mDtsType == DTS_NOR) {
@@ -4556,11 +4556,11 @@ public class VideoPlayer extends Activity {
             if (TextUtils.isEmpty(lang))
                 return null;
 
-            for (LocalePicker.LocaleInfo info : LOCALES) {
+            /*for (LocalePicker.LocaleInfo info : LOCALES) {
                 Locale l = info.getLocale();
                 if (lang.equals(l.getISO3Language()))
                     return l.getDisplayLanguage();
-            }
+            }*/
 
             return null;
         }
@@ -4582,7 +4582,7 @@ public class VideoPlayer extends Activity {
                         str += "0" + String.valueOf(total) + " ";
                     else
                         str += String.valueOf(total) + " ";
-                    str += getDisplayLanguage(mBlurayAudioLang.get(index)) + " ";
+                    //str += getDisplayLanguage(mBlurayAudioLang.get(index)) + " ";
                     str += mMediaInfo.getAudioFormatStr(mMediaInfo.getAudioFormat(index)) + " ";
                     // TODO: audio channel
                     str += String.valueOf(mMediaInfo.getAudioSampleRate(index)) + "Hz";

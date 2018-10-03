@@ -27,11 +27,10 @@ LOCAL_PROPRIETARY_MODULE := true
 endif
 
 #LOCAL_REQUIRED_MODULES := libamplayerjni libsubjni
-
 #LOCAL_PROGUARD_ENABLED := disabled
 #LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
-LOCAL_PRIVATE_PLATFORM_APIS := true
+#LOCAL_PRIVATE_PLATFORM_APIS := true
 
 include $(BUILD_PACKAGE)
 ##################################################
