@@ -30,7 +30,9 @@ endif
 #LOCAL_PROGUARD_ENABLED := disabled
 #LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
-#LOCAL_PRIVATE_PLATFORM_APIS := true
+ifndef PRODUCT_SHIPPING_API_LEVEL
+LOCAL_PRIVATE_PLATFORM_APIS := true
+endif
 
 include $(BUILD_PACKAGE)
 ##################################################
