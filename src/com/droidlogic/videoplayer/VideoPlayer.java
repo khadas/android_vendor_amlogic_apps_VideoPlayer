@@ -145,6 +145,7 @@ public class VideoPlayer extends Activity {
         private TextView subtitleTV = null;
         private ImageView subtitleIV = null;
         //certification view
+        private ImageView certificationDoblyVisionView = null;
         private ImageView certificationDoblyView = null;
         private ImageView certificationDoblyPlusView = null;
         private ImageView certificationDTSView = null;
@@ -466,6 +467,7 @@ public class VideoPlayer extends Activity {
         private static final int MSG_SUB_OPTION_UPDATE = 0xF6;
         private static final int MSG_SEEK_BY_BAR = 0xF7;
         private static final int MSG_UPDATE_DISPLAY_MODE = 0xF8;
+        private static final int MSG_SHOW_CERTIFICATION = 0xF9;
         private boolean ignoreUpdateProgressbar = false;
         private Handler mHandler = new Handler() {
             @Override
@@ -531,6 +533,10 @@ public class VideoPlayer extends Activity {
                         break;
                     case MSG_UPDATE_DISPLAY_MODE:
                         displayModeImpl();
+                        break;
+                    case MSG_SHOW_CERTIFICATION:
+                        showCertification(); // show certification
+                        startCertificationTimeout();
                         break;
                 }
             }
@@ -689,11 +695,13 @@ public class VideoPlayer extends Activity {
             subtitleIV = (ImageView)findViewById(R.id.SubtitleIV);
             subtitleShow();
             //certification image
+            certificationDoblyVisionView = (ImageView) findViewById (R.id.CertificationDoblyVision);
             certificationDoblyView = (ImageView) findViewById (R.id.CertificationDobly);
             certificationDoblyPlusView = (ImageView) findViewById (R.id.CertificationDoblyPlus);
             certificationDTSView = (ImageView) findViewById (R.id.CertificationDTS);
             certificationDTSExpressView = (ImageView) findViewById (R.id.CertificationDTSExpress);
             certificationDTSHDMasterAudioView = (ImageView) findViewById (R.id.CertificationDTSHDMasterAudio);
+            certificationDoblyVisionView.setVisibility (View.GONE);
             certificationDoblyView.setVisibility (View.GONE);
             certificationDoblyPlusView.setVisibility (View.GONE);
             certificationDTSView.setVisibility (View.GONE);
@@ -2253,6 +2261,7 @@ public class VideoPlayer extends Activity {
             mSubNum = 0;
             mSubOffset = -1;
             isShowImgSubtitle = false;
+            mIsDolbyVision = false;
         }
 
         private void sendPlayFileMsg() {
@@ -3204,8 +3213,8 @@ public class VideoPlayer extends Activity {
                 initSubtitle();
                 initMediaInfo(trackInfo);
                 displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
-                showCertification(); // show certification
-                startCertificationTimeout();
+                //showCertification(); // show certification
+                //startCertificationTimeout();
 
                 if (mResumePlay.getEnable() == true) {
                     mResumePlay.setEnable (false);
@@ -3224,8 +3233,16 @@ public class VideoPlayer extends Activity {
                         seekTo (bmPos);
                     }
                 }
+                sendShowCertificationMsg();
             }
         };
+
+        private void sendShowCertificationMsg() {
+            if (mHandler != null) {
+                Message msg = mHandler.obtainMessage (MSG_SHOW_CERTIFICATION);
+                mHandler.sendMessageDelayed (msg, 1000);
+            }
+        }
 
         private MediaPlayer.OnCompletionListener mCompletionListener =
         new MediaPlayer.OnCompletionListener() {
@@ -3340,6 +3357,7 @@ public class VideoPlayer extends Activity {
         private final int DTS_EXPRESS = 1;
         private final int DTS_HD_MASTER_AUDIO = 2;
         private int mDtsType = DTS_NOR;
+        private boolean mIsDolbyVision = false;
         private MediaPlayer.OnInfoListener mInfoListener =
         new MediaPlayer.OnInfoListener() {
             public  boolean onInfo (MediaPlayer mp, int arg1, int arg2) {
@@ -3356,10 +3374,12 @@ public class VideoPlayer extends Activity {
                         toast.show();
                     }
                     if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_ASSET) {
-                        if (getDtsApresentTotalNum() > 0) {
+                        mDtsType = DTS_NOR;
+                        showCertification();
+                        /*if (getDtsApresentTotalNum() > 0) {
                             showDtsAseetFromInfoLis = true;
                             audioDtsApresentSelect();
-                        }
+                        }*/
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_EXPRESS) {
                         mDtsType = DTS_EXPRESS;
@@ -3388,6 +3408,10 @@ public class VideoPlayer extends Activity {
                         toast.setGravity(Gravity.BOTTOM,/*110*/0,110);
                         toast.setDuration(0x00000001);
                         toast.show();
+                    }
+                    else if (arg1 == MediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DOLBY_VISION) {
+                        mIsDolbyVision = true;
+                        showCertification();
                     }
                 }
                 return true;
@@ -3989,7 +4013,12 @@ public class VideoPlayer extends Activity {
         }
 
         private void showCertification() {
-            if (certificationDoblyView == null && certificationDoblyPlusView == null && certificationDTSView == null && certificationDTSExpressView == null && certificationDTSHDMasterAudioView == null) {
+            if (certificationDoblyView == null
+                 && certificationDoblyVisionView == null
+                 && certificationDoblyPlusView == null
+                 && certificationDTSView == null
+                 && certificationDTSExpressView == null
+                 && certificationDTSHDMasterAudioView == null) {
                 return;
             }
             if (mMediaInfo == null) {
@@ -3999,6 +4028,15 @@ public class VideoPlayer extends Activity {
                 return;
             }
             closeCertification();
+            //for video
+            if (mIsDolbyVision) {
+                certificationDoblyVisionView.setVisibility (View.VISIBLE);
+            }
+            else {
+                certificationDoblyVisionView.setVisibility (View.GONE);
+            }
+
+            //for audio
             if (mMediaInfo.getAudioTotalNum() <= 0) {
                 return;
             }
@@ -4009,7 +4047,7 @@ public class VideoPlayer extends Activity {
             else if (track >= mMediaInfo.getAudioTotalNum()) {
                 track = mMediaInfo.getAudioTotalNum() - 1;
             }
-            int ret = mMediaInfo.checkAudioCertification (mMediaInfo.getAudioFormat (track/*mMediaInfo.getCurAudioIdx()*/));
+            int ret = mMediaInfo.checkAudioCertification (mMediaInfo.getAudioFormatByMetrics());
             LOGI (TAG, "[showCertification]ret:" + ret);
             if (ret == mMediaInfo.CERTIFI_Dolby) {
                 if (mSystemControl.getPropertyBoolean("ro.vendor.platform.support.dolby", false)) {
@@ -4057,10 +4095,19 @@ public class VideoPlayer extends Activity {
                 certificationDTSExpressView.setVisibility (View.GONE);
                 certificationDTSHDMasterAudioView.setVisibility (View.GONE);
             }
+
         }
 
         private void closeCertification() {
-            if (certificationDoblyView != null && certificationDoblyPlusView != null && certificationDTSView != null && certificationDTSExpressView != null && certificationDTSHDMasterAudioView != null) {
+            if (certificationDoblyVisionView != null
+                && certificationDoblyView != null
+                && certificationDoblyPlusView != null
+                && certificationDTSView != null
+                && certificationDTSExpressView != null
+                && certificationDTSHDMasterAudioView != null) {
+                if (certificationDoblyVisionView.getVisibility() == View.VISIBLE) {
+                    certificationDoblyVisionView.setVisibility (View.GONE);
+                }
                 if (certificationDoblyView.getVisibility() == View.VISIBLE) {
                     certificationDoblyView.setVisibility (View.GONE);
                 }
@@ -5219,13 +5266,15 @@ public class VideoPlayer extends Activity {
                             if (mIsBluray)
                                 map.put ("item_name", getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_AUDIO, i));
                             else
-                                map.put ("item_name", mMediaInfo.getAudioFormatStr(mMediaInfo.getAudioFormat(i)));
+                                map.put ("item_name", mMediaInfo.getAudioCodecStrByMetrics(mMediaInfo.getAudioFormatByMetrics(),mMediaInfo.getVideoFormatByMetrics()));
                             map.put ("item_sel", R.drawable.item_img_unsel);
-                            if (mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_AC3 || mMediaInfo.getAudioFormat(i) == mMediaInfo.AFORMAT_EAC3) {
-                                if (!mIsBluray) {
-                                    map.put ("item_name", null);
+                            if (mMediaInfo.getAudioMime(i) != null) {
+                                if (mMediaInfo.getAudioMime(i).equals("audio/ac3") || mMediaInfo.getAudioMime(i).equals("audio/eac3")) {
+                                    if (!mIsBluray) {
+                                        map.put ("item_name", null);
+                                    }
+                                    map.put ("item_img", R.drawable.certifi_dobly_black);
                                 }
-                                map.put ("item_img", R.drawable.certifi_dobly_black);
                             }
                             list.add (map);
                         }

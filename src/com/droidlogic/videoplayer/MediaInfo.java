@@ -3,9 +3,12 @@ package com.droidlogic.videoplayer;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
+import android.os.PersistableBundle;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Set;
+
 
 import com.droidlogic.app.MediaPlayerExt;
 
@@ -517,6 +520,35 @@ public class MediaInfo {
             return ret;
         }
 
+        public String getAudioMime (int i) {
+            String mime;
+            if (mInfo != null && mInfo.total_audio_num > 0) {
+                mime = mInfo.audioInfo[i].audioMime;
+                Log.i(TAG,"amime:"+mime);
+                return mime;
+            }
+            return null;
+        }
+
+        public String getAudioFormatByMetrics() {
+            PersistableBundle metrics = mp.getMetrics();
+            if (metrics != null && !metrics.isEmpty()) {
+                String aMime = metrics.getString(MediaPlayer.MetricsConstants.MIME_TYPE_AUDIO, null);
+                Log.i(TAG,"amime:"+aMime);
+                return aMime;
+            }
+            return null;
+        }
+        public String getVideoFormatByMetrics() {
+            PersistableBundle metrics = mp.getMetrics();
+            if (metrics != null && !metrics.isEmpty()) {
+                String vMime = metrics.getString(MediaPlayer.MetricsConstants.MIME_TYPE_VIDEO, null);
+                Log.i(TAG,"vmime:"+vMime);
+                return vMime;
+            }
+            return null;
+        }
+
         public String getAudioFormatStr (int aFormat) {
             String type = null;
             switch (aFormat) {
@@ -622,6 +654,74 @@ public class MediaInfo {
             }
             return type;
         }
+        public String getAudioCodecStrByMetrics (String aMime, String vMime) {
+            String type = "UNKNOWN";
+            switch (aMime) {
+                case "audio/mpeg":
+                    type = "MP3";
+                    break;
+                case "audio/dtshd":
+                    type = "DTS";
+                    break;
+                case "audio/ac3":
+                    type = "AC3";
+                    break;
+                case "audio/eac3":
+                    type = "EAC3";
+                    break;
+                case "audio/adpcm":
+                    type = "ADPCM";
+                    break;
+                case "audio/x-aac":
+                    type = "AAC";
+                    break;
+                case "audio/vnd.dra":
+                    type = "DRA";
+                    break;
+                case "audio/mp1":
+                    type = "MP1";
+                    break;
+                case "audio/mp2":
+                    type = "MP2";
+                    break;
+                case "audio/mp3":
+                    type = "MP3";
+                    break;
+                case "audio/x-ms-wma":
+                    type = "WMA";
+                    break;
+                case "audio/mp4a-latm":
+                    type = "AAC_LATM";
+                    break;
+                case "audio/ffmpeg":
+                    if (vMime.equals("video/mpeg2"))
+                        type = "MP2";
+                    else if (vMime.equals("video/mp4v-es"))
+                        type = "MP3";
+                    else if (vMime.equals("video/hevc"))
+                        type = "AAC";
+                    else if (vMime.equals("video/avs"))
+                        type = "AVS";
+                    else
+                        type = "WMA";
+                    break;
+                case "audio/g711-mlaw":
+                    type = "MULAW";
+                    break;
+                case "audio/vorbis":
+                    type = "VORBIS";
+                    break;
+                case "audio/opus":
+                    type = "OPUS";
+                    break;
+                case "audio/3gpp":
+                    if (vMime.equals("video/mp4v-es"))
+                        type = "MP3";
+                    break;
+            }
+            return type;
+        }
+
 
         //@@--------this part for DTS Asset check -------------------------------------------------------------
         public boolean checkAudioisDTS (int aFormat) {
@@ -636,16 +736,18 @@ public class MediaInfo {
         public static final int CERTIFI_Dolby  = 1;
         public static final int CERTIFI_Dolby_Plus  = 2;
         public static final int CERTIFI_DTS  = 3;
-        public int checkAudioCertification (int aFormat) {
+        public int checkAudioCertification (String aMime) {
             int ret = -1;
-            if (aFormat == AFORMAT_AC3) {
-                ret = CERTIFI_Dolby;
-            }
-            else if (aFormat == AFORMAT_EAC3) {
-                ret = CERTIFI_Dolby_Plus;
-            }
-            else if (aFormat == AFORMAT_DTS) {
-                ret = CERTIFI_DTS;
+            if (aMime != null) {
+                if (aMime.equals("audio/ac3")) {
+                    ret = CERTIFI_Dolby;
+                }
+                else if (aMime.equals("audio/eac3")) {
+                    ret = CERTIFI_Dolby_Plus;
+                }
+                else if (aMime.equals("audio/dtshd")) {
+                    ret = CERTIFI_DTS;
+                }
             }
             // add more ...
             return ret;
@@ -676,6 +778,7 @@ public class MediaInfo {
         public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_MULASSETHINT = MEDIA_INFO_AMLOGIC_BASE+9;
         public static final int MEDIA_INFO_AMLOGIC_SHOW_DTS_HPS_NOTSUPPORT = MEDIA_INFO_AMLOGIC_BASE+10;
         public static final int MEDIA_INFO_AMLOGIC_BLURAY_STREAM_PATH = MEDIA_INFO_AMLOGIC_BASE + 11;
+        public static final int MEDIA_INFO_AMLOGIC_SHOW_DOLBY_VISION = MEDIA_INFO_AMLOGIC_BASE + 12;
 
         public static final int BLURAY_STREAM_TYPE_VIDEO = 'V';
         public static final int BLURAY_STREAM_TYPE_AUDIO = 'A';

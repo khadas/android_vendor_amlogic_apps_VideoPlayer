@@ -50,6 +50,14 @@
         android:layout_marginTop="20dip"
         android:layout_marginRight="30dip">
         <ImageView
+            android:id="@+id/CertificationDoblyVision"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/certifi_dobly_vision_white"
+            android:layout_marginTop="50dip"
+            android:visibility="gone">
+        </ImageView>
+        <ImageView
             android:id="@+id/CertificationDobly"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
