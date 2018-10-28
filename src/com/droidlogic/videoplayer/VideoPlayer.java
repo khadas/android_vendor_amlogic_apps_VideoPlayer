@@ -575,22 +575,22 @@ public class VideoPlayer extends Activity {
         }
 
         private boolean getPlayIgnoreHdmiEnable() {
-            boolean ret = mSystemControl.getPropertyBoolean("ro.videoignorehdmi.enable", true);
+            boolean ret = mSystemControl.getPropertyBoolean("ro.vendor.videoignorehdmi.enable", true);
             return ret;
         }
 
         private boolean isTimedTextDisable() {
-            boolean ret = mSystemControl.getPropertyBoolean("sys.timedtext.disable", true);
+            boolean ret = mSystemControl.getPropertyBoolean("vendor.sys.timedtext.disable", true);
             return ret;
         }
 
         private boolean getImgSubRatioEnable() {
-            boolean ret = mSystemControl.getPropertyBoolean("sys.imgsubratio.enable", true);
+            boolean ret = mSystemControl.getPropertyBoolean("vendor.sys.imgsubratio.enable", true);
             return ret;
         }
 
         private boolean getDebugEnable() {
-            boolean ret = mSystemControl.getPropertyBoolean("sys.videoplayer.debug", false);
+            boolean ret = mSystemControl.getPropertyBoolean("vendor.sys.videoplayer.debug", false);
             return ret;
         }
 
@@ -751,7 +751,7 @@ public class VideoPlayer extends Activity {
                 play3dBtn.setVisibility (View.GONE);
             }
 
-            if (mSystemControl.getPropertyBoolean("sys.videoplayer.moresetenable", true)) {
+            if (mSystemControl.getPropertyBoolean("vendor.sys.videoplayer.moresetenable", true)) {
                 moreSetBtn.setVisibility (View.VISIBLE);
             }
             else {
@@ -2149,7 +2149,7 @@ public class VideoPlayer extends Activity {
         private boolean randomSeekTestFlag = false;
         private Random r = new Random (99);
         private boolean randomSeekEnable() {
-            boolean ret = mSystemControl.getPropertyBoolean("sys.vprandomseek.enable", false);
+            boolean ret = mSystemControl.getPropertyBoolean("vendor.sys.vprandomseek.enable", false);
             return ret;
         }
         private void randomSeekTest() {

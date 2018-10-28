@@ -308,7 +308,7 @@ public class FileList extends ListActivity {
             requestWindowFeature (Window.FEATURE_NO_TITLE);
             setContentView (R.layout.file_list);
             mSystemControl = new SystemControlManager(this);
-            if (!mSystemControl.getPropertyBoolean("sys.videoplayer.surportbin", false)) {
+            if (!mSystemControl.getPropertyBoolean("vendor.sys.videoplayer.surportbin", false)) {
                 extensions = extensions.replaceAll(SURPORT_BIN, NOT_SURPORT);
             }
             mFileListManager = new FileListManager(this);
@@ -316,7 +316,7 @@ public class FileList extends ListActivity {
             mContext = this.getApplicationContext();
             mAppInfo = mContext.getApplicationInfo();
             PlayList.setContext (this);
-            listAllFiles = mSystemControl.getPropertyBoolean("vplayer.listall.enable", false);
+            listAllFiles = mSystemControl.getPropertyBoolean("vendor.vplayer.listall.enable", false);
             currentlist = new ArrayList<String>();
             if (!listAllFiles) {
                 try {
