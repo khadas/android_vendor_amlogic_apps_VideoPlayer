@@ -28,7 +28,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.Canvas;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
@@ -119,6 +121,10 @@ public class VideoPlayer extends Activity {
         private Map<String, String> mHeaders;
         private boolean mHdmiPlugged;
 
+        private Bitmap graphicsPic;
+        private String mPicStrs[] = new String[]{"01_colorChecker_FHD_Rec709_Gamma2.2","02_colorSquare_FHD_Rec709_Gamma2.2"
+                                                                   ,"03_colorSquare_UHD_Rec709_Gamma2.2","04_colorSquare_transparent"};
+
         private LinearLayout ctlbar = null; //for OSD bar layer 1; controller bar
         private LinearLayout optbar = null; //for OSD bar layer 2; option bar
         private LinearLayout subwidget = null; //for subtitle switch
@@ -160,6 +166,11 @@ public class VideoPlayer extends Activity {
         private ImageView certificationDTSView = null;
         private ImageView certificationDTSExpressView = null;
         private ImageView certificationDTSHDMasterAudioView = null;
+
+        private ImageView hdmiPicView1 = null;
+        private ImageView hdmiPicView2 = null;
+        private ImageView hdmiPicView3 = null;
+        private ImageView hdmiPicView4 = null;
 
         //store index of file postion for back to file list
         private int item_position_selected; // for back to file list view
@@ -614,6 +625,11 @@ public class VideoPlayer extends Activity {
             return ret;
         }
 
+        private boolean isGraphicBlendEnable() {
+            boolean ret = mSystemControl.getPropertyBoolean("vendor.sys.graphicBlend.enable", false);
+            return ret;
+        }
+
         private void LOGI (String tag, String msg) {
             if (DEBUG || getDebugEnable()) { Log.i (tag, msg); }
         }
@@ -714,6 +730,10 @@ public class VideoPlayer extends Activity {
             subtitleTV = (TextView)findViewById(R.id.SubtitleTV);
             subtitleIV = (ImageView)findViewById(R.id.SubtitleIV);
             subtitleShow();
+            hdmiPicView1= (ImageView) findViewById (R.id.HdmiPic1);
+            hdmiPicView2= (ImageView) findViewById (R.id.HdmiPic2);
+            hdmiPicView3= (ImageView) findViewById (R.id.HdmiPic3);
+            hdmiPicView4= (ImageView) findViewById (R.id.HdmiPic4);
             //certification image
             certificationDoblyVisionView = (ImageView) findViewById (R.id.CertificationDoblyVision);
             certificationDoblyView = (ImageView) findViewById (R.id.CertificationDobly);
@@ -1126,10 +1146,14 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[surfaceCreated]");
                 mSurfaceHolder = holder;
                 surfaceDestroyedFlag = false;
-
                 //avoid onresume, mSubtitleManager null,171388
                 if (mSubtitleManager == null)
                     mSubtitleManager = new SubtitleManager (VideoPlayer.this);
+
+                if (isGraphicBlendEnable()) {
+                    showChoosePicDialogue();
+                }
+                //showChoosePicDialogue();
 
                 initPlayer();
                 LOGI (TAG, "[surfaceCreated]mResumePlay:" + mResumePlay + ",surfaceDestroyedFlag:" + surfaceDestroyedFlag);
@@ -1187,6 +1211,42 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[surfaceDestroyed]surfaceDestroyedFlag:" + surfaceDestroyedFlag);
             }
         };
+
+        public void showChoosePicDialogue(){
+                new AlertDialog.Builder(VideoPlayer.this)
+                    .setTitle (R.string.alertdialog_title)
+                    .setSingleChoiceItems (mPicStrs, 0, new DialogInterface.OnClickListener() {
+                        public void onClick (DialogInterface dialog, int which) {
+                            Log.d (TAG, "[showChooseDev]-onClick-");
+                            dialog.dismiss();
+                            switch (which) {
+                                case 0:
+                                    hdmiPicView1.setVisibility(View.VISIBLE);
+                                    break;
+                                case 1:
+                                    hdmiPicView2.setVisibility(View.VISIBLE);
+                                    break;
+                                case 2:
+                                    hdmiPicView3.setVisibility(View.VISIBLE);
+                                    break;
+                                case 3:
+                                    hdmiPicView4.setVisibility(View.VISIBLE);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
+                    })
+                    .setOnCancelListener (new DialogInterface.OnCancelListener() {
+                        public void onCancel (DialogInterface dialog) {
+                        }
+                    })
+                    .show();
+                //builder.setCancelable(false);
+                //builder.create().show();
+           }
+
 
         public void onConfigurationChanged (Configuration config) {
             super.onConfigurationChanged (config);
@@ -4415,6 +4475,7 @@ public class VideoPlayer extends Activity {
                         }
                     }
                 }
+                //browserBack();
             }
             else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
                 if ( (ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE)) {
