@@ -29,9 +29,9 @@ public class MediaInfo {
             mContext = context;
         }
 
-        public void initMediaInfo() {
+        public void initMediaInfo(MediaPlayerExt mp) {
             if (mp != null) {
-                mInfo = mp.getMediaInfo();
+                mInfo = mp.getMediaInfo(mp);
             }
             if (DEBUG) { printMediaInfo(); }
         }
@@ -690,6 +690,12 @@ public class MediaInfo {
                 case "audio/x-ms-wma":
                     type = "WMA";
                     break;
+                case "audio/flac":
+                    type = "FLAC";
+                    break;
+                case "audio/raw":
+                    type = "PCM";
+                    break;
                 case "audio/mp4a-latm":
                     type = "AAC_LATM";
                     break;
@@ -702,6 +708,11 @@ public class MediaInfo {
                         type = "AAC";
                     else if (vMime.equals("video/avs"))
                         type = "AVS";
+                    else if (vMime.equals("video/rm40")
+                           || vMime.equals("video/rm30")
+                           || vMime.equals("video/rm20")
+                           || vMime.equals("video/rm10"))
+                        type = "COOKER";
                     else
                         type = "WMA";
                     break;

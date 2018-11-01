@@ -646,7 +646,7 @@ public class VideoPlayer extends Activity {
         private void initMediaInfo(MediaPlayer.TrackInfo[] trackInfo) {
             LOGI (TAG, "[initMediaInfo] mMediaPlayer:"+mMediaPlayer);
             mMediaInfo = new MediaInfo (mMediaPlayer, VideoPlayer.this);
-            mMediaInfo.initMediaInfo();
+            mMediaInfo.initMediaInfo(mMediaPlayer);
             mMediaInfo.setDefaultData(trackInfo);
             //prepare for audio track
             if (mMediaInfo != null) {
@@ -4047,7 +4047,7 @@ public class VideoPlayer extends Activity {
             else if (track >= mMediaInfo.getAudioTotalNum()) {
                 track = mMediaInfo.getAudioTotalNum() - 1;
             }
-            int ret = mMediaInfo.checkAudioCertification (mMediaInfo.getAudioFormatByMetrics());
+            int ret = mMediaInfo.checkAudioCertification (mMediaInfo.getAudioMime(currAudioIndex));
             LOGI (TAG, "[showCertification]ret:" + ret);
             if (ret == mMediaInfo.CERTIFI_Dolby) {
                 if (mSystemControl.getPropertyBoolean("ro.vendor.platform.support.dolby", false)) {
@@ -5266,7 +5266,7 @@ public class VideoPlayer extends Activity {
                             if (mIsBluray)
                                 map.put ("item_name", getLanguageInfoDisplayString(MediaInfo.BLURAY_STREAM_TYPE_AUDIO, i));
                             else
-                                map.put ("item_name", mMediaInfo.getAudioCodecStrByMetrics(mMediaInfo.getAudioFormatByMetrics(),mMediaInfo.getVideoFormatByMetrics()));
+                                map.put ("item_name", mMediaInfo.getAudioCodecStrByMetrics(mMediaInfo.getAudioMime(i),mMediaInfo.getVideoFormatByMetrics()));
                             map.put ("item_sel", R.drawable.item_img_unsel);
                             if (mMediaInfo.getAudioMime(i) != null) {
                                 if (mMediaInfo.getAudioMime(i).equals("audio/ac3") || mMediaInfo.getAudioMime(i).equals("audio/eac3")) {
