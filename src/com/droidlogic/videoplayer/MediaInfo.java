@@ -12,6 +12,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 import android.os.PersistableBundle;
+import android.os.Parcel;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -63,8 +64,10 @@ public class MediaInfo {
             Method has = null;
             Method getInt = null;
             Method getMetadata = null;
+            Field parcelField = null;
             Field keyField = null;
             int key = -1;
+            boolean isGetInt = false;
             try {
                 mediaPlayerClazz = Class.forName("android.media.MediaPlayer");
                 metadataClazz = Class.forName("android.media.Metadata");
@@ -78,6 +81,7 @@ public class MediaInfo {
                 key = (int)keyField.get(metadataInstance);
                 if ((boolean)has.invoke(metadataInstance, key)) {
                     mVideoWidth = (int)getInt.invoke(metadataInstance, key);
+                    isGetInt = true;
                 }
 
                 keyField = metadataClazz.getDeclaredField("VIDEO_HEIGHT");
@@ -85,6 +89,14 @@ public class MediaInfo {
                 key = (int)keyField.get(metadataInstance);
                 if ((boolean)has.invoke(metadataInstance, key)) {
                     mVideoHeight = (int)getInt.invoke(metadataInstance, key);
+                    isGetInt = true;
+                }
+
+                if (isGetInt) {
+                    parcelField = metadataClazz.getDeclaredField("mParcel");
+                    parcelField.setAccessible(true);
+                    Parcel p = (Parcel)parcelField.get(metadataInstance);
+                    p.recycle();
                 }
             }catch (Exception ex) {
                 ex.printStackTrace();
