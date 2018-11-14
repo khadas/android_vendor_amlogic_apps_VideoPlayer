@@ -2373,6 +2373,7 @@ public class VideoPlayer extends Activity {
                 stop();
                 mBookmark.set (mPlayList.getcur(), curtime);
                 mStateBac = STATE_STOP;
+                currAudioIndex = 0;
                 mPath = mPlayList.moveprev();
                 //sendPlayFileMsg();
                 playFile(mPath);
@@ -2393,6 +2394,7 @@ public class VideoPlayer extends Activity {
                 stop();
                 mBookmark.set (mPlayList.getcur(), curtime);
                 mStateBac = STATE_STOP;
+                currAudioIndex = 0;
                 mPath = mPlayList.movenext();
                 //sendPlayFileMsg();
                 playFile(mPath);
@@ -2411,6 +2413,7 @@ public class VideoPlayer extends Activity {
             stop();
             curtime = 0;
             totaltime = 0;
+            currAudioIndex = 0;
             mBookmark.set (mPlayList.getcur(), curtime);
             mStateBac = STATE_STOP;
             mPath = mPlayList.getcur();
