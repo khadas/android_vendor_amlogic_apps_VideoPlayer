@@ -229,7 +229,7 @@ public class VideoPlayer extends Activity {
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
             //LOCALES = LocalePicker.getAllAssetLocales(this, false);
-            mSystemControl = new SystemControlManager(this);
+            mSystemControl = SystemControlManager.getInstance();
             mFileListManager = new FileListManager(this);
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
