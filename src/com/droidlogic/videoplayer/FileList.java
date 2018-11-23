@@ -119,7 +119,7 @@ public class FileList extends ListActivity {
         private final String iso_mount_dir = "/mnt/loop";
         private static final String iso_mount_dir_s = "/mnt/loop";
         private Uri uri;
-        private static SystemControlManager mSystemControl;
+        private SystemControlManager mSystemControl;
         private FileListManager mFileListManager;
 
         private void waitForBrowserIsoFile() {
@@ -315,7 +315,7 @@ public class FileList extends ListActivity {
             extensions = getResources().getString (R.string.support_video_extensions);
             requestWindowFeature (Window.FEATURE_NO_TITLE);
             setContentView (R.layout.file_list);
-            mSystemControl = new SystemControlManager(this);
+            mSystemControl = SystemControlManager.getInstance();
             if (!mSystemControl.getPropertyBoolean("vendor.sys.videoplayer.surportbin", false)) {
                 extensions = extensions.replaceAll(SURPORT_BIN, NOT_SURPORT);
             }
