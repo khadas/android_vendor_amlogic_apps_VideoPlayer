@@ -234,6 +234,7 @@ public class VideoPlayer extends Activity {
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
             setTitle (null);
+            mSubtitleManager = new SubtitleManager (VideoPlayer.this);
             mAudioManager = (AudioManager) this.getSystemService (Context.AUDIO_SERVICE);
             mScreenLock = ( (PowerManager) this.getSystemService (Context.POWER_SERVICE)).newWakeLock (
                               PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, TAG);
@@ -1114,6 +1115,11 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[surfaceCreated]");
                 mSurfaceHolder = holder;
                 surfaceDestroyedFlag = false;
+
+                //avoid onresume, mSubtitleManager null,171388
+                if (mSubtitleManager == null)
+                    mSubtitleManager = new SubtitleManager (VideoPlayer.this);
+
                 initPlayer();
                 LOGI (TAG, "[surfaceCreated]mResumePlay:" + mResumePlay + ",surfaceDestroyedFlag:" + surfaceDestroyedFlag);
                 if (mResumePlay != null) {
@@ -3056,7 +3062,8 @@ public class VideoPlayer extends Activity {
             }
             release();
             mMediaPlayer = new MediaPlayerExt();
-            mSubtitleManager = new SubtitleManager (mMediaPlayer);
+            //mSubtitleManager = new SubtitleManager (VideoPlayer.this,mMediaPlayer);
+            mSubtitleManager.setMediaPlayer(mMediaPlayer);
             ///mMediaPlayer.setIgnoreSubtitle(true); //should sync with MediaPlayer.java
             mMediaPlayer.setOnPreparedListener (mPreparedListener);
             mMediaPlayer.setOnVideoSizeChangedListener (mSizeChangedListener);
@@ -3066,7 +3073,7 @@ public class VideoPlayer extends Activity {
             mMediaPlayer.setOnInfoListener (mInfoListener);
             mMediaPlayer.setOnBlurayInfoListener(mBlurayListener);
             mMediaPlayer.setDisplay (mSurfaceHolder);
-            //mMediaPlayer.setOnTimedTextListener(mTimedTextListener);
+            mMediaPlayer.setOnTimedTextListener(mTimedTextListener);
             //@@mMediaPlayer.setOnSubtitleDataListener(mSubtitleDataListener);
         }
 
