@@ -228,13 +228,13 @@ public class VideoPlayer extends Activity {
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
+            mSubtitleManager = new SubtitleManager (VideoPlayer.this);
             //LOCALES = LocalePicker.getAllAssetLocales(this, false);
             mSystemControl = SystemControlManager.getInstance();
             mFileListManager = new FileListManager(this);
             LOGI (TAG, "[onCreate]");
             setContentView (R.layout.control_bar);
             setTitle (null);
-            mSubtitleManager = new SubtitleManager (VideoPlayer.this);
             mAudioManager = (AudioManager) this.getSystemService (Context.AUDIO_SERVICE);
             mScreenLock = ( (PowerManager) this.getSystemService (Context.POWER_SERVICE)).newWakeLock (
                               PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, TAG);
