@@ -796,6 +796,8 @@ public class MediaInfo {
         public static final int MEDIA_INFO_BAD_INTERLEAVING = 800;
         public static final int MEDIA_INFO_NOT_SEEKABLE = 801;
         public static final int MEDIA_INFO_METADATA_UPDATE = 802;
+        public static final int MEDIA_INFO_PLAY_AUDIO_ERROR = 804;
+        public static final int MEDIA_INFO_PLAY_VIDEO_ERROR = 805;
         public static final int MEDIA_INFO_TIMED_TEXT_ERROR = 900;
         public static final int MEDIA_INFO_AMLOGIC_BASE = 8000;
         public static final int MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT = MEDIA_INFO_AMLOGIC_BASE + 1;
@@ -820,7 +822,10 @@ public class MediaInfo {
             if ( (info == MEDIA_INFO_AMLOGIC_VIDEO_NOT_SUPPORT)
                     || (info == MEDIA_INFO_AMLOGIC_AUDIO_NOT_SUPPORT)
                     || (info == MEDIA_INFO_AMLOGIC_NO_VIDEO)
-                    || (info == MEDIA_INFO_AMLOGIC_NO_AUDIO)) {
+                    || (info == MEDIA_INFO_AMLOGIC_NO_AUDIO)
+                    || (info == MEDIA_INFO_PLAY_VIDEO_ERROR)
+                    || (info == MEDIA_INFO_PLAY_AUDIO_ERROR)
+                    || (info == MEDIA_INFO_TIMED_TEXT_ERROR)) {
                 ret = true;
             }
             return ret;
@@ -840,6 +845,15 @@ public class MediaInfo {
                     break;
                 case MEDIA_INFO_AMLOGIC_NO_AUDIO:
                     infoStr = context.getResources().getString (R.string.file_have_no_audio); //"file have no audio";
+                    break;
+                case MEDIA_INFO_PLAY_VIDEO_ERROR:
+                    infoStr = context.getResources().getString (R.string.play_video_error); //"video file error";
+                    break;
+                case MEDIA_INFO_PLAY_AUDIO_ERROR:
+                    infoStr = context.getResources().getString (R.string.play_audio_error); //"audio file error";
+                    break;
+                case MEDIA_INFO_TIMED_TEXT_ERROR:
+                    infoStr = context.getResources().getString (R.string.play_subtitle_error); //"subtitle file error";
                     break;
                 default:
                     break;
