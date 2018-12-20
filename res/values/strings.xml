@@ -113,6 +113,9 @@
     <string name="failed"> ) failed</string>
     <string name="decode_init_failed">Decode Init failed</string>
     <string name="file_have_no_video">file have no video</string>
+    <string name="play_video_error">video file error</string>
+    <string name="play_audio_error">audio file error</string>
+    <string name="play_subtitle_error">subtitle file error</string>
     <string name="set_playback_without_video">set playback without video</string>
     <string name="set_playback_without_audio">set playback without audio</string>
     <string name="not_authorized_to_play">This player is not authorized to play this video</string>
