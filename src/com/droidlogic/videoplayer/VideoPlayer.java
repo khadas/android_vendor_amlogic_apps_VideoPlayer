@@ -2415,6 +2415,9 @@ public class VideoPlayer extends Activity {
                 mStateBac = STATE_STOP;
                 currAudioIndex = 0;
                 mPath = mPlayList.movenext();
+                while (!FileListManager.isVideo(mPath)) {
+                    mPath = mPlayList.movenext();
+                }
                 //sendPlayFileMsg();
                 playFile(mPath);
             }
@@ -3653,7 +3656,11 @@ public class VideoPlayer extends Activity {
         private class confirmDismissListener implements DialogInterface.OnDismissListener {
                 public void onDismiss (DialogInterface arg0) {
                     if (!exitAbort) {
-                        setVideoPath (mPlayList.getcur());
+                        if (!FileListManager.isVideo(mPath)) {
+                            setVideoPath (mPlayList.movenext());
+                        } else {
+                            setVideoPath (mPlayList.getcur());
+                        }
                         resumeSecond = resumeSecondMax;
                     }
                 }
