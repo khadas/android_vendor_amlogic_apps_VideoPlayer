@@ -2436,6 +2436,7 @@ public class VideoPlayer extends Activity {
                 while (!FileListManager.isVideo(mPath)) {
                     mPath = mPlayList.movenext();
                 }
+                LOGI (TAG, "[playNext]mPath:" + mPath);
                 //sendPlayFileMsg();
                 playFile(mPath);
             }
@@ -3074,8 +3075,16 @@ public class VideoPlayer extends Activity {
             if (uriTmp == null) {
                 LOGE (TAG, "[trySetVideoURIAgain]uriTmp=null error!!!");
                 Toast.makeText (mContext, mContext.getText (R.string.wait_for_scan), Toast.LENGTH_SHORT).show();
-                browserBack();
-                return;
+                if (mOption.getRepeatMode() == mOption.REPEATLIST) {
+                    mState = STATE_ERROR;
+                    mPlayList.removeCurPath();
+                    playNext();
+                    return;
+                }
+                else {
+                    browserBack();
+                    return;
+                }
             }
             LOGI (TAG, "[trySetVideoURIAgain]setVideoURI uriTmp:" + uriTmp);
             setVideoURI (uriTmp, paramPath);
