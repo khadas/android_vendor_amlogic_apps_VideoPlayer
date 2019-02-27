@@ -1966,13 +1966,14 @@ public class VideoPlayer extends Activity {
         private void videoTrackImpl(int idx) {
             if (mMediaPlayer != null && mMediaInfo != null) {
                 int id = mMediaInfo.getVideoIdx(idx);
-                String str = Integer.toString(id);
+                //don't need setParameter above o.
+                /*String str = Integer.toString(id);
                 StringBuilder builder = new StringBuilder();
                 builder.append("vid:"+str);
                 LOGI(TAG,"[videoTrackImpl]"+builder.toString());
                 boolean ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_VIDEO_TRACK,builder.toString());
-                LOGI (TAG, "[videoTrackImpl]:mMediaPlayer.setParameter" + ret);
-                if (!ret && mTrackInfo != null) {
+                LOGI (TAG, "[videoTrackImpl]:mMediaPlayer.setParameter" + ret);*/
+                if (mTrackInfo != null) {
                     int videoTrack = -1;
                     for (int i = 0; i < mTrackInfo.length; i++) {
                         int trackType = mTrackInfo[i].getTrackType();
