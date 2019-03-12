@@ -83,9 +83,10 @@ public class MyAdapter extends BaseAdapter {
             File f = new File (paths.get (position).toString());
             File txtf = new File (items.get (position).toString());
             holder.text.setText (txtf.getName());
-            if (mFileListManager.isBDFile(f))
-                holder.icon.setImageBitmap (iconBdVideo);
-            else if (mFileListManager.isISOFile(f))
+            //if (false /*mFileListManager.isBDFile(f)*/)  //not support BD file from p
+                //holder.icon.setImageBitmap (iconBdVideo);
+            //else
+            if (mFileListManager.isISOFile(f))
                 holder.icon.setImageBitmap (iconIsoFile);
             else {
                 if (f.isDirectory())
