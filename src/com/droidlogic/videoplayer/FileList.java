@@ -693,33 +693,33 @@ public class FileList extends ListActivity {
             if (fileDirectory_position_piexl == null) {
                 fileDirectory_position_piexl = new ArrayList<Integer>();
             }
-            if (mFileListManager.isBDFile(file)) {
-                mFileFlag = true;
-            } else {
-                if (file.isDirectory()) {
-                    item_position_selected = getListView().getSelectedItemPosition();
-                    item_position_first = getListView().getFirstVisiblePosition();
-                    View cv = getListView().getChildAt (item_position_selected - item_position_first);
-                    if (cv != null) {
-                        fromtop_piexl = cv.getTop();
-                    }
-                    BrowserFile (paths.get (position));
-                    if (!listFiles.isEmpty()) {
-                        fileDirectory_position_selected.add (item_position_selected);
-                        fileDirectory_position_piexl.add (fromtop_piexl);
-                        pathLevel++;
-                        mClickFlag = true;
-                    }
-                    mFileFlag = false;
-                } else if (mFileListManager.isISOFile(file)) {
-                    waitForBrowserIsoFile();
+            //if (false/*mFileListManager.isBDFile(file)*/) {  //not support BD file from p
+                //mFileFlag = true;
+            //} else {
+            if (file.isDirectory()) {
+                item_position_selected = getListView().getSelectedItemPosition();
+                item_position_first = getListView().getFirstVisiblePosition();
+                View cv = getListView().getChildAt (item_position_selected - item_position_first);
+                if (cv != null) {
+                    fromtop_piexl = cv.getTop();
+                }
+                BrowserFile (paths.get (position));
+                if (!listFiles.isEmpty()) {
                     fileDirectory_position_selected.add (item_position_selected);
                     fileDirectory_position_piexl.add (fromtop_piexl);
                     pathLevel++;
-                    mFileFlag = false;
-                } else
-                    mFileFlag = true;
-            }
+                    mClickFlag = true;
+                }
+                mFileFlag = false;
+            } else if (mFileListManager.isISOFile(file)) {
+                waitForBrowserIsoFile();
+                fileDirectory_position_selected.add (item_position_selected);
+                fileDirectory_position_piexl.add (fromtop_piexl);
+                pathLevel++;
+                mFileFlag = false;
+            } else
+                mFileFlag = true;
+            //}
             if (mFileFlag) {
                 if (!listAllFiles) {
                     int pos = filterDir (file);

@@ -2922,7 +2922,7 @@ public class VideoPlayer extends Activity {
         private String changeForIsoFile(String path) {
             File file = new File(path);
             String fpath = file.getPath();
-            if (mFileListManager.isBDFile(file)) {
+            /*if (mFileListManager.isBDFile(file)) {   //not support BD file from p
                 if (mFileListManager.isISOFile(file))
                     fpath = "bluray:/mnt/loop";
                 else
@@ -2933,10 +2933,10 @@ public class VideoPlayer extends Activity {
                 mBluraySubLang = new ArrayList<String>();
                 mBlurayChapter = new ArrayList<ChapterInfo>();
                 chapterBtn.setVisibility(View.VISIBLE);
-            } else {
-                mIsBluray = false;
-                chapterBtn.setVisibility(View.GONE);
-            }
+            } else {*/
+            mIsBluray = false;
+            chapterBtn.setVisibility(View.GONE);
+            //}
             LOGI(TAG, "[changeForIsoFile]fpath: " + fpath);
             return fpath;
         }
