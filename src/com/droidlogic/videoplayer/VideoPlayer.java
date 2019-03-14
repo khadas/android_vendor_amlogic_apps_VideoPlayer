@@ -3569,6 +3569,12 @@ public class VideoPlayer extends Activity {
                     }
                 })
                 .show();
+
+                //setWidth in case of button not full of dialog.
+                Button posBtn = confirm_dialog.getButton(confirm_dialog.BUTTON_POSITIVE);
+                Button ngtBtn = confirm_dialog.getButton(confirm_dialog.BUTTON_NEGATIVE);
+                posBtn.setWidth(250);
+                ngtBtn.setWidth(250);
                 confirm_dialog.setOnDismissListener (new confirmDismissListener());
                 ResumeCountdown();
                 return pos;
