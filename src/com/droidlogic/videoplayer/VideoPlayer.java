@@ -2954,6 +2954,7 @@ public class VideoPlayer extends Activity {
                 mMediaPlayer.setDataSource (mContext, mUri, mHeaders);
                 mSubtitleManager.setSource (mContext, mUri);
                 mState = STATE_PREPARING;
+                mMediaPlayer.setUseLocalExtractor(mMediaPlayer);
                 mMediaPlayer.prepare();
             }
             catch (IOException ex) {
