@@ -477,6 +477,7 @@ public class VideoPlayer extends Activity {
         private static final int MSG_SEEK_BY_BAR = 0xF7;
         private static final int MSG_UPDATE_DISPLAY_MODE = 0xF8;
         private static final int MSG_SHOW_CERTIFICATION = 0xF9;
+        private static final int MSG_CONTINUE_SWITCH_DELAY = 0xFA;
         private boolean ignoreUpdateProgressbar = false;
         private Handler mHandler = new Handler() {
             @Override
@@ -539,6 +540,9 @@ public class VideoPlayer extends Activity {
                         break;
                     case MSG_SEEK_BY_BAR:
                         seekByProgressBar();
+                        break;
+                    case MSG_CONTINUE_SWITCH_DELAY:
+                        playNext();
                         break;
                     case MSG_UPDATE_DISPLAY_MODE:
                         displayModeImpl();
@@ -2610,6 +2614,14 @@ public class VideoPlayer extends Activity {
             }
         }
 
+        private void sendContinueSwitchDelayMsg() {
+            if (mHandler != null) {
+                Message msg = mHandler.obtainMessage (MSG_CONTINUE_SWITCH_DELAY);
+                mHandler.sendMessageDelayed (msg, 1000);
+                LOGI (TAG, "[sendContinueSwitchDelayMsg]sendMessageDelayed MSG_CONTINUE_SWITCH_DELAY");
+            }
+        }
+
         private void seekByProgressBar() {
             int dest = progressBar.getProgress();
             int pos = totaltime * (dest + 1) / 100;
@@ -3347,6 +3359,7 @@ public class VideoPlayer extends Activity {
             }
         };
 
+        private final int ERROR_AUDIO_SINK = -19;
         private MediaPlayer.OnErrorListener mErrorListener =
         new MediaPlayer.OnErrorListener() {
             public boolean onError (MediaPlayer mp, int what, int extra) {
@@ -3366,7 +3379,7 @@ public class VideoPlayer extends Activity {
                     toast.setDuration (0x00000001);
                     toast.show();
                     if (mOption.getRepeatMode() == mOption.REPEATLIST) {
-                        playNext();
+                        sendContinueSwitchDelayMsg();
                     }
                     else {
                         browserBack();
