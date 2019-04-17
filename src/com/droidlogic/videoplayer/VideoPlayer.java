@@ -4247,9 +4247,9 @@ public class VideoPlayer extends Activity {
                         playBtn.requestFocus();
                     }
                 }
-                else {
-                    showNoOsdView();
-                }
+                /* else {
+                    showNoOsdView();             //fix long press twinkle, OTT-3231
+                } */
             }
             else if (keyCode == KeyEvent.KEYCODE_POWER) {
                 if (mState == STATE_PLAYING
