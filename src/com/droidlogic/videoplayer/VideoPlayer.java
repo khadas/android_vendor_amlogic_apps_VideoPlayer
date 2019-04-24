@@ -369,12 +369,18 @@ public class VideoPlayer extends Activity {
         @Override
         public void onPause() {
             super.onPause();
+            LOGI (TAG, "[onPause]");
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
 
             if (!mPermissionGranted) {
                 return;
             }
 
-            LOGI (TAG, "[onPause] curtime:" + curtime);
+            LOGI (TAG, "[onStop] curtime:" + curtime);
             mErrorTime = 0;
             mErrorTimeBac = 0;
             if (randomSeekEnable()) { // random seek for test
@@ -1536,6 +1542,9 @@ public class VideoPlayer extends Activity {
                     }
                     else if (position == 1) {//vrSet
                         VRSet();
+                    } else if (position == 2) {
+                        otherwidget.setVisibility(View.GONE);
+                        startSettingActivity();
                     }
                     // TODO: add more set
                 }
@@ -1592,6 +1601,12 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget(R.string.setting_switch_VR);
+        }
+
+        private void startSettingActivity() {
+            Intent intent = new Intent();
+            intent.setClassName("com.droidlogic.tv.settings", "com.droidlogic.tv.settings.SoundActivity");
+            startActivity(intent);
         }
 
         private void subtitleSelect() {
@@ -5473,6 +5488,10 @@ public class VideoPlayer extends Activity {
                     list.add (map);
                     map = new HashMap<String, Object>();
                     map.put ("item_name", getResources().getString (R.string.setting_switch_VR));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_audio_settings));
                     map.put ("item_sel", R.drawable.item_img_unsel);
                     list.add (map);
                     map = new HashMap<String, Object>();

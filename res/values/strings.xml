@@ -66,6 +66,7 @@
     <string name="setting_VR_left">Left</string>
     <string name="setting_VR_right">Right</string>
     <string name="setting_VR_montage">Montage(L/R)</string>
+    <string name="setting_audio_settings">Audio Settings</string>
     <string name="setting_more">...</string>
 
     <string name="confirm_codec_set">Codec Set</string>
