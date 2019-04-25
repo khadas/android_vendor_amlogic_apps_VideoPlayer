@@ -3298,9 +3298,23 @@ public class VideoPlayer extends Activity {
                 mIsBluray = false;
                 mSubIndex = 0;
                 if (mOption.getRepeatMode() == mOption.REPEATONE) {
+                    if (getCurrentPosition() == 0) {   //add prompt divx not support
+                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_exit, Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.BOTTOM,0, 0);
+                        toast.setDuration (0x00000001);
+                        toast.show();
+                        browserBack();
+                        return;
+                    }
                     playCur();
                 }
                 else if (mOption.getRepeatMode() == mOption.REPEATLIST) {
+                    if (getCurrentPosition() == 0) {   //add prompt divx not support
+                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_next, Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.BOTTOM,0, 0);
+                        toast.setDuration (0x00000001);
+                        toast.show();
+                    }
                     playNext();
                 }
                 else {

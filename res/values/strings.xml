@@ -127,4 +127,6 @@
     <string name="audio_dec_enable">Invalid License,audio can not decode to output.</string>
     <string name="dts_hps_unsupport">DTSHD_Headphone_Stream Unssport,Unless Insert Headphone.</string>
     <string name="unsupport_video_size">Unsupport Bitate</string>
+    <string name="not_support_video_exit">Not support video format, Exit!</string>
+    <string name="not_support_video_next">Not support video format, Next Video!</string>
 </resources>
