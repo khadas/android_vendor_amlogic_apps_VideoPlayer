@@ -728,6 +728,12 @@ public class MediaInfo {
                         type = "AAC";
                     else if (vMime.equals("video/avs"))
                         type = "AVS";
+                    else if (vMime.equals("video/x-vnd.on2.vp8"))
+                        type = "FLAC";
+                    else if (vMime.equals("video/x-vnd.on2.vp9"))
+                        type = "OPUS";
+                    else if (vMime.equals("video/avs2"))
+                        type = "MPEG";
                     else if (vMime.equals("video/rm40")
                            || vMime.equals("video/rm30")
                            || vMime.equals("video/rm20")
