@@ -2859,7 +2859,7 @@ public class VideoPlayer extends Activity {
                     return;
                 }
                 stopFWFB();
-                mMediaPlayer.seekTo (msec);
+                mMediaPlayer.seekTo (msec,MediaPlayer.SEEK_CLOSEST);
                 //mState = STATE_SEARCHING;
                 //updateIconResource();
             }
