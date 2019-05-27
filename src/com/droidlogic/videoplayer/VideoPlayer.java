@@ -4752,7 +4752,10 @@ public class VideoPlayer extends Activity {
             //sub_para.color = subSp.getInt("color", android.graphics.Color.WHITE);
             //sub_para.font=subSp.getInt("font", 20);
             //sub_para.position_v=subSp.getInt("position_v", 0);
-            setSubtitleView();
+            if (mSubtitleManager.total() > 0) {
+                setSubtitleView();
+            }
+
         }
 
         private void subtitle_prepare() {
