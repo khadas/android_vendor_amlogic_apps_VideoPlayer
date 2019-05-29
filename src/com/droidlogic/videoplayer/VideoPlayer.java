@@ -699,9 +699,9 @@ public class VideoPlayer extends Activity {
             mContext = this.getApplicationContext();
             //videView
             initVideoView();
-            ff_fb = Toast.makeText (VideoPlayer.this, "", Toast.LENGTH_SHORT);
-            ff_fb.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
-            ff_fb.setDuration (0x00000001);
+            //ff_fb = Toast.makeText (VideoPlayer.this, "", Toast.LENGTH_SHORT);
+            //ff_fb.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+            //ff_fb.setDuration (0x0000000001);
 
             //subtitle
             subtitleTV = (TextView)findViewById(R.id.SubtitleTV);
@@ -2456,13 +2456,15 @@ public class VideoPlayer extends Activity {
                     }
                     FFimpl (FF_STEP[FF_LEVEL]);
                     if (FF_LEVEL == 0) {
-                        ff_fb.cancel();
+                        //ff_fb.cancel();
                         FF_FLAG = false;
                         start();
                     }
                     else {
-                        ff_fb.setText (new String ("FF x" + Integer.toString (FF_SPEED[FF_LEVEL])));
-                        ff_fb.show();
+                        Toast toast = Toast.makeText (VideoPlayer.this, "FF x" + Integer.toString (FF_SPEED[FF_LEVEL]), Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+                        toast.setDuration (0x00000001);
+                        toast.show();
                     }
                 }
                 if (FB_FLAG) {
@@ -2474,13 +2476,15 @@ public class VideoPlayer extends Activity {
                     }
                     FBimpl (FB_STEP[FB_LEVEL]);
                     if (FB_LEVEL == 0) {
-                        ff_fb.cancel();
+                        //ff_fb.cancel();
                         FB_FLAG = false;
                         start();
                     }
                     else {
-                        ff_fb.setText (new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])));
-                        ff_fb.show();
+                        Toast toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])), Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+                        toast.setDuration (0x00000001);
+                        toast.show();
                     }
                 }
             }
@@ -2488,8 +2492,10 @@ public class VideoPlayer extends Activity {
                 FFimpl (FF_STEP[1]);
                 FF_FLAG = true;
                 FF_LEVEL = 1;
-                ff_fb.setText (new String ("FF x" + FF_SPEED[FF_LEVEL]));
-                ff_fb.show();
+                Toast toast = Toast.makeText (VideoPlayer.this, new String ("FF x" + FF_SPEED[FF_LEVEL]), Toast.LENGTH_SHORT);
+                toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+                toast.setDuration (0x00000001);
+                toast.show();
             }
             startOsdTimeout();
         }
@@ -2506,13 +2512,15 @@ public class VideoPlayer extends Activity {
                     }
                     FBimpl (FB_STEP[FB_LEVEL]);
                     if (FB_LEVEL == 0) {
-                        ff_fb.cancel();
+                        //ff_fb.cancel();
                         FB_FLAG = false;
                         start();
                     }
                     else {
-                        ff_fb.setText (new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])));
-                        ff_fb.show();
+                        Toast toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])), Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+                        toast.setDuration (0x00000001);
+                        toast.show();
                     }
                 }
                 if (FF_FLAG) {
@@ -2524,13 +2532,15 @@ public class VideoPlayer extends Activity {
                     }
                     FFimpl (FF_STEP[FF_LEVEL]);
                     if (FF_LEVEL == 0) {
-                        ff_fb.cancel();
+                        //ff_fb.cancel();
                         FF_FLAG = false;
                         start();
                     }
                     else {
-                        ff_fb.setText (new String ("FF x" + Integer.toString (FF_SPEED[FF_LEVEL])));
-                        ff_fb.show();
+                        Toast toast = Toast.makeText (VideoPlayer.this, new String ("FF x" + Integer.toString (FF_SPEED[FF_LEVEL])), Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+                        toast.setDuration (0x00000001);
+                        toast.show();
                     }
                 }
             }
@@ -2538,16 +2548,18 @@ public class VideoPlayer extends Activity {
                 FBimpl (FB_STEP[1]);
                 FB_FLAG = true;
                 FB_LEVEL = 1;
-                ff_fb.setText (new String ("FB x" + FB_SPEED[FB_LEVEL]));
-                ff_fb.show();
+                Toast toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + FB_SPEED[FB_LEVEL]), Toast.LENGTH_SHORT);
+                toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+                toast.setDuration (0x00000001);
+                toast.show();
             }
             startOsdTimeout();
         }
 
         private void stopFWFB() {
-            if (ff_fb != null) {
+            /*if (ff_fb != null) {
                 ff_fb.cancel();
-            }
+            }*/
             if (FF_FLAG) {
                 FFimpl (0);
             }
@@ -4784,7 +4796,7 @@ public class VideoPlayer extends Activity {
                     mSubtitleManager.setTextColor (sub_para.color);
                     mSubtitleManager.setTextSize (sub_para.font);
                     mSubtitleManager.setTextStyle (Typeface.BOLD);
-                    mSubtitleManager.setPosHeight (getWindowManager().getDefaultDisplay().getHeight() *sub_para.position_v / 20 + 10);
+                    mSubtitleManager.setPosHeight (getWindowManager().getDefaultDisplay().getHeight() *sub_para.position_v / 20 + 0);
                 }
             }
         }
