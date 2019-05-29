@@ -15,6 +15,7 @@ import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContentResolver;
+import android.content.ComponentName;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
 import android.content.DialogInterface;
@@ -4478,6 +4479,13 @@ public class VideoPlayer extends Activity {
                 }
                 playBtn.requestFocusFromTouch();
                 playBtn.requestFocus();
+            }
+            else if (keyCode == KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK) {
+                Log.d("haha", "KEYCODE_MEDIA_AUDIO_TRACK ");
+                String TV_GLOBAL_SETTINGS = "com.droidlogic.tv.settings/.tvoption.HdmiCecActivity";
+                Intent intent = new Intent();
+                intent.setComponent(ComponentName.unflattenFromString(TV_GLOBAL_SETTINGS));
+                startActivity(intent);
             }
             else {
                 return super.onKeyDown (keyCode, msg);
