@@ -3275,6 +3275,14 @@ public class VideoPlayer extends Activity {
                 }
                 initSubtitle();
                 initMediaInfo(trackInfo);
+
+                /* getHDRType                                      */
+                /* return: int : 0 : not HDR                       */
+                /*               1 : HLG                           */
+                /*               2 : HDR                           */
+                int type = mMediaPlayer.getHDRType(mMediaPlayer);
+                Log.d(TAG,"[mPreparedListener]HDR type:"+type);
+
                 displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
                 //showCertification(); // show certification
                 //startCertificationTimeout();
