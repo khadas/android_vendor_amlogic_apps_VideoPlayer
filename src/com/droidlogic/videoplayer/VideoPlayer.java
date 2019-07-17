@@ -2027,7 +2027,9 @@ public class VideoPlayer extends Activity {
                     soundTrackStr = "lrmix";
                 }
                 LOGI (TAG, "[soundTrackImpl]soundTrackStr:" + soundTrackStr);
-                boolean ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
+                //boolean ret = mMediaPlayer.setParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK, soundTrackStr);
+                boolean ret = true;
+                mMediaPlayer.setSoundTrack(mMediaPlayer,idx);
                 LOGI (TAG, "[soundTrackImpl]:mMediaPlayer.setParameter" + ret);
 
                 if (!ret) {
