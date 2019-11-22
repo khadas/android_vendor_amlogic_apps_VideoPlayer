@@ -117,4 +117,6 @@
     <string name="audio_dec_enable">无效许可证，音频无法解码输出.</string>
     <string name="dts_hps_unsupport">DTSHD_Headpnhone_stream 不支持，需插入耳机.</string>
     <string name="unsupport_video_size">不支持该码率视频</string>
+    <string name="not_support_video_exit">不支持该视频,退出!</string>
+    <string name="not_support_video_next">不支持该视频,下一个!</string>
 </resources>

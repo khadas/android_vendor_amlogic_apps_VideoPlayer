@@ -116,4 +116,6 @@
     <string name="audio_dec_enable">無效許可證，音頻無法解碼輸出.</string>
     <string name="dts_hps_unsupport">DTSHD_Headpnhone_stream 不支持，需插入耳機.</string>
     <string name="unsupport_video_size">不支持該碼率視頻</string>
+    <string name="not_support_video_exit">不支持該視頻,退出!</string>
+    <string name="not_support_video_next">不支持該視頻,下壹個!</string>
 </resources>

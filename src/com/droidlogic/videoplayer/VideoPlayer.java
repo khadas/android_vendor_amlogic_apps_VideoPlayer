@@ -15,6 +15,7 @@ import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContentResolver;
+import android.content.ComponentName;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
 import android.content.DialogInterface;
@@ -27,7 +28,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.Canvas;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
@@ -118,6 +121,10 @@ public class VideoPlayer extends Activity {
         private Map<String, String> mHeaders;
         private boolean mHdmiPlugged;
 
+        private Bitmap graphicsPic;
+        private String mPicStrs[] = new String[]{"01_colorChecker_FHD_Rec709_Gamma2.2","02_colorSquare_FHD_Rec709_Gamma2.2"
+                                                                   ,"03_colorSquare_UHD_Rec709_Gamma2.2","04_colorSquare_transparent"};
+
         private LinearLayout ctlbar = null; //for OSD bar layer 1; controller bar
         private LinearLayout optbar = null; //for OSD bar layer 2; option bar
         private LinearLayout subwidget = null; //for subtitle switch
@@ -159,6 +166,11 @@ public class VideoPlayer extends Activity {
         private ImageView certificationDTSView = null;
         private ImageView certificationDTSExpressView = null;
         private ImageView certificationDTSHDMasterAudioView = null;
+
+        private ImageView hdmiPicView1 = null;
+        private ImageView hdmiPicView2 = null;
+        private ImageView hdmiPicView3 = null;
+        private ImageView hdmiPicView4 = null;
 
         //store index of file postion for back to file list
         private int item_position_selected; // for back to file list view
@@ -369,12 +381,18 @@ public class VideoPlayer extends Activity {
         @Override
         public void onPause() {
             super.onPause();
+            LOGI (TAG, "[onPause]");
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
 
             if (!mPermissionGranted) {
                 return;
             }
 
-            LOGI (TAG, "[onPause] curtime:" + curtime);
+            LOGI (TAG, "[onStop] curtime:" + curtime);
             mErrorTime = 0;
             mErrorTimeBac = 0;
             if (randomSeekEnable()) { // random seek for test
@@ -607,6 +625,11 @@ public class VideoPlayer extends Activity {
             return ret;
         }
 
+        private boolean isGraphicBlendEnable() {
+            boolean ret = mSystemControl.getPropertyBoolean("vendor.sys.graphicBlend.enable", false);
+            return ret;
+        }
+
         private void LOGI (String tag, String msg) {
             if (DEBUG || getDebugEnable()) { Log.i (tag, msg); }
         }
@@ -707,6 +730,10 @@ public class VideoPlayer extends Activity {
             subtitleTV = (TextView)findViewById(R.id.SubtitleTV);
             subtitleIV = (ImageView)findViewById(R.id.SubtitleIV);
             subtitleShow();
+            hdmiPicView1= (ImageView) findViewById (R.id.HdmiPic1);
+            hdmiPicView2= (ImageView) findViewById (R.id.HdmiPic2);
+            hdmiPicView3= (ImageView) findViewById (R.id.HdmiPic3);
+            hdmiPicView4= (ImageView) findViewById (R.id.HdmiPic4);
             //certification image
             certificationDoblyVisionView = (ImageView) findViewById (R.id.CertificationDoblyVision);
             certificationDoblyView = (ImageView) findViewById (R.id.CertificationDobly);
@@ -1119,10 +1146,14 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[surfaceCreated]");
                 mSurfaceHolder = holder;
                 surfaceDestroyedFlag = false;
-
                 //avoid onresume, mSubtitleManager null,171388
                 if (mSubtitleManager == null)
                     mSubtitleManager = new SubtitleManager (VideoPlayer.this);
+
+                if (isGraphicBlendEnable()) {
+                    showChoosePicDialogue();
+                }
+                //showChoosePicDialogue();
 
                 initPlayer();
                 LOGI (TAG, "[surfaceCreated]mResumePlay:" + mResumePlay + ",surfaceDestroyedFlag:" + surfaceDestroyedFlag);
@@ -1180,6 +1211,42 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[surfaceDestroyed]surfaceDestroyedFlag:" + surfaceDestroyedFlag);
             }
         };
+
+        public void showChoosePicDialogue(){
+                new AlertDialog.Builder(VideoPlayer.this)
+                    .setTitle (R.string.alertdialog_title)
+                    .setSingleChoiceItems (mPicStrs, 0, new DialogInterface.OnClickListener() {
+                        public void onClick (DialogInterface dialog, int which) {
+                            Log.d (TAG, "[showChooseDev]-onClick-");
+                            dialog.dismiss();
+                            switch (which) {
+                                case 0:
+                                    hdmiPicView1.setVisibility(View.VISIBLE);
+                                    break;
+                                case 1:
+                                    hdmiPicView2.setVisibility(View.VISIBLE);
+                                    break;
+                                case 2:
+                                    hdmiPicView3.setVisibility(View.VISIBLE);
+                                    break;
+                                case 3:
+                                    hdmiPicView4.setVisibility(View.VISIBLE);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
+                    })
+                    .setOnCancelListener (new DialogInterface.OnCancelListener() {
+                        public void onCancel (DialogInterface dialog) {
+                        }
+                    })
+                    .show();
+                //builder.setCancelable(false);
+                //builder.create().show();
+           }
+
 
         public void onConfigurationChanged (Configuration config) {
             super.onConfigurationChanged (config);
@@ -1536,6 +1603,9 @@ public class VideoPlayer extends Activity {
                     }
                     else if (position == 1) {//vrSet
                         VRSet();
+                    } else if (position == 2) {
+                        otherwidget.setVisibility(View.GONE);
+                        startSettingActivity();
                     }
                     // TODO: add more set
                 }
@@ -1592,6 +1662,12 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget(R.string.setting_switch_VR);
+        }
+
+        private void startSettingActivity() {
+            Intent intent = new Intent();
+            intent.setClassName("com.droidlogic.tv.settings", "com.droidlogic.tv.settings.SoundActivity");
+            startActivity(intent);
         }
 
         private void subtitleSelect() {
@@ -2420,6 +2496,7 @@ public class VideoPlayer extends Activity {
                 while (!FileListManager.isVideo(mPath)) {
                     mPath = mPlayList.movenext();
                 }
+                LOGI (TAG, "[playNext]mPath:" + mPath);
                 //sendPlayFileMsg();
                 playFile(mPath);
             }
@@ -3058,8 +3135,16 @@ public class VideoPlayer extends Activity {
             if (uriTmp == null) {
                 LOGE (TAG, "[trySetVideoURIAgain]uriTmp=null error!!!");
                 Toast.makeText (mContext, mContext.getText (R.string.wait_for_scan), Toast.LENGTH_SHORT).show();
-                browserBack();
-                return;
+                if (mOption.getRepeatMode() == mOption.REPEATLIST) {
+                    mState = STATE_ERROR;
+                    mPlayList.removeCurPath();
+                    playNext();
+                    return;
+                }
+                else {
+                    browserBack();
+                    return;
+                }
             }
             LOGI (TAG, "[trySetVideoURIAgain]setVideoURI uriTmp:" + uriTmp);
             setVideoURI (uriTmp, paramPath);
@@ -3320,9 +3405,23 @@ public class VideoPlayer extends Activity {
                 mIsBluray = false;
                 mSubIndex = 0;
                 if (mOption.getRepeatMode() == mOption.REPEATONE) {
+                    if (getCurrentPosition() == 0) {   //add prompt divx not support
+                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_exit, Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.BOTTOM,0, 0);
+                        toast.setDuration (0x00000001);
+                        toast.show();
+                        browserBack();
+                        return;
+                    }
                     playCur();
                 }
                 else if (mOption.getRepeatMode() == mOption.REPEATLIST) {
+                    if (getCurrentPosition() == 0) {   //add prompt divx not support
+                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_next, Toast.LENGTH_SHORT);
+                        toast.setGravity (Gravity.BOTTOM,0, 0);
+                        toast.setDuration (0x00000001);
+                        toast.show();
+                    }
                     playNext();
                 }
                 else {
@@ -4376,6 +4475,7 @@ public class VideoPlayer extends Activity {
                         }
                     }
                 }
+                //browserBack();
             }
             else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
                 if ( (ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE)) {
@@ -4471,6 +4571,13 @@ public class VideoPlayer extends Activity {
                 }
                 playBtn.requestFocusFromTouch();
                 playBtn.requestFocus();
+            }
+            else if (keyCode == KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK) {
+                Log.d("haha", "KEYCODE_MEDIA_AUDIO_TRACK ");
+                String TV_GLOBAL_SETTINGS = "com.droidlogic.tv.settings/.tvoption.HdmiCecActivity";
+                Intent intent = new Intent();
+                intent.setComponent(ComponentName.unflattenFromString(TV_GLOBAL_SETTINGS));
+                startActivity(intent);
             }
             else {
                 return super.onKeyDown (keyCode, msg);
@@ -5484,6 +5591,10 @@ public class VideoPlayer extends Activity {
                     list.add (map);
                     map = new HashMap<String, Object>();
                     map.put ("item_name", getResources().getString (R.string.setting_switch_VR));
+                    map.put ("item_sel", R.drawable.item_img_unsel);
+                    list.add (map);
+                    map = new HashMap<String, Object>();
+                    map.put ("item_name", getResources().getString (R.string.setting_audio_settings));
                     map.put ("item_sel", R.drawable.item_img_unsel);
                     list.add (map);
                     map = new HashMap<String, Object>();

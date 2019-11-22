@@ -20,6 +20,62 @@
 
     <RelativeLayout
         android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:id="@+id/HdmiPic2"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/hdmi_tx01"
+            android:visibility="gone">
+        </ImageView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:id="@+id/HdmiPic3"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/hdmi_tx02"
+            android:visibility="gone">
+        </ImageView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:id="@+id/HdmiPic4"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/hdmi_tx03"
+            android:visibility="gone">
+        </ImageView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:id="@+id/HdmiPic1"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/hdmi_tx04"
+            android:visibility="gone">
+        </ImageView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="match_parent"
         android:layout_width="match_parent">
         <TextView
             android:id="@+id/SubtitleTV"

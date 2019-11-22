@@ -82,6 +82,14 @@ public class PlayList {
             return true;
         }
 
+        public void removeCurPath() {
+            if (hfilelist != null) {
+                if (!hfilelist.isEmpty()) {
+                    hfilelist.remove (pos);
+                }
+            }
+        }
+
         public String movenext() {
             if (pos < hfilelist.size() - 1) {
                 pos ++;
