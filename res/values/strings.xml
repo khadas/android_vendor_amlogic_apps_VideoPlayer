@@ -95,6 +95,10 @@
     <string name="str_stereo_auidochannel">Stereo</string>
     <string name="file_have_no_audio">file have no audio</string>
 
+    <string name="setting_audioTuning">setting_audioTuning</string>
+    <string name="delay_range">delay_range</string>
+    <string name="cur_value">cur_value</string>
+
     <string name="alertdialog_title">please choose osd picture</string>
     <string name="memory_device_str">Internal Memory </string>
     <string name="sdcard_device_str">Local Disk</string>
