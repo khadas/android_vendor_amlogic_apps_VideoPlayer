@@ -128,6 +128,8 @@ public class VideoPlayer extends Activity {
         private LinearLayout ctlbar = null; //for OSD bar layer 1; controller bar
         private LinearLayout optbar = null; //for OSD bar layer 2; option bar
         private LinearLayout subwidget = null; //for subtitle switch
+        private LinearLayout audioTuningwidget = null;// audio tuning
+
         private LinearLayout otherwidget = null; //for audio track, resume play on/off, repeat mode, display mode
         private LinearLayout infowidget = null; //for video infomation showing
 
@@ -147,6 +149,10 @@ public class VideoPlayer extends Activity {
         private ImageButton repeatModeBtn = null;
         private ImageButton audiooptionBtn = null;
         private ImageButton subtitleSwitchBtn = null;
+
+        private ImageButton audioTunningBtn = null;
+        private int curAudioTuningValue = 0;
+
         private ImageButton chapterBtn = null;
         private ImageButton displayModeBtn = null;
         private ImageButton brigtnessBtn = null;
@@ -750,11 +756,17 @@ public class VideoPlayer extends Activity {
             ctlbar = (LinearLayout) findViewById (R.id.infobarLayout);
             optbar = (LinearLayout) findViewById (R.id.morebarLayout);
             subwidget = (LinearLayout) findViewById (R.id.LinearLayout_sub);
+
+
+            audioTuningwidget = (LinearLayout) findViewById (R.id.LinearLayout_audioTuning);
+
             otherwidget = (LinearLayout) findViewById (R.id.LinearLayout_other);
             infowidget = (LinearLayout) findViewById (R.id.dialog_layout);
             ctlbar.setVisibility (View.GONE);
             optbar.setVisibility (View.GONE);
             subwidget.setVisibility (View.GONE);
+            audioTuningwidget.setVisibility (View.GONE);
+
             otherwidget.setVisibility (View.GONE);
             infowidget.setVisibility (View.GONE);
             //layer 1
@@ -776,6 +788,9 @@ public class VideoPlayer extends Activity {
             repeatModeBtn = (ImageButton) findViewById (R.id.PlaymodeBtn);
             audiooptionBtn = (ImageButton) findViewById (R.id.ChangetrackBtn);
             subtitleSwitchBtn = (ImageButton) findViewById (R.id.SubtitleBtn);
+
+            audioTunningBtn = (ImageButton) findViewById (R.id.audioTunningBtn);
+
             chapterBtn = (ImageButton) findViewById (R.id.ChapterBtn);
             displayModeBtn = (ImageButton) findViewById (R.id.DisplayBtn);
             brigtnessBtn = (ImageButton) findViewById (R.id.BrightnessBtn);
@@ -901,6 +916,12 @@ public class VideoPlayer extends Activity {
                 public void onClick (View v) {
                     LOGI (TAG, "subtitleSwitchBtn onClick");
                     subtitleSelect();
+                }
+            });
+            audioTunningBtn.setOnClickListener (new View.OnClickListener() {
+                public void onClick (View v) {
+                    LOGI (TAG, "audioTunningBtn onClick");
+                    audioTunningSelect();
                 }
             });
             chapterBtn.setOnClickListener (new View.OnClickListener() {
@@ -1689,6 +1710,14 @@ public class VideoPlayer extends Activity {
             }
             showSubWidget (R.string.setting_subtitle);
             subtitle_control();
+        }
+
+        private void audioTunningSelect(){
+            LOGI (TAG, "[audioTunningSelect]");
+            //ListView listView = (ListView) findViewById (R.id.ListView);
+            //showSubWidget (R.string.setting_audioTunning);
+            showAudioTuningWidget (R.string.setting_audioTuning);
+            audioTunning_control();
         }
 
         private void setListViewHeight(int height) {
@@ -3917,6 +3946,19 @@ public class VideoPlayer extends Activity {
             }
         }
 
+        private void showAudioTuningWidget (int StrId) {
+            if ( (null != audioTuningwidget) && (View.GONE == audioTuningwidget.getVisibility())) {
+                audioTuningwidget.setVisibility (View.VISIBLE);
+                if ( (null != optbar) && (View.VISIBLE == optbar.getVisibility())) {
+                    optbar.setVisibility (View.GONE);
+                }
+                audioTuningwidget.requestFocus();
+                otherwidgetStatus = StrId;
+                stopOsdTimeout();
+            }
+        }
+
+
         private void showInfoWidget (int StrId) {
             TextView title;
             if ( (null != infowidget) && (View.GONE == infowidget.getVisibility())) {
@@ -3950,6 +3992,18 @@ public class VideoPlayer extends Activity {
         private void exitSubWidget (ImageButton btn) {
             if ( (null != subwidget) && (View.VISIBLE == subwidget.getVisibility())) {
                 subwidget.setVisibility (View.GONE);
+                if ( (null != optbar) && (View.GONE == optbar.getVisibility())) {
+                    optbar.setVisibility (View.VISIBLE);
+                }
+                btn.requestFocus();
+                btn.requestFocusFromTouch();
+                startOsdTimeout();
+            }
+        }
+
+        private void exitAudioWidget (ImageButton btn) {
+            if ( (null != audioTuningwidget) && (View.VISIBLE == audioTuningwidget.getVisibility())) {
+                audioTuningwidget.setVisibility (View.GONE);
                 if ( (null != optbar) && (View.GONE == optbar.getVisibility())) {
                     optbar.setVisibility (View.VISIBLE);
                 }
@@ -5171,6 +5225,53 @@ public class VideoPlayer extends Activity {
             else {
                 sendSubOptionUpdateMsg();
             }
+        }
+
+        private void audioTunning_control() {
+            LOGI (TAG, "[audioTunning_control]");
+            Button ok = (Button) findViewById (R.id.prop_button_ok);
+            Button cancel = (Button) findViewById (R.id.prop_button_canncel);
+            ImageButton Audio_reduce_l = (ImageButton) findViewById (R.id.audio_reduce_l);
+            ImageButton Audio_add_r = (ImageButton) findViewById (R.id.audio_add_r);
+            TextView curValue = (TextView) findViewById (R.id.audio_tuning_curV);
+
+            ok.setOnClickListener (new View.OnClickListener() {
+                public void onClick (View v) {
+                    mSystemControl.setProperty("media.amnuplayer.audio.delayus", "" + curAudioTuningValue * 1000);
+                    exitAudioWidget (audioTunningBtn);
+                }
+            });
+            cancel.setOnClickListener (new View.OnClickListener() {
+                public void onClick (View v) {
+                    LOGI (TAG, "[exitAudioWidget (audioTunningBtn)]");
+                    exitAudioWidget (audioTunningBtn);
+                }
+            });
+            Audio_reduce_l.setOnClickListener (new View.OnClickListener() {
+                public void onClick (View v) {
+                    //curAudioTuningValue -= 10;
+                    //curValue.setText("" + curAudioTuningValue);
+                    if (curAudioTuningValue > -200) {
+                        curAudioTuningValue -= 10;
+                        curValue.setText("" + curAudioTuningValue);
+                    } else if (curAudioTuningValue == -200) {
+                        curAudioTuningValue = 200;
+                    }
+                }
+            });
+           Audio_add_r.setOnClickListener (new View.OnClickListener() {
+                public void onClick (View v){
+                    //curAudioTuningValue += 10;
+                    //curValue.setText("" + curAudioTuningValue);
+                    if (200 > curAudioTuningValue) {
+                        curAudioTuningValue += 10;
+                        curValue.setText("" + curAudioTuningValue);
+                    } else if (curAudioTuningValue == 200){
+                        curAudioTuningValue = -200;
+                    }
+                }
+           });
+
         }
 
         private void initSubSetOptions (String color_text[]) {
