@@ -223,6 +223,8 @@ public class VideoPlayer extends Activity {
         private AudioManager mAudioManager;
         private boolean mAudioFocused = false;
 
+        private boolean mActivityResumed = false;
+
         private SubtitleManager mSubtitleManager;
         private SystemControlManager mSystemControl;
         private FileListManager mFileListManager;
@@ -286,6 +288,7 @@ public class VideoPlayer extends Activity {
         @Override
         public void onResume() {
             super.onResume();
+            mActivityResumed = true;
             if (!mPermissionGranted) {
                 return;
             }
@@ -388,6 +391,7 @@ public class VideoPlayer extends Activity {
         public void onPause() {
             super.onPause();
             LOGI (TAG, "[onPause]");
+            mActivityResumed = false;
         }
 
         @Override
@@ -1450,10 +1454,7 @@ public class VideoPlayer extends Activity {
             if (mMediaInfo != null) {
                 LOGI (TAG, "[audioOption] mMediaInfo.getAudioTotalNum():" + mMediaInfo.getAudioTotalNum());
                 if (/*(audio_flag == Errorno.PLAYER_NO_AUDIO) || */ (mMediaInfo.getAudioTotalNum() <= 0)) {
-                    Toast toast = Toast.makeText (VideoPlayer.this, R.string.file_have_no_audio, Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(R.string.file_have_no_audio, 0, 0);
                     startOsdTimeout();
                     return;
                 }
@@ -1692,19 +1693,10 @@ public class VideoPlayer extends Activity {
         }
 
         private void subtitleSelect() {
-            /*Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
-            toast.setGravity(Gravity.BOTTOM,110,0);
-            toast.setDuration(0x00000001);
-            toast.show();
-            startOsdTimeout();
-            return;*/
             subtitle_prepare();
             LOGI (TAG, "[subtitleSelect] sub_para.totalnum:" + sub_para.totalnum);
             if (sub_para.totalnum <= 0) {
-                Toast toast = Toast.makeText (VideoPlayer.this, R.string.sub_no_subtitle, Toast.LENGTH_SHORT);
-                toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                toast.setDuration (0x00000001);
-                toast.show();
+                showBottomShortToast(R.string.sub_no_subtitle, 0, 0);
                 startOsdTimeout();
                 return;
             }
@@ -1752,10 +1744,7 @@ public class VideoPlayer extends Activity {
             if (mMediaInfo != null) {
                 int videoNum = mMediaInfo.getVideoTotalNum();
                 if (videoNum <= 0) {
-                    Toast toast = Toast.makeText (VideoPlayer.this, R.string.file_have_no_video, Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(R.string.file_have_no_video, 0, 0);
                     startOsdTimeout();
                     return;
                 }
@@ -2209,10 +2198,7 @@ public class VideoPlayer extends Activity {
                         mOption.set3DMode (0);
                     }
                     set_3d_flag = false;
-                    Toast toast = Toast.makeText (VideoPlayer.this, getResources().getString (R.string.not_support_3d), Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(R.string.not_support_3d, 0, 0);
                     startOsdTimeout();
                 }
             }
@@ -3435,10 +3421,7 @@ public class VideoPlayer extends Activity {
                 mSubIndex = 0;
                 if (mOption.getRepeatMode() == mOption.REPEATONE) {
                     if (getCurrentPosition() == 0) {   //add prompt divx not support
-                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_exit, Toast.LENGTH_SHORT);
-                        toast.setGravity (Gravity.BOTTOM,0, 0);
-                        toast.setDuration (0x00000001);
-                        toast.show();
+                        showBottomShortToast(R.string.not_support_video_exit, 0, 0);
                         browserBack();
                         return;
                     }
@@ -3446,10 +3429,7 @@ public class VideoPlayer extends Activity {
                 }
                 else if (mOption.getRepeatMode() == mOption.REPEATLIST) {
                     if (getCurrentPosition() == 0) {   //add prompt divx not support
-                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_next, Toast.LENGTH_SHORT);
-                        toast.setGravity (Gravity.BOTTOM,0, 0);
-                        toast.setDuration (0x00000001);
-                        toast.show();
+                        showBottomShortToast(R.string.not_support_video_next, 0, 0);
                     }
                     playNext();
                 }
@@ -3523,11 +3503,10 @@ public class VideoPlayer extends Activity {
                 if (offset > 300) {
                     mState = STATE_ERROR;
                     mErrorTimeBac = mErrorTime;
+
                     String infoStr = mErrorInfo.getErrorInfo (what, extra, mPlayList.getcur());
-                    Toast toast = Toast.makeText (VideoPlayer.this, "Status Error:" + infoStr, Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(infoStr, 0, 0);
+
                     if (mOption.getRepeatMode() == mOption.REPEATLIST) {
                         sendContinueSwitchDelayMsg();
                     }
@@ -3554,10 +3533,7 @@ public class VideoPlayer extends Activity {
                     if (needShow == true) {
                         String infoStr = MediaInfo.getInfo (arg1, VideoPlayer.this);
                         LOGI (TAG, "[onInfo] infoStr: " + infoStr);
-                        Toast toast = Toast.makeText (VideoPlayer.this, /*"Media Info:"+*/infoStr, Toast.LENGTH_SHORT);
-                        toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                        toast.setDuration (0x00000001);
-                        toast.show();
+                        showBottomShortToast(infoStr, 0, 0);
                     }
                     if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_ASSET) {
                         mDtsType = DTS_NOR;
@@ -3577,10 +3553,7 @@ public class VideoPlayer extends Activity {
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_AUDIO_LIMITED) {
                         String ainfoStr = getResources().getString(R.string.audio_dec_enable);
-                        Toast toast =Toast.makeText(VideoPlayer.this, ainfoStr, Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
-                        toast.setDuration(0x00000001);
-                        toast.show();
+                        showBottomShortToast(ainfoStr, 0, 0);
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_MULASSETHINT) {
                         /*Toast toast =Toast.makeText(VideoPlayer.this, "MulAssetAudio",Toast.LENGTH_SHORT);
@@ -3590,10 +3563,7 @@ public class VideoPlayer extends Activity {
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_HPS_NOTSUPPORT) {
                         String dtshpsUnsupportStr = getResources().getString(R.string.dts_hps_unsupport);
-                        Toast toast =Toast.makeText(VideoPlayer.this, dtshpsUnsupportStr, Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.BOTTOM,/*110*/0,110);
-                        toast.setDuration(0x00000001);
-                        toast.show();
+                        showBottomShortToast(dtshpsUnsupportStr, 0, 110);
                     }
                     else if (arg1 == MediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DOLBY_VISION) {
                         mIsDolbyVision = true;
@@ -5743,6 +5713,27 @@ public class VideoPlayer extends Activity {
             return list;
         }
 
+    private void showBottomShortToast (int resId, int xOffset, int yOffset) {
+        if (!mActivityResumed) {
+            LOGI (TAG, "activity paused, so drop message: " + getResources().getString(resId));
+            return;
+        }
+        Toast toast =Toast.makeText(VideoPlayer.this, resId, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, xOffset, yOffset);
+        toast.setDuration(0x00000001);
+        toast.show();
+    }
+
+    private void showBottomShortToast (String message, int xOffset, int yOffset) {
+        if (!mActivityResumed) {
+            LOGI (TAG, "activity paused, so drop message: " + message);
+            return;
+        }
+        Toast toast =Toast.makeText(VideoPlayer.this, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, xOffset, yOffset);
+        toast.setDuration(0x00000001);
+        toast.show();
+    }
 }
 
 
