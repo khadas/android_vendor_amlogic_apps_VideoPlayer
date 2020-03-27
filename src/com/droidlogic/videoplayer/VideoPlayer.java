@@ -1904,8 +1904,16 @@ public class VideoPlayer extends Activity {
 
             String mode = mSystemControl.readSysFs(DISPLAY_MODE_SYSFS).replaceAll("\n","");
             int[] curPosition = mSystemControl.getPosition(mode);
-            dispWidth = curPosition[2];
-            dispHeight = curPosition[3];
+			if ((SystemProperties.getInt("persist.sys.builtinrotation", 0)%2) > 0)
+			{
+				dispWidth = curPosition[3];
+				dispHeight = curPosition[2];
+			}
+			else
+			{
+				dispWidth = curPosition[2];
+				dispHeight = curPosition[3];
+			}
             DisplayMetrics dm = new DisplayMetrics();
             this.getWindowManager().getDefaultDisplay().getRealMetrics (dm);
             frameWidth = dm.widthPixels;
