@@ -245,6 +245,13 @@ public class VideoPlayer extends Activity {
         private int mListViewHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
         private static final String LOOP_DIR = "/mnt/loop";
 
+        private static final int CCITTO33_WIDTH  = 720;
+        private static final int CCITTO33_HEIGHT = 576;
+        private static final int MATRX625_WIDTH  = 704;
+        private static final int MATRX625_HEIGHT = 576;
+        private static final int MATRIX525_WIDTH  = 704;
+        private static final int MATRIX525_HEIGHT = 480;
+
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
@@ -2032,9 +2039,51 @@ public class VideoPlayer extends Activity {
                     LOGI(TAG,"[displayModeImpl]after change width:" + width + ",height:" + height + ", ratioW:" + ratioW + ",ratioH:" + ratioH +", maxW:" + maxW + ",maxH:" + maxH);
                 }
 
+                int displayWidth  = 0;
+                int displayHeight = 0;
+                int resolutionWidth  = 720;
+                int resolutionHeight = 576;
                 if (width > 0 && height > 0) {
+                    if (mode.contains("576cvbs") || mode.contains("480cvbs")) {
+                        if (mode.contains("576cvbs")) {
+                            if (mPlayList.getcur().contains("ccitto33_pal")) {
+                                displayWidth = CCITTO33_WIDTH;
+                                displayHeight = CCITTO33_HEIGHT;
+                            } else if (mPlayList.getcur().contains("Matrx625")) {
+                                displayWidth = MATRX625_WIDTH;
+                                displayHeight = MATRX625_HEIGHT;
+                            }
+                        } else if (mode.contains("480cvbs")) {
+                            if (mPlayList.getcur().contains("Matrix525")) {
+                                displayWidth = MATRIX525_WIDTH;
+                                displayHeight = MATRIX525_HEIGHT;
+                            }
+                            resolutionHeight = 480;
+                        }
+                        String size = SystemProperties.get("vendor.videoplayer.surfaceview.axis", "");
+                        if (size != "") {
+                            String result[] = size.split(" ");
+                            displayWidth = Integer.parseInt(result[0]) + 1;
+                            displayHeight = Integer.parseInt(result[1]) + 1;
+                        }
+
+                        if (displayWidth != 0 || displayHeight != 0) {
+                            width = displayWidth * frameWidth / resolutionWidth;
+                            height = displayHeight * frameHeight / resolutionHeight;
+                            if (displayWidth * frameWidth % resolutionWidth != 0) {
+                                width += 1;
+                            }
+                            if (displayHeight * frameHeight % resolutionHeight != 0) {
+                                height += 1;
+                            }
+                        }
+                    }
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams (width, height);
-                    lp.addRule (RelativeLayout.CENTER_IN_PARENT);
+                    if (displayWidth != 0 || displayHeight != 0) {
+                        //lp.addRule (RelativeLayout.CENTER_IN_PARENT);
+                    } else {
+                        lp.addRule (RelativeLayout.CENTER_IN_PARENT);
+                    }
                     mSurfaceViewRoot.setLayoutParams (lp);
                     //mSurfaceViewRoot.requestLayout();
                 }
