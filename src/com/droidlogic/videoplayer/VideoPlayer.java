@@ -590,7 +590,7 @@ public class VideoPlayer extends Activity {
                 // add for seeking to head
                 if (curtime <= 1000) { //current time is equal or smaller than 1S stop fw/fb
                     stopFWFB();
-                    mState = STATE_PLAYING;
+                    //mState = STATE_PLAYING;
                     updateIconResource();
                 }
                 LOGI (TAG, "[updateProgressbar]curtime:" + curtime + ",totaltime:" + totaltime + ",progressBar:" + progressBar + ",ctlbar:" + ctlbar + ",ctlbar.getVisibility():" + ctlbar.getVisibility());
