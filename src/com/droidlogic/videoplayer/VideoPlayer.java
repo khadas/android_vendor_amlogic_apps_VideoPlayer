@@ -588,7 +588,7 @@ public class VideoPlayer extends Activity {
                 curtime = getCurrentPosition();
                 totaltime = getDuration();
                 // add for seeking to head
-                if (curtime <= 1000) { //current time is equal or smaller than 1S stop fw/fb
+                if (curtime <= 1000 || (totaltime - curtime < 1000)) { //current time is equal or smaller than 1S stop fw/fb
                     stopFWFB();
                     //mState = STATE_PLAYING;
                     updateIconResource();
@@ -2680,6 +2680,9 @@ public class VideoPlayer extends Activity {
         private void FFimpl (int para) {
             if (mMediaPlayer != null) {
                 LOGI (TAG, "[FFimpl]para:" + para);
+                if (mState == STATE_PLAY_COMPLETED) {
+                   return;
+                }
                 if (para > 0) {
                     mState = STATE_SEARCHING;
                 }
