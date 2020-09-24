@@ -2759,6 +2759,10 @@ public class VideoPlayer extends Activity {
                 mStateBac = STATE_STOP;
                 currAudioIndex = 0;
                 mPath = mPlayList.movenext();
+                if (null == mPath) { // add this for convenfient auto test
+                    browserBack();
+                    return;
+                }
                 while (!FileListManager.isVideo(mPath)) {
                     mPath = mPlayList.movenext();
                 }
