@@ -27,6 +27,7 @@ public class PlayList {
         private List<Boolean> hErrorList = null;
         private static Context mContext = null;
         private SystemControlManager mSystemControl1 = SystemControlManager.getInstance();
+
         public static void setContext (Context context) {
             mContext = context;
         }

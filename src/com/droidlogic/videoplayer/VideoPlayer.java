@@ -3090,7 +3090,7 @@ public class VideoPlayer extends Activity {
                                                      AudioManager.AUDIOFOCUS_GAIN);
                 }
                 mMediaPlayer.start();
-                mSubtitleManager.enableDisplay();
+                //mSubtitleManager.enableDisplay();
                 mSubtitleManager.start();
                 mSubtitleManager.startSubtitle();// Subtitle API need revise!!!
                 Locale loc = Locale.getDefault();
