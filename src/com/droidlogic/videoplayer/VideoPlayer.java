@@ -3337,10 +3337,6 @@ public class VideoPlayer extends Activity {
 
         private void setVideoURI (Uri uri, Map<String, String> headers, String path) {
             LOGI (TAG, "[setVideoURI]uri:" + uri + ",headers:" + headers + ",mState:" + mState);
-            if (uri == null || mContext == null) {
-                LOGE (TAG, "[setVideoURI]init uri=null mContext=null error!!!");
-                return;
-            }
             mUri = uri;
             mHeaders = headers;
             try {
