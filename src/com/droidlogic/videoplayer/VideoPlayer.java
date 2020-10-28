@@ -28,7 +28,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.Canvas;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
@@ -37,13 +39,6 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
 import android.Manifest;
 import android.net.Uri;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.text.Editable;
-import android.widget.EditText;
-import com.droidlogic.app.OutputModeManager;
-
-
 //import android.os.Bundle;
 //import android.os.Handler;
 //import android.os.Message;
@@ -128,15 +123,15 @@ public class VideoPlayer extends Activity {
 
         private Bitmap graphicsPic;
         private String mPicStrs[] = new String[]{"01_colorChecker_FHD_Rec709_Gamma2.2","02_colorSquare_FHD_Rec709_Gamma2.2"
-                                                                          ,"03_colorSquare_UHD_Rec709_Gamma2.2","04_colorSquare_transparent"};
+                                                                   ,"03_colorSquare_UHD_Rec709_Gamma2.2","04_colorSquare_transparent"};
 
         private LinearLayout ctlbar = null; //for OSD bar layer 1; controller bar
         private LinearLayout optbar = null; //for OSD bar layer 2; option bar
         private LinearLayout subwidget = null; //for subtitle switch
-        //private LinearLayout audioTuningwidget = null;// audio tuning
+        private LinearLayout audioTuningwidget = null;// audio tuning
+
         private LinearLayout otherwidget = null; //for audio track, resume play on/off, repeat mode, display mode
         private LinearLayout infowidget = null; //for video infomation showing
-        private LinearLayout ttPagewidget = null; //for teletext page control
 
         private SeekBar progressBar; // all the follow for OSD bar layer 1
         private TextView curTimeTx = null;
@@ -148,26 +143,15 @@ public class VideoPlayer extends Activity {
         private ImageButton nextBtn = null;
         private ImageButton fastforwordBtn = null;
         private ImageButton optBtn = null;
-        private SeekBar seekbardts;
-        private TextView dtsdrc;
-        private LinearLayout audioDtsDrc;
-
-        private SeekBar seekbarAudioOffset;
-        private TextView audioOffsetText;
-        private LinearLayout audioOffset;
 
         private ImageButton ctlBtn = null; // all the follow for OSD bar layer 2
         private ImageButton resumeModeBtn = null;
         private ImageButton repeatModeBtn = null;
         private ImageButton audiooptionBtn = null;
         private ImageButton subtitleSwitchBtn = null;
-        private ImageButton ttPageBtn = null;
 
-        //private ImageButton audioTunningBtn = null;
-        //private int curAudioTuningValue = 0;
-
-        private int curAudioOffsetProgressValue = 0;
-        private int latency = 0;
+        private ImageButton audioTunningBtn = null;
+        private int curAudioTuningValue = 0;
 
         private ImageButton chapterBtn = null;
         private ImageButton displayModeBtn = null;
@@ -224,7 +208,6 @@ public class VideoPlayer extends Activity {
         MediaInfo mMediaInfo = null;
         ErrorInfo mErrorInfo = null;
         MediaPlayer.TrackInfo[] mTrackInfo;
-        Toast toast = null;
 
         private boolean browserBackDoing = false;
         private boolean browserBackInvokeFromOnPause = false; //browserBack invoked by back keyevent and browserBack button as usually, if invoked from OnPause suppose to meaning HOME key pressed
@@ -240,11 +223,11 @@ public class VideoPlayer extends Activity {
         private AudioManager mAudioManager;
         private boolean mAudioFocused = false;
 
+        private boolean mActivityResumed = false;
+
         private SubtitleManager mSubtitleManager;
         private SystemControlManager mSystemControl;
         private FileListManager mFileListManager;
-        private OutputModeManager mOutputModeManager;
-        private int curProgressValue = 0;
 
         //request code for permission check
         private boolean mPermissionGranted = false;
@@ -269,12 +252,10 @@ public class VideoPlayer extends Activity {
         private static final int MATRIX525_WIDTH  = 704;
         private static final int MATRIX525_HEIGHT = 480;
 
-
         @Override
         public void onCreate (Bundle savedInstanceState) {
             super.onCreate (savedInstanceState);
             mSubtitleManager = new SubtitleManager (VideoPlayer.this);
-            mOutputModeManager = new OutputModeManager(this);
             //LOCALES = LocalePicker.getAllAssetLocales(this, false);
             mSystemControl = SystemControlManager.getInstance();
             mFileListManager = new FileListManager(this);
@@ -308,18 +289,13 @@ public class VideoPlayer extends Activity {
                 storeFilePos();
             }
 
-
-            //audioOffsetText = (TextView) findViewById(R.id.text_audio_offset);
-            //seekbarAudioOffset = (SeekBar) findViewById(R.id.seekbar_audio_offset);
-            int delay = mSystemControl.getPropertyInt("persist.vendor.sys.media.amnuplayer.audio.delayus" , 0);
-            mSystemControl.setProperty("vendor.media.amnuplayer.audio.delayus", "" + delay);
-
             ////showCtlBar();
         }
 
         @Override
         public void onResume() {
             super.onResume();
+            mActivityResumed = true;
             if (!mPermissionGranted) {
                 return;
             }
@@ -410,9 +386,6 @@ public class VideoPlayer extends Activity {
         public void onDestroy() {
             super.onDestroy();
             LOGI (TAG, "[onDestroy]");
-            if (mSubtitleManager != null) {
-                mSubtitleManager.destory();
-            }
             if (mResumePlay != null) {
                 mResumePlay.setEnable (false); //disable resume play
             }
@@ -425,6 +398,7 @@ public class VideoPlayer extends Activity {
         public void onPause() {
             super.onPause();
             LOGI (TAG, "[onPause]");
+            mActivityResumed = false;
         }
 
         @Override
@@ -551,7 +525,6 @@ public class VideoPlayer extends Activity {
                         if ( (mState == STATE_PLAYING
                                 || mState == STATE_PAUSED
                                 || mState == STATE_SEARCHING)  && (mSeekState == SEEK_END) /*&& osdisshowing*/ && !ignoreUpdateProgressbar) {
-                            removeMessages (MSG_UPDATE_PROGRESS);
                             pos = getCurrentPosition();
                             updateProgressbar();
                             msg = obtainMessage (MSG_UPDATE_PROGRESS);
@@ -622,12 +595,9 @@ public class VideoPlayer extends Activity {
                 curtime = getCurrentPosition();
                 totaltime = getDuration();
                 // add for seeking to head
-                if (curtime <= 1000) { //current time is equal or smaller than 1S stop fw/fb
+                if (curtime <= 1000 || (totaltime - curtime < 1000)) { //current time is equal or smaller than 1S stop fw/fb
                     stopFWFB();
                     //mState = STATE_PLAYING;
-                    if (mState == STATE_SEARCHING) {
-                        mState = STATE_PLAYING;
-                    }
                     updateIconResource();
                 }
                 LOGI (TAG, "[updateProgressbar]curtime:" + curtime + ",totaltime:" + totaltime + ",progressBar:" + progressBar + ",ctlbar:" + ctlbar + ",ctlbar.getVisibility():" + ctlbar.getVisibility());
@@ -672,7 +642,7 @@ public class VideoPlayer extends Activity {
             return ret;
         }
 
-         private boolean isGraphicBlendEnable() {
+        private boolean isGraphicBlendEnable() {
             boolean ret = mSystemControl.getPropertyBoolean("vendor.sys.graphicBlend.enable", false);
             return ret;
         }
@@ -797,19 +767,17 @@ public class VideoPlayer extends Activity {
             ctlbar = (LinearLayout) findViewById (R.id.infobarLayout);
             optbar = (LinearLayout) findViewById (R.id.morebarLayout);
             subwidget = (LinearLayout) findViewById (R.id.LinearLayout_sub);
-            //audioTuningwidget = (LinearLayout) findViewById (R.id.LinearLayout_audioTuning);
-            ttPagewidget= (LinearLayout) findViewById (R.id.LinearLayout_ttPage);
+
+
+            audioTuningwidget = (LinearLayout) findViewById (R.id.LinearLayout_audioTuning);
+
             otherwidget = (LinearLayout) findViewById (R.id.LinearLayout_other);
-            audioDtsDrc = (LinearLayout) findViewById (R.id.audio_dts_drc);
-
-            audioOffset = (LinearLayout) findViewById (R.id.audio_offset);
-
             infowidget = (LinearLayout) findViewById (R.id.dialog_layout);
             ctlbar.setVisibility (View.GONE);
             optbar.setVisibility (View.GONE);
             subwidget.setVisibility (View.GONE);
-            //audioTuningwidget.setVisibility (View.GONE);
-            ttPagewidget.setVisibility (View.GONE);
+            audioTuningwidget.setVisibility (View.GONE);
+
             otherwidget.setVisibility (View.GONE);
             infowidget.setVisibility (View.GONE);
             //layer 1
@@ -831,8 +799,9 @@ public class VideoPlayer extends Activity {
             repeatModeBtn = (ImageButton) findViewById (R.id.PlaymodeBtn);
             audiooptionBtn = (ImageButton) findViewById (R.id.ChangetrackBtn);
             subtitleSwitchBtn = (ImageButton) findViewById (R.id.SubtitleBtn);
-            //audioTunningBtn = (ImageButton) findViewById (R.id.audioTunningBtn);
-            ttPageBtn = (ImageButton) findViewById (R.id.ttPageBtn);
+
+            audioTunningBtn = (ImageButton) findViewById (R.id.audioTunningBtn);
+
             chapterBtn = (ImageButton) findViewById (R.id.ChapterBtn);
             displayModeBtn = (ImageButton) findViewById (R.id.DisplayBtn);
             brigtnessBtn = (ImageButton) findViewById (R.id.BrightnessBtn);
@@ -873,6 +842,7 @@ public class VideoPlayer extends Activity {
                         ignoreUpdateProgressbar = true;
                         startOsdTimeout();
                         mHandler.removeMessages (MSG_SEEK_BY_BAR);
+                        progressBarSeekFlag = true;
                         sendSeekByProgressBarMsg();
                     }
                 }
@@ -959,16 +929,10 @@ public class VideoPlayer extends Activity {
                     subtitleSelect();
                 }
             });
-            /*audioTunningBtn.setOnClickListener (new View.OnClickListener() {
+            audioTunningBtn.setOnClickListener (new View.OnClickListener() {
                 public void onClick (View v) {
                     LOGI (TAG, "audioTunningBtn onClick");
                     audioTunningSelect();
-                }
-            });*/
-            ttPageBtn.setOnClickListener (new View.OnClickListener() {
-                public void onClick (View v) {
-                    LOGI (TAG, "ttPageBtn onClick");
-                    ttPageSelect();
                 }
             });
             chapterBtn.setOnClickListener (new View.OnClickListener() {
@@ -1118,7 +1082,6 @@ public class VideoPlayer extends Activity {
                     }
                     else {
                         // unsupported mUri, exit directly
-                        Log.d("Error", "Error! unsuppored mUri="+mUri);
                         android.os.Process.killProcess (android.os.Process.myPid());
                         return -1;
                     }
@@ -1215,14 +1178,14 @@ public class VideoPlayer extends Activity {
                 LOGI (TAG, "[surfaceCreated]");
                 mSurfaceHolder = holder;
                 surfaceDestroyedFlag = false;
-
                 //avoid onresume, mSubtitleManager null,171388
                 if (mSubtitleManager == null)
                     mSubtitleManager = new SubtitleManager (VideoPlayer.this);
 
-                 if (isGraphicBlendEnable()) {
+                if (isGraphicBlendEnable()) {
                     showChoosePicDialogue();
                 }
+                //showChoosePicDialogue();
 
                 initPlayer();
                 LOGI (TAG, "[surfaceCreated]mResumePlay:" + mResumePlay + ",surfaceDestroyedFlag:" + surfaceDestroyedFlag);
@@ -1315,6 +1278,7 @@ public class VideoPlayer extends Activity {
                 //builder.setCancelable(false);
                 //builder.create().show();
            }
+
 
         public void onConfigurationChanged (Configuration config) {
             super.onConfigurationChanged (config);
@@ -1472,10 +1436,6 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget (R.string.setting_resume);
-            audioDtsDrc.setVisibility (View.GONE);
-            audioOffset.setVisibility (View.GONE);
-            listView.setVisibility (View.VISIBLE);
-            listView.requestFocus();
         }
 
         private void repeatSelect() {
@@ -1494,10 +1454,6 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget (R.string.setting_playmode);
-            audioDtsDrc.setVisibility (View.GONE);
-            audioOffset.setVisibility (View.GONE);
-            listView.setVisibility (View.VISIBLE);
-            listView.requestFocus();
         }
 
         private void audioOption() {
@@ -1505,10 +1461,7 @@ public class VideoPlayer extends Activity {
             if (mMediaInfo != null) {
                 LOGI (TAG, "[audioOption] mMediaInfo.getAudioTotalNum():" + mMediaInfo.getAudioTotalNum());
                 if (/*(audio_flag == Errorno.PLAYER_NO_AUDIO) || */ (mMediaInfo.getAudioTotalNum() <= 0)) {
-                    Toast toast = Toast.makeText (VideoPlayer.this, R.string.file_have_no_audio, Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(R.string.file_have_no_audio, 0, 0);
                     startOsdTimeout();
                     return;
                 }
@@ -1532,19 +1485,9 @@ public class VideoPlayer extends Activity {
                     else if (position == 2) {
                         videotrackSelect();
                     }
-                    else if (position == 3) {
-                        dtsDrcSelect();
-                    }
-                    else if (position == 4) {
-                        audioOffsetSelect();
-                    }
                 }
             });
             showOtherWidget (R.string.setting_audiooption);
-            audioDtsDrc.setVisibility (View.GONE);
-            audioOffset.setVisibility (View.GONE);
-            listView.setVisibility (View.VISIBLE);
-            listView.requestFocus();
         }
 
         private void audiotrackSelect() {
@@ -1607,28 +1550,6 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget(R.string.setting_videotrack);
-        }
-
-        private void dtsDrcSelect() {
-           LOGI(TAG,"[dtsDrcSelect]");
-           ListView listView = (ListView)findViewById(R.id.ListView);
-           if (listView.getVisibility() == View.VISIBLE) {
-              listView.setVisibility (View.GONE);
-           }
-           audioDtsDrc.setVisibility (View.VISIBLE);
-           dtsDrcImpl();
-           showOtherWidget(R.string.setting_dtsdrc);
-        }
-
-        private void audioOffsetSelect() {
-           LOGI(TAG,"[audioOffsetSelect]");
-           ListView listView = (ListView)findViewById(R.id.ListView);
-           if (listView.getVisibility() == View.VISIBLE) {
-              listView.setVisibility (View.GONE);
-           }
-           audioOffset.setVisibility (View.VISIBLE);
-           audioOffsetImpl();
-           showOtherWidget(R.string.setting_audio_offset);
         }
 
         private void audioDtsApresentSelect() {
@@ -1698,10 +1619,6 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget (R.string.setting_3d_mode);
-            audioDtsDrc.setVisibility (View.GONE);
-            audioOffset.setVisibility (View.GONE);
-            listView.setVisibility (View.VISIBLE);
-            listView.requestFocus();
         }
 
         private void moreSet() {
@@ -1723,10 +1640,6 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget(R.string.setting_moreset);
-            audioDtsDrc.setVisibility (View.GONE);
-            audioOffset.setVisibility (View.GONE);
-            listView.setVisibility (View.VISIBLE);
-            listView.requestFocus();
         }
 
         private void codecSet() {
@@ -1787,19 +1700,10 @@ public class VideoPlayer extends Activity {
         }
 
         private void subtitleSelect() {
-            /*Toast toast =Toast.makeText(VideoPlayer.this, "this function is not opened right now",Toast.LENGTH_SHORT );
-            toast.setGravity(Gravity.BOTTOM,110,0);
-            toast.setDuration(0x00000001);
-            toast.show();
-            startOsdTimeout();
-            return;*/
             subtitle_prepare();
             LOGI (TAG, "[subtitleSelect] sub_para.totalnum:" + sub_para.totalnum);
             if (sub_para.totalnum <= 0) {
-                Toast toast = Toast.makeText (VideoPlayer.this, R.string.sub_no_subtitle, Toast.LENGTH_SHORT);
-                toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                toast.setDuration (0x00000001);
-                toast.show();
+                showBottomShortToast(R.string.sub_no_subtitle, 0, 0);
                 startOsdTimeout();
                 return;
             }
@@ -1807,21 +1711,12 @@ public class VideoPlayer extends Activity {
             subtitle_control();
         }
 
-         /*private void audioTunningSelect(){
+        private void audioTunningSelect(){
             LOGI (TAG, "[audioTunningSelect]");
             //ListView listView = (ListView) findViewById (R.id.ListView);
             //showSubWidget (R.string.setting_audioTunning);
             showAudioTuningWidget (R.string.setting_audioTuning);
             audioTunning_control();
-        }*/
-
-         private void ttPageSelect(){
-            LOGI (TAG, "[audioTunningSelect]");
-            //ListView listView = (ListView) findViewById (R.id.ListView);
-            //showSubWidget (R.string.setting_audioTunning);
-            //showNoOsdView();
-            showTTPageWidget (R.string.setting_ttPage);
-            ttPage_control();
         }
 
         private void setListViewHeight(int height) {
@@ -1856,10 +1751,7 @@ public class VideoPlayer extends Activity {
             if (mMediaInfo != null) {
                 int videoNum = mMediaInfo.getVideoTotalNum();
                 if (videoNum <= 0) {
-                    Toast toast = Toast.makeText (VideoPlayer.this, R.string.file_have_no_video, Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(R.string.file_have_no_video, 0, 0);
                     startOsdTimeout();
                     return;
                 }
@@ -1892,10 +1784,6 @@ public class VideoPlayer extends Activity {
                 }
             });
             showOtherWidget (R.string.setting_displaymode);
-            audioDtsDrc.setVisibility (View.GONE);
-            audioOffset.setVisibility (View.GONE);
-            listView.setVisibility (View.VISIBLE);
-            listView.requestFocus();
         }
 
         /*private void brightnessSelect() {
@@ -2257,86 +2145,6 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        private void dtsDrcImpl(){
-            dtsdrc = (TextView) findViewById(R.id.dts_drc);
-            seekbardts = (SeekBar) findViewById(R.id.seekbar_dts_drc);
-            String dtsdrcResult = mSystemControl.getPropertyString("persist.vendor.sys.dtsdrcscale", "0");
-            int dtsDrcValue = Integer.valueOf(dtsdrcResult);
-            seekbardts.setProgress(dtsDrcValue);
-            dtsdrc.setText(" " + dtsDrcValue + " / 100 ");
-            seekbardts.requestFocus();
-            seekbardts.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    curProgressValue = seekbardts.getProgress();
-                    final String selection = String.valueOf(curProgressValue);
-                    mOutputModeManager.setDtsDrcScale(selection);
-                    dtsdrc.setText(" " + curProgressValue + " / 100 ");
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-
-            });
-
-        }
-
-        private void audioOffsetImpl() {
-             seekbarAudioOffset = (SeekBar) findViewById(R.id.seekbar_audio_offset);
-             audioOffsetText = (TextView) findViewById(R.id.text_audio_offset);
-             int delay = (mSystemControl.getPropertyInt("persist.vendor.sys.media.amnuplayer.audio.delayus", 0)) / 1000;
-             int latency = convertAudioLatencyToProgress(delay);
-             seekbarAudioOffset.setProgress(latency);
-             audioOffsetText.setText(" " + delay + "ms");
-             seekbarAudioOffset.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-                 @Override
-                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                      curAudioOffsetProgressValue = seekbarAudioOffset.getProgress();
-                      int latency = convertProgressToAudioLatency(curAudioOffsetProgressValue);
-                      audioOffsetText.setText(" " + latency + "ms");
-                      mSystemControl.setProperty("persist.vendor.sys.media.amnuplayer.audio.delayus", "" + latency * 1000);
-                      mSystemControl.setProperty("vendor.media.amnuplayer.audio.delayus", "" + latency * 1000);
-                 }
-                 @Override
-                 public void onStartTrackingTouch(SeekBar seekBar) {
-
-                 }
-
-                 @Override
-                 public void onStopTrackingTouch(SeekBar seekBar) {
-
-                 }
-
-            });
-
-        }
-
-        //convert -200~200 to 0~40
-        private int convertAudioLatencyToProgress(int latency) {
-            int result = 20;
-            if (latency >= -200 && latency <= 200) {
-                result = (latency + 200) / 10;
-            }
-            return result;
-        }
-
-        //convert 0~40 to -200~200
-        private int convertProgressToAudioLatency(int progress) {
-            int result = 0;
-            if (progress >= 0 && progress <= 40) {
-                result = -200 + progress * 10;
-            }
-            return result;
-        }
-
         private void soundTrackImpl (int idx) {
             if (mMediaPlayer != null && mMediaInfo != null) {
                 LOGI (TAG, "[soundTrackImpl]idx:" + idx);
@@ -2386,11 +2194,11 @@ public class VideoPlayer extends Activity {
         private int getDtsApresentTotalNum() {
             int num = 0;
             Parcel p = Parcel.obtain();
-            /*if (mMediaPlayer != null ) {
+            if (mMediaPlayer != null ) {
                 p = mMediaPlayer.getParcelParameter(mMediaPlayer.KEY_PARAMETER_AML_PLAYER_GET_DTS_ASSET_TOTAL);
                 num = p.readInt();
                 p.readIntArray(assetsArrayNum);
-            }*/
+            }
             p.recycle();
 
             LOGI(TAG,"[getDtsApresentTotalNum] num:"+num);
@@ -2447,10 +2255,7 @@ public class VideoPlayer extends Activity {
                         mOption.set3DMode (0);
                     }
                     set_3d_flag = false;
-                    Toast toast = Toast.makeText (VideoPlayer.this, getResources().getString (R.string.not_support_3d), Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(R.string.not_support_3d, 0, 0);
                     startOsdTimeout();
                 }
             }
@@ -2642,6 +2447,7 @@ public class VideoPlayer extends Activity {
                 return;
             }
             LOGI(TAG, "[playFile]resume mode:" + mOption.getResumeMode() + ",path:" + path);
+
             resetVariate();
             if (mResumePlay.getEnable() == true) {
                 setVideoPath (path);
@@ -2762,6 +2568,7 @@ public class VideoPlayer extends Activity {
                 while (!FileListManager.isVideo(mPath)) {
                     mPath = mPlayList.movenext();
                 }
+                LOGI (TAG, "[playNext]mPath:" + mPath);
                 //sendPlayFileMsg();
                 playFile(mPath);
             }
@@ -2808,13 +2615,9 @@ public class VideoPlayer extends Activity {
                         start();
                     }
                     else {
-                        if (toast != null) {
-                            Log.d (TAG, "Toast cancel");
-                            toast.cancel();
-                        }
-                        Log.d (TAG, "Toast start" + FF_SPEED[FF_LEVEL]);
-                        toast = Toast.makeText (this, "FF x" + Integer.toString (FF_SPEED[FF_LEVEL]), Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText (VideoPlayer.this, "FF x" + Integer.toString (FF_SPEED[FF_LEVEL]), Toast.LENGTH_SHORT);
                         toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
+                        toast.setDuration (0x00000001);
                         toast.show();
                     }
                 }
@@ -2832,7 +2635,7 @@ public class VideoPlayer extends Activity {
                         start();
                     }
                     else {
-                        toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])), Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])), Toast.LENGTH_SHORT);
                         toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
                         toast.setDuration (0x00000001);
                         toast.show();
@@ -2843,7 +2646,7 @@ public class VideoPlayer extends Activity {
                 FFimpl (FF_STEP[1]);
                 FF_FLAG = true;
                 FF_LEVEL = 1;
-                toast = Toast.makeText (VideoPlayer.this, new String ("FF x" + FF_SPEED[FF_LEVEL]), Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText (VideoPlayer.this, new String ("FF x" + FF_SPEED[FF_LEVEL]), Toast.LENGTH_SHORT);
                 toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
                 toast.setDuration (0x00000001);
                 toast.show();
@@ -2868,11 +2671,7 @@ public class VideoPlayer extends Activity {
                         start();
                     }
                     else {
-                        if (toast != null) {
-                            Log.d (TAG, "Toast cancel");
-                            toast.cancel();
-                        }
-                        toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])), Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + Integer.toString (FB_SPEED[FB_LEVEL])), Toast.LENGTH_SHORT);
                         toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
                         toast.setDuration (0x00000001);
                         toast.show();
@@ -2892,7 +2691,7 @@ public class VideoPlayer extends Activity {
                         start();
                     }
                     else {
-                        toast = Toast.makeText (VideoPlayer.this, new String ("FF x" + Integer.toString (FF_SPEED[FF_LEVEL])), Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText (VideoPlayer.this, new String ("FF x" + Integer.toString (FF_SPEED[FF_LEVEL])), Toast.LENGTH_SHORT);
                         toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
                         toast.setDuration (0x00000001);
                         toast.show();
@@ -2903,7 +2702,7 @@ public class VideoPlayer extends Activity {
                 FBimpl (FB_STEP[1]);
                 FB_FLAG = true;
                 FB_LEVEL = 1;
-                toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + FB_SPEED[FB_LEVEL]), Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText (VideoPlayer.this, new String ("FB x" + FB_SPEED[FB_LEVEL]), Toast.LENGTH_SHORT);
                 toast.setGravity (Gravity.TOP | Gravity.RIGHT, 10, 10);
                 toast.setDuration (0x00000001);
                 toast.show();
@@ -2931,7 +2730,7 @@ public class VideoPlayer extends Activity {
             if (mMediaPlayer != null) {
                 LOGI (TAG, "[FFimpl]para:" + para);
                 if (mState == STATE_PLAY_COMPLETED) {
-                    return;
+                   return;
                 }
                 if (para > 0) {
                     mState = STATE_SEARCHING;
@@ -3086,9 +2885,7 @@ public class VideoPlayer extends Activity {
                                                      AudioManager.AUDIOFOCUS_GAIN);
                 }
                 mMediaPlayer.start();
-                mSubtitleManager.enableDisplay();
                 mSubtitleManager.start();
-                mSubtitleManager.startSubtitle();// Subtitle API need revise!!!
                 Locale loc = Locale.getDefault();
                 if (loc != null && mIsBluray) {
                     if (mSubIndex == 0) {
@@ -3114,7 +2911,6 @@ public class VideoPlayer extends Activity {
             LOGI (TAG, "[pause]mMediaPlayer:" + mMediaPlayer);
             if (mMediaPlayer != null) {
                 if (/*isPlaying()*/mState == STATE_PLAYING) {
-                    mSubtitleManager.disableDisplay();
                     mMediaPlayer.pause();
                     mState = STATE_PAUSED;
                     updateIconResource();
@@ -3130,7 +2926,6 @@ public class VideoPlayer extends Activity {
 
                 mMediaPlayer.stop();
                 mMediaPlayer.reset();
-                mSubtitleManager.stopSubtitle();// Subtitle API need revise!!!
                 mSubtitleManager.close();
                 mState = STATE_STOP;
             }
@@ -3203,7 +2998,6 @@ public class VideoPlayer extends Activity {
                 if (mHandler != null) {
                     mHandler.removeMessages (MSG_UPDATE_PROGRESS);
                 }
-                mState = STATE_SEARCHING;
                 if (mState == STATE_SEARCHING) {
                     mStateBac = STATE_PLAYING;
                 }
@@ -3216,8 +3010,7 @@ public class VideoPlayer extends Activity {
                     return;
                 }
                 stopFWFB();
-                mSubtitleManager.hide();
-                mMediaPlayer.seekTo (msec,MediaPlayer.SEEK_CLOSEST);
+                mMediaPlayer.seekTo (msec);
                 //mState = STATE_SEARCHING;
                 //updateIconResource();
             }
@@ -3583,13 +3376,10 @@ public class VideoPlayer extends Activity {
                 if (mTrackInfo != null) {
                     mSubtitleManager.resetTrackIdx();
                     for (int j = 0; j < mTrackInfo.length; j++) {
-                        if (mTrackInfo[j] != null) {
-                            int trackType = mTrackInfo[j].getTrackType();
-                            if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_SUBTITLE || trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
-                                mSubtitleManager.storeTrackIdx(j);
-                            }
+                        int trackType = mTrackInfo[j].getTrackType();
+                        if (trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_SUBTITLE || trackType == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
+                            mSubtitleManager.storeTrackIdx(j);
                         }
-
                     }
                 }
 
@@ -3625,15 +3415,20 @@ public class VideoPlayer extends Activity {
                         LOGI(TAG,"[mPreparedListener]trackInfo["+i+"].trackType:"+trackType);
                     }
                 }*/
-                if ((mOption.getResumeMode() == true) && (bmPos >0)) {
-                    seekTo (bmPos);
-                }else{
-                    if (mStateBac != STATE_PAUSED) {
-                        start();
-                    }
+
+                if (mStateBac != STATE_PAUSED) {
+                    start();
                 }
                 initSubtitle();
                 initMediaInfo(trackInfo);
+
+                /* getHDRType                                      */
+                /* return: int : 0 : not HDR                       */
+                /*               1 : HLG                           */
+                /*               2 : HDR                           */
+                int type = mMediaPlayer.getHDRType(mMediaPlayer);
+                Log.d(TAG,"[mPreparedListener]HDR type:"+type);
+
                 displayModeImpl(); // init display mode //useless because it will reset when start playing, it should set after the moment playing
                 //showCertification(); // show certification
                 //startCertificationTimeout();
@@ -3649,6 +3444,11 @@ public class VideoPlayer extends Activity {
                         pause();
                     }
                     return;
+                }
+                if (mOption.getResumeMode() == true) {
+                    if (bmPos > 0) {
+                        seekTo (bmPos);
+                    }
                 }
                 sendShowCertificationMsg();
             }
@@ -3681,10 +3481,7 @@ public class VideoPlayer extends Activity {
                 mSubIndex = 0;
                 if (mOption.getRepeatMode() == mOption.REPEATONE) {
                     if (getCurrentPosition() == 0) {   //add prompt divx not support
-                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_exit, Toast.LENGTH_SHORT);
-                        toast.setGravity (Gravity.BOTTOM,0, 0);
-                        toast.setDuration (0x00000001);
-                        toast.show();
+                        showBottomShortToast(R.string.not_support_video_exit, 0, 0);
                         browserBack();
                         return;
                     }
@@ -3692,10 +3489,7 @@ public class VideoPlayer extends Activity {
                 }
                 else if (mOption.getRepeatMode() == mOption.REPEATLIST) {
                     if (getCurrentPosition() == 0) {   //add prompt divx not support
-                        Toast toast = Toast.makeText (VideoPlayer.this, R.string.not_support_video_next, Toast.LENGTH_SHORT);
-                        toast.setGravity (Gravity.BOTTOM,0, 0);
-                        toast.setDuration (0x00000001);
-                        toast.show();
+                        showBottomShortToast(R.string.not_support_video_next, 0, 0);
                     }
                     playNext();
                 }
@@ -3769,11 +3563,10 @@ public class VideoPlayer extends Activity {
                 if (offset > 300) {
                     mState = STATE_ERROR;
                     mErrorTimeBac = mErrorTime;
+
                     String infoStr = mErrorInfo.getErrorInfo (what, extra, mPlayList.getcur());
-                    Toast toast = Toast.makeText (VideoPlayer.this, "Status Error:" + infoStr, Toast.LENGTH_SHORT);
-                    toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                    toast.setDuration (0x00000001);
-                    toast.show();
+                    showBottomShortToast(infoStr, 0, 0);
+
                     if (mOption.getRepeatMode() == mOption.REPEATLIST) {
                         sendContinueSwitchDelayMsg();
                     }
@@ -3800,10 +3593,7 @@ public class VideoPlayer extends Activity {
                     if (needShow == true) {
                         String infoStr = MediaInfo.getInfo (arg1, VideoPlayer.this);
                         LOGI (TAG, "[onInfo] infoStr: " + infoStr);
-                        Toast toast = Toast.makeText (VideoPlayer.this, /*"Media Info:"+*/infoStr, Toast.LENGTH_SHORT);
-                        toast.setGravity (Gravity.BOTTOM,/*110*/0, 0);
-                        toast.setDuration (0x00000001);
-                        toast.show();
+                        showBottomShortToast(infoStr, 0, 0);
                     }
                     if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_ASSET) {
                         mDtsType = DTS_NOR;
@@ -3823,10 +3613,7 @@ public class VideoPlayer extends Activity {
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_AUDIO_LIMITED) {
                         String ainfoStr = getResources().getString(R.string.audio_dec_enable);
-                        Toast toast =Toast.makeText(VideoPlayer.this, ainfoStr, Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.BOTTOM,/*110*/0,0);
-                        toast.setDuration(0x00000001);
-                        toast.show();
+                        showBottomShortToast(ainfoStr, 0, 0);
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_MULASSETHINT) {
                         /*Toast toast =Toast.makeText(VideoPlayer.this, "MulAssetAudio",Toast.LENGTH_SHORT);
@@ -3836,10 +3623,7 @@ public class VideoPlayer extends Activity {
                     }
                     else if (arg1 == mMediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DTS_HPS_NOTSUPPORT) {
                         String dtshpsUnsupportStr = getResources().getString(R.string.dts_hps_unsupport);
-                        Toast toast =Toast.makeText(VideoPlayer.this, dtshpsUnsupportStr, Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.BOTTOM,/*110*/0,110);
-                        toast.setDuration(0x00000001);
-                        toast.show();
+                        showBottomShortToast(dtshpsUnsupportStr, 0, 110);
                     }
                     else if (arg1 == MediaInfo.MEDIA_INFO_AMLOGIC_SHOW_DOLBY_VISION) {
                         mIsDolbyVision = true;
@@ -4116,8 +3900,6 @@ public class VideoPlayer extends Activity {
         private final int MORE_SET = 12;
         private final int CODEC_SET = 13;
         private final int VR_SET = 14;
-        private final int DTS_DRC = 15;
-        private final int AUDIO_OFFSET = 16;
         private int otherwidgetStatus = 0;
 
         protected void startOsdTimeout() {
@@ -4194,29 +3976,18 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        /*private void showAudioTuningWidget (int StrId) {
-             if ( (null != audioTuningwidget) && (View.GONE == audioTuningwidget.getVisibility())) {
-                 audioTuningwidget.setVisibility (View.VISIBLE);
-                 if ( (null != optbar) && (View.VISIBLE == optbar.getVisibility())) {
-                      optbar.setVisibility (View.GONE);
-                 }
-                 audioTuningwidget.requestFocus();
-                 otherwidgetStatus = StrId;
-                 stopOsdTimeout();
-             }
-        }*/
-
-        private void showTTPageWidget (int StrId) {
-             if ( (null != ttPagewidget) && (View.GONE == ttPagewidget.getVisibility())) {
-                 ttPagewidget.setVisibility (View.VISIBLE);
-                 if ( (null != optbar) && (View.VISIBLE == optbar.getVisibility())) {
-                      optbar.setVisibility (View.GONE);
-                 }
-                 ttPagewidget.requestFocus();
-                 otherwidgetStatus = StrId;
-                 stopOsdTimeout();
-             }
+        private void showAudioTuningWidget (int StrId) {
+            if ( (null != audioTuningwidget) && (View.GONE == audioTuningwidget.getVisibility())) {
+                audioTuningwidget.setVisibility (View.VISIBLE);
+                if ( (null != optbar) && (View.VISIBLE == optbar.getVisibility())) {
+                    optbar.setVisibility (View.GONE);
+                }
+                audioTuningwidget.requestFocus();
+                otherwidgetStatus = StrId;
+                stopOsdTimeout();
+            }
         }
+
 
         private void showInfoWidget (int StrId) {
             TextView title;
@@ -4260,7 +4031,7 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        /*private void exitAudioWidget (ImageButton btn) {
+        private void exitAudioWidget (ImageButton btn) {
             if ( (null != audioTuningwidget) && (View.VISIBLE == audioTuningwidget.getVisibility())) {
                 audioTuningwidget.setVisibility (View.GONE);
                 if ( (null != optbar) && (View.GONE == optbar.getVisibility())) {
@@ -4270,20 +4041,7 @@ public class VideoPlayer extends Activity {
                 btn.requestFocusFromTouch();
                 startOsdTimeout();
             }
-        }*/
-
-        private void exitTTPageWidget (ImageButton btn) {
-            if ( (null != ttPagewidget) && (View.VISIBLE == ttPagewidget.getVisibility())) {
-                ttPagewidget.setVisibility (View.GONE);
-                if ( (null != optbar) && (View.GONE == optbar.getVisibility())) {
-                    optbar.setVisibility (View.VISIBLE);
-                }
-                btn.requestFocus();
-                btn.requestFocusFromTouch();
-                startOsdTimeout();
-            }
         }
-
 
         private void exitInfoWidget (ImageButton btn) {
             if ( (null != infowidget) && (View.VISIBLE == infowidget.getVisibility())) {
@@ -4740,8 +4498,6 @@ public class VideoPlayer extends Activity {
                             case R.string.setting_audiotrack:
                             case R.string.setting_soundtrack:
                             case R.string.setting_videotrack:
-                            case R.string.setting_dtsdrc:
-                            case R.string.setting_audio_offset:
                                 audioOption();
                                 break;
                             case R.string.setting_audiodtsapresent:
@@ -4803,6 +4559,7 @@ public class VideoPlayer extends Activity {
                         }
                     }
                 }
+                //browserBack();
             }
             else if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_9) {
                 if ( (ctlbar.getVisibility() == View.VISIBLE) || (optbar.getVisibility() == View.VISIBLE)) {
@@ -5017,13 +4774,21 @@ public class VideoPlayer extends Activity {
         }
 
         private void subtitleHide() {
-            mSubtitleManager.disableDisplay();
-            mSubtitleManager.hide();
+            if ((null != subtitleIV) && (View.VISIBLE == subtitleIV.getVisibility())) {
+                subtitleIV.setVisibility(View.GONE);
+            }
+            if ((null != subtitleTV) && (View.VISIBLE == subtitleTV.getVisibility())) {
+                subtitleTV.setVisibility(View.GONE);
+            }
         }
 
         private void subtitleShow() {
-            mSubtitleManager.enableDisplay();
-            mSubtitleManager.display();
+            if ((null != subtitleIV) && (View.GONE == subtitleIV.getVisibility())) {
+                subtitleIV.setVisibility(View.VISIBLE);
+            }
+            if ((null != subtitleTV) && (View.GONE == subtitleTV.getVisibility())) {
+                subtitleTV.setVisibility(View.VISIBLE);
+            }
         }
 
         private void subtitleSetFont(int size) {
@@ -5195,10 +4960,10 @@ public class VideoPlayer extends Activity {
         }
 
         private void initSubtitle() {
-            LOGI (TAG, "@@[initSubtitle]");
+            LOGI (TAG, "[initSubtitle]");
             SharedPreferences subSp = getSharedPreferences (subSettingStr, 0);
             sub_para = new subview_set();
-            sub_para.totalnum = -1;
+            sub_para.totalnum = 0;
             sub_para.curid = mSubIndex;
             sub_para.curidbac = 0;
             sub_para.color = android.graphics.Color.WHITE;
@@ -5214,8 +4979,6 @@ public class VideoPlayer extends Activity {
         }
 
         private void subtitle_prepare() {
-            if (sub_para.totalnum != -1)
-                return;
             if (!isTimedTextDisable()) {
                 sub_para.totalnum = getSubtitleTotal();
             }
@@ -5277,7 +5040,12 @@ public class VideoPlayer extends Activity {
                     LOGI (TAG, "[subtitle_control]sub_para.curid:" + sub_para.curid + ",sub_para.curidbac:" + sub_para.curidbac);
                     if (mMediaPlayer != null) {
                         if (sub_para.curid == sub_para.totalnum) {
+                            if (!isTimedTextDisable()) {
                                 subtitleHide();
+                            }
+                            else {
+                                mSubtitleManager.hide();
+                            }
                         }
                         else {
                             if (sub_para.curidbac != sub_para.curid) {
@@ -5305,7 +5073,12 @@ public class VideoPlayer extends Activity {
                             sub_para.curidbac = sub_para.curid;
                         }
                         //else {
+                            if (!isTimedTextDisable()) {
                                 subtitleShow();
+                            }
+                            else {
+                                mSubtitleManager.display();
+                            }
                         }
                     }
                     if (sub_color_state == 0) {
@@ -5484,7 +5257,7 @@ public class VideoPlayer extends Activity {
             }
         }
 
-        /*private void audioTunning_control() {
+        private void audioTunning_control() {
             LOGI (TAG, "[audioTunning_control]");
             Button ok = (Button) findViewById (R.id.prop_button_ok);
             Button cancel = (Button) findViewById (R.id.prop_button_canncel);
@@ -5494,7 +5267,7 @@ public class VideoPlayer extends Activity {
 
             ok.setOnClickListener (new View.OnClickListener() {
                 public void onClick (View v) {
-                    mSystemControl.setProperty("vendor.media.amnuplayer.audio.delayus", "" + curAudioTuningValue * 1000);
+                    mSystemControl.setProperty("media.amnuplayer.audio.delayus", "" + curAudioTuningValue * 1000);
                     exitAudioWidget (audioTunningBtn);
                 }
             });
@@ -5529,75 +5302,7 @@ public class VideoPlayer extends Activity {
                 }
            });
 
-        }*/
-
-        private int DEFAULT_TELETEXT_PAGE_NO = 888;
-        int pageNo = DEFAULT_TELETEXT_PAGE_NO;
-        private void ttPage_control() {
-            LOGI (TAG, "[ttPage_control]");
-            Button ok = (Button) findViewById (R.id.tt_button_ok);
-            Button cancel = (Button) findViewById (R.id.tt_button_canncel);
-            Button gohome = (Button) findViewById (R.id.go_home);
-            ImageButton tt_last_page = (ImageButton) findViewById (R.id.tt_last_page);
-            ImageButton tt_next_page = (ImageButton) findViewById (R.id.tt_next_page);
-            EditText edit = (EditText) findViewById (R.id.tt_page_no);
-            edit.requestFocus();
-            disableTTPageOptions();
-            ok.setOnClickListener (new View.OnClickListener() {
-                public void onClick (View v) {
-                    pageNo = Integer.parseInt(edit.getText().toString());
-                    LOGI (TAG, "[ttPage_control]pageNo:" + pageNo);
-                    mSubtitleManager.ttGotoPage(pageNo, 0);
-                }
-            });
-            cancel.setOnClickListener (new View.OnClickListener() {
-                public void onClick (View v) {
-                    //LOGI (TAG, "[exitAudioWidget (ttPageBtn)]");
-                    exitTTPageWidget (ttPageBtn);
-                }
-            });
-            gohome.setOnClickListener (new View.OnClickListener() {
-                public void onClick (View v) {
-                    //mSystemControl.setProperty("vendor.media.amnuplayer.audio.delayus", "" + curAudioTuningValue * 1000);
-                    //exitAudioWidget (audioTunningBtn);
-                    edit.setText("100");
-                    mSubtitleManager.ttGoHome();
-                    edit.setText("100");
-                    //exitTTPageWidget (ttPageBtn);
-                }
-            });
-            tt_last_page.setOnClickListener (new View.OnClickListener() {
-                public void onClick (View v) {
-                    //pageNo = Integer.parseInt(edit.getText().toString());
-                    if (pageNo <= 100) {
-                        edit.setText("899");
-                    } else {
-                        pageNo--;
-                        edit.setText("" + pageNo);
-                    }
-                    mSubtitleManager.ttNextPage(-1);
-                    //exitTTPageWidget (ttPageBtn);
-                }
-            });
-           tt_next_page.setOnClickListener (new View.OnClickListener() {
-                public void onClick (View v){
-                    //pageNo = Integer.parseInt(edit.getText().toString());
-                    LOGI(TAG, "nextPage pageNo:" + pageNo);
-                    if (pageNo >= 899) {
-                        edit.setText("100");
-                        pageNo = 100;
-                    } else {
-                        pageNo++;
-                        edit.setText("" + pageNo);
-                    }
-                    LOGI(TAG, "##nextPage dir:");
-                    mSubtitleManager.ttNextPage(1);
-                    //exitTTPageWidget (ttPageBtn);
-                }
-           });
-
         }
-
 
         private void initSubSetOptions (String color_text[]) {
             t_subswitch = (TextView) findViewById (R.id.sub_swith111);
@@ -5654,21 +5359,6 @@ public class VideoPlayer extends Activity {
             t_subsfont.setTextColor (android.graphics.Color.BLACK);
             t_subscolor.setTextColor (android.graphics.Color.BLACK);
             t_subsposition_v.setTextColor (android.graphics.Color.BLACK);
-            if (mSubtitleManager.getDisplayType() == SubtitleManager.SUBTITLE_TXT) {
-                Bfont_l.setFocusable (true);
-                Bfont_r.setFocusable (true);
-                Bcolor_l.setFocusable (true);
-                Bcolor_r.setFocusable (true);
-                Bposition_v_l.setFocusable (true);
-                Bposition_v_r.setFocusable (true);
-            } else {
-                Bfont_l.setFocusable (false);
-                Bfont_r.setFocusable (false);
-                Bcolor_l.setFocusable (false);
-                Bcolor_r.setFocusable (false);
-                Bposition_v_l.setFocusable (false);
-                Bposition_v_r.setFocusable (false);
-            }
             Bfont_l.setEnabled (true);
             Bfont_r.setEnabled (true);
             Bcolor_l.setEnabled (true);
@@ -5773,18 +5463,6 @@ public class VideoPlayer extends Activity {
             cancel.setNextFocusRightId (R.id.button_canncel);
         }
 
-        private void disableTTPageOptions() {
-            ImageButton Bsub_page_l = (ImageButton) findViewById (R.id.tt_last_sub_page);
-            ImageButton Bsub_page_r = (ImageButton) findViewById (R.id.tt_next_sub_page);
-            EditText sub_page_edit = (EditText) findViewById (R.id.tt_sub_page_no);
-            Bsub_page_l.setEnabled (false);
-            Bsub_page_r.setEnabled (false);
-            sub_page_edit.setEnabled(false);
-            Bsub_page_l.setImageResource (R.drawable.fondsetup_larrow_disable);
-            Bsub_page_r.setImageResource (R.drawable.fondsetup_rarrow_disable);
-            sub_page_edit.setTextColor (android.graphics.Color.LTGRAY);
-        }
-
         //@@--------this part for other widget list view--------------------------------------------------------------------------------
         private String[] m_brightness = {"1", "2", "3", "4", "5", "6"}; // for brightness
         private int[] string_3d_id = {
@@ -5865,14 +5543,6 @@ public class VideoPlayer extends Activity {
                     list.add (map);
                     map = new HashMap<String, Object>();
                     map.put("item_name", getResources().getString(R.string.setting_videotrack));
-                    map.put("item_sel", R.drawable.item_img_unsel);
-                    list.add(map);
-                    map = new HashMap<String, Object>();
-                    map.put("item_name", getResources().getString(R.string.setting_dtsdrc));
-                    map.put("item_sel", R.drawable.item_img_unsel);
-                    list.add(map);
-                    map = new HashMap<String, Object>();
-                    map.put("item_name", getResources().getString(R.string.setting_audio_offset));
                     map.put("item_sel", R.drawable.item_img_unsel);
                     list.add(map);
                     break;
@@ -5963,17 +5633,6 @@ public class VideoPlayer extends Activity {
                         list.get(pos).put("item_sel", R.drawable.item_img_sel);
                     }
                 break;
-
-                case DTS_DRC:
-                    map = new HashMap<String, Object>();
-                    map.put ("item_name", getResources().getString (R.string.setting_dtsdrc));
-                    map.put ("item_sel", R.drawable.item_img_unsel);
-                    list.add (map);
-                case AUDIO_OFFSET:
-                    map = new HashMap<String, Object>();
-                    map.put ("item_name", getResources().getString (R.string.setting_audio_offset));
-                    map.put ("item_sel", R.drawable.item_img_unsel);
-                    list.add (map);
                 case AUDIO_DTS_APRESENT:
                     int dts_apresent_total_num = getDtsApresentTotalNum(); //dts test
                     for (int i = 0; i < dts_apresent_total_num; i++) {
@@ -6114,6 +5773,27 @@ public class VideoPlayer extends Activity {
             return list;
         }
 
+    private void showBottomShortToast (int resId, int xOffset, int yOffset) {
+        if (!mActivityResumed) {
+            LOGI (TAG, "activity paused, so drop message: " + getResources().getString(resId));
+            return;
+        }
+        Toast toast =Toast.makeText(VideoPlayer.this, resId, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, xOffset, yOffset);
+        toast.setDuration(0x00000001);
+        toast.show();
+    }
+
+    private void showBottomShortToast (String message, int xOffset, int yOffset) {
+        if (!mActivityResumed) {
+            LOGI (TAG, "activity paused, so drop message: " + message);
+            return;
+        }
+        Toast toast =Toast.makeText(VideoPlayer.this, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, xOffset, yOffset);
+        toast.setDuration(0x00000001);
+        toast.show();
+    }
 }
 
 
@@ -6128,8 +5808,6 @@ class Option {
         private int audiotrack = -1;
         private int soundtrack = -1;
         private int videotrack = -1;
-        private int dtsdrc = -1;
-        private int audiooffset = -1;
         private int audiodtsasset = -1;
         private int audiodtsapresent = -1;
         private int display = 0;
@@ -6149,8 +5827,6 @@ class Option {
         private String AUDIO_TRACK = "AudioTrack";
         private String SOUND_TRACK = "SoundTrack";
         private String VIDEO_TRACK = "VideoTrack";
-        private String DTS_DRC = "DtsDrc";
-        private String AUDIO_OFFSET = "AudioOffset";
         private String AUDIO_DTS_APRESENT = "AudioDtsApresent";
         private String AUDIO_DTS_ASSET = "AudioDtsAsset";
         private String DISPLAY_MODE = "DisplayMode";
@@ -6194,18 +5870,6 @@ class Option {
             if (sp != null)
                 videotrack = sp.getInt(VIDEO_TRACK, 0);
             return videotrack;
-        }
-
-        public int getDtsdrcTrack() {
-            if (sp != null)
-                dtsdrc = sp.getInt(DTS_DRC, 0);
-            return dtsdrc;
-        }
-
-        public int getAudioOffsetTrack(){
-            if (sp != null)
-                audiooffset = sp.getInt(AUDIO_OFFSET, 0);
-            return audiooffset;
         }
 
         public int getAudioDtsApresent() {
@@ -6285,22 +5949,6 @@ class Option {
                 .commit();
             }
         }
-
-       public void setDtsdrcTrack(int para) {
-            if (sp != null) {
-                sp.edit()
-                .putInt(DTS_DRC, para)
-                .commit();
-            }
-        }
-
-       public void setAudioOffsetTrack(int para) {
-            if (sp != null) {
-                sp.edit()
-                .putInt(AUDIO_OFFSET, para)
-                .commit();
-            }
-       }
 
         public void setAudioDtsApresent(int para) {
             if (sp != null) {
