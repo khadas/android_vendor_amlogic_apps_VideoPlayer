@@ -1911,7 +1911,8 @@ public class VideoPlayer extends Activity {
 
             String mode = mSystemControl.readSysFs(DISPLAY_MODE_SYSFS).replaceAll("\n","");
             int[] curPosition = mSystemControl.getPosition(mode);
-			if ((SystemProperties.getInt("persist.sys.builtinrotation", 0)%2) > 0)
+			if (((SystemProperties.getInt("persist.sys.builtinrotation", 0)%2) > 0 && (curPosition[2] > curPosition[3]))
+				|| ((SystemProperties.getInt("persist.sys.builtinrotation", 0)%2) < 1 && (curPosition[2] < curPosition[3])))
 			{
 				dispWidth = curPosition[3];
 				dispHeight = curPosition[2];
